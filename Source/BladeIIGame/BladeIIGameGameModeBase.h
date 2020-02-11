@@ -13,7 +13,8 @@ class BLADEIIGAME_API ABladeIIGameGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
-	QCardFactory* CardFactory;
+	QCardFactory CardFactory;
 
+	// The game lifecycle is initiated from this function
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 };

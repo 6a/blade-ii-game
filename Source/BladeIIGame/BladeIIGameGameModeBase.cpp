@@ -7,7 +7,7 @@ void ABladeIIGameGameModeBase::InitGame(const FString& MapName, const FString& O
 
 	CardFactoryConfig cardFactoryConfig;
 
-	CardFactory = new QCardFactory(cardFactoryConfig);
+	CardFactory = QCardFactory(cardFactoryConfig);
 
 	Utility::LogInfo("GameMode Initialized");
 }
