@@ -13,12 +13,13 @@ public:
 class QCardFactory
 {
 public:
+	QCardFactory() {}
 	QCardFactory(CardFactoryConfig& config);
 	~QCardFactory();
 
 	ACard* Make(ECard card, const FVector& targetPosition);
 
 private:
-	FString CardEnumToString(ECard card);
+	bool bIsInitialised;
 };
 
