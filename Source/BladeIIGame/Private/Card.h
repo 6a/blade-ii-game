@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/StaticMeshComponent.h"
 #include "Card.generated.h"
 
 UENUM(BlueprintType)
@@ -27,8 +28,12 @@ class ACard : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* Mesh;
+
 	ACard();
+
 	virtual void Tick(float DeltaTime) override;
 
 	static FString EnumToString(ECard card);
@@ -37,6 +42,5 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-
 
 };

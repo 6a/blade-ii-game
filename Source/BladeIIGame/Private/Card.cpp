@@ -1,11 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
+#include "UObject/ConstructorHelpers.h"
 #include "Card.h"
 
-// Sets default values
 ACard::ACard()
 {
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Card Mesh"));
+	RootComponent = Mesh;
 }
 
 // Called when the game starts or when spawned
