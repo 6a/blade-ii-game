@@ -17,5 +17,8 @@ public:
 	~QCardFactory();
 
 	ACard* Make(ECard card, const FVector& targetPosition);
+
+private:
+	FString CardEnumToString(ECard card);
 };
 
