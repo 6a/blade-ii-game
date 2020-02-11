@@ -29,11 +29,14 @@ class ACard : public AActor
 	
 public:	
 	ACard();
+	virtual void Tick(float DeltaTime) override;
+
+	static FString EnumToString(ECard card);
 
 protected:
 	virtual void BeginPlay() override;
 
-public:	
-	virtual void Tick(float DeltaTime) override;
+private:
+
 
 };
