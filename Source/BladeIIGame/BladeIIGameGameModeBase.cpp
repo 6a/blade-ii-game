@@ -1,5 +1,13 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
-
-
 #include "BladeIIGameGameModeBase.h"
+#include "Private/Utility.h"
 
+void ABladeIIGameGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	CardFactoryConfig cardFactoryConfig;
+
+	CardFactory = new QCardFactory(cardFactoryConfig);
+
+	Utility::LogInfo("GameMode Initialized");
+}
