@@ -1,21 +1,21 @@
 #include "Utility.h"
 
-const void Utility::LogInfo(const FString& message)
+const void B2Utility::LogInfo(const FString& message)
 {
 #if QDEBUG
-	UE_LOG(LogTemp, Warning, TEXT("[INFO   ][%s] %s"), *Utility::GetTimestamp(), *message);
+	UE_LOG(LogTemp, Warning, TEXT("[INFO   ][%s] %s"), *B2Utility::GetTimestamp(), *message);
 #endif
 }
 
-const void Utility::LogWarning(const FString& message)
+const void B2Utility::LogWarning(const FString& message)
 {
 #if QDEBUG
-	UE_LOG(LogTemp, Warning, TEXT("[WARNING][%s] %s"), *Utility::GetTimestamp(), *message);
+	UE_LOG(LogTemp, Warning, TEXT("[WARNING][%s] %s"), *B2Utility::GetTimestamp(), *message);
 #endif
 }
 
-const FString Utility::GetTimestamp()
+const FString B2Utility::GetTimestamp()
 {
-	auto utcnow = FDateTime::UtcNow();
-	return FString::Printf(TEXT("%02d:%02d:%02d:%03d"), utcnow.GetHour(), utcnow.GetMinute(), utcnow.GetSecond(), utcnow.GetMillisecond());
+	auto Now = FDateTime::UtcNow();
+	return FString::Printf(TEXT("%02d:%02d:%02d:%03d"), Now.GetHour(), Now.GetMinute(), Now.GetSecond(), Now.GetMillisecond());
 }

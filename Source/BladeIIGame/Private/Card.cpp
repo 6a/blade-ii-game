@@ -1,5 +1,5 @@
-#include "UObject/ConstructorHelpers.h"
 #include "Card.h"
+#include "UObject/ConstructorHelpers.h"
 
 ACard::ACard()
 {
@@ -21,9 +21,9 @@ void ACard::Tick(float DeltaTime)
 
 }
 
-FString ACard::EnumToString(ECard card)
+FString ACard::EnumToString(ECard Card)
 {
-	switch (card)
+	switch (Card)
 	{
 	case ECard::ElliotsOrbalStaff:
 		return "01 Elliot's Orbal Staff";
@@ -49,6 +49,6 @@ FString ACard::EnumToString(ECard card)
 		return "11 Sara's Sword and Gun";
 	}
 
-	return "";
+	return "00 Unknown";
 }
 

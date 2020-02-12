@@ -3,23 +3,22 @@
 #include "CoreMinimal.h"
 #include "Card.h"
 
-struct CardFactoryConfig
+struct B2CardFactoryConfig
 {
 public:
-	CardFactoryConfig() {}
-	~CardFactoryConfig() {}
+	B2CardFactoryConfig() {}
+	~B2CardFactoryConfig() {}
 };
 
-class QCardFactory
+class B2CardFactory
 {
 public:
-	QCardFactory() {}
-	QCardFactory(CardFactoryConfig& config);
-	~QCardFactory();
+	B2CardFactory(B2CardFactoryConfig& Config);
+	~B2CardFactory();
 
-	ACard* Make(ECard card, const FVector& targetPosition);
+	ACard* Make(ECard Card, const FVector& TargetPosition);
 
 private:
-	bool bIsInitialised;
+
 };
 

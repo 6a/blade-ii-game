@@ -1,26 +1,21 @@
 #include "CardFactory.h"
 #include "Utility.h"
 
-QCardFactory::QCardFactory(CardFactoryConfig& config)
+B2CardFactory::B2CardFactory(B2CardFactoryConfig& Config)
 {
-	bIsInitialised = true;
-
-	Utility::LogInfo("Card Factory Initialized");
+	B2Utility::LogInfo("Card Factory initialized");
 }
 
-QCardFactory::~QCardFactory()
+B2CardFactory::~B2CardFactory()
 {
 
 }
 
-ACard* QCardFactory::Make(ECard card, const FVector& targetPosition)
+ACard* B2CardFactory::Make(ECard Card, const FVector& TargetPosition)
 {
-	if (ensure(bIsInitialised))
-	{
-		Utility::LogInfo(FString::Format(TEXT("Card Factory created card: [{0}]"), { ACard::EnumToString(card) }));
-	
-		// Card generation logic	
-	}
+	B2Utility::LogInfo(FString::Format(TEXT("Card Factory created card: [{0}]"), { ACard::EnumToString(Card) }));
+
+	// Card generation logic	
 
 	return nullptr;
 }
