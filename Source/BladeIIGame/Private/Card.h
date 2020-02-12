@@ -36,8 +36,11 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	static FString EnumToString(ECard card);
-
+	/**
+	 * Returns the string representation of a card enum.
+	 * @param Card - The card to return as a string.
+	 */
+	static FString EnumToString(ECard Card);
 protected:
 	virtual void BeginPlay() override;
 
