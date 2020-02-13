@@ -1,6 +1,6 @@
 #include "BladeIIGameGameModeBase.h"
 #include "Private/Utility.h"
-#include "Private/MatchInfo.h"
+#include "Private/LaunchConfig.h"
 
 void ABladeIIGameGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
@@ -9,7 +9,7 @@ void ABladeIIGameGameModeBase::InitGame(const FString& MapName, const FString& O
 	B2CardFactoryConfig B2CardFactoryConfig;
 	CardFactory = new B2CardFactory(B2CardFactoryConfig);
 
-	B2MatchInfo GameInfo("GameInfo.txt");
+	B2LaunchConfig LaunchConfig("Launch.conf");
 
 	B2Utility::LogInfo("GameMode initialized");
 }
