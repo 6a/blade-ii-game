@@ -29,19 +29,21 @@ class ACard : public AActor
 	GENERATED_BODY()
 	
 public:
+	/* The mesh for this card actor - exposed to any child blueprints */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* Mesh;
 
 	ACard();
 
-	virtual void Tick(float DeltaTime) override;
-
 	/**
-	 * Returns the string representation of a card enum.
-	 * @param Card - The card to return as a string.
+	 * Helper function that returns the string representation of a card enum.
+	 * @param Card - The card enum to return as a string.
+	 * @return the card enum as a string
 	 */
 	static FString EnumToString(ECard Card);
+
 protected:
+	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 
 private:

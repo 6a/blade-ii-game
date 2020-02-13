@@ -31,8 +31,11 @@ private:
 	 */
 	const FString FromFile(const FString& FilePath) const;
 
+	/**
+	 * Parses a string that represents the contents of a launch config file
+	 * @param LaunchConfigRaw - The file contents as a string.
+	 * @returns An error message, or an empty string if parsing was successful.
+	 */
 	const FString Parse(const FString& LaunchConfigRaw);
-
-	bool ValidateResolution(const FIntPoint& resolution) const;
 };
 

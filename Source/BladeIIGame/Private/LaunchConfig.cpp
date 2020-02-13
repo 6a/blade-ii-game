@@ -24,10 +24,16 @@ const FString PARSE_ERROR_NONE = TEXT("");
 
 B2LaunchConfig::B2LaunchConfig(const FString& GameInfoFileName)
 {
+	// Get the raw content of the launch config file
 	FString LaunchConfigRaw = FromFile(GameInfoFileName);
+
+	// Exit if the contents was not loaded properly
 	ensureMsgf(!LaunchConfigRaw.IsEmpty(), TEXT("Launch config file could not be loaded"));
 
+	// Parse the launch config file
 	FString Error = Parse(LaunchConfigRaw);
+
+	// Exit if the values could not be parsed properly, with the returned error message
 	ensureMsgf(Error.IsEmpty(), TEXT("Launch config file could not be parsed: %s"), *Error);
 
 	B2Utility::LogInfo("Launch config loaded and parsed successfully");
@@ -62,8 +68,6 @@ const FString B2LaunchConfig::FromFile(const FString& FilePath) const
 
 const FString B2LaunchConfig::Parse(const FString& LaunchConfigRaw)
 {
-	B2Utility::LogInfo(LaunchConfigRaw);
-
 	// Parse into a string array
 	TArray<FString> StringValues;
 	LaunchConfigRaw.ParseIntoArray(StringValues, DELIMITER_CONFIG);
@@ -79,7 +83,8 @@ const FString B2LaunchConfig::Parse(const FString& LaunchConfigRaw)
 	AuthToken = StringValues[2];
 	Language = StringValues[4];
 
-	// Set the int values after validating
+	// Set the numerical values after validating
+	// Early exit if the value is not numeric, and return an appropriate error message
 
 	// Match ID
 	if (!StringValues[3].IsNumeric()) return PARSE_ERROR_MATCH_ID_NOT_INT;
@@ -117,16 +122,12 @@ const FString B2LaunchConfig::Parse(const FString& LaunchConfigRaw)
 	if (!StringValues[13].IsNumeric()) return PARSE_ERROR_SFX_VOLUME_NOT_FLOAT;
 	SFXVolume = FCString::Atof(*StringValues[13]);
 
-	// Resolution
-	FString X, Y;
-	if (!StringValues[5].Split(DELIMITER_RESOLUTION, &X, &Y)) return PARSE_ERROR_RESOLUTION_BAD_FORMAT;
-	if (!X.IsNumeric() || !Y.IsNumeric()) return PARSE_ERROR_RESOLUTION_BAD_FORMAT;
-	Resolution = FIntPoint(FCString::Atoi(*X), FCString::Atoi(*Y));
+	// Parse resolution in two steps - first, split the config value at the delimiter, and then validate + parse the individual values
+	FString ResolutionX, ResolutionY;
+	if (!StringValues[5].Split(DELIMITER_RESOLUTION, &ResolutionX, &ResolutionY)) return PARSE_ERROR_RESOLUTION_BAD_FORMAT;
+	if (!ResolutionX.IsNumeric() || !ResolutionY.IsNumeric()) return PARSE_ERROR_RESOLUTION_BAD_FORMAT;
+	Resolution = FIntPoint(FCString::Atoi(*ResolutionX), FCString::Atoi(*ResolutionY));
 
+	// If we reached this point the parsing was successful, so we return and inform the caller that the parsing succeeded
 	return PARSE_ERROR_NONE;
-}
-
-bool B2LaunchConfig::ValidateResolution(const FIntPoint& resolution) const
-{
-	return false;
 }
