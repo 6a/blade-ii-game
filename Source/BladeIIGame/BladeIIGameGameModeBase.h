@@ -3,11 +3,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Private/CardFactory.h"
+#include "Private/Opponent.h"
 #include "BladeIIGameGameModeBase.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class BLADEIIGAME_API ABladeIIGameGameModeBase : public AGameModeBase
 {
@@ -25,8 +23,24 @@ protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
 private:
-
-	// Pointer to the cardfactory that will be used throughout this match
+	/* Pointer to the cardfactory that will be used throughout this match */
 	B2CardFactory* CardFactory;
+
+	/* Pointer to the opponent that will be used throughout this match */
+	UB2Opponent* Opponent;
+
+	/**
+	 * Event handler for moves received from the server.
+	 * @param Move - The move that was received
+	 */
+	UFUNCTION()
+	void HandleMoveReceived(FB2Move& Move);
+
+	/**
+	 * Event handler for instructions from the server.
+	 * @param Move - The instruction that was received
+	 */
+	UFUNCTION()
+	void HandleInstructionReceived(EInstruction& Instruction);
 
 };
