@@ -1,4 +1,4 @@
-#include "CardFactory.h"
+#include "B2Engine/CardFactory.h"
 
 B2CardFactory::B2CardFactory(B2CardFactoryConfig& Config)
 {

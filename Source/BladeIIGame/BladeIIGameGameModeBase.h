@@ -2,8 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "Private/CardFactory.h"
-#include "Private/Opponent.h"
+
+#include "B2Engine/CardFactory.h"
+#include "B2Engine/Opponent.h"
+
 #include "BladeIIGameGameModeBase.generated.h"
 
 UCLASS()

@@ -1,6 +1,8 @@
 #pragma once
+
 #include "CoreMinimal.h"
-#include "Utility.h"
+
+#include "B2Misc/Utility.h"
 
 class B2Server
 {

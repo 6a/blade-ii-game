@@ -1,5 +1,7 @@
 #pragma once
+
 #include "CoreMinimal.h"
+
 #include "Misc/DateTime.h"
 
 #define B2_SHOW_DEBUG 1

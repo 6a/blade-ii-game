@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
-#include "Utility.h"
+
+#include "B2Misc/Utility.h"
+
 #include "Card.generated.h"
 
 UCLASS()

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Card.h"
-#include "Utility.h"
+
+#include "B2Game/Card.h"
+#include "B2Misc/Utility.h"
 
 struct B2CardFactoryConfig
 {

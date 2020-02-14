@@ -1,4 +1,4 @@
-#include "Utility.h"
+#include "B2Misc/Utility.h"
 
 const void B2Utility::LogInfo(const FString& message)
 {

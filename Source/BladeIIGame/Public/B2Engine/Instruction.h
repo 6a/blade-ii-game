@@ -1,4 +1,5 @@
 #pragma once
+
 #include "CoreMinimal.h"
 
 /* ETableSlot represents different slots on the table (deck, hand, field or discard) */

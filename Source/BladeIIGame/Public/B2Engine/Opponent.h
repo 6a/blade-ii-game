@@ -1,8 +1,11 @@
 #pragma once
+
 #include "CoreMinimal.h"
-#include "Move.h"
-#include "Instruction.h"
-#include "Server.h"
+
+#include "B2Engine/Move.h"
+#include "B2Engine/Instruction.h"
+#include "B2Engine/Server.h"
+
 #include "Opponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReceivedDelegate, FB2Move&, Move);

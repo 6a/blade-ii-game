@@ -1,4 +1,5 @@
-#include "Card.h"
+#include "B2Game/Card.h"
+
 #include "UObject/ConstructorHelpers.h"
 
 ACard::ACard()

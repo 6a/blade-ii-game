@@ -1,8 +1,9 @@
-#include "LaunchConfig.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "HAL/PlatformFilemanager.h"
-#include "Utility.h"
+
+#include "B2Engine/LaunchConfig.h"
+#include "B2Misc/Utility.h"
 
 const FString CONFIG_DIRECTORY = TEXT("BladeIIGame/Data");
 const TCHAR* DELIMITER_CONFIG = TEXT(":");
