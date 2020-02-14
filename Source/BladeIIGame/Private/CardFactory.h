@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Card.h"
+#include "Utility.h"
 
 struct B2CardFactoryConfig
 {
