@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "B2Game/Card.h"
-#include "B2Misc/Utility.h"
+#include "B2Enum/ECard.h"
 
 struct B2CardFactoryConfig
 {

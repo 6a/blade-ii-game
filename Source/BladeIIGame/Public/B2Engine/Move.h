@@ -2,7 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Enum/TableSlot.h"
+#include "B2Enum/ECard.h"
 #include "Move.generated.h"
 
 USTRUCT()

@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "B2Engine/Move.h"
-#include "B2Engine/Instruction.h"
+#include "B2Enum/Instruction.h"
 #include "B2Engine/Server.h"
 
 #include "Opponent.generated.h"

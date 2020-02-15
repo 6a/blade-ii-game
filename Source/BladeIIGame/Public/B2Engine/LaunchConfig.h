@@ -21,6 +21,8 @@ public:
 	float BGMVolume;
 	float SFXVolume;
 
+	const static int MATCH_ID_AI_GAME = -1;
+
 	B2LaunchConfig(const FString& GameInfoFileName);
 	~B2LaunchConfig();
 
