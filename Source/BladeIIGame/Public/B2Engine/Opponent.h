@@ -24,20 +24,6 @@ public:
 	FInstructionReceivedDelegate OnInstructionReceived;
 
 	/**
-	 * Function to override for configuring a net opponent.
-	 * @param PublicID - Public ID of the local user.
-	 * @param AuthToken - Auth token for the local user.
-	 * @param MatchID - Match ID.
-	 */
-	virtual void Configure(FString PublicID, FString AuthToken, uint64 MatchID) {};
-
-	/**
-	 * Function to override for configuring an AI opponent
-	 * @param EAIDifficulty - The difficulty of the AI opponent.
-	 */
-	virtual void Configure(EAIDifficulty Difficulty) {};
-
-	/**
 	 * Send a move to the server.
 	 * @param Move - The move to send
 	 */

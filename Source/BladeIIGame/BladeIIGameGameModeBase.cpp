@@ -9,7 +9,7 @@
 
 ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& ObjectInitializer)
 {
-		// Load card config (textures to use, etc)
+	// Load card config (textures to use, etc)
 	B2CardFactoryConfig B2CardFactoryConfig;
 	CardFactory = new B2CardFactory(B2CardFactoryConfig);
 
@@ -21,13 +21,18 @@ ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& Obj
 	// Create the opponent class based launch config
 	if (LaunchConfig.MatchID <= B2LaunchConfig::MATCH_ID_AI_GAME_THRESHOLD)
 	{
-		Opponent = ObjectInitializer.CreateDefaultSubobject<UB2AIOpponent>(this, TEXT("AI Opponent"));
-		Opponent->Configure(static_cast<EAIDifficulty>(LaunchConfig.MatchID));
+		UB2AIOpponent* AIOpponent = ObjectInitializer.CreateDefaultSubobject<UB2AIOpponent>(this, TEXT("AI Opponent"));
+		AIOpponent->Configure(static_cast<EAIDifficulty>(LaunchConfig.MatchID));
+
+		Opponent = static_cast<UB2Opponent*>(AIOpponent);
 	}
 	else
 	{
-		Opponent = ObjectInitializer.CreateDefaultSubobject<UB2NetOpponent>(this, TEXT("Net Opponent"));
-		Opponent->Configure(LaunchConfig.PublicID, LaunchConfig.AuthToken, LaunchConfig.MatchID);
+		UB2NetOpponent* NetOpponent = ObjectInitializer.CreateDefaultSubobject<UB2NetOpponent>(this, TEXT("Net Opponent"));
+		NetOpponent->Configure(LaunchConfig.PublicID, LaunchConfig.AuthToken, LaunchConfig.MatchID);
+
+		Opponent = static_cast<UB2Opponent*>(NetOpponent);
+
 	}
 
 	// Register event handlers
