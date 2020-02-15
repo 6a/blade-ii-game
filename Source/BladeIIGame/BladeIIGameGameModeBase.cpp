@@ -9,9 +9,7 @@
 
 ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& ObjectInitializer)
 {
-	// Load card config (textures to use, etc)
-	B2CardFactoryConfig B2CardFactoryConfig;
-	CardFactory = new B2CardFactory(B2CardFactoryConfig);
+	SetupCardFactory();
 
 	// Read the launch config
 	B2LaunchConfig LaunchConfig("Launch.conf");
@@ -40,6 +38,46 @@ ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& Obj
 	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameGameModeBase::HandleInstructionReceived);
 
 	B2Utility::LogInfo("GameMode initialized");
+}
+
+void ABladeIIGameGameModeBase::StartPlay()
+{
+	B2Utility::LogInfo("ABladeIIGameGameModeBase::StartPlay");
+}
+
+void ABladeIIGameGameModeBase::SetupCardFactory()
+{
+	// Load card config (textures to use, etc)
+	B2CardFactoryConfig B2CardFactoryConfig;
+
+	B2CardFactoryConfig.CardFrontPaths = TArray<FString>({
+	/* Basic cards */
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Staff.T_Card_Staff"),
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Gunswords.T_Card_Gunswords"),
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Bow.T_Card_Bow"),
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Sword.T_Card_Sword"),
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Shotgun.T_Card_Shotgun"),
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Spear.T_Card_Spear"),
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Broadsword.T_Card_Broadsword"),
+
+	/* Special cards */
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Bolt.T_Card_Bolt"),
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Mirror.T_Card_Mirror"),
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Blast.T_Card_Blast"),
+	TEXT("/Game/BladeIIGame/Textures/T_Card_Force.T_Card_Force"),
+	});
+
+	/* Back and MRS (metallic, roughness, specular) paths */
+	B2CardFactoryConfig.CardBackPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Back.T_Card_Back");
+	B2CardFactoryConfig.CardFrontMRSPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Front_MRS.T_Card_Front_MRS");
+	B2CardFactoryConfig.CardBackMRSPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Back_MRS.T_Card_Back_MRS");
+
+	/* Card actor path */
+	B2CardFactoryConfig.CardActorPath = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/BP_Card.BP_Card'");
+
+	B2CardFactoryConfig.World = GetWorld();
+
+	CardFactory = new B2CardFactory(B2CardFactoryConfig);
 }
 
 void ABladeIIGameGameModeBase::HandleMoveReceived(FB2Move& Move)

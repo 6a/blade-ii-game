@@ -18,12 +18,16 @@ public:
 protected:
 	ABladeIIGameGameModeBase(const FObjectInitializer& ObjectInitializer);
 
+	virtual void StartPlay() override;
+
 private:
 	/* Pointer to the cardfactory that will be used throughout this match */
 	B2CardFactory* CardFactory;
 
 	/* Pointer to the opponent that will be used throughout this match */
 	UB2Opponent* Opponent;
+
+	void SetupCardFactory();
 
 	/**
 	 * Event handler for moves received from the server.
