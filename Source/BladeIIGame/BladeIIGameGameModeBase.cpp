@@ -19,13 +19,15 @@ ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& Obj
 	// Do stuff with the launch config
 
 	// Create the opponent class based launch config
-	if (LaunchConfig.MatchID == B2LaunchConfig::MATCH_ID_AI_GAME)
+	if (LaunchConfig.MatchID <= B2LaunchConfig::MATCH_ID_AI_GAME_THRESHOLD)
 	{
 		Opponent = ObjectInitializer.CreateDefaultSubobject<UB2AIOpponent>(this, TEXT("AI Opponent"));
+		Opponent->Configure(static_cast<EAIDifficulty>(LaunchConfig.MatchID));
 	}
 	else
 	{
 		Opponent = ObjectInitializer.CreateDefaultSubobject<UB2NetOpponent>(this, TEXT("Net Opponent"));
+		Opponent->Configure(LaunchConfig.PublicID, LaunchConfig.AuthToken, LaunchConfig.MatchID);
 	}
 
 	// Register event handlers

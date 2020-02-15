@@ -14,14 +14,14 @@ public:
 	FIntPoint Resolution;
 	EWindowMode::Type ScreenMode;
 	bool VSyncOn;
-	int32 AntiAliasing;
-	int32 ShadowQuality;
-	int32 PostProcessing;
+	int8 AntiAliasing;
+	int8 ShadowQuality;
+	int8 PostProcessing;
 	float MasterVolume;
 	float BGMVolume;
 	float SFXVolume;
 
-	const static int MATCH_ID_AI_GAME = -1;
+	const static int MATCH_ID_AI_GAME_THRESHOLD = 1;
 
 	B2LaunchConfig(const FString& GameInfoFileName);
 	~B2LaunchConfig();

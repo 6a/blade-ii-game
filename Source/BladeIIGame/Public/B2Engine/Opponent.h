@@ -4,6 +4,7 @@
 
 #include "B2Engine/Move.h"
 #include "B2Enum/Instruction.h"
+#include "B2Enum/AIDifficulty.h"
 #include "B2Engine/Server.h"
 
 #include "Opponent.generated.h"
@@ -22,6 +23,20 @@ public:
 
 	/* Callback for receiving instructions from the server */
 	FInstructionReceivedDelegate OnInstructionReceived;
+
+	/**
+	 * Function to override for configuring a net opponent.
+	 * @param PublicID - Public ID of the local user.
+	 * @param AuthToken - Auth token for the local user.
+	 * @param MatchID - Match ID.
+	 */
+	virtual void Configure(FString PublicID, FString AuthToken, uint64 MatchID) {};
+
+	/**
+	 * Function to override for configuring an AI opponent
+	 * @param EAIDifficulty - The difficulty of the AI opponent.
+	 */
+	virtual void Configure(EAIDifficulty Difficulty) {};
 
 	/**
 	 * Send a move to the server.

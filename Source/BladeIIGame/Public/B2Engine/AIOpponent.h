@@ -18,5 +18,5 @@ public:
 	 * Configure the AI opponent.
 	 * @param EAIDifficulty - The difficulty of the AI opponent.
 	 */
-	void Configure(EAIDifficulty Difficulty);
+	virtual void Configure(EAIDifficulty Difficulty) override;
 };

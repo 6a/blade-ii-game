@@ -19,6 +19,6 @@ public:
 	 * @param AuthToken - Auth token for the local user.
 	 * @param MatchID - Match ID.
 	 */
-	void Configure(FString PublicID, FString AuthToken, uint64 MatchID);
+	virtual void Configure(FString PublicID, FString AuthToken, uint64 MatchID) override;
 
 };
