@@ -5,7 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 
-#include "B2Enum/ECard.h"
+#include "B2Misc/Enum.h"
 
 #include "Card.generated.h"
 

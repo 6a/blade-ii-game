@@ -4,7 +4,7 @@
 
 #include "Misc/DateTime.h"
 
-#include "B2Enum/ECard.h"
+#include "Enum.h"
 
 #define B2_SHOW_DEBUG 1
 
