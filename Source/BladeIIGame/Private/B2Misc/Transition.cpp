@@ -1,8 +1,14 @@
-#include "B2Engine/Transition.h"
+#include "B2Misc/Transition.h"
 
 #include "Math/UnrealMathUtility.h"
+#include "..\..\Public\B2Misc\Transition.h"
 
-Transition::Transition(FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, float Duration, float ArcRatio)
+B2Transition::B2Transition()
+{
+	CurrentAlpha = 1.f;
+}
+
+B2Transition::B2Transition(FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, float Duration, float ArcRatio)
 	: StartPosition(StartPosition), EndPosition(EndPosition), StartRotation(StartRotation), EndRotation(EndRotation), Duration(Duration)
 {
 	/* Set initial values */
@@ -16,7 +22,7 @@ Transition::Transition(FVector StartPosition, FVector EndPosition, FRotator Star
 	MaxVerticalOffset = TotalDistance * ArcRatio;
 }
 
-void Transition::Tick(float DeltaTime)
+void B2Transition::Tick(float DeltaTime)
 {
 	/* Calculate the step for this frame and increment the current alpha */
 	float Step = LERP_MAX / (Duration / DeltaTime);
@@ -34,7 +40,7 @@ void Transition::Tick(float DeltaTime)
 	CurrentRotation = FMath::InterpEaseOut(StartRotation, EndRotation, CurrentAlpha, EASE_EXPONENT);
 }
 
-bool Transition::Done() const
+bool B2Transition::Done() const
 {
 	return CurrentAlpha == 1.f;
 }

@@ -2,11 +2,14 @@
 
 #include "CoreMinimal.h"
 
-class Transition
+class B2Transition
 {
 public:
 	FVector CurrentPosition;
 	FRotator CurrentRotation;
+
+	/* Default constructor to avoid having to store a pointer when declared */
+	B2Transition();
 
 	/**
 	 * Start a transition.
@@ -17,7 +20,7 @@ public:
 	 * @param Duration - How long this transition should take
 	 * @param ArcRatio - How high the transition should arc (vertically) as a ratio of the total distance travelled
 	 */
-	Transition(FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, float Duration, float ArcRatio = 0.5f);
+	B2Transition(FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, float Duration, float ArcRatio = 0.5f);
 
 	/**
 	 * Ticks this transition by 1 frame.
