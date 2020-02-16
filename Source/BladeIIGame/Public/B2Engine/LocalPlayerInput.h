@@ -29,7 +29,7 @@ private:
 	/* Mouse position during the previous frame */
 	FVector2D PreviousMousePosition;
 
-	FVector2D GetCurrentMousePosition();
+	FVector2D GetCurrentMousePosition() const;
 
 	void UpdateMousePosition();
 
@@ -37,6 +37,6 @@ private:
 
 	void OnMouseButtonLeft();
 
-	void OnMouseMoved(FVector2D NewMousePosition);
+	void OnMouseMoved(const FVector2D& NewMousePosition);
 
 };

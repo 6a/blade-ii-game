@@ -25,12 +25,12 @@ void ALocalPlayerInput::OnMouseButtonLeft()
 	B2Utility::LogInfo(FString::Format(TEXT("Mouse Clicked @ [{0} {1}]"), { PreviousMousePosition.X, PreviousMousePosition.Y }));
 }
 
-void ALocalPlayerInput::OnMouseMoved(FVector2D NewMousePosition)
+void ALocalPlayerInput::OnMouseMoved(const FVector2D& NewMousePosition)
 {
 
 }
 
-FVector2D ALocalPlayerInput::GetCurrentMousePosition()
+FVector2D ALocalPlayerInput::GetCurrentMousePosition() const
 {
 	FVector2D CurrentMousePosition;
 	PlayerController->GetMousePosition(CurrentMousePosition.X, CurrentMousePosition.Y);
@@ -40,7 +40,7 @@ FVector2D ALocalPlayerInput::GetCurrentMousePosition()
 
 void ALocalPlayerInput::UpdateMousePosition()
 {
-
+	FVector2D CurrentMousePosition = GetCurrentMousePosition();
 
 	if (CurrentMousePosition != PreviousMousePosition)
 	{
