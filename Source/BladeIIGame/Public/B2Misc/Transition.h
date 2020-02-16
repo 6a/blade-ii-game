@@ -19,8 +19,9 @@ public:
 	 * @param EndRotation - Ending rotation for this transition
 	 * @param Duration - How long this transition should take
 	 * @param ArcRatio - How high the transition should arc (vertically) as a ratio of the total distance travelled
+	 * @param Delay - How long to wait before transitioning
 	 */
-	B2Transition(FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, float Duration, float ArcRatio = 0.5f);
+	B2Transition(FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, float Duration, float ArcRatio = 0.5f, float Delay = 0.f);
 
 	/**
 	 * Ticks this transition by 1 frame.
@@ -32,11 +33,6 @@ public:
 	bool Done() const;
 
 private:
-	const float LERP_MIN = 0.f;
-	const float LERP_MAX = 1.f;
-	const float LERP_MAX_HALF = LERP_MAX / 2;
-	const float EASE_EXPONENT = 2.f;
-
 	FVector StartPosition;
 	FVector EndPosition;
 
@@ -48,5 +44,6 @@ private:
 
 	float Duration;
 	float CurrentAlpha;
+	float RemainingDelay;
 };
 
