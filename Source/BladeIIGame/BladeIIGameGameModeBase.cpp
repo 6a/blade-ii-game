@@ -20,6 +20,8 @@ ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& Obj
 
 void ABladeIIGameGameModeBase::StartPlay()
 {
+	Super::StartPlay();
+
 	B2Utility::LogInfo("ABladeIIGameGameModeBase::StartPlay");
 }
 
