@@ -8,11 +8,20 @@ ACard::ACard()
 	RootComponent = Mesh;
 }
 
-// Called when the game starts or when spawned
 void ACard::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ACard::StartTransitionAsync(const B2Transition& Transition)
+{
+
+}
+
+bool ACard::IsTransitioning() const
+{
+	return !CurrentTransition.Done();
 }
 
 // Called every frame
@@ -20,5 +29,10 @@ void ACard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsTransitioning())
+	{
+		CurrentTransition.Tick(DeltaTime);
+		SetActorLocationAndRotation(CurrentTransition.CurrentPosition, CurrentTransition.CurrentRotation);
+	}
 }
 

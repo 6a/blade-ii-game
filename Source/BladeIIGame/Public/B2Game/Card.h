@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 
 #include "B2Misc/Enum.h"
+#include "B2Misc/Transition.h"
 
 #include "Card.generated.h"
 
@@ -25,8 +26,20 @@ public:
 
 	ACard();
 
+	/**
+	 * Initiate an asynchronous transition.
+	 * @param Transition - A transition helper objectq
+	 * @param Duration - How long the transition will take
+	 */
+	void StartTransitionAsync(const B2Transition& Transition);
+
+	/* Returns true if this card is currently transitioning */
+	bool IsTransitioning() const;
+
 protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 
+private:
+	B2Transition CurrentTransition;
 };
