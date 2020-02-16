@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericWindow.h"
 
+/* Utility class for reading and parsing the launch config */
 class B2LaunchConfig
 {
 public:
@@ -20,7 +21,8 @@ public:
 	float MasterVolume;
 	float BGMVolume;
 	float SFXVolume;
-
+	 
+	/* A MatchID equal or less than this value indicates that the match is a bot game of (value) difficulty */
 	const static int MATCH_ID_AI_GAME_THRESHOLD = 1;
 
 	B2LaunchConfig(const FString& GameInfoFileName);

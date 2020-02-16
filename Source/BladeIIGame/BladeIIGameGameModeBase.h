@@ -13,8 +13,6 @@ class BLADEIIGAME_API ABladeIIGameGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
-public:
-
 protected:
 	ABladeIIGameGameModeBase(const FObjectInitializer& ObjectInitializer);
 
@@ -27,7 +25,17 @@ private:
 	/* Pointer to the opponent that will be used throughout this match */
 	UB2Opponent* Opponent;
 
+	/**
+	 * Reads the launch config and sets up the engine accordingly.
+	 * @param ObjectInitializer - ObjectInitializer helper from constructor
+	 */
+	void SetupLaunchConfig(const FObjectInitializer& ObjectInitializer);
+
+	/* Set up the internal card factory */
 	void SetupCardFactory();
+
+	/* Set up any event listeners */
+	void RegisterEventListeners();
 
 	/**
 	 * Event handler for moves received from the server.

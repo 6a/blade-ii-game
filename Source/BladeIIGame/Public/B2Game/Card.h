@@ -19,16 +19,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* Mesh;
 
-	ACard();
-
 	/* The type of this card, with read access for blueprints */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	ECard Type;
 
+	ACard();
+
 protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
-
-private:
 
 };
