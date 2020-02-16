@@ -20,15 +20,10 @@ ACard* B2CardFactory::Make(const ECard& Card, const FVector& TargetPosition)
 	ACard* SpawnedCard = World->SpawnActor<ACard>(CardActorClass, TargetPosition, FRotator::ZeroRotator);
 	SpawnedCard->Rename(*B2Utility::EnumToString(Card));
 	SpawnedCard->SetActorLabel(*B2Utility::EnumToString(Card));
+	SpawnedCard->Type = Card;
 
 	UMaterialInstanceDynamic* MaterialFront = UMaterialInstanceDynamic::Create(SpawnedCard->Mesh->GetMaterial(0), NULL);
 	UMaterialInstanceDynamic* MaterialBack = UMaterialInstanceDynamic::Create(SpawnedCard->Mesh->GetMaterial(1), NULL);
-
-	if (GetTexture(Card))
-	{
-		B2Utility::LogInfo(TEXT("Card front texture loaded"));
-
-	}
 
 	MaterialFront->SetTextureParameterValue(TEXT("Texture"), GetTexture(Card));
 	MaterialFront->SetTextureParameterValue(TEXT("Metallic / Roughness / Specular Map"), CardFrontMRSTexture);
@@ -38,8 +33,6 @@ ACard* B2CardFactory::Make(const ECard& Card, const FVector& TargetPosition)
 
 	SpawnedCard->Mesh->SetMaterial(0, MaterialFront);
 	SpawnedCard->Mesh->SetMaterial(1, MaterialBack);
-
-	SpawnedCard->Type = Card;
 
 	B2Utility::LogInfo(FString::Format(TEXT("Card Factory created card: [{0}]"), { B2Utility::EnumToString(Card) }));
 
