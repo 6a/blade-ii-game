@@ -32,10 +32,11 @@ public:
 	/**
 	 * Spawn and return a pointer to a card actor.
 	 * @param Card - The type of card to create.
-	 * @param TargetPosition - The world position at which the spawned card will be placed.
+	 * @param StartingPosition - The world position at which the spawned card will be placed.
+	 * @param StartingRotation - The rotation that the card will start with.
 	 * @return a pointer to the card actor that was spawned
 	 */
-	ACard* Make(const ECard& Card, const FVector& TargetPosition);
+	ACard* Make(const ECard& Card, const FVector& StartingPosition, const FRotator& StartingRotation);
 
 private:
 	/* Card textures */

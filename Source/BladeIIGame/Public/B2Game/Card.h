@@ -29,7 +29,6 @@ public:
 	/**
 	 * Initiate an asynchronous transition.
 	 * @param Transition - A transition helper objectq
-	 * @param Duration - How long the transition will take
 	 */
 	void StartTransitionAsync(const B2Transition& Transition);
 
@@ -41,5 +40,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	/* The current transition handler for this card */
 	B2Transition CurrentTransition;
 };

@@ -6,6 +6,8 @@ ACard::ACard()
 {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Card Mesh"));
 	RootComponent = Mesh;
+
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ACard::BeginPlay()
@@ -16,7 +18,7 @@ void ACard::BeginPlay()
 
 void ACard::StartTransitionAsync(const B2Transition& Transition)
 {
-
+	CurrentTransition = Transition;
 }
 
 bool ACard::IsTransitioning() const
@@ -31,6 +33,7 @@ void ACard::Tick(float DeltaTime)
 
 	if (IsTransitioning())
 	{
+
 		CurrentTransition.Tick(DeltaTime);
 		SetActorLocationAndRotation(CurrentTransition.CurrentPosition, CurrentTransition.CurrentRotation);
 	}

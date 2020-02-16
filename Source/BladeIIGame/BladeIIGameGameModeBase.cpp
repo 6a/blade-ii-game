@@ -6,6 +6,7 @@
 #include "B2Engine/AIOpponent.h"
 #include "B2Engine/NetOpponent.h"
 #include "B2Engine/LaunchConfig.h"
+#include "B2Misc/Transition.h"
 
 ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& ObjectInitializer)
 {
@@ -21,6 +22,16 @@ ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& Obj
 void ABladeIIGameGameModeBase::StartPlay()
 {
 	Super::StartPlay();
+
+	ACard* Card = CardFactory->Make(ECard::ReansTachi, FVector(0, 0, 100), FRotator(180, 0, 0));
+
+	FVector StartLocation = Card->GetActorLocation();
+	FVector EndLocation = StartLocation + FVector(-300, 0, 0);
+	FRotator StartRotation = Card->GetActorRotation();
+	FRotator EndRotation = StartRotation - FRotator(180, 0, 0);
+
+	B2Transition Transition = B2Transition(StartLocation, EndLocation, StartRotation, EndRotation, 2, 0.3f, 0.3f);
+	Card->StartTransitionAsync(Transition);
 
 	B2Utility::LogInfo("ABladeIIGameGameModeBase::StartPlay");
 }

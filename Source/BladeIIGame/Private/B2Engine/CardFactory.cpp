@@ -15,9 +15,9 @@ B2CardFactory::~B2CardFactory()
 
 }
 
-ACard* B2CardFactory::Make(const ECard& Card, const FVector& TargetPosition)
+ACard* B2CardFactory::Make(const ECard& Card, const FVector& StartingPosition, const FRotator& StartingRotation)
 {
-	ACard* SpawnedCard = World->SpawnActor<ACard>(CardActorClass, TargetPosition, FRotator::ZeroRotator);
+	ACard* SpawnedCard = World->SpawnActor<ACard>(CardActorClass, StartingPosition, StartingRotation);
 	SpawnedCard->Rename(*B2Utility::EnumToString(Card));
 	SpawnedCard->SetActorLabel(*B2Utility::EnumToString(Card));
 	SpawnedCard->Type = Card;
