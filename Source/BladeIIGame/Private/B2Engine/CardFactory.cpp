@@ -39,6 +39,8 @@ ACard* B2CardFactory::Make(const ECard& Card, const FVector& TargetPosition)
 	SpawnedCard->Mesh->SetMaterial(0, MaterialFront);
 	SpawnedCard->Mesh->SetMaterial(1, MaterialBack);
 
+	SpawnedCard->Type = Card;
+
 	B2Utility::LogInfo(FString::Format(TEXT("Card Factory created card: [{0}]"), { B2Utility::EnumToString(Card) }));
 
 	return SpawnedCard;
