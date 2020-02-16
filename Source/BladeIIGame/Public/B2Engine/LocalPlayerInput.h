@@ -1,9 +1,9 @@
-
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerController.h"
+
 #include "LocalPlayerInput.generated.h"
 
 UCLASS()
@@ -21,5 +21,22 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+private:
+	/* Casted version of APawns standard controller  */
+	APlayerController* PlayerController;
+
+	/* Mouse position during the previous frame */
+	FVector2D PreviousMousePosition;
+
+	FVector2D GetCurrentMousePosition();
+
+	void UpdateMousePosition();
+
+	void OnMenuPressed();
+
+	void OnMouseButtonLeft();
+
+	void OnMouseMoved(FVector2D NewMousePosition);
 
 };
