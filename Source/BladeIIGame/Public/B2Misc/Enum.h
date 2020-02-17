@@ -27,6 +27,15 @@ enum class ECard : uint8
 	SarasSwordAndGun UMETA(DisplayName = "Sara's Sword and Gun")
 };
 
+/* EEase represents different ease types */
+UENUM(BlueprintType)
+enum class EEase : uint8
+{
+	EaseIn UMETA(DisplayName = "Ease In"),
+	EaseInOut UMETA(DisplayName = "Ease In Out"),
+	EaseOut UMETA(DisplayName = "Ease Out")
+};
+
 /* ETableSlot represents different slots on the table (deck, hand, field or discard) */
 UENUM(BlueprintType)
 enum class EInstruction : uint8
