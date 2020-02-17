@@ -16,14 +16,14 @@ void ACard::BeginPlay()
 	
 }
 
-void ACard::StartTransitionAsync(const B2Transition& Transition)
+void ACard::QueueTransition(const B2Transition& Transition)
 {
-	CurrentTransition = Transition;
+	Transitions.Enqueue(Transition);
 }
 
 bool ACard::IsTransitioning() const
 {
-	return !CurrentTransition.Done();
+	return !Transitions.IsEmpty();
 }
 
 // Called every frame
@@ -31,11 +31,20 @@ void ACard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/* If there is an active transition */
 	if (IsTransitioning())
 	{
+		/* Tick the transition */
+		Transitions.Peek()->Tick(DeltaTime);
 
-		CurrentTransition.Tick(DeltaTime);
-		SetActorLocationAndRotation(CurrentTransition.CurrentPosition, CurrentTransition.CurrentRotation);
+		/* Apply the new values to the card */
+		SetActorLocationAndRotation(Transitions.Peek()->CurrentPosition, Transitions.Peek()->CurrentRotation);
+
+		/* If the transition has now finished, remove it */
+		if (Transitions.Peek()->Done())
+		{
+			Transitions.Pop();
+		}
 	}
 }
 

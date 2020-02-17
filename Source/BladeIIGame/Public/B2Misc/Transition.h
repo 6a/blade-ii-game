@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 
+#include "B2Misc/Enum.h"
+
 class B2Transition
 {
 public:
@@ -17,11 +19,12 @@ public:
 	 * @param EndPosition - Ending position for this transition
 	 * @param StartRotation - Starting rotation for this transition
 	 * @param EndRotation - Ending rotation for this transition
+	 * @param ArcOffset - How much the transition should arc in X, Y and Z.
+	 * @param Ease - The easing algorithm to use.
 	 * @param Duration - How long this transition should take
-	 * @param ArcRatio - How high the transition should arc (vertically) as a ratio of the total distance travelled
 	 * @param Delay - How long to wait before transitioning
 	 */
-	B2Transition(FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, float Duration, float ArcRatio = 0.5f, float Delay = 0.f);
+	B2Transition(FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, FVector ArcOffset = FVector::ZeroVector, EEase Ease = EEase::EaseInOut, float Duration = 0.5f,  float Delay = 0.f);
 
 	/**
 	 * Ticks this transition by 1 frame.
@@ -39,8 +42,10 @@ private:
 	FRotator StartRotation;
 	FRotator EndRotation;
 
-	float MinVerticalOffset;
-	float MaxVerticalOffset;
+	FVector MinArcOffset;
+	FVector MaxArcOffset;
+
+	EEase Ease;
 
 	float Duration;
 	float CurrentAlpha;

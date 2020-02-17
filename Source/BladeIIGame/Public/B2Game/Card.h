@@ -27,10 +27,10 @@ public:
 	ACard();
 
 	/**
-	 * Initiate an asynchronous transition.
-	 * @param Transition - A transition helper objectq
+	 * Add a transition to the transition queue, which will play after any preceeding transitions have finished playing.
+	 * @param Transition - A transition helper object
 	 */
-	void StartTransitionAsync(const B2Transition& Transition);
+	void QueueTransition(const B2Transition& Transition);
 
 	/* Returns true if this card is currently transitioning */
 	bool IsTransitioning() const;
@@ -40,6 +40,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	/* The current transition handler for this card */
-	B2Transition CurrentTransition;
+	/* The queue of transitions for this card */
+	TQueue<B2Transition> Transitions;
 };
