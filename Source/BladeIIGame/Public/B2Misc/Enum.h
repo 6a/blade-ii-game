@@ -21,10 +21,10 @@ enum class ECard : uint8
 	MachiasOrbalShotgun UMETA(DisplayName = "Machias' Orbal Shotgun"),
 	GaiusSpear UMETA(DisplayName = "Gaius' Spear"),
 	LaurasGreatsword UMETA(DisplayName = "Laura's Greatsword"),
-	ReansTachi UMETA(DisplayName = "Rean's Tachi"),
-	EmmasOrbalStaff UMETA(DisplayName = "Emma's Orbal Staff"),
-	ElisesRapier UMETA(DisplayName = "Elise's Rapier"),
-	SarasSwordAndGun UMETA(DisplayName = "Sara's Sword and Gun")
+	Bolt UMETA(DisplayName = "Bolt"),
+	Mirror UMETA(DisplayName = "Emma's Orbal Staff"),
+	Blast UMETA(DisplayName = "Elise's Rapier"),
+	Force UMETA(DisplayName = "Sara's Sword and Gun")
 };
 
 /* EEase represents different ease types */

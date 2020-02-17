@@ -23,7 +23,7 @@ void ABladeIIGameGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	ACard* Card = CardFactory->Make(ECard::ReansTachi, FVector(0, 0, 30), FRotator(180, 0, 0));
+	ACard* Card = CardFactory->Make(ECard::Bolt, FVector(0, 0, 30), FRotator(180, 0, 0));
 
 	FVector StartLocation = Card->GetActorLocation();
 	FVector EndLocation = StartLocation + FVector(0, 0, 100);

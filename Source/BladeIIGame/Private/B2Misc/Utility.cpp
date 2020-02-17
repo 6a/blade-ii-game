@@ -38,14 +38,14 @@ const FString B2Utility::EnumToString(ECard Card)
 		return "06 Gaius' Spear";
 	case ECard::LaurasGreatsword:
 		return "07 Laura's Greatsword";
-	case ECard::ReansTachi:
-		return "08 Rean's Tachi";
-	case ECard::EmmasOrbalStaff:
-		return "09 Emma's Orbal Staff";
-	case ECard::ElisesRapier:
-		return "10 Elise's Rapier";
-	case ECard::SarasSwordAndGun:
-		return "11 Sara's Sword and Gun";
+	case ECard::Bolt:
+		return "08 Bolt";
+	case ECard::Mirror:
+		return "09 Mirror";
+	case ECard::Blast:
+		return "10 Blast";
+	case ECard::Force:
+		return "11 Force";
 	}
 
 	return "00 Unknown";
