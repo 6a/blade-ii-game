@@ -6,10 +6,13 @@
 #include "B2Engine/AIOpponent.h"
 #include "B2Engine/NetOpponent.h"
 #include "B2Engine/LaunchConfig.h"
+#include "B2Engine/LocalPlayerInput.h"
 #include "B2Misc/Transition.h"
 
 ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& ObjectInitializer)
 {
+	DefaultPawnClass = ALocalPlayerInput::StaticClass();
+
 	SetupLaunchConfig(ObjectInitializer);
 	
 	SetupCardFactory();
@@ -22,15 +25,14 @@ ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& Obj
 void ABladeIIGameGameModeBase::StartPlay()
 {
 	Super::StartPlay();
-
-	ACard* Card = CardFactory->Make(ECard::Bolt, FVector(0, 0, 30), FRotator(180, 0, 0));
+	ACard* Card = CardFactory->Make(ECard::Bolt, FVector(19.5545776, -17.346609, 1.51910190), FRotator(180, 0, 0));
 
 	FVector StartLocation = Card->GetActorLocation();
-	FVector EndLocation = StartLocation + FVector(0, 0, 100);
+	FVector EndLocation = StartLocation + FVector(0, 0, 5.0);
 	FRotator StartRotation = Card->GetActorRotation();
 	FRotator EndRotation = StartRotation;
 
-	B2Transition Transition = B2Transition(StartLocation, EndLocation, StartRotation, EndRotation, FVector(0, 0, 50), EEase::EaseInOut, 0.4f, 0.5f);
+	B2Transition Transition = B2Transition(StartLocation, EndLocation, StartRotation, EndRotation, FVector(0, 0, 5.0), EEase::EaseInOut, 0.4f, 1.5f);
 	Card->QueueTransition(Transition);
 
 	StartLocation = EndLocation;
@@ -38,15 +40,14 @@ void ABladeIIGameGameModeBase::StartPlay()
 	StartRotation = StartRotation;
 	EndRotation = StartRotation + FRotator(-180, 0, 0);
 
-	Transition = B2Transition(StartLocation, EndLocation, StartRotation, EndRotation, FVector(0, 0, 30), EEase::EaseOut, 0.6f, 0.0f);
+	Transition = B2Transition(StartLocation, EndLocation, StartRotation, EndRotation, FVector(0, 0, 3.0), EEase::EaseOut, 0.6f, 0.0f);
 	Card->QueueTransition(Transition);
-
 	StartLocation = EndLocation;
-	EndLocation = StartLocation + FVector(-300, 0, -70);
+	EndLocation = FVector(-25.664478, -17.346609, 1.523549);
 	StartRotation = EndRotation;
 	EndRotation = StartRotation;
 
-	Transition = B2Transition(StartLocation, EndLocation, StartRotation, EndRotation, FVector(0, -40, 0), EEase::EaseInOut, 0.4f, 0.0f);
+	Transition = B2Transition(StartLocation, EndLocation, StartRotation, EndRotation, FVector(0, -2.0, 0), EEase::EaseInOut, 0.4f, 0.0f);
 	Card->QueueTransition(Transition);
 
 	B2Utility::LogInfo("ABladeIIGameGameModeBase::StartPlay");

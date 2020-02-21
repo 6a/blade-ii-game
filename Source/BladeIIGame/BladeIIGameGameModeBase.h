@@ -13,10 +13,11 @@ class BLADEIIGAME_API ABladeIIGameGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
+public:
+	virtual void StartPlay() override;
+
 protected:
 	ABladeIIGameGameModeBase(const FObjectInitializer& ObjectInitializer);
-
-	virtual void StartPlay() override;
 
 private:
 	/* Pointer to the cardfactory that will be used throughout this match */
