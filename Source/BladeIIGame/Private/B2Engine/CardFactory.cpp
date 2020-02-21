@@ -1,7 +1,8 @@
+#include "B2Engine/CardFactory.h"
+
 #include "Materials/MaterialInstanceDynamic.h"
 
 #include "B2Misc/Utility.h"
-#include "B2Engine/CardFactory.h"
 
 B2CardFactory::B2CardFactory(const B2CardFactoryConfig& CardFactoryConfig)
 {
