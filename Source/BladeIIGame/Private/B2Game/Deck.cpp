@@ -3,8 +3,6 @@
 
 UDeck::UDeck()
 {
-	Super::Super();
-
 	BasePosition = GetComponentLocation();
 	BaseRotation = GetComponentRotation();
 }

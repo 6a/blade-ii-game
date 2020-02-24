@@ -12,8 +12,6 @@ class BLADEIIGAME_API UCardSlot : public USceneComponent
 	GENERATED_BODY()
 	
 public:	
-	UCardSlot();
-
 	/* Returns the current stack size (i.e. the number of cards on this anchor) */
 	UINT Size() const;
 

@@ -1,12 +1,5 @@
 #include "B2Game/CardSlot.h"
 
-UCardSlot::UCardSlot()
-{
-	//PrimaryActorTick.bCanEverTick = true;
-
-
-}
-
 UINT UCardSlot::Size() const
 {
 	return Cards.Num();
