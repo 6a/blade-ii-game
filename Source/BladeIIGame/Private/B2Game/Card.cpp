@@ -1,11 +1,14 @@
 #include "B2Game/Card.h"
 
+#include "Misc/Guid.h"
 #include "UObject/ConstructorHelpers.h"
 
 ACard::ACard()
 {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Card Mesh"));
 	RootComponent = Mesh;
+
+	ID = FGuid::NewGuid().ToString();
 
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -24,6 +27,11 @@ void ACard::QueueTransition(const B2Transition& Transition)
 bool ACard::IsTransitioning() const
 {
 	return !Transitions.IsEmpty();
+}
+
+const FString ACard::GetID() const
+{
+	return ID;
 }
 
 // Called every frame

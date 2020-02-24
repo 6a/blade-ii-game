@@ -7,6 +7,7 @@
 
 #include "B2Misc/Enum.h"
 #include "B2Misc/Transition.h"
+#include "B2Game/CardAnchor.h"
 
 #include "Card.generated.h"
 
@@ -24,6 +25,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	ECard Type;
 
+	/* The anchor to which this card is currently attached to */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCardAnchor* Anchor;
+
 	ACard();
 
 	/**
@@ -35,6 +40,9 @@ public:
 	/* Returns true if this card is currently transitioning */
 	bool IsTransitioning() const;
 
+	/* Returns the ID for this card */
+	const FString GetID() const;
+
 protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
@@ -42,4 +50,7 @@ protected:
 private:
 	/* The queue of transitions for this card */
 	TQueue<B2Transition> Transitions;
+
+	/* The randomly generated ID for this card */
+	FString ID;
 };
