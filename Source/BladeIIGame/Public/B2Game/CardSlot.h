@@ -34,7 +34,23 @@ public:
 	 */
 	const virtual ACard* RemoveByID(FString ID);
 
-private:
+protected:
 	/* A container for the current stack of cards on this anchor */
 	TArray<const ACard*> Cards;
+
+	/* Position from which all positional calculations will be based on */
+	FVector BasePosition;
+
+	/* Rotation from which all rotation calculations will be based on */
+	FRotator BaseRotation;
+
+	/**
+	 * Return the transform that a card with the index "Index" should have.
+	 * @param Index - The index for which the transform will be returned
+	 * @returns A transform for index "Index"
+	 * @warning Base class has no implementation - override and do not call base class
+	 */
+	const virtual FTransform GetTransformForIndex(UINT Index);
+
+private:
 };

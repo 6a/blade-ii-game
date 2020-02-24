@@ -6,6 +6,7 @@ UCardSlot::UCardSlot()
 
 
 }
+
 UINT UCardSlot::Size() const
 {
 	return Cards.Num();
@@ -44,4 +45,9 @@ const ACard* UCardSlot::RemoveByID(FString ID)
 	}
 
 	return Card;
+}
+
+const FTransform UCardSlot::GetTransformForIndex(UINT Index)
+{
+	return FTransform();
 }
