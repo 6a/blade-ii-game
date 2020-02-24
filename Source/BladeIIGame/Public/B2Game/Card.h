@@ -7,7 +7,6 @@
 
 #include "B2Misc/Enum.h"
 #include "B2Misc/Transition.h"
-#include "B2Game/CardAnchor.h"
 
 #include "Card.generated.h"
 
@@ -21,13 +20,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* Mesh;
 
-	/* The type of this card, with read access for blueprints */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	/* The type of this cards */
 	ECard Type;
-
-	/* The anchor to which this card is currently attached to */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UCardAnchor* Anchor;
 
 	ACard();
 
@@ -43,6 +37,9 @@ public:
 	/* Returns the ID for this card */
 	const FString GetID() const;
 
+	/* Returns the ID for this card */
+	const class UCardSlot* GetAnchor() const;
+
 protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
@@ -53,4 +50,7 @@ private:
 
 	/* The randomly generated ID for this card */
 	FString ID;
+
+	/* The anchor to which this card is currently attached to */
+	UCardSlot* Anchor;
 };

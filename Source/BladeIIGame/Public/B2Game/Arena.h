@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "B2Game/CardSlot.h"
+
 #include "Arena.generated.h"
 
 UCLASS()
@@ -28,12 +30,41 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* VSBadgeText;
 
+	/* Root for all the card anchors */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USceneComponent* Slots;
+
+	/* Slot for local players deck slot */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCardSlot* PlayerDeck;
+
+	/* Slot for local players hand slots */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCardSlot* PlayerHand;
+
+	/* Slot for local players field slots */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCardSlot* PlayerField;
+
+	/* Slot for opponents deck slot */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCardSlot* OpponentDeck;
+
+	/* Slot for opponents hand slots */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCardSlot* OpponentHand;
+
+	/* Slot for opponents field slots */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCardSlot* OpponentField;
+
 	AArena();
+
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
 
-public:	
-	virtual void Tick(float DeltaTime) override;
+private:
 
 };

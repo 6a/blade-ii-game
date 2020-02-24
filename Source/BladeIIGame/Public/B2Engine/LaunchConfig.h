@@ -32,6 +32,7 @@ private:
 	/**
 	 * Loads the specified file.
 	 * @param FilePath - The absolute path to the file that should be loaded.
+	 * @returns The content of the file
 	 * @warning Will close the program if the file cannot be loaded properly.
 	 */
 	const FString FromFile(const FString& FilePath) const;

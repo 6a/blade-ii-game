@@ -34,6 +34,11 @@ const FString ACard::GetID() const
 	return ID;
 }
 
+const UCardSlot* ACard::GetAnchor() const
+{
+	return Anchor;
+}
+
 // Called every frame
 void ACard::Tick(float DeltaTime)
 {
