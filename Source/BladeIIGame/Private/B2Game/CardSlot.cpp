@@ -1,8 +1,20 @@
 #include "B2Game/CardSlot.h"
 
+UCardSlot::UCardSlot()
+{
+	BaseTransform = B2Transform(GetComponentLocation(), GetComponentRotation());
+
+
+}
+
 UINT UCardSlot::Size() const
 {
 	return Cards.Num();
+}
+
+void UCardSlot::SetCardOffset(B2Transform Offset)
+{
+	CardOffset = Offset;
 }
 
 void UCardSlot::Add(const ACard* Card)
@@ -40,7 +52,7 @@ const ACard* UCardSlot::RemoveByID(FString ID)
 	return Card;
 }
 
-const FTransform UCardSlot::GetTransformForIndex(UINT Index)
+const FTransform UCardSlot::GetTransformForIndex(UINT Index) const
 {
 	return FTransform();
 }

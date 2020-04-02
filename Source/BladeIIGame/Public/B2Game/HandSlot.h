@@ -4,13 +4,13 @@
 
 #include "B2Game/CardSlot.h"
 
-#include "FieldSlot.generated.h"
+#include "HandSlot.generated.h"
 
 UCLASS()
-class BLADEIIGAME_API UFieldSlot : public UCardSlot
+class BLADEIIGAME_API UHandSlot : public UCardSlot
 {
 	GENERATED_BODY()
-	
+		
 public:
 	/* Add the specified card */
 	virtual void Add(const ACard* Card) override;

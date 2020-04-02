@@ -55,3 +55,13 @@ enum class ETableSlot : uint8
 	Field UMETA(DisplayName = "Field"),
 	Discard UMETA(DisplayName = "Discard")
 };
+
+///* EPlayer represents the two types of player - Local, and opponent
+// * Used to identify which player a particular card, slot etc. belongs to
+//*/
+//UENUM(BlueprintType)
+//enum class EPlayer : uint8
+//{
+//	Local UMETA(DisplayName = "Local"),
+//	Opponent UMETA(DisplayName = "Opponent")
+//};

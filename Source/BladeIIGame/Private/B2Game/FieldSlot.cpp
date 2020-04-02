@@ -1,11 +1,5 @@
 #include "B2Game/FieldSlot.h"
 
-UFieldSlot::UFieldSlot()
-{
-	BasePosition = GetComponentLocation();
-	BaseRotation = GetComponentRotation();
-}
-
 void UFieldSlot::Add(const ACard* Card)
 {
 
@@ -24,7 +18,7 @@ const ACard* UFieldSlot::RemoveByID(FString ID)
 	return Super::RemoveByID(ID);
 }
 
-const FTransform UFieldSlot::GetTransformForIndex(UINT Index)
+const FTransform UFieldSlot::GetTransformForIndex(UINT Index) const
 {
 	return FTransform(GetComponentTransform());
 }

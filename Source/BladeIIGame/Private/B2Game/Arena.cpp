@@ -3,6 +3,10 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
 
+#include "B2Game/DeckSlot.h"
+#include "B2Game/FieldSlot.h"
+#include "B2Game/HandSlot.h"
+
 AArena::AArena()
 {
 	MainMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Arena Mesh"));
@@ -22,25 +26,23 @@ AArena::AArena()
 	Slots = CreateDefaultSubobject<USceneComponent>(TEXT("Card Slots"));
 	Slots->AttachToComponent(MainMesh, StandardAttachmentRules);
 
-	PlayerDeck = CreateDefaultSubobject<UCardSlot>(TEXT("Player Deck"));
+	PlayerDeck = CreateDefaultSubobject<UDeckSlot>(TEXT("Player Deck"));
 	PlayerDeck->AttachToComponent(Slots, StandardAttachmentRules);
 
-	PlayerHand = CreateDefaultSubobject<UCardSlot>(TEXT("Player Hand"));
+	PlayerHand = CreateDefaultSubobject<UHandSlot>(TEXT("Player Hand"));
 	PlayerHand->AttachToComponent(Slots, StandardAttachmentRules);
 
-	PlayerField = CreateDefaultSubobject<UCardSlot>(TEXT("Player Field"));
+	PlayerField = CreateDefaultSubobject<UFieldSlot>(TEXT("Player Field"));
 	PlayerField->AttachToComponent(Slots, StandardAttachmentRules);
 
-	OpponentDeck = CreateDefaultSubobject<UCardSlot>(TEXT("Opponent Deck"));
+	OpponentDeck = CreateDefaultSubobject<UDeckSlot>(TEXT("Opponent Deck"));
 	OpponentDeck->AttachToComponent(Slots, StandardAttachmentRules);
 
-	OpponentHand = CreateDefaultSubobject<UCardSlot>(TEXT("Opponent Hand"));
+	OpponentHand = CreateDefaultSubobject<UHandSlot>(TEXT("Opponent Hand"));
 	OpponentHand->AttachToComponent(Slots, StandardAttachmentRules);
 
-	OpponentField = CreateDefaultSubobject<UCardSlot>(TEXT("Opponent Field"));
+	OpponentField = CreateDefaultSubobject<UFieldSlot>(TEXT("Opponent Field"));
 	OpponentField->AttachToComponent(Slots, StandardAttachmentRules);
-
-	// PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned

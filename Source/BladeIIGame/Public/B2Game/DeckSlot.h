@@ -12,8 +12,6 @@ class BLADEIIGAME_API UDeckSlot : public UCardSlot
 	GENERATED_BODY()
 		
 public:
-	UDeckSlot();
-
 	/* Add the specified card */
 	virtual void Add(const ACard* Card) override;
 
@@ -36,5 +34,5 @@ public:
 	 * @param Index - The index for which the transform will be returned
 	 * @returns A transform for index "Index"
 	 */
-	const virtual FTransform GetTransformForIndex(UINT Index) override;
+	const virtual FTransform GetTransformForIndex(UINT Index) const override;
 };
