@@ -12,27 +12,55 @@ UINT UCardSlot::Size() const
 	return Cards.Num();
 }
 
-void UCardSlot::Add(const ACard* Card)
+void UCardSlot::Add(ACard* Card)
 {
 	Cards.Add(Card);
 }
 
-const ACard* UCardSlot::RemoveByIndex(UINT N)
+ACard* UCardSlot::GetCardByIndex(UINT N)
 {
-	if (!Cards.IsValidIndex(N))
-	{
-		return nullptr;
-	}
+	ACard* Card = nullptr;
 
-	const ACard* Card = Cards[N];
-	Cards.RemoveAt(N);
+	if (Cards.IsValidIndex(N))
+	{
+		Card = Cards[N];
+	}
 
 	return Card;
 }
 
-const ACard* UCardSlot::RemoveByID(FString ID)
+ACard* UCardSlot::GetCardByID(FString ID)
 {
-	const ACard* Card = nullptr;
+	ACard* Card = nullptr;
+
+	for (size_t i = 0; i < Cards.Num(); i++)
+	{
+		if (Cards[i]->GetID().Compare(ID) == 0)
+		{
+			Card = Cards[i];
+			break;
+		}
+	}
+
+	return Card;
+}
+
+ACard* UCardSlot::RemoveByIndex(UINT N)
+{
+	ACard* Card = nullptr;
+
+	if (Cards.IsValidIndex(N))
+	{
+		Card = Cards[N];
+		Cards.RemoveAt(N);
+	}
+
+	return Card;
+}
+
+ACard* UCardSlot::RemoveByID(FString ID)
+{
+	ACard* Card = nullptr;
 	
 	for (size_t i = 0; i < Cards.Num(); i++)
 	{
@@ -47,7 +75,14 @@ const ACard* UCardSlot::RemoveByID(FString ID)
 	return Card;
 }
 
-const FTransform UCardSlot::GetTransformForIndex(UINT Index) const
+const FB2Transform UCardSlot::GetTransformForIndex(UINT Index) const
 {
-	return FTransform();
+	FB2Transform transform;
+	
+	if (CardTransforms.IsValidIndex(Index))
+	{
+		transform = CardTransforms[Index];
+	}
+
+	return transform;
 }

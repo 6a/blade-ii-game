@@ -1,24 +1,19 @@
 #include "B2Game/FieldSlot.h"
 
-void UFieldSlot::Add(const ACard* Card)
+void UFieldSlot::Add(ACard* Card)
 {
 
 	Super::Add(Card);
 }
 
-const ACard* UFieldSlot::RemoveByIndex(UINT N)
+ACard* UFieldSlot::RemoveByIndex(UINT N)
 {
 
 	return Super::RemoveByIndex(N);
 }
 
-const ACard* UFieldSlot::RemoveByID(FString ID)
+ACard* UFieldSlot::RemoveByID(FString ID)
 {
 
 	return Super::RemoveByID(ID);
-}
-
-const FTransform UFieldSlot::GetTransformForIndex(UINT Index) const
-{
-	return FTransform(GetComponentTransform());
 }

@@ -1,9 +1,8 @@
-
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
 #include "B2Game/CardSlot.h"
 
 #include "Arena.generated.h"

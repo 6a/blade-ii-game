@@ -1,5 +1,6 @@
 #include "BladeIIGameGameModeBase.h"
 
+#include "EngineUtils.h"
 #include "UObject/UObjectGlobals.h"
 
 #include "B2Misc/Utility.h"
@@ -25,30 +26,14 @@ ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& Obj
 void ABladeIIGameGameModeBase::StartPlay()
 {
 	Super::StartPlay();
-	ACard* Card = CardFactory->Make(ECard::Bolt, FVector(19.5545776, -17.346609, 1.51910190), FRotator(180, 0, 0));
 
-	FVector StartLocation = Card->GetActorLocation();
-	FVector EndLocation = StartLocation + FVector(0, 0, 5.0);
-	FRotator StartRotation = Card->GetActorRotation();
-	FRotator EndRotation = StartRotation;
+	FindArena();
 
-	B2Transition Transition = B2Transition(StartLocation, EndLocation, StartRotation, EndRotation, FVector(0, 0, 5.0), EEase::EaseInOut, 0.4f, 1.5f);
-	Card->QueueTransition(Transition);
+	SetupDealer();
 
-	StartLocation = EndLocation;
-	EndLocation = StartLocation;
-	StartRotation = StartRotation;
-	EndRotation = StartRotation + FRotator(-180, 0, 0);
+	InitialiseBoard(B2BoardState());
 
-	Transition = B2Transition(StartLocation, EndLocation, StartRotation, EndRotation, FVector(0, 0, 3.0), EEase::EaseOut, 0.6f, 0.0f);
-	Card->QueueTransition(Transition);
-	StartLocation = EndLocation;
-	EndLocation = FVector(-25.664478, -17.346609, 1.523549);
-	StartRotation = EndRotation;
-	EndRotation = StartRotation;
-
-	Transition = B2Transition(StartLocation, EndLocation, StartRotation, EndRotation, FVector(0, -2.0, 0), EEase::EaseInOut, 0.4f, 0.0f);
-	Card->QueueTransition(Transition);
+	Dealer->Deal();
 
 	B2Utility::LogInfo("ABladeIIGameGameModeBase::StartPlay");
 }
@@ -116,6 +101,48 @@ void ABladeIIGameGameModeBase::RegisterEventListeners()
 	// Register event listeners
 	Opponent->OnMoveReceived.AddDynamic(this, &ABladeIIGameGameModeBase::HandleMoveReceived);
 	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameGameModeBase::HandleInstructionReceived);
+}
+
+void ABladeIIGameGameModeBase::FindArena()
+{
+	// Try to get a reference to the arena
+	for (TActorIterator<AArena> ArenaIter(GetWorld()); ArenaIter; ++ArenaIter)
+	{
+		if (ArenaIter)
+		{
+			Arena = *ArenaIter;
+		}
+	}
+
+	// Throw if the arena was not found
+	check(Arena);
+}
+
+void ABladeIIGameGameModeBase::SetupDealer()
+{
+	Dealer = new B2Dealer();
+	Dealer->Arena = Arena;
+}
+
+void ABladeIIGameGameModeBase::InitialiseBoard(B2BoardState BoardState)
+{
+	// Test state
+
+	// Player Deck
+	for (size_t i = 0; i < 15; i++)
+	{
+		FB2Transform CardTransform = Arena->PlayerDeck->GetTransformForIndex(i);
+		ACard* Card = CardFactory->Make(static_cast<ECard>(i % 11), CardTransform.Position, CardTransform.Rotation);
+		Arena->PlayerDeck->Add(Card);
+	}
+
+	// Opponent Deck
+	for (size_t i = 0; i < 15; i++)
+	{
+		FB2Transform CardTransform = Arena->OpponentDeck->GetTransformForIndex(i);
+		ACard* Card = CardFactory->Make(static_cast<ECard>(i % 11), CardTransform.Position, CardTransform.Rotation);
+		Arena->OpponentDeck->Add(Card);
+	}
 }
 
 void ABladeIIGameGameModeBase::HandleMoveReceived(FB2Move& Move)
