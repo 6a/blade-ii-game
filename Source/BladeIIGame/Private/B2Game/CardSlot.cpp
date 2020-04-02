@@ -2,7 +2,7 @@
 
 UCardSlot::UCardSlot()
 {
-	BaseTransform = B2Transform(GetComponentLocation(), GetComponentRotation());
+	BaseTransform = FB2Transform(GetComponentLocation(), GetComponentRotation());
 
 
 }
@@ -10,11 +10,6 @@ UCardSlot::UCardSlot()
 UINT UCardSlot::Size() const
 {
 	return Cards.Num();
-}
-
-void UCardSlot::SetCardOffset(B2Transform Offset)
-{
-	CardOffset = Offset;
 }
 
 void UCardSlot::Add(const ACard* Card)

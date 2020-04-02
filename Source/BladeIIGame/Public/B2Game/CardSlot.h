@@ -14,13 +14,14 @@ class BLADEIIGAME_API UCardSlot : public USceneComponent
 	GENERATED_BODY()
 	
 public:	
+	/* The positions for each possible card location */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Configuration)
+	TArray<FB2Transform> CardTransforms;
+
 	UCardSlot();
 
 	/* Returns the current stack size (i.e. the number of cards on this anchor) */
 	UINT Size() const;
-
-	/* Set the card offset for each placed card (offset from the previous) */
-	void SetCardOffset(B2Transform Offset);
 
 	/* Add the specified card */
 	virtual void Add(const ACard* Card);
@@ -44,10 +45,7 @@ protected:
 	TArray<const ACard*> Cards;
 
 	/* Transform from which all positional calculations will be based on */
-	B2Transform BaseTransform;
-
-	/* The offset for each card from the previous */
-	B2Transform CardOffset;
+	FB2Transform BaseTransform;
 
 	/**
 	 * Return the transform that a card with the index "Index" should have.
@@ -56,7 +54,4 @@ protected:
 	 * @warning Base class has no implementation - override and do not call base class
 	 */
 	const virtual FTransform GetTransformForIndex(UINT Index) const;
-
-private:
-	TArray<const B2Transform> CardPositions;
 };
