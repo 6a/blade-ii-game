@@ -132,7 +132,7 @@ void ABladeIIGameGameModeBase::InitialiseBoard(B2BoardState BoardState)
 	for (int i = 14; i >= 0; --i)
 	{
 		FB2Transform CardTransform = Arena->PlayerDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(static_cast<ECard>(i % 11), CardTransform.Position + FVector(28, 0, 5), CardTransform.Rotation);
+		ACard* Card = CardFactory->Make(static_cast<ECard>(FMath::RandRange(0, 10)), CardTransform.Position + FVector(28, 0, 5), CardTransform.Rotation);
 		Arena->PlayerDeck->Add(Card);
 	}
 
@@ -140,7 +140,7 @@ void ABladeIIGameGameModeBase::InitialiseBoard(B2BoardState BoardState)
 	for (int i = 14; i >= 0; --i)
 	{
 		FB2Transform CardTransform = Arena->OpponentDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(static_cast<ECard>(i % 11), CardTransform.Position + FVector(-28, 0, 5), CardTransform.Rotation);
+		ACard* Card = CardFactory->Make(static_cast<ECard>(FMath::RandRange(0, 10)), CardTransform.Position + FVector(-28, 0, 5), CardTransform.Rotation);
 		Arena->OpponentDeck->Add(Card);
 	}
 }
