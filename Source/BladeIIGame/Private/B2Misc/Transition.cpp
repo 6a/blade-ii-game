@@ -9,13 +9,18 @@ const float LERP_MAX = 1.f;
 const float LERP_MAX_HALF = LERP_MAX / 2;
 const float EASE_EXPONENT = 2.f;
 
+// Setting static members for B2Transition
+TMap<B2WaitGroup, size_t> B2Transition::WaitGroups;
+B2WaitGroup B2Transition::CurrentWaitGroup = 0;
+B2WaitGroup B2Transition::NextWaitGroup = 0;
+
 B2Transition::B2Transition()
 {
 	CurrentAlpha = 1.f;
 }
 
-B2Transition::B2Transition(FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, FVector ArcOffset, EEase Ease, float Duration, float Delay)
-	: StartPosition(StartPosition), EndPosition(EndPosition), StartRotation(StartRotation), EndRotation(EndRotation), MaxArcOffset(ArcOffset), Ease(Ease), Duration(Duration), RemainingDelay(Delay)
+B2Transition::B2Transition(B2WaitGroup WaitGroup, FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, FVector ArcOffset, EEase Ease, float Duration, float Delay)
+	: WaitGroup(WaitGroup), StartPosition(StartPosition), EndPosition(EndPosition), StartRotation(StartRotation), EndRotation(EndRotation), MaxArcOffset(ArcOffset), Ease(Ease), Duration(Duration), RemainingDelay(Delay)
 {
 	/* Set initial values */
 	CurrentPosition = StartPosition;
@@ -25,10 +30,61 @@ B2Transition::B2Transition(FVector StartPosition, FVector EndPosition, FRotator 
 	MaxArcOffset = ArcOffset;
 
 	CurrentAlpha = 0;
+
+	bTransitionFinished = false;
+
+	if (WaitGroup >= 0)
+	{
+		if (!WaitGroups.Contains(WaitGroup))
+		{
+			WaitGroups.Add(WaitGroup, 1);
+		}
+		else
+		{
+			WaitGroups[WaitGroup]++;
+		}
+	}
 }
 
 void B2Transition::Tick(float DeltaTime)
 {
+	//Waitgroup check to ensure all transitions in a particular wait group start when the waitgroup is active
+	if (WaitGroup >= 0)
+	{
+		if (WaitGroup < CurrentWaitGroup || WaitGroup > CurrentWaitGroup)
+		{
+			// Early exit if this transitions waitgroup is not yet in action
+			return;
+		}
+
+		// If done, early exit and remove this transition from its waitgroup
+		if (CurrentAlpha == LERP_MAX)
+		{
+			if (!bTransitionFinished)
+			{
+				bTransitionFinished = true;
+				WaitGroups[WaitGroup]--;
+
+				if (WaitGroups[WaitGroup] <= 0)
+				{
+					WaitGroups.Remove(WaitGroup);
+					CurrentWaitGroup++;
+
+					B2Utility::LogWarning(FString::Printf(TEXT("Removed group")));
+				}
+			}
+
+			return;
+		}
+	}
+	else
+	{
+		if (CurrentAlpha == LERP_MAX && !bTransitionFinished)
+		{
+			bTransitionFinished = true;
+		}
+	}
+
 	/* Calculate the step for this frame and increment the current alpha */
 	float Step = Duration == 0 ? 1 : LERP_MAX / (Duration / DeltaTime);
 
@@ -75,5 +131,15 @@ void B2Transition::Tick(float DeltaTime)
 
 bool B2Transition::Done() const
 {
-	return CurrentAlpha == 1.f;
+	bool bWaitGroupDone = !WaitGroups.Contains(WaitGroup);
+	bool Done = bWaitGroupDone && bTransitionFinished;
+
+	return Done;
+}
+
+B2WaitGroup B2Transition::GetNextWaitGroup()
+{
+	B2Utility::LogWarning(FString::Printf(TEXT("Assigned waitgroup: %d"), NextWaitGroup));
+
+	return NextWaitGroup++;
 }
