@@ -251,7 +251,7 @@ void B2Dealer::Deal()
 	for (size_t i = 0; i < Arena->PlayerHand->Size(); i++)
 	{
 		float Delay = 1.f;
-		FVector CenterPosition = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(4).Position, Arena->PlayerHand->GetTransformForIndex(5).Position, 0.5f) + (i * FVector(0, 0, CARD_HEIGHT));
+		FVector CenterPosition = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(3).Position, Arena->PlayerHand->GetTransformForIndex(4).Position, 0.5f) + (i * FVector(0, 0, CARD_HEIGHT));
 		FRotator CenterRotation = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(4).Rotation, Arena->PlayerHand->GetTransformForIndex(5).Rotation, 0.5f);
 		
 		// Get a pointer to the target card 
@@ -287,7 +287,7 @@ void B2Dealer::Deal()
 	for (size_t i = 0; i < Arena->OpponentHand->Size(); i++)
 	{
 		float Delay = 1.f;
-		FVector CenterPosition = FMath::Lerp(Arena->OpponentHand->GetTransformForIndex(4).Position, Arena->OpponentHand->GetTransformForIndex(5).Position, 0.5f) + (i * FVector(0, 0, CARD_HEIGHT));
+		FVector CenterPosition = FMath::Lerp(Arena->OpponentHand->GetTransformForIndex(3).Position, Arena->OpponentHand->GetTransformForIndex(4).Position, 0.5f) + (i * FVector(0, 0, CARD_HEIGHT));
 		FRotator CenterRotation = FMath::Lerp(Arena->OpponentHand->GetTransformForIndex(4).Rotation, Arena->OpponentHand->GetTransformForIndex(5).Rotation, 0.5f);
 
 		// Get a pointer to the target card 
@@ -309,70 +309,155 @@ void B2Dealer::Deal()
 			EEase::EaseInOut,
 		};
 
-		FVector StartPosition = Arena->OpponentHand->GetTransformForIndex(i).Position;
-		FRotator StartRotation = Arena->OpponentHand->GetTransformForIndex(i).Rotation;
-		FVector EndPosition = CenterPosition;
-		FRotator EndRotation = CenterRotation;
-
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WG_GatherUp, Position, Rotation, DurationGroupCards, Delay);
 		Card->QueueTransition(Transition);
 	}
 
-	//// Player cards shuffle
-	//for (size_t i = 0; i < Arena->PlayerHand->Size(); i++)
-	//{
-	//	float Delay = 2.f;
+	B2WaitGroup WG_PlayerShuffle = B2Transition::GetNextWaitGroup();
 
-	//	// Get a pointer to the target card 
-	//	ACard* Card = Arena->PlayerHand->GetCardByIndex(i);
+	// Player cards shuffle
+	for (size_t i = 0; i < Arena->PlayerHand->Size(); i++)
+	{
+		float Delay = 0.5f;
 
-	//	FVector CenterPosition = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(4).Position, Arena->PlayerHand->GetTransformForIndex(5).Position, 0.5f);
-	//	CenterPosition += (i * FVector(0, 0, CARD_HEIGHT));
-	//	FRotator CenterRotation = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(4).Rotation, Arena->PlayerHand->GetTransformForIndex(5).Rotation, 0.5f);
+		// Get a pointer to the target card 
+		ACard* Card = Arena->PlayerHand->GetCardByIndex(i);
 
-	//	// Transition 1
-	//	FVector StartPosition = CenterPosition;
-	//	FRotator StartRotation = CenterRotation;
-	//	FVector EndPosition = CenterPosition + FVector(0, 0, 4.f);
-	//	FRotator EndRotation = CenterRotation;
+		FVector CenterPosition = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(3).Position, Arena->PlayerHand->GetTransformForIndex(4).Position, 0.5f);
+		CenterPosition += (i * FVector(0, 0, CARD_HEIGHT));
+		FRotator CenterRotationUpwards = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(4).Rotation, Arena->PlayerHand->GetTransformForIndex(5).Rotation, 0.5f);
 
-	//	// Add the transition to the transition queue
-	//	B2Transition Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, 0, 0), EEase::EaseInOut, 0.5f, Delay);
-	//	Card->QueueTransition(Transition);
+		// Transition 1
+		B2TPosition Position
+		{
+			CenterPosition,
+			CenterPosition + FVector(0, 0, 6.f),
+			FVector(0, 0, 0),
+			EEase::EaseInOut,
+		};
 
-	//	FVector PositionBeforeExpansion = EndPosition;
-	//	FRotator RotationBeforeExpansion = EndRotation;
+		B2TRotation Rotation
+		{
+			CenterRotationUpwards,
+			CenterRotationUpwards,
+			EEase::EaseInOut,
+		};
 
-	//	float Radians = FMath::DegreesToRadians(360 / Arena->PlayerHand->Size() * i);
-	//	FVector2D Direction = FVector2D(FMath::Cos(Radians), FMath::Sin(Radians));
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, 0.4f, Delay);
+		Card->QueueTransition(Transition);
 
-	//	FVector PosOffset = FVector(Direction.X, Direction.Y, 0) * 8.f;
-	//	PosOffset.Z = FMath::FRandRange(-1, 1) * 3.f;
+		// Transition 2
+		FRotator CenterRotationDownwards = FMath::Lerp(Arena->PlayerHandReversed->GetTransformForIndex(4).Rotation, Arena->PlayerHandReversed->GetTransformForIndex(5).Rotation, 0.5f);
 
-	//	// Transition 2
-	//	StartPosition = EndPosition;
-	//	StartRotation = EndRotation;
-	//	EndPosition = EndPosition + PosOffset;
-	//	EndRotation = CenterRotation;
+		FVector ArcOffset;
+		float VerticalOffset = i > 4 ? CARD_HEIGHT + ((i - 5) * CARD_HEIGHT * 2) : -(CARD_HEIGHT + ((4 - i) * CARD_HEIGHT * 2));
 
-	//	// Add the transition to the transition queue
-	//	Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, 0, 0), EEase::EaseOut, 0.5f, 0);
-	//	Card->QueueTransition(Transition);
+		Position = B2TPosition
+		{
+			Position.EndPosition,
+			Position.EndPosition - FVector(0, 0, VerticalOffset),
+			FVector(0, 0, 0),
+			EEase::EaseInOut,
+		};
 
-	//	// TODO sort and recalculate. Also pop all and reinsert in correct order
-	//	// TODO do the same for opponent, but dont animate (do instantly)
+		Rotation = B2TRotation
+		{
+			CenterRotationUpwards,
+			CenterRotationDownwards,
+			EEase::EaseInOut,
+		};
 
-	//	PosOffset.Z = 0;
+		// Add the transition to the transition queue
+		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, 0.4f, Delay);
+		Card->QueueTransition(Transition);
 
-	//	// Transition 3
-	//	StartPosition = EndPosition;
-	//	StartRotation = EndRotation;
-	//	EndPosition = PositionBeforeExpansion;
-	//	EndRotation = RotationBeforeExpansion;
+		// Transition 3
+		Position = B2TPosition
+		{
+			Position.EndPosition,
+			CenterPosition + FVector(0, 0, 6.f),
+			FVector(0, 0, 0),
+			EEase::EaseInOut,
+		};
 
-	//	// Add the transition to the transition queue
-	//	Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, 0, 0), EEase::EaseOut, 0.5f, 0);
-	//	Card->QueueTransition(Transition);
-	//}
+		Rotation = B2TRotation
+		{
+			CenterRotationDownwards,
+			CenterRotationUpwards,
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		Transition = B2Transition(WG_PlayerShuffle, Position, Rotation, 0.4f, Delay);
+		Card->QueueTransition(Transition);
+
+
+		// TODO sort and rearrange for both hands
+	}
+
+	B2WaitGroup WG_PostShuffleSpread = B2Transition::GetNextWaitGroup();
+
+	// Player cards spread
+	for (size_t i = 0; i < Arena->PlayerHand->Size(); i++)
+	{
+		float Delay = 1.f;
+		FVector CenterPosition = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(3).Position, Arena->PlayerHand->GetTransformForIndex(4).Position, 0.5f) + (i * FVector(0, 0, CARD_HEIGHT));
+		FRotator CenterRotation = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(4).Rotation, Arena->PlayerHand->GetTransformForIndex(5).Rotation, 0.5f);
+
+		// Get a pointer to the target card 
+		ACard* Card = Arena->PlayerHand->GetCardByIndex(i);
+
+		// Transition 1
+		B2TPosition Position
+		{
+			CenterPosition + FVector(0, 0, 6.f),
+			Arena->PlayerHand->GetTransformForIndex(i).Position,
+			FVector(0, 0, 0),
+			EEase::EaseInOut,
+		};
+
+		B2TRotation Rotation
+		{
+			CenterRotation,
+			Arena->PlayerHand->GetTransformForIndex(i).Rotation,
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(WG_PostShuffleSpread, Position, Rotation, DurationGroupCards, Delay);
+		Card->QueueTransition(Transition);
+	}
+
+	// Opponent cards spread
+	for (size_t i = 0; i < Arena->OpponentHand->Size(); i++)
+	{
+		float Delay = 1.f;
+		FVector CenterPosition = FMath::Lerp(Arena->OpponentHand->GetTransformForIndex(3).Position, Arena->OpponentHand->GetTransformForIndex(4).Position, 0.5f) + (i * FVector(0, 0, CARD_HEIGHT));
+		FRotator CenterRotation = FMath::Lerp(Arena->OpponentHand->GetTransformForIndex(4).Rotation, Arena->OpponentHand->GetTransformForIndex(5).Rotation, 0.5f);
+
+		// Get a pointer to the target card 
+		ACard* Card = Arena->OpponentHand->GetCardByIndex(i);
+
+		// Transition 1
+		B2TPosition Position
+		{
+			CenterPosition + FVector(0, 0, 6.f),
+			Arena->OpponentHand->GetTransformForIndex(i).Position,
+			FVector(0, 0, 0),
+			EEase::EaseInOut,
+		};
+
+		B2TRotation Rotation
+		{
+			CenterRotation,
+			Arena->OpponentHand->GetTransformForIndex(i).Rotation,
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(WG_PostShuffleSpread, Position, Rotation, DurationGroupCards, Delay);
+		Card->QueueTransition(Transition);
+	}
 }
