@@ -6,12 +6,15 @@
 
 class B2Dealer
 {
-public:
-	void Deal();
-
+public:	
+	
 	/* Pointer to the arena */
 	AArena* Arena;
 
+	B2Dealer();
+
+	/* Deal the cards out onto the arena. Can only be called once */
+	void Deal();
 private:
 	
 	/* Whether or not the cards have already been dealt (to avoid dealing twice) */

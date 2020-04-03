@@ -7,6 +7,21 @@
 typedef int64 B2WaitGroup;
 const B2WaitGroup B2WaitGroupNone = -1;
 
+struct B2TRotation
+{
+	FRotator StartRotation;
+	FRotator EndRotation;
+	EEase Ease;
+};
+
+struct B2TPosition
+{
+	FVector StartPosition;
+	FVector EndPosition;
+	FVector ArcOffset;
+	EEase Ease;
+};
+
 class B2Transition
 {
 public:
@@ -20,16 +35,12 @@ public:
 	/**
 	 * Start a transition.
 	 * @param WaitGroup - The wait group for this transition (it will not start until the wait group is active, and will not finish until the waitgroup has been closed)
-	 * @param StartPosition - Starting position for this transition
-	 * @param EndPosition - Ending position for this transition
-	 * @param StartRotation - Starting rotation for this transition
-	 * @param EndRotation - Ending rotation for this transition
-	 * @param ArcOffset - How much the transition should arc in X, Y and Z.
-	 * @param Ease - The easing algorithm to use.
+	 * @param Position - Translation data for this transition
+	 * @param Rotation - Rotation data for this transition
 	 * @param Duration - How long this transition should take
 	 * @param Delay - How long to wait before transitioning
 	 */
-	B2Transition(B2WaitGroup WaitGroup, FVector StartPosition, FVector EndPosition, FRotator StartRotation, FRotator EndRotation, FVector ArcOffset = FVector::ZeroVector, EEase Ease = EEase::EaseInOut, float Duration = 0.5f,  float Delay = 0.f);
+	B2Transition(B2WaitGroup WaitGroup, B2TPosition Position, B2TRotation Rotation, float Duration = 0.5f, float Delay = 0.f);
 
 	/**
 	 * Ticks this transition by 1 frame.
@@ -43,17 +54,12 @@ public:
 	/* Returns the next wait group */
 	static B2WaitGroup GetNextWaitGroup();
 
+	/* Reset all the static counters such as current and next wait group  */
+	static void ResetStatic();
+
 private:
-	FVector StartPosition;
-	FVector EndPosition;
-
-	FRotator StartRotation;
-	FRotator EndRotation;
-
-	FVector MinArcOffset;
-	FVector MaxArcOffset;
-
-	EEase Ease;
+	B2TRotation Rotation;
+	B2TPosition Translation;
 
 	float Duration;
 	float CurrentAlpha;
