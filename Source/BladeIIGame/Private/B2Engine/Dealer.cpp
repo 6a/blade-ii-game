@@ -23,8 +23,10 @@ void B2Dealer::Deal()
 	float DelayOffsetOnStart = 0.2f;
 	float DelayOOBToDeck = 0.4f;
 	float DelayPreDeal = 1.f;
-	float DelayDeckToAir = 0.4f;
-	float DelayAirToHand = 0.3f;
+	float DelayPostDeal = 16.f;
+	float DelayShowPlayerCards = 0.4f;
+	float DurationDeckToAir = 0.4f;
+	float DurationAirToHand = 0.3f;
 
 	// Player cards - into deck
 	for (size_t i = 0; i < DECK_CAPACITY; i++)
@@ -67,7 +69,7 @@ void B2Dealer::Deal()
 	{
 		size_t DeckIndex = DECK_CAPACITY - 1 - i;
 		size_t HandIndex = i;
-		float Delay = DelayPreDeal + i * (DelayDeckToAir + DelayOOBToDeck);
+		float Delay = DelayPreDeal + i * (DurationDeckToAir + DelayOOBToDeck);
 
 		// Transition 1
 		FVector StartPosition = Arena->PlayerDeck->GetTransformForIndex(DeckIndex).Position;
@@ -79,7 +81,7 @@ void B2Dealer::Deal()
 		ACard* Card = Arena->PlayerDeck->RemoveByIndex(DeckIndex);
 
 		// Add the transition to the transition queue
-		B2Transition Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, 0, 0), EEase::EaseInOut, DelayDeckToAir, Delay);
+		B2Transition Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, 0, 0), EEase::EaseInOut, DurationDeckToAir, Delay);
 		Card->QueueTransition(Transition);
 
 		// Transition 2
@@ -89,7 +91,7 @@ void B2Dealer::Deal()
 		EndRotation = Arena->PlayerHandReversed->GetTransformForIndex(HandIndex).Rotation;
 
 		// Add the transition to the transition queue
-		Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, -2.0, 12), EEase::EaseOut, DelayAirToHand, 0.0f);
+		Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, -2.0, 12), EEase::EaseOut, DurationAirToHand, 0.0f);
 		Card->QueueTransition(Transition);
 
 		// Add the card that we popped from the players deck, to the players hand
@@ -101,7 +103,7 @@ void B2Dealer::Deal()
 	{
 		size_t DeckIndex = DECK_CAPACITY - 1 - i;
 		size_t HandIndex = i;
-		float Delay = DelayPreDeal + i * (DelayDeckToAir + DelayOOBToDeck);
+		float Delay = DelayPreDeal + i * (DurationDeckToAir + DelayOOBToDeck);
 
 		// Transition 1
 		FVector StartPosition = Arena->OpponentDeck->GetTransformForIndex(DeckIndex).Position;
@@ -113,7 +115,7 @@ void B2Dealer::Deal()
 		ACard* Card = Arena->OpponentDeck->RemoveByIndex(DeckIndex);
 
 		// Add the transition to the transition queue
-		B2Transition Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, 0, 0), EEase::EaseInOut, DelayDeckToAir, Delay);
+		B2Transition Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, 0, 0), EEase::EaseInOut, DurationDeckToAir, Delay);
 		Card->QueueTransition(Transition);
 
 		// Transition 2
@@ -123,7 +125,7 @@ void B2Dealer::Deal()
 		EndRotation = Arena->OpponentHand->GetTransformForIndex(HandIndex).Rotation;
 
 		// Add the transition to the transition queue
-		Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, 2.0, 12), EEase::EaseOut, DelayAirToHand, 0.0f);
+		Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(0, 2.0, 12), EEase::EaseOut, DurationAirToHand, 0.0f);
 		Card->QueueTransition(Transition);
 
 		// Add the card that we popped from the opponents deck, to the opponents hand
@@ -131,7 +133,23 @@ void B2Dealer::Deal()
 	}
 
 	// Player cards reveal
+	for (size_t i = 0; i < Arena->PlayerHand->Size(); i++)
+	{
+		float Delay = DelayPostDeal - (i * DelayShowPlayerCards);
 
+		// Transition 1
+		FVector StartPosition = Arena->PlayerHandReversed->GetTransformForIndex(i).Position;
+		FRotator StartRotation = Arena->PlayerHandReversed->GetTransformForIndex(i).Rotation;
+		FVector EndPosition = StartPosition;
+		FRotator EndRotation = Arena->PlayerHand->GetTransformForIndex(i).Rotation;
+
+		// Get a pointer to the first card card from the players hand
+		ACard* Card = Arena->PlayerHand->GetCardByIndex(i);
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(StartPosition, EndPosition, StartRotation, EndRotation, FVector(4.5f, 2.f, 5.f), EEase::EaseIn, 0.2f, Delay);
+		Card->QueueTransition(Transition);
+	}
 
 	bCardsDealt = true;
 }
