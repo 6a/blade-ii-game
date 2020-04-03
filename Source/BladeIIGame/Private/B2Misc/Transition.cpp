@@ -30,7 +30,7 @@ B2Transition::B2Transition(FVector StartPosition, FVector EndPosition, FRotator 
 void B2Transition::Tick(float DeltaTime)
 {
 	/* Calculate the step for this frame and increment the current alpha */
-	float Step = LERP_MAX / (Duration / DeltaTime);
+	float Step = Duration == 0 ? 1 : LERP_MAX / (Duration / DeltaTime);
 
 	// If there is some time to wait, do so, decrementing the wait time and exiting early
 	if (RemainingDelay > 0)

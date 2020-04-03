@@ -16,6 +16,5 @@ private:
 	
 	/* Whether or not the cards have already been dealt (to avoid dealing twice) */
 	bool bCardsDealt;
-
 };
 
