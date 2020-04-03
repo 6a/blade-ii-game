@@ -32,6 +32,9 @@ AArena::AArena()
 	PlayerHand = CreateDefaultSubobject<UHandSlot>(TEXT("Player Hand"));
 	PlayerHand->AttachToComponent(Slots, StandardAttachmentRules);
 
+	PlayerHandReversed = CreateDefaultSubobject<UHandSlot>(TEXT("Player Hand (Reversed)"));
+	PlayerHandReversed->AttachToComponent(Slots, StandardAttachmentRules);
+
 	PlayerField = CreateDefaultSubobject<UFieldSlot>(TEXT("Player Field"));
 	PlayerField->AttachToComponent(Slots, StandardAttachmentRules);
 

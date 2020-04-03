@@ -83,7 +83,7 @@ void ABladeIIGameGameModeBase::SetupCardFactory()
 	});
 
 	/* Back and MRS (metallic, roughness, specular) paths */
-	B2CardFactoryConfig.CardBackPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Back.T_Card_Back");
+	B2CardFactoryConfig.CardBackPath = TEXT("/Game/BladeIIGame/Textures/T_Up_Test.T_Up_Test");
 	B2CardFactoryConfig.CardFrontMRSPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Front_MRS.T_Card_Front_MRS");
 	B2CardFactoryConfig.CardBackMRSPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Back_MRS.T_Card_Back_MRS");
 
@@ -129,18 +129,18 @@ void ABladeIIGameGameModeBase::InitialiseBoard(B2BoardState BoardState)
 	// Test state
 
 	// Player Deck
-	for (size_t i = 0; i < 15; i++)
+	for (int i = 14; i >= 0; --i)
 	{
 		FB2Transform CardTransform = Arena->PlayerDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(static_cast<ECard>(i % 11), CardTransform.Position, CardTransform.Rotation);
+		ACard* Card = CardFactory->Make(static_cast<ECard>(i % 11), CardTransform.Position + FVector(28, 0, 5), CardTransform.Rotation);
 		Arena->PlayerDeck->Add(Card);
 	}
 
 	// Opponent Deck
-	for (size_t i = 0; i < 15; i++)
+	for (int i = 14; i >= 0; --i)
 	{
 		FB2Transform CardTransform = Arena->OpponentDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(static_cast<ECard>(i % 11), CardTransform.Position, CardTransform.Rotation);
+		ACard* Card = CardFactory->Make(static_cast<ECard>(i % 11), CardTransform.Position + FVector(-28, 0, 5), CardTransform.Rotation);
 		Arena->OpponentDeck->Add(Card);
 	}
 }

@@ -41,6 +41,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCardSlot* PlayerHand;
 
+	/* Slot for local players hand slots (reversed) */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCardSlot* PlayerHandReversed;
+
 	/* Slot for local players field slots */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCardSlot* PlayerField;
