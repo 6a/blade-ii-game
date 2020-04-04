@@ -611,6 +611,11 @@ void UB2Dealer::Tick(float DeltaSeconds)
 		// Fire a callback when the dealing transition has finished
 		if (WaitGroupDealFinished == CurrentWaitGroup)
 		{
+			// Also re-sort the hands as their orders were messed up when shuffling
+			Arena->PlayerHand->UpdateCardOrder();
+			Arena->OpponentHand->UpdateCardOrder();
+
+			// Fire the event and reset this wait group so we dont keep entering this part
 			OnCardsDealt.Broadcast(EDealerEvent::CardsDealt);
 			WaitGroupDealFinished = B2WaitGroupNone;
 		}

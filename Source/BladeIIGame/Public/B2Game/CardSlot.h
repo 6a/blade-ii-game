@@ -67,6 +67,9 @@ public:
 	 */
 	const virtual FB2Transform GetTransformForIndex(UINT Index) const;
 
+	/* Updates the internal container so that the cards are in the right order (0 -> MAX, from left to right */
+	virtual void UpdateCardOrder();
+
 protected:
 	/* A container for the current stack of cards on this anchor */
 	TArray<ACard*> Cards;

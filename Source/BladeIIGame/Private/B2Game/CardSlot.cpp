@@ -111,3 +111,13 @@ const FB2Transform UCardSlot::GetTransformForIndex(UINT Index) const
 
 	return transform;
 }
+
+void UCardSlot::UpdateCardOrder()
+{
+	Cards.Sort([](const ACard& a, const ACard& b) { return a.GetActorLocation().X > b.GetActorLocation().X; });
+
+	for (size_t i = 0; i < Cards.Num(); i++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Card: %s"), *Cards[i]->GetFName().ToString());
+	}
+}
