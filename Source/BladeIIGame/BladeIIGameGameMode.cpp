@@ -10,9 +10,16 @@
 #include "B2Engine/LocalPlayerInput.h"
 #include "B2Misc/Transition.h"
 
+const float OUT_OF_BOUNDS_OFFSET_X = 28;
+
 void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 {
-	Dealer->Tick(DeltaSeconds);
+	if (EngineState > EEngineState::Initialisation)
+	{
+		Dealer->Tick(DeltaSeconds);
+	}
+
+	Opponent->Tick(DeltaSeconds);
 }
 
 ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer)
@@ -22,6 +29,8 @@ ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectIniti
 	SetupLaunchConfig(ObjectInitializer);
 	
 	SetupCardFactory();
+
+	EngineState = EEngineState::Initialisation;
 
 	B2Utility::LogInfo("GameMode initialized");
 }
@@ -36,10 +45,6 @@ void ABladeIIGameGameMode::StartPlay()
 
 	RegisterEventListeners();
 
-	InitialiseBoard(B2BoardState());
-
-	Dealer->Deal();
-	
 	SetupSelector();
 
 	B2Utility::LogInfo("ABladeIIGameGameModeBase::StartPlay");
@@ -110,6 +115,7 @@ void ABladeIIGameGameMode::RegisterEventListeners()
 	// From Opponent
 	Opponent->OnMoveReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleMoveReceived);
 	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleInstructionReceived);
+	Opponent->OnCardsReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleCardsReceived);
 
 	// From Dealer
 	Dealer->OnCardsDealt.AddDynamic(this, &ABladeIIGameGameMode::HandleEventUpdate);
@@ -150,33 +156,47 @@ void ABladeIIGameGameMode::SetupSelector()
 	CardSelector = GetWorld()->SpawnActor<ACardSelector>(CardSelectorClass, FVector::ZeroVector, FRotator::ZeroRotator);
 }
 
-void ABladeIIGameGameMode::InitialiseBoard(B2BoardState BoardState)
+void ABladeIIGameGameMode::InitialiseBoard(B2BoardState State)
 {
-	// Test state
+	BoardState = State;
 
 	// Player Deck
-	for (int i = 14; i >= 0; --i)
+	for (int i = 0; i < BoardState.Cards.PlayerDeck.Num(); ++i)
 	{
 		FB2Transform CardTransform = Arena->PlayerDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(static_cast<ECard>(FMath::RandRange(0, 10)), CardTransform.Position + FVector(28, 0, 5), CardTransform.Rotation);
+		ACard* Card = CardFactory->Make(BoardState.Cards.PlayerDeck[i], CardTransform.Position + FVector(OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
 		Arena->PlayerDeck->Add(Card);
 	}
 
 	// Opponent Deck
-	for (int i = 14; i >= 0; --i)
+	for (int i = 0; i < BoardState.Cards.OpponentDeck.Num(); ++i)
 	{
 		FB2Transform CardTransform = Arena->OpponentDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(static_cast<ECard>(FMath::RandRange(0, 10)), CardTransform.Position + FVector(-28, 0, 5), CardTransform.Rotation);
-		Arena->OpponentDeck->Add(Card);
+		ACard* Card = CardFactory->Make(BoardState.Cards.OpponentDeck[i], CardTransform.Position + FVector(-OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
+		Arena->OpponentDeck->Add(Card); 
 	}
 }
 
 void ABladeIIGameGameMode::OnCardsDealt()
 {
-	FB2Transform SelectorStartingTransform = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Size() - 1);
+	FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Size() - 1).Position;
 
-	CardSelector->SetActorLocationAndRotation(SelectorStartingTransform.Position, FRotator::ZeroRotator);
+	CardSelector->SetActorLocationAndRotation(SelectorStartingPosition, FRotator::ZeroRotator);
 	CardSelector->ToggleActorVisibility(true);
+}
+
+void ABladeIIGameGameMode::HandleCardsReceived(const FB2Cards& Cards)
+{
+	B2BoardState State = B2BoardState
+	{
+		Cards
+	};
+
+	InitialiseBoard(State);
+
+	EngineState = EEngineState::Dealing;
+
+	Dealer->Deal();
 }
 
 void ABladeIIGameGameMode::HandleMoveReceived(const FB2Move& Move)

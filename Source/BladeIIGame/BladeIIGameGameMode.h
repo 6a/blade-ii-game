@@ -7,6 +7,7 @@
 #include "B2Engine/Opponent.h"
 #include "B2Engine/Dealer.h"
 #include "B2Engine/BoardState.h"
+#include "B2Engine/Cards.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
 
@@ -41,6 +42,12 @@ private:
 	/* Pointer to the card selector that will be used throughout this match */
 	ACardSelector* CardSelector;
 
+	/* The current state of the board */
+	B2BoardState BoardState;
+
+	/* The current state of the engine */
+	EEngineState EngineState;
+
 	/**
 	 * Reads the launch config and sets up the engine accordingly.
 	 * @param ObjectInitializer - ObjectInitializer helper from constructor
@@ -67,6 +74,13 @@ private:
 
 	/* Game logic for when the cards have been dealt by the dealer */
 	void OnCardsDealt();
+
+	/**
+	 * Event handler for receiving the cards for this game.
+	 * @param Cards - The cards for this game
+	 */
+	UFUNCTION()
+	void HandleCardsReceived(const FB2Cards& Cards);
 
 	/**
 	 * Event handler for moves received from the server.

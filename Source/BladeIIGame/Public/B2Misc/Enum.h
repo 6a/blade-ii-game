@@ -64,3 +64,23 @@ enum class EDealerEvent : uint8
 	CardsDealt UMETA(DisplayName = "Cards Dealt"),
 	CardPlaced UMETA(DisplayName = "Card Placed")
 };
+
+/* EEngineState represents the current state of the engine (as in, what it is doing - init, dealing, in-play etc */
+UENUM(BlueprintType)
+enum class EEngineState : uint8
+{
+	Initialisation UMETA(DisplayName = "Initialisation"),
+	Dealing UMETA(DisplayName = "Dealing"),
+	InPlay UMETA(DisplayName = "In Play"),
+	PostGame UMETA(DisplayName = "Post Game"),
+};
+
+/* EPayload represents the various types of data once can send/receive to and from a server */
+UENUM(BlueprintType)
+enum class EPayload : uint8
+{
+	None UMETA(DisplayName = "None"),
+	Cards UMETA(DisplayName = "Cards"),
+	Move UMETA(DisplayName = "Move"),
+	Instruction UMETA(DisplayName = "Instruction")
+};

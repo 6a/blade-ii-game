@@ -20,5 +20,4 @@ public:
 	 * @param MatchID - Match ID.
 	 */
 	void Configure(FString PublicID, FString AuthToken, uint64 MatchID);
-
 };

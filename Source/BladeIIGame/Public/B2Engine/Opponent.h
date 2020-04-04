@@ -3,13 +3,15 @@
 #include "CoreMinimal.h"
 
 #include "B2Engine/Move.h"
-#include "B2Misc/Enum.h"
 #include "B2Engine/Server.h"
+#include "B2Engine/Cards.h"
+#include "B2Misc/Enum.h"
 
 #include "Opponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReceivedDelegate, const FB2Move&, Move);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInstructionReceivedDelegate, EInstruction, Move);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCardsReceived, const FB2Cards&, Cards);
 
 UCLASS()
 class UB2Opponent : public UObject
@@ -23,6 +25,15 @@ public:
 	/* Callback for receiving instructions from the server */
 	FInstructionReceivedDelegate OnInstructionReceived;
 
+	/* Callback for when the cards for this game are received from the server */
+	FCardsReceived OnCardsReceived;
+
+	/**
+	 * Tick this opponent instance.
+	 * @param DeltaSeconds - DeltaSeconds for the previous frame.
+	 */
+	virtual void Tick(float DeltaSeconds);
+
 	/**
 	 * Send a move to the server.
 	 * @param Move - The move to send
@@ -35,9 +46,9 @@ public:
 	 */
 	void SendInstruction(const EInstruction& Instruction);
 
-private:
+protected:
 	/* The back end for this opponent. Could be an AI opponent, or a network opponent */
-	B2Server BackEnd;
+	B2Server* BackEnd;
 
 };
 

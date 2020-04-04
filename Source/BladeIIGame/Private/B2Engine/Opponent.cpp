@@ -1,5 +1,26 @@
 #include "B2Engine/Opponent.h"
 
+void UB2Opponent::Tick(float DeltaSeconds)
+{
+	B2ServerUpdate ServerUpdate = BackEnd->GetNextUpdate();
+
+	switch (ServerUpdate.Type)
+	{
+		case EPayload::None:
+
+			break;
+		case EPayload::Cards:
+			OnCardsReceived.Broadcast(ServerUpdate.Cards);
+			break;
+		case EPayload::Move:
+
+			break;
+		case EPayload::Instruction:
+
+			break;
+	}
+}
+
 void UB2Opponent::SendMove(const FB2Move& Move)
 {
 
