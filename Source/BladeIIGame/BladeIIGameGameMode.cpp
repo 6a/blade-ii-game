@@ -1,4 +1,4 @@
-#include "BladeIIGameGameModeBase.h"
+#include "BladeIIGameGameMode.h"
 
 #include "EngineUtils.h"
 #include "UObject/UObjectGlobals.h"
@@ -10,7 +10,7 @@
 #include "B2Engine/LocalPlayerInput.h"
 #include "B2Misc/Transition.h"
 
-ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& ObjectInitializer)
+ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer)
 {
 	DefaultPawnClass = ALocalPlayerInput::StaticClass();
 
@@ -23,7 +23,7 @@ ABladeIIGameGameModeBase::ABladeIIGameGameModeBase(const FObjectInitializer& Obj
 	B2Utility::LogInfo("GameMode initialized");
 }
 
-void ABladeIIGameGameModeBase::StartPlay()
+void ABladeIIGameGameMode::StartPlay()
 {
 	Super::StartPlay();
 
@@ -38,7 +38,7 @@ void ABladeIIGameGameModeBase::StartPlay()
 	B2Utility::LogInfo("ABladeIIGameGameModeBase::StartPlay");
 }
 
-void ABladeIIGameGameModeBase::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)
+void ABladeIIGameGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)
 {
 	// Read the launch config
 	B2LaunchConfig LaunchConfig("Launch.conf");
@@ -60,7 +60,7 @@ void ABladeIIGameGameModeBase::SetupLaunchConfig(const FObjectInitializer& Objec
 	}
 }
 
-void ABladeIIGameGameModeBase::SetupCardFactory()
+void ABladeIIGameGameMode::SetupCardFactory()
 {
 	// Load card config (textures to use, etc)
 	B2CardFactoryConfig B2CardFactoryConfig;
@@ -96,14 +96,14 @@ void ABladeIIGameGameModeBase::SetupCardFactory()
 	CardFactory = new B2CardFactory(B2CardFactoryConfig);
 }
 
-void ABladeIIGameGameModeBase::RegisterEventListeners()
+void ABladeIIGameGameMode::RegisterEventListeners()
 {
 	// Register event listeners
-	Opponent->OnMoveReceived.AddDynamic(this, &ABladeIIGameGameModeBase::HandleMoveReceived);
-	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameGameModeBase::HandleInstructionReceived);
+	Opponent->OnMoveReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleMoveReceived);
+	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleInstructionReceived);
 }
 
-void ABladeIIGameGameModeBase::FindArena()
+void ABladeIIGameGameMode::FindArena()
 {
 	// Try to get a reference to the arena
 	for (TActorIterator<AArena> ArenaIter(GetWorld()); ArenaIter; ++ArenaIter)
@@ -118,13 +118,13 @@ void ABladeIIGameGameModeBase::FindArena()
 	check(Arena);
 }
 
-void ABladeIIGameGameModeBase::SetupDealer()
+void ABladeIIGameGameMode::SetupDealer()
 {
 	Dealer = NewObject<UB2Dealer>(this, TEXT("Dealer"));
 	Dealer->Arena = Arena;
 }
 
-void ABladeIIGameGameModeBase::InitialiseBoard(B2BoardState BoardState)
+void ABladeIIGameGameMode::InitialiseBoard(B2BoardState BoardState)
 {
 	// Test state
 
@@ -145,12 +145,12 @@ void ABladeIIGameGameModeBase::InitialiseBoard(B2BoardState BoardState)
 	}
 }
 
-void ABladeIIGameGameModeBase::HandleMoveReceived(FB2Move& Move)
+void ABladeIIGameGameMode::HandleMoveReceived(FB2Move& Move)
 {
 
 }
 
-void ABladeIIGameGameModeBase::HandleInstructionReceived(EInstruction& Instruction)
+void ABladeIIGameGameMode::HandleInstructionReceived(EInstruction& Instruction)
 {
 
 }

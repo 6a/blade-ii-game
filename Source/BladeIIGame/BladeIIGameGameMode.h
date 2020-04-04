@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameMode.h"
 
 #include "B2Engine/CardFactory.h"
 #include "B2Engine/Opponent.h"
@@ -9,10 +9,10 @@
 #include "B2Engine/BoardState.h"
 #include "B2Game/Arena.h"
 
-#include "BladeIIGameGameModeBase.generated.h"
+#include "BladeIIGameGameMode.generated.h"
 
 UCLASS()
-class BLADEIIGAME_API ABladeIIGameGameModeBase : public AGameModeBase
+class BLADEIIGAME_API ABladeIIGameGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
@@ -20,7 +20,7 @@ public:
 	virtual void StartPlay() override;
 
 protected:
-	ABladeIIGameGameModeBase(const FObjectInitializer& ObjectInitializer);
+	ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer);
 
 private:
 	/* Pointer to the cardfactory that will be used throughout this match */
