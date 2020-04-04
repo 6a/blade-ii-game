@@ -17,12 +17,22 @@ void ALocalPlayerInput::BeginPlay()
 
 void ALocalPlayerInput::OnMenuPressed()
 {
-
+	B2Utility::LogInfo(TEXT("Menu Pressed"));
 }
 
 void ALocalPlayerInput::OnMouseButtonLeft()
 {
 	B2Utility::LogInfo(FString::Format(TEXT("Mouse Clicked @ [{0} {1}]"), { PreviousMousePosition.X, PreviousMousePosition.Y }));
+}
+
+void ALocalPlayerInput::OnNavivateLeftPressed()
+{
+	B2Utility::LogInfo(TEXT("Navigate Left Pressed"));
+}
+
+void ALocalPlayerInput::OnNavivateRightPressed()
+{
+	B2Utility::LogInfo(TEXT("Navigate Right Pressed"));
 }
 
 void ALocalPlayerInput::OnMouseMoved(const FVector2D& NewMousePosition)
@@ -53,9 +63,7 @@ void ALocalPlayerInput::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
 	UpdateMousePosition();
-
 }
 
 void ALocalPlayerInput::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -73,5 +81,9 @@ void ALocalPlayerInput::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
     /* Bind the Menu button */
     InputComponent->BindAction("Menu", IE_Pressed, this, &ALocalPlayerInput::OnMenuPressed);
+
+	/* Bind the Navigation buttons */
+	InputComponent->BindAction("NavigateRight", IE_Pressed, this, &ALocalPlayerInput::OnNavivateRightPressed);
+	InputComponent->BindAction("NavigateLeft", IE_Pressed, this, &ALocalPlayerInput::OnNavivateLeftPressed);
 }
 

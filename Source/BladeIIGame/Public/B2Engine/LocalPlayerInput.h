@@ -19,6 +19,9 @@ public:
 	/* Called to bind functionality to input */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/* Returns the current cursor position. Top left is (0, 0), bottom right is (MAX, MAX) */
+	FVector2D GetCurrentMousePosition() const;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -29,14 +32,15 @@ private:
 	/* Mouse position during the previous frame */
 	FVector2D PreviousMousePosition;
 
-	FVector2D GetCurrentMousePosition() const;
-
+	/* Updates the current mouse position */
 	void UpdateMousePosition();
 
+	// Various callbacks
+
 	void OnMenuPressed();
-
 	void OnMouseButtonLeft();
-
+	void OnNavivateLeftPressed();
+	void OnNavivateRightPressed();
 	void OnMouseMoved(const FVector2D& NewMousePosition);
 
 };
