@@ -67,8 +67,6 @@ void B2Transition::Tick(float DeltaTime)
 				{
 					WaitGroups.Remove(WaitGroup);
 					CurrentWaitGroup++;
-
-					B2Utility::LogWarning(FString::Printf(TEXT("Removed group")));
 				}
 			}
 
@@ -93,36 +91,6 @@ void B2Transition::Tick(float DeltaTime)
 		return;
 	}
 
-	/* Store a function pointer for the appropriate interpolation for translation */
-	FVector(*EaseFunctionVector)(const FVector & A, const FVector & B, float Alpha, float Exponent) = nullptr;
-	switch (Translation.Ease)
-	{
-	case EEase::EaseIn:
-		EaseFunctionVector = FMath::InterpEaseIn;
-		break;
-	case EEase::EaseInOut:
-		EaseFunctionVector = FMath::InterpEaseInOut;
-		break;
-	case EEase::EaseOut:
-		EaseFunctionVector = FMath::InterpEaseOut;
-		break;
-	}
-
-	/* Store a function pointer for the appropriate interpolation for rotation */
-	FRotator(*EaseFunctionRotator)(const FRotator & A, const FRotator & B, float Alpha, float Exponent) = nullptr;
-	switch (Rotation.Ease)
-	{
-	case EEase::EaseIn:
-		EaseFunctionRotator = FMath::InterpEaseIn;
-		break;
-	case EEase::EaseInOut:
-		EaseFunctionRotator = FMath::InterpEaseInOut;
-		break;
-	case EEase::EaseOut:
-		EaseFunctionRotator = FMath::InterpEaseOut;
-		break;
-	}
-
 	/* Calculate and update the alpha value */
 	CurrentAlpha = FMath::Clamp(CurrentAlpha + Step, LERP_MIN, LERP_MAX);
 
@@ -131,11 +99,11 @@ void B2Transition::Tick(float DeltaTime)
 	FVector Arc = FMath::InterpEaseOut(ARC_OFFSET_MIN, Translation.ArcOffset, ArcAlpha, EASE_EXPONENT);
 
 	/* Calculate and update the current position including the current arc offset */
-	CurrentPosition = (*EaseFunctionVector)(Translation.StartPosition, Translation.EndPosition, CurrentAlpha, EASE_EXPONENT);
+	CurrentPosition = EaseVector(Translation.StartPosition, Translation.EndPosition, CurrentAlpha, Translation.Ease);
 	CurrentPosition += Arc;
 
 	/* Calculate and update the current rotation */
-	CurrentRotation = (*EaseFunctionRotator)(Rotation.StartRotation, Rotation.EndRotation, CurrentAlpha, EASE_EXPONENT);
+	CurrentRotation = EaseRotator(Rotation.StartRotation, Rotation.EndRotation, CurrentAlpha, Rotation.Ease);
 }
 
 bool B2Transition::Done() const
@@ -148,8 +116,6 @@ bool B2Transition::Done() const
 
 B2WaitGroup B2Transition::GetNextWaitGroup()
 {
-	B2Utility::LogWarning(FString::Printf(TEXT("Assigned waitgroup: %d"), NextWaitGroup));
-
 	return NextWaitGroup++;
 }
 
@@ -159,3 +125,40 @@ void B2Transition::ResetStatic()
 	CurrentWaitGroup = 0;
 	NextWaitGroup = 0;
 }
+
+FVector B2Transition::EaseVector(FVector Start, FVector Target, float Alpha, EEase Ease)
+{
+	switch (Ease)
+	{
+	case EEase::EaseIn:
+		return FMath::InterpEaseIn(Start, Target, Alpha, EASE_EXPONENT);
+	case EEase::EaseInOut:
+		return FMath::InterpEaseInOut(Start, Target, Alpha, EASE_EXPONENT);
+	case EEase::EaseOut:
+		return FMath::InterpEaseOut(Start, Target, Alpha, EASE_EXPONENT);
+	case EEase::Linear:
+		return FMath::Lerp(Start, Target, Alpha);
+	}
+
+	return FVector::ZeroVector;
+}
+
+FRotator B2Transition::EaseRotator(FRotator Start, FRotator Target, float Alpha, EEase Ease)
+{
+	switch (Ease)
+	{
+	case EEase::EaseIn:
+		return FMath::InterpEaseIn(Start, Target, Alpha, EASE_EXPONENT);
+	case EEase::EaseInOut:
+		return FMath::InterpEaseInOut(Start, Target, Alpha, EASE_EXPONENT);
+	case EEase::EaseOut:
+		return FMath::InterpEaseOut(Start, Target, Alpha, EASE_EXPONENT);
+	case EEase::Linear:
+		return FMath::Lerp(Start, Target, Alpha);
+	}
+
+	return FRotator::ZeroRotator;
+}
+
+
+

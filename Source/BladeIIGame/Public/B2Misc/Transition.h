@@ -71,5 +71,25 @@ private:
 	static TMap<B2WaitGroup, size_t> WaitGroups;
 	static B2WaitGroup CurrentWaitGroup;
 	static B2WaitGroup NextWaitGroup;
+
+	/**
+	 * Eases between two vectors using the specified easing method
+	 * @param Start - Starting Vector
+	 * @param Target - Target Vector
+	 * @param Alpha - Current alpha value
+	 * @param Ease - Easing method
+	 * @return The eased vector
+	 */
+	FVector EaseVector(FVector Start, FVector Target, float Alpha, EEase Ease);
+
+	/**
+	 * Eases between two rotators using the specified easing method
+	 * @param Start - Starting rotator
+	 * @param Target - Target rotator
+	 * @param Alpha - Current alpha value
+	 * @param Ease - Easing method
+	 * @return The eased rotator
+	 */
+	FRotator EaseRotator(FRotator Start, FRotator Target, float Alpha, EEase Ease);
 };
 

@@ -3,7 +3,7 @@
 const void B2Utility::LogInfo(const FString& message)
 {
 #if B2_SHOW_DEBUG
-	UE_LOG(LogTemp, Warning, TEXT("[INFO   ][%s] %s"), *B2Utility::GetTimestamp(), *message);
+	UE_LOG(LogTemp, Warning, TEXT("[INFO][%s] %s"), *B2Utility::GetTimestamp(), *message);
 #endif
 }
 

@@ -1,4 +1,5 @@
 #include "B2Game/CardSlot.h"
+#include "Algo/Reverse.h"
 
 UCardSlot::UCardSlot()
 {
@@ -10,6 +11,30 @@ UCardSlot::UCardSlot()
 UINT UCardSlot::Size() const
 {
 	return Cards.Num();
+}
+
+TArray<FString> UCardSlot::GetSortedIDsAscending()
+{
+	TArray<ACard*> CardsCopy(Cards);
+	CardsCopy.Sort([](const ACard& a, const ACard& b) { return a.Type > b.Type; });
+
+	TArray<FString> Strings;
+
+	for (auto Iter = CardsCopy.CreateConstIterator(); Iter; ++Iter)
+	{
+		Strings.Add((*Iter)->GetID());
+	}
+
+	return Strings;
+}
+
+TArray<FString> UCardSlot::GetSortedIDsDescending()
+{
+	TArray<FString> OutArray = GetSortedIDsAscending();
+
+	Algo::Reverse(OutArray);
+
+	return OutArray;
 }
 
 void UCardSlot::Add(ACard* Card)

@@ -33,7 +33,8 @@ enum class EEase : uint8
 {
 	EaseIn UMETA(DisplayName = "Ease In"),
 	EaseInOut UMETA(DisplayName = "Ease In Out"),
-	EaseOut UMETA(DisplayName = "Ease Out")
+	EaseOut UMETA(DisplayName = "Ease Out"),
+	Linear UMETA(DisplayName = "Linear"),
 };
 
 /* ETableSlot represents different slots on the table (deck, hand, field or discard) */

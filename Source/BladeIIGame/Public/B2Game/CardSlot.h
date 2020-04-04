@@ -23,6 +23,12 @@ public:
 	/* Returns the current stack size (i.e. the number of cards on this anchor) */
 	UINT Size() const;
 
+	/* Returns an array of the card ID's, in ascending order */
+	TArray<FString> GetSortedIDsAscending();
+
+	/* Returns an array of the card ID's, in descending order */
+	TArray<FString> GetSortedIDsDescending();
+
 	/* Add the specified card */
 	virtual void Add(ACard* Card);
 
