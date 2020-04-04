@@ -114,7 +114,14 @@ const FB2Transform UCardSlot::GetTransformForIndex(UINT Index) const
 
 void UCardSlot::UpdateCardOrder()
 {
-	Cards.Sort([](const ACard& a, const ACard& b) { return a.GetActorLocation().X > b.GetActorLocation().X; });
+	FVector RootLocation = CardTransforms[0].Position;
+	Cards.Sort([RootLocation](const ACard& a, const ACard& b)
+	{
+		float SquareDistanceA = FVector::DistSquared(RootLocation, a.GetActorLocation());
+		float SquareDistanceB = FVector::DistSquared(RootLocation, b.GetActorLocation());
+
+		return SquareDistanceA < SquareDistanceB;
+	});
 
 	for (size_t i = 0; i < Cards.Num(); i++)
 	{
