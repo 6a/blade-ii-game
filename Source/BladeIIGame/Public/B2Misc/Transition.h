@@ -54,6 +54,9 @@ public:
 	/* Returns the next wait group */
 	static B2WaitGroup GetNextWaitGroup();
 
+	/* Returns the current wait group */
+	static B2WaitGroup GetCurrentWaitGroup();
+
 	/* Reset all the static counters such as current and next wait group  */
 	static void ResetStatic();
 

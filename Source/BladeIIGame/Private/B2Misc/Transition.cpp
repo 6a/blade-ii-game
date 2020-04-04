@@ -119,6 +119,11 @@ B2WaitGroup B2Transition::GetNextWaitGroup()
 	return NextWaitGroup++;
 }
 
+B2WaitGroup B2Transition::GetCurrentWaitGroup()
+{
+	return CurrentWaitGroup;
+}
+
 void B2Transition::ResetStatic()
 {
 	WaitGroups.Empty();

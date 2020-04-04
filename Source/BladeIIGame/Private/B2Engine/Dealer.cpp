@@ -4,6 +4,7 @@
 
 #include "B2Misc/Utility.h"
 
+// Class scope values
 const size_t DECK_CAPACITY = 15;
 const size_t HAND_CAPACITY = 10;
 const size_t FIELD_CAPACITY = 15;
@@ -12,6 +13,9 @@ const float CARD_STACKING_OFFSET = 0.09f;
 UB2Dealer::UB2Dealer()
 {
 	bCardsDealt = false;
+
+	// Set all event-use waitgroups to none;
+	WaitGroupDealFinished = B2WaitGroupNone;
 
 	B2Transition::ResetStatic();
 }
@@ -336,6 +340,9 @@ void UB2Dealer::Deal()
 	B2WaitGroup WG_Shuffle = B2Transition::GetNextWaitGroup();
 	B2WaitGroup WG_PostShuffleSpread = B2Transition::GetNextWaitGroup();
 
+	// Set the waitgroup for dealing
+	WaitGroupDealFinished = WG_PostShuffleSpread + 1;
+
 	// Correct order for players hand
 	TArray<FString> SortedPlayerHand = Arena->PlayerHand->GetSortedIDsDescending();
 
@@ -592,7 +599,20 @@ void UB2Dealer::Deal()
 	}
 }
 
-void UB2Dealer::Tick(float DeltaTime)
+void UB2Dealer::Tick(float DeltaSeconds)
 {
+	// Start processing callbacks, but only the cards were dealt
+	if (bCardsDealt)
+	{
+		B2WaitGroup CurrentWaitGroup = B2Transition::GetCurrentWaitGroup();
 
+		// Various wait groups checked with if else - wait groups are not constant so cant use a switch statement
+
+		// Fire a callback when the dealing transition has finished
+		if (WaitGroupDealFinished == CurrentWaitGroup)
+		{
+			OnCardsDealt.Broadcast(EDealerEvent::CardsDealt);
+			WaitGroupDealFinished = B2WaitGroupNone;
+		}
+	}
 }

@@ -8,6 +8,7 @@
 #include "B2Engine/Dealer.h"
 #include "B2Engine/BoardState.h"
 #include "B2Game/Arena.h"
+#include "B2Game/CardSelector.h"
 
 #include "BladeIIGameGameMode.generated.h"
 
@@ -18,6 +19,8 @@ class BLADEIIGAME_API ABladeIIGameGameMode : public AGameMode
 
 public:
 	virtual void StartPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
 
 protected:
 	ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer);
@@ -34,6 +37,9 @@ private:
 
 	/* Pointer the dealer that will be used throughout this match */
 	UB2Dealer* Dealer;
+
+	/* Pointer to the card selector that will be used throughout this match */
+	ACardSelector* CardSelector;
 
 	/**
 	 * Reads the launch config and sets up the engine accordingly.
@@ -53,20 +59,33 @@ private:
 	/* Set up the internal dealer instance */
 	void SetupDealer();
 
+	/* Set up the card selector actor */
+	void SetupSelector();
+
 	/* Set the board state based on the specified state */
 	void InitialiseBoard(B2BoardState BoardState);
+
+	/* Game logic for when the cards have been dealt by the dealer */
+	void OnCardsDealt();
 
 	/**
 	 * Event handler for moves received from the server.
 	 * @param Move - The move that was received
 	 */
 	UFUNCTION()
-	void HandleMoveReceived(FB2Move& Move);
+	void HandleMoveReceived(const FB2Move& Move);
 
 	/**
 	 * Event handler for instructions from the server.
 	 * @param Move - The instruction that was received
 	 */
 	UFUNCTION()
-	void HandleInstructionReceived(EInstruction& Instruction);
+	void HandleInstructionReceived(EInstruction Instruction);
+
+	/**
+	 * Event handler for updates from the dealer instance.
+	 * @param Event - The update type
+	 */
+	UFUNCTION()
+	void HandleEventUpdate(EDealerEvent Event);
 };

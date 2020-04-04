@@ -10,6 +10,11 @@
 #include "B2Engine/LocalPlayerInput.h"
 #include "B2Misc/Transition.h"
 
+void ABladeIIGameGameMode::Tick(float DeltaSeconds)
+{
+	Dealer->Tick(DeltaSeconds);
+}
+
 ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer)
 {
 	DefaultPawnClass = ALocalPlayerInput::StaticClass();
@@ -17,8 +22,6 @@ ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectIniti
 	SetupLaunchConfig(ObjectInitializer);
 	
 	SetupCardFactory();
-
-	RegisterEventListeners();
 
 	B2Utility::LogInfo("GameMode initialized");
 }
@@ -31,9 +34,13 @@ void ABladeIIGameGameMode::StartPlay()
 
 	SetupDealer();
 
+	RegisterEventListeners();
+
 	InitialiseBoard(B2BoardState());
 
 	Dealer->Deal();
+	
+	SetupSelector();
 
 	B2Utility::LogInfo("ABladeIIGameGameModeBase::StartPlay");
 }
@@ -99,8 +106,13 @@ void ABladeIIGameGameMode::SetupCardFactory()
 void ABladeIIGameGameMode::RegisterEventListeners()
 {
 	// Register event listeners
+
+	// From Opponent
 	Opponent->OnMoveReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleMoveReceived);
 	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleInstructionReceived);
+
+	// From Dealer
+	Dealer->OnCardsDealt.AddDynamic(this, &ABladeIIGameGameMode::HandleEventUpdate);
 }
 
 void ABladeIIGameGameMode::FindArena()
@@ -124,6 +136,20 @@ void ABladeIIGameGameMode::SetupDealer()
 	Dealer->Arena = Arena;
 }
 
+void ABladeIIGameGameMode::SetupSelector()
+{
+	UObject* CardSelectorActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BladeIIGame/Blueprints/GameObjects/BP_CardSelector.BP_CardSelector"));
+	ensureMsgf(CardSelectorActor, TEXT("Could not load card selector actor - static load failed"));
+
+	UBlueprint* CardSelectorBlueprint = Cast<UBlueprint>(CardSelectorActor);
+	ensureMsgf(CardSelectorBlueprint, TEXT("Could not cast UObject to UBlueprint"));
+
+	UClass* CardSelectorClass = CardSelectorBlueprint->GeneratedClass;
+	ensureMsgf(CardSelectorClass, TEXT("Could not get class from card selector blueprint"));
+
+	CardSelector = GetWorld()->SpawnActor<ACardSelector>(CardSelectorClass, FVector::ZeroVector, FRotator::ZeroRotator);
+}
+
 void ABladeIIGameGameMode::InitialiseBoard(B2BoardState BoardState)
 {
 	// Test state
@@ -145,12 +171,33 @@ void ABladeIIGameGameMode::InitialiseBoard(B2BoardState BoardState)
 	}
 }
 
-void ABladeIIGameGameMode::HandleMoveReceived(FB2Move& Move)
+void ABladeIIGameGameMode::OnCardsDealt()
+{
+	FB2Transform SelectorStartingTransform = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Size() - 1);
+
+	CardSelector->SetActorLocationAndRotation(SelectorStartingTransform.Position, FRotator::ZeroRotator);
+	CardSelector->ToggleActorVisibility(true);
+}
+
+void ABladeIIGameGameMode::HandleMoveReceived(const FB2Move& Move)
 {
 
 }
 
-void ABladeIIGameGameMode::HandleInstructionReceived(EInstruction& Instruction)
+void ABladeIIGameGameMode::HandleInstructionReceived(EInstruction Instruction)
 {
 
+}
+
+void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
+{
+	switch (Event)
+	{
+	case EDealerEvent::CardsDealt:
+		OnCardsDealt();
+		break;
+	case EDealerEvent::CardPlaced:
+
+		break;
+	}
 }

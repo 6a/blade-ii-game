@@ -16,4 +16,6 @@ public:
 	UStaticMeshComponent* Mesh;
 
 	ACardSelector();
+
+	void ToggleActorVisibility(bool bIsVisible);
 };
