@@ -9,14 +9,14 @@ const size_t HAND_CAPACITY = 10;
 const size_t FIELD_CAPACITY = 15;
 const float CARD_STACKING_OFFSET = 0.09f;
 
-B2Dealer::B2Dealer()
+UB2Dealer::UB2Dealer()
 {
 	bCardsDealt = false;
 
 	B2Transition::ResetStatic();
 }
 
-void B2Dealer::Deal()
+void UB2Dealer::Deal()
 {
 	if (bCardsDealt)
 	{
@@ -590,4 +590,9 @@ void B2Dealer::Deal()
 		Transition = B2Transition(WG_PostShuffleSpread, Position, Rotation, DurationShuffleSpread, Delay);
 		Card->QueueTransition(Transition);
 	}
+}
+
+void UB2Dealer::Tick(float DeltaTime)
+{
+
 }

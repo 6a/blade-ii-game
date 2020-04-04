@@ -120,7 +120,7 @@ void ABladeIIGameGameModeBase::FindArena()
 
 void ABladeIIGameGameModeBase::SetupDealer()
 {
-	Dealer = new B2Dealer();
+	Dealer = NewObject<UB2Dealer>(this, TEXT("Dealer"));
 	Dealer->Arena = Arena;
 }
 

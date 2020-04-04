@@ -33,7 +33,7 @@ private:
 	AArena* Arena;
 
 	/* Pointer the dealer that will be used throughout this match */
-	B2Dealer* Dealer;
+	UB2Dealer* Dealer;
 
 	/**
 	 * Reads the launch config and sets up the engine accordingly.
