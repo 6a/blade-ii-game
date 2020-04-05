@@ -15,7 +15,7 @@ class UB2Dealer : public UObject
 	GENERATED_BODY()
 
 public:	
-	/* Callback for when dealing has finished */
+	/* Callback for when a transition has finished */
 	FDealerEventDelegate OnDealerEvent;
 	
 	/* Pointer to the arena */
