@@ -27,7 +27,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	/* Get a reference to the card slot of the specified type */
-	UCardSlot* GetCardSlot(ETableSlot Slot) const;
+	UCardSlot* GetCardSlot(ECardSlot Slot) const;
 
 	/* Getters for various references */
 	UB2Opponent* GetOpponent() const { return Opponent; }
@@ -107,6 +107,13 @@ private:
 
 	/* Performs whatever is required for when the game enters play (post deal) */
 	void OnCardsDealt();
+
+	/**
+	 * Add up all the card values for a particular card slot
+	 * @param Slot - The slot to aggregate the score for
+	 * @return The aggregate score
+	 */
+	int32 AggregateScore(UCardSlot* Slot) const;
 
 	/* Event listeners */
 

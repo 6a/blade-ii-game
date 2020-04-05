@@ -143,12 +143,12 @@ void UCardSlot::UpdateCardOrder()
 	}
 }
 
-void UCardSlot::SetType(ETableSlot SlotType)
+void UCardSlot::SetType(ECardSlot SlotType)
 {
 	Type = SlotType;
 }
 
-ETableSlot UCardSlot::GetType() const
+ECardSlot UCardSlot::GetType() const
 {
 	return Type;
 }

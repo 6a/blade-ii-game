@@ -26,31 +26,31 @@ AArena::AArena()
 
 	PlayerDeck = CreateDefaultSubobject<UDeckSlot>(TEXT("Player Deck"));
 	PlayerDeck->SetupAttachment(Slots);
-	PlayerDeck->SetType(ETableSlot::PlayerDeck);
+	PlayerDeck->SetType(ECardSlot::PlayerDeck);
 
 	PlayerHand = CreateDefaultSubobject<UHandSlot>(TEXT("Player Hand"));
 	PlayerHand->SetupAttachment(Slots);
-	PlayerHand->SetType(ETableSlot::PlayerHand);
+	PlayerHand->SetType(ECardSlot::PlayerHand);
 
 	PlayerHandReversed = CreateDefaultSubobject<UHandSlot>(TEXT("Player Hand (Reversed)"));
 	PlayerHandReversed->SetupAttachment(Slots);
-	PlayerHandReversed->SetType(ETableSlot::PlayerHand);
+	PlayerHandReversed->SetType(ECardSlot::PlayerHand);
 
 	PlayerField = CreateDefaultSubobject<UFieldSlot>(TEXT("Player Field"));
 	PlayerField->SetupAttachment(Slots);
-	PlayerField->SetType(ETableSlot::PlayerField);
+	PlayerField->SetType(ECardSlot::PlayerField);
 
 	OpponentDeck = CreateDefaultSubobject<UDeckSlot>(TEXT("Opponent Deck"));
 	OpponentDeck->SetupAttachment(Slots);
-	OpponentDeck->SetType(ETableSlot::OpponentDeck);
+	OpponentDeck->SetType(ECardSlot::OpponentDeck);
 
 	OpponentHand = CreateDefaultSubobject<UHandSlot>(TEXT("Opponent Hand"));
 	OpponentHand->SetupAttachment(Slots);
-	OpponentHand->SetType(ETableSlot::OpponentHand);
+	OpponentHand->SetType(ECardSlot::OpponentHand);
 
 	OpponentField = CreateDefaultSubobject<UFieldSlot>(TEXT("Opponent Field"));
 	OpponentField->SetupAttachment(Slots);
-	OpponentField->SetType(ETableSlot::OpponentField);
+	OpponentField->SetType(ECardSlot::OpponentField);
 }
 
 // Called when the game starts or when spawned

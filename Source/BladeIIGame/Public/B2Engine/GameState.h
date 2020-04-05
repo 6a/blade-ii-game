@@ -7,6 +7,8 @@
 
 struct B2GameState
 {
+	B2GameState(const FB2Cards& Cards);
+
 	// Cards
 	FB2Cards Cards;
 
@@ -16,7 +18,10 @@ struct B2GameState
 
 	// Input
 	bool bAcceptPlayerInput;
-	ETableSlot CursorPosition;
+	ECardSlot CursorPosition;
 	uint32 CursorSlotIndex;
+
+	// Turn
+	ETurn Turn;
 };
 

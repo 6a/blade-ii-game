@@ -27,7 +27,7 @@ void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
 			EButton Button;
 			while (GameModeInstance->GetLocalPlayerInput()->ButtonInputQueue.Dequeue(Button))
 			{
-				if (GameModeInstance->GetGameState()->CursorPosition == ETableSlot::PlayerDeck)
+				if (GameModeInstance->GetGameState()->CursorPosition == ECardSlot::PlayerDeck)
 				{
 					if ((Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
 					{
@@ -43,14 +43,14 @@ void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
 						GameModeInstance->GetCursor()->ToggleActorVisibility(false);
 
 						// From player deck to player field
-						UCardSlot* CurrentSlot = GameModeInstance->GetCardSlot(ETableSlot::PlayerDeck);
+						UCardSlot* CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::PlayerDeck);
 						UCardSlot* TargetSlot = GameModeInstance->GetArena()->PlayerField;
 
 						GameModeInstance->GetDealer()->MoveFromDeck(CurrentSlot, GameModeInstance->GetArena()->PlayerDeck->Size() - 1, TargetSlot, false);
 						GameModeInstance->GetGameState()->Cards.PlayerField.Push(GameModeInstance->GetGameState()->Cards.PlayerDeck.Pop());
 
 						// From opponent deck to opponent field
-						CurrentSlot = GameModeInstance->GetCardSlot(ETableSlot::OpponentDeck);
+						CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::OpponentDeck);
 						TargetSlot = GameModeInstance->GetArena()->OpponentField;
 
 						GameModeInstance->GetDealer()->MoveFromDeck(CurrentSlot, GameModeInstance->GetArena()->OpponentDeck->Size() - 1, TargetSlot);

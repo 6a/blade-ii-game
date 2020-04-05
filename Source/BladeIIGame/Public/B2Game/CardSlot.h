@@ -75,10 +75,10 @@ public:
 	virtual void UpdateCardOrder();
 
 	/* Set this instance's slot type */
-	void SetType(ETableSlot SlotType);
+	void SetType(ECardSlot SlotType);
 
 	/* Get this instance's slot type */
-	ETableSlot GetType() const;
+	ECardSlot GetType() const;
 
 protected:
 	/* The positions for each possible card location */
@@ -92,5 +92,5 @@ protected:
 	FB2Transform BaseTransform;
 
 	/* The slot type for this instance. Should be set after creation */
-	ETableSlot Type;
+	ECardSlot Type;
 };

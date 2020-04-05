@@ -14,9 +14,9 @@ struct FB2Move
 	ECard Card;
 
 	/* The current location of the card being moved */
-	ETableSlot CurrentSlot;
+	ECardSlot CurrentSlot;
 
 	/* The target location of the card being moved */
-	ETableSlot TargetSlot;
+	ECardSlot TargetSlot;
 };
 

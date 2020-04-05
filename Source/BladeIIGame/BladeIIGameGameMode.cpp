@@ -214,40 +214,61 @@ void ABladeIIGameGameMode::OnCardsDealt()
 	Cursor->ToggleActorVisibility(true);
 
 	GameState->bAcceptPlayerInput = true;
-	GameState->CursorPosition = ETableSlot::PlayerDeck;
+	GameState->CursorPosition = ECardSlot::PlayerDeck;
 
 	EngineState = EEngineState::InPlay;
 }
 
-UCardSlot* ABladeIIGameGameMode::GetCardSlot(ETableSlot Slot) const
+int32 ABladeIIGameGameMode::AggregateScore(UCardSlot* Slot) const
+{
+	int32 Total = 0;
+
+	for (size_t i = 0; i < Slot->Size(); i++)
+	{
+		ACard* Card = Slot->GetCardByIndex(i);
+
+		if (Card->Type > ECard::Force)
+		{
+			Total *= 2;
+		}
+		else
+		{
+			Total += static_cast<uint32>(Card->Type);
+		}
+	}
+
+	return Total;
+}
+
+UCardSlot* ABladeIIGameGameMode::GetCardSlot(ECardSlot Slot) const
 {
 	UCardSlot* CardSlot = nullptr;
 
 	switch (Slot)
 	{
-	case ETableSlot::PlayerDeck:
+	case ECardSlot::PlayerDeck:
 		CardSlot = Arena->PlayerDeck;
 		break;
-	case ETableSlot::PlayerHand:
+	case ECardSlot::PlayerHand:
 		CardSlot = Arena->PlayerHand;
 		break;
-	case ETableSlot::PlayerField:
+	case ECardSlot::PlayerField:
 		CardSlot = Arena->PlayerField;
 		break;
-	case ETableSlot::PlayerDiscard:
+	case ECardSlot::PlayerDiscard:
 		// TODO impl?
 		B2Utility::LogWarning("PlayerDiscard does not exist!!!");
 		break;
-	case ETableSlot::OpponentDeck:
+	case ECardSlot::OpponentDeck:
 		CardSlot = Arena->OpponentDeck;
 		break;
-	case ETableSlot::OpponentHand:
+	case ECardSlot::OpponentHand:
 		CardSlot = Arena->OpponentHand;
 		break;
-	case ETableSlot::OpponentField:
+	case ECardSlot::OpponentField:
 		CardSlot = Arena->OpponentField;
 		break;
-	case ETableSlot::OpponentDiscard:
+	case ECardSlot::OpponentDiscard:
 		// TODO impl?
 		B2Utility::LogWarning("OpponentDiscard does not exist!!!");
 		break;
@@ -258,13 +279,7 @@ UCardSlot* ABladeIIGameGameMode::GetCardSlot(ETableSlot Slot) const
 
 void ABladeIIGameGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
-	GameState = new B2GameState
-	{
-		FB2Cards(Cards) /* Cards for this game */,
-		0 /* Player Score */,
-		0 /* Opponent Score */,
-		false /* (Not) accepting player input */ ,
-	};
+	GameState = new B2GameState(Cards);
 
 	InitialiseBoard();
 
@@ -291,7 +306,39 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 		OnCardsDealt();
 		break;
 	case EDealerEvent::CardPlaced:
+		if (GPSM->IsCurrentState(EGamePhase::DrawToEmptyField))
+		{
+			// Update scores
+			GameState->PlayerScore = AggregateScore(Arena->PlayerField);
+			GameState->OpponentScore = AggregateScore(Arena->OpponentField);
 
+			// Change state to the turn of the player with the highest score, or each draw another on draw
+			if (GameState->PlayerScore == GameState->OpponentScore)
+			{
+				// Lets go round again.wav
+				GameState->Turn = ETurn::Undecided;
+
+				FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Size() - 1).Position;
+
+				Cursor->SetActorLocationAndRotation(SelectorStartingPosition, FRotator::ZeroRotator);
+				Cursor->ToggleActorVisibility(true);
+
+				GameState->bAcceptPlayerInput = true;
+				GameState->CursorPosition = ECardSlot::PlayerDeck;
+
+			}
+			else if (GameState->PlayerScore > GameState->OpponentScore)
+			{
+				// Switch to player turn
+				GameState->Turn = ETurn::Player;
+				
+			}
+			else
+			{
+				// Switch to opponent
+				GameState->Turn = ETurn::Opponent;
+			}
+		}
 		break;
 	}
 }

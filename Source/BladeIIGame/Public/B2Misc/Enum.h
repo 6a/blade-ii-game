@@ -49,7 +49,7 @@ enum class EInstruction : uint8
 
 /* ETableSlot represents different slots on the table (deck, hand, field or discard) */
 UENUM(BlueprintType)
-enum class ETableSlot : uint8
+enum class ECardSlot : uint8
 {
 	PlayerDeck UMETA(DisplayName = "Player Deck"),
 	PlayerHand UMETA(DisplayName = "Player Hand"),
@@ -109,4 +109,13 @@ enum class EButton : uint8
 	NavigateLeft UMETA(DisplayName = "Navigate Left"),
 	NavigateRight UMETA(DisplayName = "Navigate Right"),
 	Select UMETA(DisplayName = "Select")
+};
+
+/* ETurn represents different dealer events (such as on deck dealt, on card placed) */
+UENUM(BlueprintType)
+enum class ETurn : uint8
+{
+	Undecided UMETA(DisplayName = "Undecided"),
+	Player UMETA(DisplayName = "Player"),
+	Opponent UMETA(DisplayName = "Opponent")
 };
