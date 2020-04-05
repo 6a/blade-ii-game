@@ -7,6 +7,8 @@
 
 struct B2GameState
 {
+	~B2GameState();
+
 	// Cards
 	FB2Cards Cards;
 
