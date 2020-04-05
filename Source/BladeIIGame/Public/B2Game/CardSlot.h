@@ -5,6 +5,7 @@
 
 #include "Card.h"
 #include "Transform.h"
+#include "B2Misc/Enum.h"
 
 #include "CardSlot.generated.h"
 
@@ -14,10 +15,6 @@ class BLADEIIGAME_API UCardSlot : public USceneComponent
 	GENERATED_BODY()
 	
 public:	
-	/* The positions for each possible card location */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Configuration)
-	TArray<FB2Transform> CardTransforms;
-
 	UCardSlot();
 
 	/* Returns the current stack size (i.e. the number of cards on this anchor) */
@@ -67,13 +64,26 @@ public:
 	 */
 	const virtual FB2Transform GetTransformForIndex(UINT Index) const;
 
-	/* Updates the internal container so that the cards are in the right order (0 -> MAX, from left to right */
+	/* Updates the internal container so that the cards are in the right order */
 	virtual void UpdateCardOrder();
 
+	/* Set this instance's slot type */
+	void SetType(ETableSlot SlotType);
+
+	/* Get this instance's slot type */
+	ETableSlot GetType() const;
+
 protected:
+	/* The positions for each possible card location */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Configuration)
+	TArray<FB2Transform> CardTransforms;
+
 	/* A container for the current stack of cards on this anchor */
 	TArray<ACard*> Cards;
 
 	/* Transform from which all positional calculations will be based on */
 	FB2Transform BaseTransform;
+
+	/* The slot type for this instance. Should be set after creation */
+	ETableSlot Type;
 };

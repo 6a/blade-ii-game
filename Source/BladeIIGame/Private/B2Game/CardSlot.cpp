@@ -4,8 +4,6 @@
 UCardSlot::UCardSlot()
 {
 	BaseTransform = FB2Transform(GetComponentLocation(), GetComponentRotation());
-
-
 }
 
 UINT UCardSlot::Size() const
@@ -127,4 +125,14 @@ void UCardSlot::UpdateCardOrder()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Card: %s"), *Cards[i]->GetFName().ToString());
 	}
+}
+
+void UCardSlot::SetType(ETableSlot SlotType)
+{
+	Type = SlotType;
+}
+
+ETableSlot UCardSlot::GetType() const
+{
+	return Type;
 }

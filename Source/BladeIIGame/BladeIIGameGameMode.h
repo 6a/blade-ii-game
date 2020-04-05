@@ -6,7 +6,7 @@
 #include "B2Engine/CardFactory.h"
 #include "B2Engine/Opponent.h"
 #include "B2Engine/Dealer.h"
-#include "B2Engine/BoardState.h"
+#include "B2Engine/GameState.h"
 #include "B2Engine/Cards.h"
 #include "B2Engine/LocalPlayerInput.h"
 #include "B2Game/Arena.h"
@@ -43,8 +43,8 @@ private:
 	/* Pointer to the card selector that will be used throughout this match */
 	ACardSelector* CardSelector;
 
-	/* The current state of the board */
-	B2BoardState BoardState;
+	/* The current state of the game */
+	B2GameState GameState;
 
 	/* The current state of the engine */
 	EEngineState EngineState;
@@ -77,19 +77,12 @@ private:
 	void SetupSelector();
 
 	/* Set the board state based on the specified state */
-	void InitialiseBoard(B2BoardState BoardState);
+	void InitialiseBoard(B2GameState GameState);
 
 	/* Performs whatever is required for when the game enters play (post deal) */
 	void EnterGamePlayState();
 
 	/* Event listeners */
-
-	/**
-	 * Event handler for when the player presses a button.
-	 * @param Button - The button that was pressed
-	 */
-	UFUNCTION()
-	void HandleButtonPressed(EButton Button);
 
 	/**
 	 * Event handler for receiving the cards for this game.

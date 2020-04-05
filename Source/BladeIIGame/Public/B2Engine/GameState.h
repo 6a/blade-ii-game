@@ -3,9 +3,9 @@
 #include "CoreMinimal.h"
 
 #include "Cards.h"
-#include "B2Misc/Enum.h"
+#include "B2Game/CardSlot.h"
 
-struct B2BoardState
+struct B2GameState
 {
 	// Cards
 	FB2Cards Cards;
@@ -16,6 +16,7 @@ struct B2BoardState
 
 	// Input
 	bool bAcceptPlayerInput;
-	ETableSlot CursorPosition;
+	UCardSlot* CursorPosition;
+	uint32 CursorSlotIndex;
 };
 

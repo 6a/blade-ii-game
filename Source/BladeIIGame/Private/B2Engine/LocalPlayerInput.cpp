@@ -17,7 +17,7 @@ void ALocalPlayerInput::BeginPlay()
 
 void ALocalPlayerInput::OnMenuPressed()
 {
-	HandleButtonPressed.Broadcast(EButton::Menu);
+	ButtonInputQueue.Enqueue(EButton::Menu);
 
 	B2Utility::LogInfo(TEXT("Menu Pressed"));
 }
@@ -29,21 +29,21 @@ void ALocalPlayerInput::OnMouseButtonLeft()
 
 void ALocalPlayerInput::OnNavivateLeftPressed()
 {
-	HandleButtonPressed.Broadcast(EButton::NavigateLeft);
+	ButtonInputQueue.Enqueue(EButton::NavigateLeft);
 
 	B2Utility::LogInfo(TEXT("Navigate Left Pressed"));
 }
 
 void ALocalPlayerInput::OnNavivateRightPressed()
 {
-	HandleButtonPressed.Broadcast(EButton::NavigateRight);
+	ButtonInputQueue.Enqueue(EButton::NavigateRight);
 
 	B2Utility::LogInfo(TEXT("Navigate Right Pressed"));
 }
 
 void ALocalPlayerInput::OnSelectPressed()
 {
-	HandleButtonPressed.Broadcast(EButton::Select);
+	ButtonInputQueue.Enqueue(EButton::Select);
 
 	B2Utility::LogInfo(TEXT("Select Pressed"));
 }

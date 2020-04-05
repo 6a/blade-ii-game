@@ -19,6 +19,40 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 	}
 
 	Opponent->Tick(DeltaSeconds);
+
+	if (GameState.bAcceptPlayerInput)
+	{
+		if (!CardSelector->IsHidden())
+		{
+			EButton Button;
+			while (LocalPlayerInput->ButtonInputQueue.Dequeue(Button))
+			{
+				// Filter out left and right momvement when the cursor is on the players deck
+				if (GameState.CursorPosition->GetType() == ETableSlot::PlayerDeck && (Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
+				{
+					continue;
+				}
+
+				switch (Button)
+				{
+				case EButton::Menu:
+					// Handle menu open / close etc
+					break;
+				case EButton::NavigateLeft:
+					// Handle nav left
+					break;
+				case EButton::NavigateRight:
+					// handle nav right
+					break;
+				case EButton::Select:
+					// Handle select logic
+					break;
+				}
+			}
+		}
+	}
+
+	LocalPlayerInput->ButtonInputQueue.Empty();
 }
 
 ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer)
@@ -120,9 +154,6 @@ void ABladeIIGameGameMode::RegisterEventListeners()
 
 	// From Dealer
 	Dealer->EnterGamePlayState.AddDynamic(this, &ABladeIIGameGameMode::HandleEventUpdate);
-
-	// From Player input
-	LocalPlayerInput->HandleButtonPressed.AddDynamic(this, &ABladeIIGameGameMode::HandleButtonPressed);
 }
 
 void ABladeIIGameGameMode::FindArena()
@@ -175,30 +206,25 @@ void ABladeIIGameGameMode::SetupSelector()
 	CardSelector = GetWorld()->SpawnActor<ACardSelector>(CardSelectorClass, FVector::ZeroVector, FRotator::ZeroRotator);
 }
 
-void ABladeIIGameGameMode::InitialiseBoard(B2BoardState State)
+void ABladeIIGameGameMode::InitialiseBoard(B2GameState State)
 {
-	BoardState = State;
+	GameState = State;
 
 	// Player Deck
-	for (int i = 0; i < BoardState.Cards.PlayerDeck.Num(); ++i)
+	for (int i = 0; i < GameState.Cards.PlayerDeck.Num(); ++i)
 	{
 		FB2Transform CardTransform = Arena->PlayerDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(BoardState.Cards.PlayerDeck[i], CardTransform.Position + FVector(OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
+		ACard* Card = CardFactory->Make(GameState.Cards.PlayerDeck[i], CardTransform.Position + FVector(OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
 		Arena->PlayerDeck->Add(Card);
 	}
 
 	// Opponent Deck
-	for (int i = 0; i < BoardState.Cards.OpponentDeck.Num(); ++i)
+	for (int i = 0; i < GameState.Cards.OpponentDeck.Num(); ++i)
 	{
 		FB2Transform CardTransform = Arena->OpponentDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(BoardState.Cards.OpponentDeck[i], CardTransform.Position + FVector(-OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
+		ACard* Card = CardFactory->Make(GameState.Cards.OpponentDeck[i], CardTransform.Position + FVector(-OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
 		Arena->OpponentDeck->Add(Card); 
 	}
-}
-
-void ABladeIIGameGameMode::HandleButtonPressed(EButton Button)
-{
-	B2Utility::LogInfo(FString::Printf(TEXT("Button press detected: %d"), Button));
 }
 
 void ABladeIIGameGameMode::EnterGamePlayState()
@@ -208,13 +234,13 @@ void ABladeIIGameGameMode::EnterGamePlayState()
 	CardSelector->SetActorLocationAndRotation(SelectorStartingPosition, FRotator::ZeroRotator);
 	CardSelector->ToggleActorVisibility(true);
 
-	BoardState.bAcceptPlayerInput = true;
-	BoardState.CursorPosition = ETableSlot::PlayerDeck;
+	GameState.bAcceptPlayerInput = true;
+	GameState.CursorPosition = Arena->PlayerDeck;
 }
 
 void ABladeIIGameGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
-	B2BoardState State = B2BoardState
+	B2GameState State = B2GameState
 	{
 		Cards /* Cards for this game */,
 		0 /* Player Score */,

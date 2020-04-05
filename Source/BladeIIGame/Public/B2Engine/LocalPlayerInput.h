@@ -3,12 +3,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
+#include "Containers/Queue.h"
 
 #include "B2Misc/Enum.h"
 
 #include "LocalPlayerInput.generated.h"
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FButtonEventDelegate, const EButton, Button);
 
 UCLASS()
 class BLADEIIGAME_API ALocalPlayerInput : public APawn
@@ -16,8 +15,7 @@ class BLADEIIGAME_API ALocalPlayerInput : public APawn
 	GENERATED_BODY()
 
 public:
-	/* Callback for player button inputs */
-	FButtonEventDelegate HandleButtonPressed;
+	TQueue<EButton> ButtonInputQueue;
 
 	ALocalPlayerInput();
 
