@@ -44,6 +44,13 @@ public:
 	virtual ACard* GetCardByID(FString ID);
 
 	/**
+	 * Get the index of the card with the specified ID
+	 * @param ID - The ID of the card for which the index will be returned
+	 * @returns the index as an int - returns -1 if the card with the specified ID was not found
+	 */
+	virtual int GetIndexByID(FString ID);
+
+	/**
 	 * Remove the card at index N 
 	 * @param N - The index of the card to remove
 	 * @returns A pointer to the removed card

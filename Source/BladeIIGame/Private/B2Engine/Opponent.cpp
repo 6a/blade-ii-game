@@ -1,5 +1,7 @@
 #include "B2Engine/Opponent.h"
 
+#include "B2Misc/Utility.h"
+
 void UB2Opponent::Tick(float DeltaSeconds)
 {
 	B2ServerUpdate ServerUpdate = BackEnd->GetNextUpdate();

@@ -68,6 +68,22 @@ ACard* UCardSlot::GetCardByID(FString ID)
 	return Card;
 }
 
+int UCardSlot::GetIndexByID(FString ID)
+{
+	int OutIndex = -1;
+
+	for (size_t i = 0; i < Cards.Num(); i++)
+	{
+		if (Cards[i]->GetID().Compare(ID) == 0)
+		{
+			OutIndex = i;
+			break;
+		}
+	}
+
+	return OutIndex;
+}
+
 ACard* UCardSlot::RemoveByIndex(UINT N)
 {
 	ACard* Card = nullptr;

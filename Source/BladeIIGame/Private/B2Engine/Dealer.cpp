@@ -599,6 +599,48 @@ void UB2Dealer::Deal()
 	}
 }
 
+void UB2Dealer::MoveCard(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot)
+{
+	// TODO add edge case for removing from the hand (update hand positions?)
+
+	const float DelayOnStart = 0.2f;
+	const float DurationIntoDeck = 0.4f;
+	WaitGroupCardMove = B2Transition::GetNextWaitGroup();
+
+	float Delay = DelayOnStart;
+
+	// Get a pointer to the target card
+	ACard* Card = SourceSlot->GetCardByIndex(SourceIndex);
+
+	// Remove it from the source slot
+	SourceSlot->RemoveByIndex(SourceIndex);
+
+	// Add it to the target slot
+	TargetSlot->Add(Card);
+
+	// Get target transform
+	FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(TargetSlot->Size() - 1);
+
+	B2TPosition Position
+	{
+		Card->GetActorLocation(),
+		TargetTransform.Position,
+		FVector(0, 0, 0),
+		EEase::EaseInOut,
+	};
+
+	B2TRotation Rotation
+	{
+		Card->GetActorRotation(),
+		TargetTransform.Rotation,
+		EEase::EaseInOut,
+	};
+
+	// Add the transition to the transition queue
+	B2Transition Transition = B2Transition(WaitGroupCardMove, Position, Rotation, DurationIntoDeck, Delay);
+	Card->QueueTransition(Transition);
+}
+
 void UB2Dealer::Tick(float DeltaSeconds)
 {
 	// Start processing callbacks, but only the cards were dealt
@@ -616,8 +658,15 @@ void UB2Dealer::Tick(float DeltaSeconds)
 			Arena->OpponentHand->UpdateCardOrder();
 
 			// Fire the event and reset this wait group so we dont keep entering this part
-			EnterGamePlayState.Broadcast(EDealerEvent::CardsDealt);
+			OnDealerEvent.Broadcast(EDealerEvent::CardsDealt);
 			WaitGroupDealFinished = B2WaitGroupNone;
+		}
+
+		if (WaitGroupCardMove == CurrentWaitGroup)
+		{
+			// Fire the event and reset this wait group so we dont keep entering this part
+			OnDealerEvent.Broadcast(EDealerEvent::CardPlaced);
+			WaitGroupCardMove = B2WaitGroupNone;
 		}
 	}
 }

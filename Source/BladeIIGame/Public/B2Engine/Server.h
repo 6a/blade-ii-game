@@ -11,7 +11,7 @@ public:
 	virtual ~B2Server();
 
 	/**
-	 * Get the next update from the server.
+	 * Get the next update from the server. Call this on derived classes to get a default (no update) return value
 	 * @return The update
 	 */
 	virtual const B2ServerUpdate GetNextUpdate();

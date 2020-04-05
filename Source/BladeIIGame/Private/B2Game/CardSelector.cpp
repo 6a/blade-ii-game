@@ -10,7 +10,14 @@ ACardSelector::ACardSelector()
 	ToggleActorVisibility(false);
 }
 
-void ACardSelector::ToggleActorVisibility(bool bIsVisible)
+void ACardSelector::ToggleActorVisibility(bool bVisible)
 {
-	SetActorHiddenInGame(!bIsVisible);
+	SetActorHiddenInGame(!bVisible);
+
+	bIsVisible = bVisible;
+}
+
+bool ACardSelector::IsVisible() const
+{
+	return bIsVisible;
 }

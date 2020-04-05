@@ -7,7 +7,7 @@
 
 #include "Dealer.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCardsDealtDelegate, EDealerEvent, Update);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDealerEventDelegate, EDealerEvent, Update);
 
 UCLASS()
 class UB2Dealer : public UObject
@@ -16,15 +16,24 @@ class UB2Dealer : public UObject
 
 public:	
 	/* Callback for when dealing has finished */
-	FCardsDealtDelegate EnterGamePlayState;
+	FDealerEventDelegate OnDealerEvent;
 	
 	/* Pointer to the arena */
 	AArena* Arena;
 
 	UB2Dealer();
-
+	
 	/* Deal the cards out onto the arena. Can only be called once */
 	void Deal();
+
+	/**
+	 * Move a card from the source slot + index to the target slot (at the next available position).
+	 * @param SourceSlot - The CardSlot from which to get the card
+	 * @param SourceIndex - The index in the specified card slot from which to get the card
+	 * @param TargetSlot - The CardSlot to where the card will go (at the next available position)
+	 * @returns FB2Transform for index "Index"
+	 */
+	void MoveCard(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot);
 
 	/* Tick the dealer so that it can perform tasks such as calling-back after transitions are finished etc. */
 	void Tick(float DeltaSeconds);
@@ -35,5 +44,6 @@ private:
 
 	/* Waitgroups for firing various events */
 	B2WaitGroup WaitGroupDealFinished;
+	B2WaitGroup WaitGroupCardMove;
 };
 

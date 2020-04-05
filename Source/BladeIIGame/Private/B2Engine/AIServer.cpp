@@ -2,7 +2,7 @@
 
 const B2ServerUpdate B2AIServer::GetNextUpdate()
 {
-	B2ServerUpdate Payload;
+	B2ServerUpdate Payload = B2Server::GetNextUpdate();
 
 	// Current has a test implementation that just sends random cards
 	if (!bCardsSent)

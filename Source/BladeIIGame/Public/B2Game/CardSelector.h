@@ -17,5 +17,16 @@ public:
 
 	ACardSelector();
 
-	void ToggleActorVisibility(bool bIsVisible);
+	/**
+	 * Toggle the visiblity for the selector
+	 * @param bIsVisible - whether the selector should be visible or not after this function call
+	 */
+	void ToggleActorVisibility(bool bVisible);
+
+	/* Returns true if the selector is visible */
+	bool IsVisible() const;
+
+private:
+	/* Whether the selector is currently visible */
+	bool bIsVisible;
 };

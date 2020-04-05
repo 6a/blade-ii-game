@@ -22,31 +22,34 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 
 	if (GameState.bAcceptPlayerInput)
 	{
-		if (!CardSelector->IsHidden())
+		if (Cursor->IsVisible())
 		{
 			EButton Button;
 			while (LocalPlayerInput->ButtonInputQueue.Dequeue(Button))
 			{
-				// Filter out left and right momvement when the cursor is on the players deck
-				if (GameState.CursorPosition->GetType() == ETableSlot::PlayerDeck && (Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
+				if (GameState.CursorPosition->GetType() == ETableSlot::PlayerDeck)
 				{
-					continue;
-				}
+					if ((Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
+					{
+						continue;
+					}
 
-				switch (Button)
-				{
-				case EButton::Menu:
-					// Handle menu open / close etc
-					break;
-				case EButton::NavigateLeft:
-					// Handle nav left
-					break;
-				case EButton::NavigateRight:
-					// handle nav right
-					break;
-				case EButton::Select:
-					// Handle select logic
-					break;
+					switch (Button)
+					{
+					case EButton::Menu:
+						// Handle menu open / close etc
+						break;
+					case EButton::Select:
+						Cursor->ToggleActorVisibility(false);
+
+						UCardSlot* CurrentSlot = GameState.CursorPosition;
+						UCardSlot* TargetSlot = Arena->PlayerField;
+
+						Dealer->MoveCard(CurrentSlot, GameState.CursorSlotIndex, TargetSlot);
+
+						GameState.bAcceptPlayerInput = false;
+						break;
+					}
 				}
 			}
 		}
@@ -153,7 +156,7 @@ void ABladeIIGameGameMode::RegisterEventListeners()
 	Opponent->OnCardsReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleCardsReceived);
 
 	// From Dealer
-	Dealer->EnterGamePlayState.AddDynamic(this, &ABladeIIGameGameMode::HandleEventUpdate);
+	Dealer->OnDealerEvent.AddDynamic(this, &ABladeIIGameGameMode::HandleEventUpdate);
 }
 
 void ABladeIIGameGameMode::FindArena()
@@ -203,7 +206,7 @@ void ABladeIIGameGameMode::SetupSelector()
 	UClass* CardSelectorClass = CardSelectorBlueprint->GeneratedClass;
 	ensureMsgf(CardSelectorClass, TEXT("Could not get class from card selector blueprint"));
 
-	CardSelector = GetWorld()->SpawnActor<ACardSelector>(CardSelectorClass, FVector::ZeroVector, FRotator::ZeroRotator);
+	Cursor = GetWorld()->SpawnActor<ACardSelector>(CardSelectorClass, FVector::ZeroVector, FRotator::ZeroRotator);
 }
 
 void ABladeIIGameGameMode::InitialiseBoard(B2GameState State)
@@ -227,12 +230,12 @@ void ABladeIIGameGameMode::InitialiseBoard(B2GameState State)
 	}
 }
 
-void ABladeIIGameGameMode::EnterGamePlayState()
+void ABladeIIGameGameMode::OnDealerEvent()
 {
 	FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Size() - 1).Position;
 
-	CardSelector->SetActorLocationAndRotation(SelectorStartingPosition, FRotator::ZeroRotator);
-	CardSelector->ToggleActorVisibility(true);
+	Cursor->SetActorLocationAndRotation(SelectorStartingPosition, FRotator::ZeroRotator);
+	Cursor->ToggleActorVisibility(true);
 
 	GameState.bAcceptPlayerInput = true;
 	GameState.CursorPosition = Arena->PlayerDeck;
@@ -270,7 +273,7 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 	switch (Event)
 	{
 	case EDealerEvent::CardsDealt:
-		EnterGamePlayState();
+		OnDealerEvent();
 		break;
 	case EDealerEvent::CardPlaced:
 

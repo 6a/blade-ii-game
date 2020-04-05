@@ -41,7 +41,7 @@ private:
 	UB2Dealer* Dealer;
 
 	/* Pointer to the card selector that will be used throughout this match */
-	ACardSelector* CardSelector;
+	ACardSelector* Cursor;
 
 	/* The current state of the game */
 	B2GameState GameState;
@@ -80,7 +80,7 @@ private:
 	void InitialiseBoard(B2GameState GameState);
 
 	/* Performs whatever is required for when the game enters play (post deal) */
-	void EnterGamePlayState();
+	void OnDealerEvent();
 
 	/* Event listeners */
 
