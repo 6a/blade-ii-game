@@ -79,6 +79,17 @@ enum class EEngineState : uint8
 	PostGame UMETA(DisplayName = "Post Game"),
 };
 
+/* EGamePhase represents different phases of the actual game, such as both players drawing onto the field, or waiting for the opponents move */
+UENUM(BlueprintType)
+enum class EGamePhase : uint8
+{
+	DrawToEmptyField UMETA(DisplayName = "Drawing from the deck to an empty field"),
+	PlayerTurn UMETA(DisplayName = "The players turn"),
+	WaitingForOpponentMove UMETA(DisplayName = "Waiting for the opponents move to be received"),
+	SelectingFromPlayerHand UMETA(DisplayName = "Selecting a card from the local players hand"),
+	SelectingFromOpponentHand UMETA(DisplayName = "Selecting a card from the opponents hand")
+};
+
 /* EPayload represents the various types of data once can send/receive to and from a server */
 UENUM(BlueprintType)
 enum class EPayload : uint8
