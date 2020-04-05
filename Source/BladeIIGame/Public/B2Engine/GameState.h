@@ -3,12 +3,10 @@
 #include "CoreMinimal.h"
 
 #include "Cards.h"
-#include "B2Game/CardSlot.h"
+#include "B2Misc/Enum.h"
 
 struct B2GameState
 {
-	~B2GameState();
-
 	// Cards
 	FB2Cards Cards;
 
@@ -18,7 +16,7 @@ struct B2GameState
 
 	// Input
 	bool bAcceptPlayerInput;
-	UCardSlot* CursorPosition;
+	ETableSlot CursorPosition;
 	uint32 CursorSlotIndex;
 };
 
