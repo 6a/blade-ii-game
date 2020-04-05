@@ -8,7 +8,7 @@ const B2ServerUpdate B2Server::GetNextUpdate()
 {
 	B2ServerUpdate Payload
 	{
-		EPayload::None,
+		EPayload::WaitingForInitialDeal,
 	};
 
 	return Payload;

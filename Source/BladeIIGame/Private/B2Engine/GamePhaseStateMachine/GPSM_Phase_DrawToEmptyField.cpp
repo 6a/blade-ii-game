@@ -4,8 +4,6 @@
 
 #include "../BladeIIGameGameMode.h"
 
-class ABladeIIGameGameMode* GameModeInstance;
-
 GPSM_Phase_DrawToEmptyField::GPSM_Phase_DrawToEmptyField()
 {
 	GPSM_Phase::GPSM_Phase();

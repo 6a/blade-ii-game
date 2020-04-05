@@ -83,7 +83,7 @@ enum class EEngineState : uint8
 UENUM(BlueprintType)
 enum class EGamePhase : uint8
 {
-	None UMETA(DisplayName = "Default phase"),
+	WaitingForInitialDeal UMETA(DisplayName = "Waiting for initial deal"),
 	DrawToEmptyField UMETA(DisplayName = "Drawing from the deck to an empty field"),
 	PlayerTurn UMETA(DisplayName = "The players turn"),
 	WaitingForOpponentMove UMETA(DisplayName = "Waiting for the opponents move to be received"),
@@ -95,7 +95,7 @@ enum class EGamePhase : uint8
 UENUM(BlueprintType)
 enum class EPayload : uint8
 {
-	None UMETA(DisplayName = "None"),
+	WaitingForInitialDeal UMETA(DisplayName = "None"),
 	Cards UMETA(DisplayName = "Cards"),
 	Move UMETA(DisplayName = "Move"),
 	Instruction UMETA(DisplayName = "Instruction")

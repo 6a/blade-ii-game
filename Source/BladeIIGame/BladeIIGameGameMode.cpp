@@ -121,7 +121,7 @@ void ABladeIIGameGameMode::SetupCardFactory()
 void ABladeIIGameGameMode::SetupGPSM()
 {
 	GPSM = new B2GPSM(this);
-	GPSM->ChangeState<GPSM_Phase_DrawToEmptyField>();
+	GPSM->ChangeState<GPSM_Phase_WaitingForInitialDeal>();
 }
 
 void ABladeIIGameGameMode::RegisterEventListeners()
@@ -215,6 +215,8 @@ void ABladeIIGameGameMode::OnCardsDealt()
 
 	GameState->bAcceptPlayerInput = true;
 	GameState->CursorPosition = ECardSlot::PlayerDeck;
+
+	GPSM->ChangeState<GPSM_Phase_DrawToEmptyField>();
 
 	EngineState = EEngineState::InPlay;
 }

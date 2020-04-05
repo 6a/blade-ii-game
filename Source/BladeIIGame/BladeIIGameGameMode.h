@@ -11,8 +11,11 @@
 #include "B2Engine/LocalPlayerInput.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
+
+// Game Phase State Machine
 #include "B2Engine/GamePhaseStateMachine/GPSM.h"
 #include "B2Engine/GamePhaseStateMachine/GPSM_Phase_DrawToEmptyField.h"
+#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_WaitingForInitialDeal.h"
 
 #include "BladeIIGameGameMode.generated.h"
 

@@ -60,7 +60,7 @@ void B2Transition::Tick(float DeltaTime)
 		{
 			if (!bTransitionFinished)
 			{
-				bTransitionFinished = true;
+				bTransitionFinished = true;	
 				WaitGroups[WaitGroup]--;
 
 				if (WaitGroups[WaitGroup] <= 0)

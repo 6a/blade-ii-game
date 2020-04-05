@@ -8,7 +8,7 @@ void UB2Opponent::Tick(float DeltaSeconds)
 
 	switch (ServerUpdate.Type)
 	{
-		case EPayload::None:
+		case EPayload::WaitingForInitialDeal:
 
 			break;
 		case EPayload::Cards:

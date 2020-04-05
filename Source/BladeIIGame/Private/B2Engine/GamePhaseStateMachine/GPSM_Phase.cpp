@@ -24,5 +24,5 @@ void GPSM_Phase::End()
 
 EGamePhase GPSM_Phase::GetStateType()
 {
-	return EGamePhase::None;
+	return EGamePhase::WaitingForInitialDeal;
 }
