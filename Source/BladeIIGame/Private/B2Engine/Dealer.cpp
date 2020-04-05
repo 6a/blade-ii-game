@@ -604,7 +604,8 @@ void UB2Dealer::MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlo
 	const float DelayOnStart = 0.2f;
 	const float DurationIntoDeck = 0.4f;
 
-	WaitGroupCardMove = bUseWaitGroup ? B2Transition::GetNextWaitGroup() : B2WaitGroupNone;
+	B2WaitGroup MoveWaitGroup = bUseWaitGroup ? B2Transition::GetNextWaitGroup() : B2WaitGroupNone;
+	if (bUseWaitGroup) WaitGroupCardMoveFinished = MoveWaitGroup + 1;
 
 	float Delay = DelayOnStart;
 
@@ -636,7 +637,7 @@ void UB2Dealer::MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlo
 	};
 
 	// Add the transition to the transition queue
-	B2Transition Transition = B2Transition(WaitGroupCardMove, Position, Rotation, DurationIntoDeck, Delay);
+	B2Transition Transition = B2Transition(MoveWaitGroup, Position, Rotation, DurationIntoDeck, Delay);
 	Card->QueueTransition(Transition);
 }
 
@@ -661,11 +662,11 @@ void UB2Dealer::Tick(float DeltaSeconds)
 			WaitGroupDealFinished = B2WaitGroupNone;
 		}
 
-		if (WaitGroupCardMove == CurrentWaitGroup)
+		if (WaitGroupCardMoveFinished == CurrentWaitGroup)
 		{
 			// Fire the event and reset this wait group so we dont keep entering this part
 			OnDealerEvent.Broadcast(EDealerEvent::CardPlaced);
-			WaitGroupCardMove = B2WaitGroupNone;
+			WaitGroupCardMoveFinished = B2WaitGroupNone;
 		}
 	}
 }

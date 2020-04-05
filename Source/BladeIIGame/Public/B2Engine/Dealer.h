@@ -45,6 +45,6 @@ private:
 
 	/* Waitgroups for firing various events */
 	B2WaitGroup WaitGroupDealFinished;
-	B2WaitGroup WaitGroupCardMove;
+	B2WaitGroup WaitGroupCardMoveFinished;
 };
 
