@@ -20,37 +20,42 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 
 	Opponent->Tick(DeltaSeconds);
 
-	// TODO why does this crash sometimes with a memory access error? 
-	// Seems to be only after playing. Do we need to do a proper cleanup after the game finishes or something?
-	if (GameState.bAcceptPlayerInput)
+	if (EngineState > EEngineState::InPlay)
 	{
-		if (Cursor->IsVisible())
+		// TODO why does this crash sometimes with a memory access error? 
+		// Seems to be only after playing. Do we need to do a proper cleanup after the game finishes or something?
+		if (GameState.bAcceptPlayerInput)
 		{
-			EButton Button;
-			while (LocalPlayerInput->ButtonInputQueue.Dequeue(Button))
+			if (Cursor->IsVisible() /* Needs null check? */)
 			{
-				if (GameState.CursorPosition->GetType() == ETableSlot::PlayerDeck)
+				EButton Button;
+				while (LocalPlayerInput->ButtonInputQueue.Dequeue(Button))
 				{
-					if ((Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
+					if (GameState.CursorPosition == ETableSlot::PlayerDeck)
 					{
-						continue;
-					}
+						if ((Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
+						{
+							continue;
+						}
 
-					switch (Button)
-					{
-					case EButton::Menu:
-						// Handle menu open / close etc
-						break;
-					case EButton::Select:
-						Cursor->ToggleActorVisibility(false);
+						switch (Button)
+						{
+						case EButton::Menu:
+							// Handle menu open / close etc
+							break;
+						case EButton::Select:
+							Cursor->ToggleActorVisibility(false);
 
-						UCardSlot* CurrentSlot = GameState.CursorPosition;
-						UCardSlot* TargetSlot = Arena->PlayerField;
+							UCardSlot* CurrentSlot = GetCardSlot(GameState.CursorPosition);
+							UCardSlot* TargetSlot = Arena->PlayerField;
 
-						Dealer->MoveFromDeck(CurrentSlot, GameState.CursorSlotIndex, TargetSlot);
+							Dealer->MoveFromDeck(CurrentSlot, GameState.CursorSlotIndex, TargetSlot);
 
-						GameState.bAcceptPlayerInput = false;
-						break;
+							GameState.bAcceptPlayerInput = false;
+
+							GameState.Cards.PlayerField.Push(GameState.Cards.PlayerDeck.Pop());
+							break;
+						}
 					}
 				}
 			}
@@ -232,7 +237,7 @@ void ABladeIIGameGameMode::InitialiseBoard(B2GameState State)
 	}
 }
 
-void ABladeIIGameGameMode::OnDealerEvent()
+void ABladeIIGameGameMode::OnCardsDealt()
 {
 	FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Size() - 1).Position;
 
@@ -240,14 +245,53 @@ void ABladeIIGameGameMode::OnDealerEvent()
 	Cursor->ToggleActorVisibility(true);
 
 	GameState.bAcceptPlayerInput = true;
-	GameState.CursorPosition = Arena->PlayerDeck;
+	GameState.CursorPosition = ETableSlot::PlayerDeck;
+
+	EngineState = EEngineState::InPlay;
+}
+
+UCardSlot* ABladeIIGameGameMode::GetCardSlot(ETableSlot Slot) const
+{
+	UCardSlot* CardSlot = nullptr;
+
+	switch (Slot)
+	{
+	case ETableSlot::PlayerDeck:
+		CardSlot = Arena->PlayerDeck;
+		break;
+	case ETableSlot::PlayerHand:
+		CardSlot = Arena->PlayerHand;
+		break;
+	case ETableSlot::PlayerField:
+		CardSlot = Arena->PlayerField;
+		break;
+	case ETableSlot::PlayerDiscard:
+		// TODO impl?
+		B2Utility::LogWarning("PlayerDiscard does not exist!!!");
+		break;
+	case ETableSlot::OpponentDeck:
+		CardSlot = Arena->OpponentDeck;
+		break;
+	case ETableSlot::OpponentHand:
+		CardSlot = Arena->OpponentHand;
+		break;
+	case ETableSlot::OpponentField:
+		CardSlot = Arena->OpponentField;
+		break;
+	case ETableSlot::OpponentDiscard:
+		// TODO impl?
+		B2Utility::LogWarning("OpponentDiscard does not exist!!!");
+		break;
+	}
+
+	return CardSlot;
 }
 
 void ABladeIIGameGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
 	B2GameState State = B2GameState
 	{
-		Cards /* Cards for this game */,
+		FB2Cards(Cards) /* Cards for this game */,
 		0 /* Player Score */,
 		0 /* Opponent Score */,
 		false /* (Not) accepting player input */ ,
@@ -275,7 +319,7 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 	switch (Event)
 	{
 	case EDealerEvent::CardsDealt:
-		OnDealerEvent();
+		OnCardsDealt();
 		break;
 	case EDealerEvent::CardPlaced:
 
