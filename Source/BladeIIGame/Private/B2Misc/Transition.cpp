@@ -150,19 +150,22 @@ FVector B2Transition::EaseVector(FVector Start, FVector Target, float Alpha, EEa
 
 FRotator B2Transition::EaseRotator(FRotator Start, FRotator Target, float Alpha, EEase Ease)
 {
-	switch (Ease)
-	{
-	case EEase::EaseIn:
-		return FMath::InterpEaseIn(Start, Target, Alpha, EASE_EXPONENT);
-	case EEase::EaseInOut:
-		return FMath::InterpEaseInOut(Start, Target, Alpha, EASE_EXPONENT);
-	case EEase::EaseOut:
-		return FMath::InterpEaseOut(Start, Target, Alpha, EASE_EXPONENT);
-	case EEase::Linear:
-		return FMath::Lerp(Start, Target, Alpha);
-	}
+	FQuat StartQuat = Start.Quaternion();
+	FQuat TargetQuat = Target.Quaternion();
 
-	return FRotator::ZeroRotator;
+	//switch (Ease)
+	//{
+	//case EEase::EaseIn:
+	//	;
+	//case EEase::EaseInOut:
+	//	return FMath::InterpEaseInOut(StartQuat, TargetQuat, Alpha, EASE_EXPONENT).Rotator();
+	//case EEase::EaseOut:
+	//	return FMath::InterpEaseOut(StartQuat, TargetQuat, Alpha, EASE_EXPONENT).Rotator();
+	//case EEase::Linear:
+	//	return FMath::Lerp(StartQuat, TargetQuat, Alpha).Rotator();
+	//}
+
+	return FQuat::Slerp(StartQuat, TargetQuat, Alpha).Rotator();
 }
 
 

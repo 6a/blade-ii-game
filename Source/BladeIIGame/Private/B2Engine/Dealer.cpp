@@ -599,12 +599,11 @@ void UB2Dealer::Deal()
 	}
 }
 
-void UB2Dealer::MoveCard(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot)
+void UB2Dealer::MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot)
 {
-	// TODO add edge case for removing from the hand (update hand positions?)
-
 	const float DelayOnStart = 0.2f;
 	const float DurationIntoDeck = 0.4f;
+
 	WaitGroupCardMove = B2Transition::GetNextWaitGroup();
 
 	float Delay = DelayOnStart;
@@ -625,7 +624,7 @@ void UB2Dealer::MoveCard(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* T
 	{
 		Card->GetActorLocation(),
 		TargetTransform.Position,
-		FVector(0, 0, 0),
+		FVector(0, 0, 12.f),
 		EEase::EaseInOut,
 	};
 

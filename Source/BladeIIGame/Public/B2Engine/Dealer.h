@@ -33,7 +33,7 @@ public:
 	 * @param TargetSlot - The CardSlot to where the card will go (at the next available position)
 	 * @returns FB2Transform for index "Index"
 	 */
-	void MoveCard(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot);
+	void MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot);
 
 	/* Tick the dealer so that it can perform tasks such as calling-back after transitions are finished etc. */
 	void Tick(float DeltaSeconds);

@@ -20,6 +20,8 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 
 	Opponent->Tick(DeltaSeconds);
 
+	// TODO why does this crash sometimes with a memory access error? 
+	// Seems to be only after playing. Do we need to do a proper cleanup after the game finishes or something?
 	if (GameState.bAcceptPlayerInput)
 	{
 		if (Cursor->IsVisible())
@@ -45,7 +47,7 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 						UCardSlot* CurrentSlot = GameState.CursorPosition;
 						UCardSlot* TargetSlot = Arena->PlayerField;
 
-						Dealer->MoveCard(CurrentSlot, GameState.CursorSlotIndex, TargetSlot);
+						Dealer->MoveFromDeck(CurrentSlot, GameState.CursorSlotIndex, TargetSlot);
 
 						GameState.bAcceptPlayerInput = false;
 						break;
