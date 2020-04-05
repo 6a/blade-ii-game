@@ -32,15 +32,19 @@ private:
 	B2CardFactory* CardFactory;
 
 	/* Pointer to the opponent that will be used throughout this match */
+	UPROPERTY()
 	UB2Opponent* Opponent;
 
 	/* Pointer to the arena that will be used throughout this match */
+	UPROPERTY()
 	AArena* Arena;
 
 	/* Pointer the dealer that will be used throughout this match */
+	UPROPERTY()
 	UB2Dealer* Dealer;
 
 	/* Pointer to the card selector that will be used throughout this match */
+	UPROPERTY()
 	ACardSelector* Cursor;
 
 	/* The current state of the game */
@@ -50,6 +54,7 @@ private:
 	EEngineState EngineState;
 
 	/* Pointer to the local player input receiver */
+	UPROPERTY()
 	ALocalPlayerInput* LocalPlayerInput;
 
 	/**
@@ -80,7 +85,10 @@ private:
 	void InitialiseBoard(B2GameState GameState);
 
 	/* Performs whatever is required for when the game enters play (post deal) */
-	void OnDealerEvent();
+	void OnCardsDealt();
+
+	/* Get a reference to the card slot of the specified type */
+	UCardSlot* GetCardSlot(ETableSlot Slot) const;
 
 	/* Event listeners */
 
