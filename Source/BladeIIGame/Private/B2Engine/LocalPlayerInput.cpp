@@ -17,6 +17,8 @@ void ALocalPlayerInput::BeginPlay()
 
 void ALocalPlayerInput::OnMenuPressed()
 {
+	HandleButtonPressed.Broadcast(EButton::Menu);
+
 	B2Utility::LogInfo(TEXT("Menu Pressed"));
 }
 
@@ -27,12 +29,23 @@ void ALocalPlayerInput::OnMouseButtonLeft()
 
 void ALocalPlayerInput::OnNavivateLeftPressed()
 {
+	HandleButtonPressed.Broadcast(EButton::NavigateLeft);
+
 	B2Utility::LogInfo(TEXT("Navigate Left Pressed"));
 }
 
 void ALocalPlayerInput::OnNavivateRightPressed()
 {
+	HandleButtonPressed.Broadcast(EButton::NavigateRight);
+
 	B2Utility::LogInfo(TEXT("Navigate Right Pressed"));
+}
+
+void ALocalPlayerInput::OnSelectPressed()
+{
+	HandleButtonPressed.Broadcast(EButton::Select);
+
+	B2Utility::LogInfo(TEXT("Select Pressed"));
 }
 
 void ALocalPlayerInput::OnMouseMoved(const FVector2D& NewMousePosition)
@@ -85,5 +98,9 @@ void ALocalPlayerInput::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	/* Bind the Navigation buttons */
 	InputComponent->BindAction("NavigateRight", IE_Pressed, this, &ALocalPlayerInput::OnNavivateRightPressed);
 	InputComponent->BindAction("NavigateLeft", IE_Pressed, this, &ALocalPlayerInput::OnNavivateLeftPressed);
+
+	/* Bind Selct button */
+	InputComponent->BindAction("Select", IE_Pressed, this, &ALocalPlayerInput::OnSelectPressed);
+
 }
 

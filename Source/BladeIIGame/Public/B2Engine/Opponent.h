@@ -11,7 +11,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReceivedDelegate, const FB2Move&, Move);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInstructionReceivedDelegate, EInstruction, Move);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCardsReceived, const FB2Cards&, Cards);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCardsReceivedDelegate, const FB2Cards&, Cards);
 
 UCLASS()
 class UB2Opponent : public UObject
@@ -26,7 +26,7 @@ public:
 	FInstructionReceivedDelegate OnInstructionReceived;
 
 	/* Callback for when the cards for this game are received from the server */
-	FCardsReceived OnCardsReceived;
+	FCardsReceivedDelegate OnCardsReceived;
 
 	/**
 	 * Tick this opponent instance.

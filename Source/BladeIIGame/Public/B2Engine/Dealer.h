@@ -16,7 +16,7 @@ class UB2Dealer : public UObject
 
 public:	
 	/* Callback for when dealing has finished */
-	FCardsDealtDelegate OnCardsDealt;
+	FCardsDealtDelegate EnterGamePlayState;
 	
 	/* Pointer to the arena */
 	AArena* Arena;

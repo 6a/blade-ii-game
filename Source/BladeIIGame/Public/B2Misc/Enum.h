@@ -51,10 +51,14 @@ enum class EInstruction : uint8
 UENUM(BlueprintType)
 enum class ETableSlot : uint8
 {
-	Deck UMETA(DisplayName = "Deck"),
-	Hand UMETA(DisplayName = "Hand"),
-	Field UMETA(DisplayName = "Field"),
-	Discard UMETA(DisplayName = "Discard")
+	PlayerDeck UMETA(DisplayName = "Player Deck"),
+	PlayerHand UMETA(DisplayName = "Player Hand"),
+	PlayerField UMETA(DisplayName = "Player Field"),
+	PlayerDiscard UMETA(DisplayName = "Player Discard"),
+	OpponentDeck UMETA(DisplayName = "Opponent Deck"),
+	OpponentHand UMETA(DisplayName = "Opponent Hand"),
+	OpponentField UMETA(DisplayName = "Opponent Field"),
+	OpponentDiscard UMETA(DisplayName = "Opponent Discard"),
 };
 
 /* EDealerEvent represents different dealer events (such as on deck dealt, on card placed) */
@@ -83,4 +87,14 @@ enum class EPayload : uint8
 	Cards UMETA(DisplayName = "Cards"),
 	Move UMETA(DisplayName = "Move"),
 	Instruction UMETA(DisplayName = "Instruction")
+};
+
+/* EButton represents different buttons that the player can press to interect with the game */
+UENUM(BlueprintType)
+enum class EButton : uint8
+{
+	Menu UMETA(DisplayName = "Menu"),
+	NavigateLeft UMETA(DisplayName = "Navigate Left"),
+	NavigateRight UMETA(DisplayName = "Navigate Right"),
+	Select UMETA(DisplayName = "Select")
 };

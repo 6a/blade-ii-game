@@ -8,6 +8,7 @@
 #include "B2Engine/Dealer.h"
 #include "B2Engine/BoardState.h"
 #include "B2Engine/Cards.h"
+#include "B2Engine/LocalPlayerInput.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
 
@@ -48,6 +49,9 @@ private:
 	/* The current state of the engine */
 	EEngineState EngineState;
 
+	/* Pointer to the local player input receiver */
+	ALocalPlayerInput* LocalPlayerInput;
+
 	/**
 	 * Reads the launch config and sets up the engine accordingly.
 	 * @param ObjectInitializer - ObjectInitializer helper from constructor
@@ -63,6 +67,9 @@ private:
 	/* Find and store a reference to the arena */
 	void FindArena();
 
+	/* Find and store a reference to the local player input actors */
+	void FindLocalPlayerInput();
+
 	/* Set up the internal dealer instance */
 	void SetupDealer();
 
@@ -72,8 +79,17 @@ private:
 	/* Set the board state based on the specified state */
 	void InitialiseBoard(B2BoardState BoardState);
 
-	/* Game logic for when the cards have been dealt by the dealer */
-	void OnCardsDealt();
+	/* Performs whatever is required for when the game enters play (post deal) */
+	void EnterGamePlayState();
+
+	/* Event listeners */
+
+	/**
+	 * Event handler for when the player presses a button.
+	 * @param Button - The button that was pressed
+	 */
+	UFUNCTION()
+	void HandleButtonPressed(EButton Button);
 
 	/**
 	 * Event handler for receiving the cards for this game.
@@ -91,7 +107,7 @@ private:
 
 	/**
 	 * Event handler for instructions from the server.
-	 * @param Move - The instruction that was received
+	 * @param Instruction - The instruction that was received
 	 */
 	UFUNCTION()
 	void HandleInstructionReceived(EInstruction Instruction);

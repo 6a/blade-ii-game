@@ -7,7 +7,6 @@
 #include "B2Engine/AIOpponent.h"
 #include "B2Engine/NetOpponent.h"
 #include "B2Engine/LaunchConfig.h"
-#include "B2Engine/LocalPlayerInput.h"
 #include "B2Misc/Transition.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
@@ -42,6 +41,8 @@ void ABladeIIGameGameMode::StartPlay()
 	FindArena();
 
 	SetupDealer();
+
+	FindLocalPlayerInput();
 
 	RegisterEventListeners();
 
@@ -118,7 +119,10 @@ void ABladeIIGameGameMode::RegisterEventListeners()
 	Opponent->OnCardsReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleCardsReceived);
 
 	// From Dealer
-	Dealer->OnCardsDealt.AddDynamic(this, &ABladeIIGameGameMode::HandleEventUpdate);
+	Dealer->EnterGamePlayState.AddDynamic(this, &ABladeIIGameGameMode::HandleEventUpdate);
+
+	// From Player input
+	LocalPlayerInput->HandleButtonPressed.AddDynamic(this, &ABladeIIGameGameMode::HandleButtonPressed);
 }
 
 void ABladeIIGameGameMode::FindArena()
@@ -134,6 +138,21 @@ void ABladeIIGameGameMode::FindArena()
 
 	// Throw if the arena was not found
 	check(Arena);
+}
+
+void ABladeIIGameGameMode::FindLocalPlayerInput()
+{
+	// Try to get a reference to the local player input actor
+	for (TActorIterator<ALocalPlayerInput> InputIter(GetWorld()); InputIter; ++InputIter)
+	{
+		if (InputIter)
+		{
+			LocalPlayerInput = *InputIter;
+		}
+	}
+
+	// Throw if the input actor was not found
+	check(LocalPlayerInput);
 }
 
 void ABladeIIGameGameMode::SetupDealer()
@@ -177,19 +196,30 @@ void ABladeIIGameGameMode::InitialiseBoard(B2BoardState State)
 	}
 }
 
-void ABladeIIGameGameMode::OnCardsDealt()
+void ABladeIIGameGameMode::HandleButtonPressed(EButton Button)
+{
+	B2Utility::LogInfo(FString::Printf(TEXT("Button press detected: %d"), Button));
+}
+
+void ABladeIIGameGameMode::EnterGamePlayState()
 {
 	FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Size() - 1).Position;
 
 	CardSelector->SetActorLocationAndRotation(SelectorStartingPosition, FRotator::ZeroRotator);
 	CardSelector->ToggleActorVisibility(true);
+
+	BoardState.bAcceptPlayerInput = true;
+	BoardState.CursorPosition = ETableSlot::PlayerDeck;
 }
 
 void ABladeIIGameGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
 	B2BoardState State = B2BoardState
 	{
-		Cards
+		Cards /* Cards for this game */,
+		0 /* Player Score */,
+		0 /* Opponent Score */,
+		false /* (Not) accepting player input */ ,
 	};
 
 	InitialiseBoard(State);
@@ -214,7 +244,7 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 	switch (Event)
 	{
 	case EDealerEvent::CardsDealt:
-		OnCardsDealt();
+		EnterGamePlayState();
 		break;
 	case EDealerEvent::CardPlaced:
 
