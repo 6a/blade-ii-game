@@ -12,46 +12,44 @@ AArena::AArena()
 	MainMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Arena Mesh"));
 	RootComponent = MainMesh;
 
-	FAttachmentTransformRules StandardAttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
-
 	DividerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Divider Mesh"));
-	DividerMesh->AttachToComponent(MainMesh, StandardAttachmentRules);
+	DividerMesh->SetupAttachment(MainMesh);
 
 	VSBadgeBody = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VS Badge Body"));
-	VSBadgeBody->AttachToComponent(MainMesh, StandardAttachmentRules);
+	VSBadgeBody->SetupAttachment(MainMesh);
 
 	VSBadgeText = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VS Badge Text"));
-	VSBadgeText->AttachToComponent(MainMesh, StandardAttachmentRules);
+	VSBadgeText->SetupAttachment(MainMesh);
 
 	Slots = CreateDefaultSubobject<USceneComponent>(TEXT("Card Slots"));
-	Slots->AttachToComponent(MainMesh, StandardAttachmentRules);
+	Slots->SetupAttachment(MainMesh);
 
 	PlayerDeck = CreateDefaultSubobject<UDeckSlot>(TEXT("Player Deck"));
-	PlayerDeck->AttachToComponent(Slots, StandardAttachmentRules);
+	PlayerDeck->SetupAttachment(Slots);
 	PlayerDeck->SetType(ETableSlot::PlayerDeck);
 
 	PlayerHand = CreateDefaultSubobject<UHandSlot>(TEXT("Player Hand"));
-	PlayerHand->AttachToComponent(Slots, StandardAttachmentRules);
+	PlayerHand->SetupAttachment(Slots);
 	PlayerHand->SetType(ETableSlot::PlayerHand);
 
 	PlayerHandReversed = CreateDefaultSubobject<UHandSlot>(TEXT("Player Hand (Reversed)"));
-	PlayerHandReversed->AttachToComponent(Slots, StandardAttachmentRules);
+	PlayerHandReversed->SetupAttachment(Slots);
 	PlayerHandReversed->SetType(ETableSlot::PlayerHand);
 
 	PlayerField = CreateDefaultSubobject<UFieldSlot>(TEXT("Player Field"));
-	PlayerField->AttachToComponent(Slots, StandardAttachmentRules);
+	PlayerField->SetupAttachment(Slots);
 	PlayerField->SetType(ETableSlot::PlayerField);
 
 	OpponentDeck = CreateDefaultSubobject<UDeckSlot>(TEXT("Opponent Deck"));
-	OpponentDeck->AttachToComponent(Slots, StandardAttachmentRules);
+	OpponentDeck->SetupAttachment(Slots);
 	OpponentDeck->SetType(ETableSlot::OpponentDeck);
 
 	OpponentHand = CreateDefaultSubobject<UHandSlot>(TEXT("Opponent Hand"));
-	OpponentHand->AttachToComponent(Slots, StandardAttachmentRules);
+	OpponentHand->SetupAttachment(Slots);
 	OpponentHand->SetType(ETableSlot::OpponentHand);
 
 	OpponentField = CreateDefaultSubobject<UFieldSlot>(TEXT("Opponent Field"));
-	OpponentField->AttachToComponent(Slots, StandardAttachmentRules);
+	OpponentField->SetupAttachment(Slots);
 	OpponentField->SetType(ETableSlot::OpponentField);
 }
 
