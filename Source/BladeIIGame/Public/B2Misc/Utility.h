@@ -23,6 +23,12 @@ public:
 	 */
 	const static void LogWarning(const FString& Message);
 
+	/**
+	 * Logs a timestamped bool to the debug console.
+	 * @param bInBool - The bool to display.
+	 */
+	const static void LogBool(bool bInBool);
+
 	/* Returns the current timestap as string in the following format: hh:mm:ss:MMM */
 	const static FString GetTimestamp();
 

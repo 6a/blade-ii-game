@@ -599,12 +599,12 @@ void UB2Dealer::Deal()
 	}
 }
 
-void UB2Dealer::MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot)
+void UB2Dealer::MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot, bool bUseWaitGroup)
 {
 	const float DelayOnStart = 0.2f;
 	const float DurationIntoDeck = 0.4f;
 
-	WaitGroupCardMove = B2Transition::GetNextWaitGroup();
+	WaitGroupCardMove = bUseWaitGroup ? B2Transition::GetNextWaitGroup() : B2WaitGroupNone;
 
 	float Delay = DelayOnStart;
 

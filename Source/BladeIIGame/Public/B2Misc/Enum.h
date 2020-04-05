@@ -83,6 +83,7 @@ enum class EEngineState : uint8
 UENUM(BlueprintType)
 enum class EGamePhase : uint8
 {
+	None UMETA(DisplayName = "Default phase"),
 	DrawToEmptyField UMETA(DisplayName = "Drawing from the deck to an empty field"),
 	PlayerTurn UMETA(DisplayName = "The players turn"),
 	WaitingForOpponentMove UMETA(DisplayName = "Waiting for the opponents move to be received"),

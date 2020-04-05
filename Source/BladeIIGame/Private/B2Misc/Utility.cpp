@@ -14,6 +14,11 @@ const void B2Utility::LogWarning(const FString& message)
 #endif
 }
 
+const void B2Utility::LogBool(bool bInBool)
+{
+	LogWarning(FString::Printf(TEXT("Bool Value: %s"), bInBool ? TEXT("True") : TEXT("False")));
+}
+
 const FString B2Utility::GetTimestamp()
 {
 	auto Now = FDateTime::UtcNow();

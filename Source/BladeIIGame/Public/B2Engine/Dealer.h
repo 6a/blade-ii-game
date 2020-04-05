@@ -31,9 +31,10 @@ public:
 	 * @param SourceSlot - The CardSlot from which to get the card
 	 * @param SourceIndex - The index in the specified card slot from which to get the card
 	 * @param TargetSlot - The CardSlot to where the card will go (at the next available position)
+	 * @param bUseWaitGroup - Whether the move should use a waitgroup (makes the animation exclusive so subsequent onces will have to wait)
 	 * @returns FB2Transform for index "Index"
 	 */
-	void MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot);
+	void MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot, bool bUseWaitGroup = true);
 
 	/* Tick the dealer so that it can perform tasks such as calling-back after transitions are finished etc. */
 	void Tick(float DeltaSeconds);

@@ -20,46 +20,9 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 
 	Opponent->Tick(DeltaSeconds);
 
-	if (EngineState > EEngineState::InPlay)
+	if (EngineState >= EEngineState::InPlay)
 	{
-		// TODO why does this crash sometimes with a memory access error? 
-		// Seems to be only after playing. Do we need to do a proper cleanup after the game finishes or something?
-		if (GameState.bAcceptPlayerInput)
-		{
-			if (Cursor->IsVisible() /* Needs null check? */)
-			{
-				EButton Button;
-				while (LocalPlayerInput->ButtonInputQueue.Dequeue(Button))
-				{
-					if (GameState.CursorPosition == ETableSlot::PlayerDeck)
-					{
-						if ((Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
-						{
-							continue;
-						}
-
-						switch (Button)
-						{
-						case EButton::Menu:
-							// Handle menu open / close etc
-							break;
-						case EButton::Select:
-							Cursor->ToggleActorVisibility(false);
-
-							UCardSlot* CurrentSlot = GetCardSlot(GameState.CursorPosition);
-							UCardSlot* TargetSlot = Arena->PlayerField;
-
-							Dealer->MoveFromDeck(CurrentSlot, GameState.CursorSlotIndex, TargetSlot);
-
-							GameState.bAcceptPlayerInput = false;
-
-							GameState.Cards.PlayerField.Push(GameState.Cards.PlayerDeck.Pop());
-							break;
-						}
-					}
-				}
-			}
-		}
+		GPSM->Tick(DeltaSeconds);
 	}
 
 	LocalPlayerInput->ButtonInputQueue.Empty();
@@ -72,6 +35,8 @@ ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectIniti
 	SetupLaunchConfig(ObjectInitializer);
 	
 	SetupCardFactory();
+
+	SetupGPSM();
 
 	EngineState = EEngineState::Initialisation;
 
@@ -153,6 +118,12 @@ void ABladeIIGameGameMode::SetupCardFactory()
 	CardFactory = new B2CardFactory(B2CardFactoryConfig);
 }
 
+void ABladeIIGameGameMode::SetupGPSM()
+{
+	GPSM = new B2GPSM(this);
+	GPSM->ChangeState<GPSM_Phase_DrawToEmptyField>();
+}
+
 void ABladeIIGameGameMode::RegisterEventListeners()
 {
 	// Register event listeners
@@ -216,23 +187,21 @@ void ABladeIIGameGameMode::SetupSelector()
 	Cursor = GetWorld()->SpawnActor<ACardSelector>(CardSelectorClass, FVector::ZeroVector, FRotator::ZeroRotator);
 }
 
-void ABladeIIGameGameMode::InitialiseBoard(B2GameState State)
+void ABladeIIGameGameMode::InitialiseBoard()
 {
-	GameState = State;
-
 	// Player Deck
-	for (int i = 0; i < GameState.Cards.PlayerDeck.Num(); ++i)
+	for (int i = 0; i < GameState->Cards.PlayerDeck.Num(); ++i)
 	{
 		FB2Transform CardTransform = Arena->PlayerDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(GameState.Cards.PlayerDeck[i], CardTransform.Position + FVector(OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
+		ACard* Card = CardFactory->Make(GameState->Cards.PlayerDeck[i], CardTransform.Position + FVector(OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
 		Arena->PlayerDeck->Add(Card);
 	}
 
 	// Opponent Deck
-	for (int i = 0; i < GameState.Cards.OpponentDeck.Num(); ++i)
+	for (int i = 0; i < GameState->Cards.OpponentDeck.Num(); ++i)
 	{
 		FB2Transform CardTransform = Arena->OpponentDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(GameState.Cards.OpponentDeck[i], CardTransform.Position + FVector(-OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
+		ACard* Card = CardFactory->Make(GameState->Cards.OpponentDeck[i], CardTransform.Position + FVector(-OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
 		Arena->OpponentDeck->Add(Card); 
 	}
 }
@@ -244,8 +213,8 @@ void ABladeIIGameGameMode::OnCardsDealt()
 	Cursor->SetActorLocationAndRotation(SelectorStartingPosition, FRotator::ZeroRotator);
 	Cursor->ToggleActorVisibility(true);
 
-	GameState.bAcceptPlayerInput = true;
-	GameState.CursorPosition = ETableSlot::PlayerDeck;
+	GameState->bAcceptPlayerInput = true;
+	GameState->CursorPosition = ETableSlot::PlayerDeck;
 
 	EngineState = EEngineState::InPlay;
 }
@@ -289,7 +258,7 @@ UCardSlot* ABladeIIGameGameMode::GetCardSlot(ETableSlot Slot) const
 
 void ABladeIIGameGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
-	B2GameState State = B2GameState
+	GameState = new B2GameState
 	{
 		FB2Cards(Cards) /* Cards for this game */,
 		0 /* Player Score */,
@@ -297,7 +266,7 @@ void ABladeIIGameGameMode::HandleCardsReceived(const FB2Cards& Cards)
 		false /* (Not) accepting player input */ ,
 	};
 
-	InitialiseBoard(State);
+	InitialiseBoard();
 
 	EngineState = EEngineState::Dealing;
 

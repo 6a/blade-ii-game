@@ -11,6 +11,8 @@
 #include "B2Engine/LocalPlayerInput.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
+#include "B2Engine/GamePhaseStateMachine/GPSM.h"
+#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_DrawToEmptyField.h"
 
 #include "BladeIIGameGameMode.generated.h"
 
@@ -24,13 +26,23 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	/* Get a reference to the card slot of the specified type */
+	UCardSlot* GetCardSlot(ETableSlot Slot) const;
+
+	/* Getters for various references */
+	UB2Opponent* GetOpponent() const { return Opponent; }
+	AArena* GetArena() const { return Arena; }
+	UB2Dealer* GetDealer() const { return Dealer; }
+	ACardSelector* GetCursor() const { return Cursor; }
+	ALocalPlayerInput* GetLocalPlayerInput() const { return LocalPlayerInput; }
+	B2CardFactory* GetCardFactory() const { return CardFactory; }
+	B2GameState* GetGameState() const { return GameState; }
+	EEngineState GetEngineState() const { return EngineState; }
+
 protected:
 	ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer);
 
 private:
-	/* Pointer to the cardfactory that will be used throughout this match */
-	B2CardFactory* CardFactory;
-
 	/* Pointer to the opponent that will be used throughout this match */
 	UPROPERTY()
 	UB2Opponent* Opponent;
@@ -47,15 +59,21 @@ private:
 	UPROPERTY()
 	ACardSelector* Cursor;
 
-	/* The current state of the game */
-	B2GameState GameState;
-
-	/* The current state of the engine */
-	EEngineState EngineState;
-
 	/* Pointer to the local player input receiver */
 	UPROPERTY()
 	ALocalPlayerInput* LocalPlayerInput;
+
+	/* Pointer to the cardfactory that will be used throughout this match */
+	B2CardFactory* CardFactory;
+
+	/* The gameplay state machine instance */
+	B2GPSM* GPSM;
+
+	/* The current state of the game */
+	B2GameState* GameState;
+
+	/* The current state of the engine */
+	EEngineState EngineState;
 
 	/**
 	 * Reads the launch config and sets up the engine accordingly.
@@ -65,6 +83,9 @@ private:
 
 	/* Set up the internal card factory */
 	void SetupCardFactory();
+
+	/* Set up the gameplay state machine */
+	void SetupGPSM();
 
 	/* Set up any event listeners */
 	void RegisterEventListeners();
@@ -81,14 +102,11 @@ private:
 	/* Set up the card selector actor */
 	void SetupSelector();
 
-	/* Set the board state based on the specified state */
-	void InitialiseBoard(B2GameState GameState);
+	/* Set the board state based on the current state */
+	void InitialiseBoard();
 
 	/* Performs whatever is required for when the game enters play (post deal) */
 	void OnCardsDealt();
-
-	/* Get a reference to the card slot of the specified type */
-	UCardSlot* GetCardSlot(ETableSlot Slot) const;
 
 	/* Event listeners */
 
