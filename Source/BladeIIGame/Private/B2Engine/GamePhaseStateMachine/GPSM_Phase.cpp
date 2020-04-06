@@ -1,6 +1,6 @@
 #include "B2Engine/GamePhaseStateMachine/GPSM_Phase.h"
 
-#include "../BladeIIGameGameMode.h"
+#include "B2GameMode/BladeIIGameGameMode.h"
 
 GPSM_Phase::GPSM_Phase()
 {

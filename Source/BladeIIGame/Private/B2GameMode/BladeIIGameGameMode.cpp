@@ -1,4 +1,4 @@
-#include "BladeIIGameGameMode.h"
+#include "B2GameMode/BladeIIGameGameMode.h"
 
 #include "EngineUtils.h"
 #include "UObject/UObjectGlobals.h"

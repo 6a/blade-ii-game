@@ -2,7 +2,7 @@
 
 #include "B2Misc/Utility.h"
 
-#include "../BladeIIGameGameMode.h"
+#include "B2GameMode/BladeIIGameGameMode.h"
 
 GPSM_Phase_PlayerTurn::GPSM_Phase_PlayerTurn()
 {
