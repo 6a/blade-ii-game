@@ -17,11 +17,11 @@ void UB2UIEffectLayer::Initialise()
 		EffectsLayerWidgetClass = ClassFinder.Class;
 	}
 
-	//EffectsLayerWidget = CreateWidget<UEffectsLayerWidget>(this, EffectsLayerWidgetClass, TEXT("Effects Layer Widget"));
-	//if (EffectsLayerWidget)
-	//{
-	//	EffectsLayerWidget->AddToViewport();
-	//}
+	EffectsLayerWidget = CreateWidget<UEffectsLayerWidget>(GetWorld()->GetGameInstance(), EffectsLayerWidgetClass, TEXT("Effects Layer Widget"));
+	if (EffectsLayerWidget)
+	{
+		EffectsLayerWidget->AddToViewport();
+	}
 }
 
 void UB2UIEffectLayer::Tick(float DeltaSeconds)
