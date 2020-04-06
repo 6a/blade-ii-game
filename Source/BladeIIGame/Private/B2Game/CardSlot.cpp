@@ -1,5 +1,8 @@
-#include "B2Game/CardSlot.h"
 #include "Algo/Reverse.h"
+
+#include "B2Game/CardSlot.h"
+#include "B2Predicate/SortCardsByDistanceAscending.h"
+#include "B2Predicate/SortCardsByTypeAscending.h"
 
 UCardSlot::UCardSlot()
 {
@@ -14,7 +17,7 @@ UINT UCardSlot::Count() const
 TArray<FString> UCardSlot::GetSortedIDsAscending()
 {
 	TArray<ACard*> CardsCopy(Cards);
-	CardsCopy.Sort([](const ACard& a, const ACard& b) { return a.Type > b.Type; });
+	CardsCopy.Sort(B2Predicate_SortCardsByTypeAscending());
 
 	TArray<FString> Strings;
 
@@ -22,6 +25,8 @@ TArray<FString> UCardSlot::GetSortedIDsAscending()
 	{
 		Strings.Add((*Iter)->GetID());
 	}
+
+	CardsCopy.Empty();
 
 	return Strings;
 }
@@ -128,19 +133,11 @@ const FB2Transform UCardSlot::GetTransformForIndex(UINT Index) const
 
 void UCardSlot::UpdateCardOrder()
 {
+	// This actually sorts by doing a distance check from the position of the 0th card, for all the cards in the slot
+	// Lowest distance is closer to index 0 and so on
+
 	FVector RootLocation = CardTransforms[0].Position;
-	Cards.Sort([RootLocation](const ACard& a, const ACard& b)
-	{
-		float SquareDistanceA = FVector::DistSquared(RootLocation, a.GetActorLocation());
-		float SquareDistanceB = FVector::DistSquared(RootLocation, b.GetActorLocation());
-
-		return SquareDistanceA < SquareDistanceB;
-	});
-
-	for (size_t i = 0; i < Cards.Num(); i++)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Card: %s"), *Cards[i]->GetFName().ToString());
-	}
+	Cards.Sort(B2Predicate_SortCardsByDistanceAscending(RootLocation));
 }
 
 void UCardSlot::SetType(ECardSlot SlotType)
