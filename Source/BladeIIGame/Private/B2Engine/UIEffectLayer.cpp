@@ -22,6 +22,8 @@ void UB2UIEffectLayer::Initialise()
 	{
 		EffectsLayerWidget->AddToViewport();
 	}
+
+	// TODO finish implementation, add test stuff to widget so we can actually see it etc.
 }
 
 void UB2UIEffectLayer::Tick(float DeltaSeconds)

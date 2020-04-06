@@ -3,11 +3,12 @@
 #include "EngineUtils.h"
 #include "UObject/UObjectGlobals.h"
 
-#include "B2Misc/Utility.h"
 #include "B2Engine/AIOpponent.h"
 #include "B2Engine/NetOpponent.h"
 #include "B2Engine/LaunchConfig.h"
 #include "B2Misc/Transition.h"
+#include "B2Misc/Utility.h"
+#include "B2GameMode/BladeIIGameInstance.h"
 
 // Game phase state machines
 #include "B2Engine/GamePhaseStateMachine/GPSM_Phase_DrawToEmptyField.h"
