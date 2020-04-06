@@ -9,6 +9,12 @@
 #include "B2Engine/LaunchConfig.h"
 #include "B2Misc/Transition.h"
 
+// Game phase state machines
+#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_DrawToEmptyField.h"
+#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_WaitingForInitialDeal.h"
+#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_PlayerTurn.h"
+#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_WaitingForOpponentMove.h"
+
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
 void ABladeIIGameGameMode::Tick(float DeltaSeconds)
@@ -208,7 +214,7 @@ void ABladeIIGameGameMode::InitialiseBoard()
 
 void ABladeIIGameGameMode::OnCardsDealt()
 {
-	FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Size() - 1).Position;
+	FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Count() - 1).Position;
 
 	Cursor->SetActorLocationAndRotation(SelectorStartingPosition, FRotator::ZeroRotator);
 	Cursor->ToggleActorVisibility(true);
@@ -225,7 +231,7 @@ int32 ABladeIIGameGameMode::AggregateScore(UCardSlot* Slot) const
 {
 	int32 Total = 0;
 
-	for (size_t i = 0; i < Slot->Size(); i++)
+	for (size_t i = 0; i < Slot->Count(); i++)
 	{
 		ACard* Card = Slot->GetCardByIndex(i);
 
@@ -320,7 +326,7 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 				// Lets go round again.wav
 				GameState->Turn = ETurn::Undecided;
 
-				FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Size() - 1).Position;
+				FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Count() - 1).Position;
 
 				Cursor->SetActorLocationAndRotation(SelectorStartingPosition, FRotator::ZeroRotator);
 				Cursor->ToggleActorVisibility(true);
@@ -331,14 +337,23 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 			}
 			else if (GameState->PlayerScore > GameState->OpponentScore)
 			{
-				// Switch to player turn
+				// Switch game state to player turn
 				GameState->Turn = ETurn::Player;
 				
+				// Switch state machine to player turn
+				GPSM->ChangeState<GPSM_Phase_PlayerTurn>();
+
+				// Fire off any animations / on screen stuff...
 			}
 			else
 			{
-				// Switch to opponent
+				// Switch game state to opponent
 				GameState->Turn = ETurn::Opponent;
+
+				// Switch state machine to opponent turn
+				GPSM->ChangeState<GPSM_Phase_WaitingForOpponentMove>();
+
+				// Fire off any animations / on screen stuff...
 			}
 		}
 		break;
