@@ -225,7 +225,7 @@ void UB2Dealer::Deal()
 	B2WaitGroup WG_PlayerHandReveal = B2Transition::GetNextWaitGroup();
 
 	// Player cards reveal
-	for (size_t i = 0; i < Arena->PlayerHand->Size(); i++)
+	for (size_t i = 0; i < Arena->PlayerHand->Count(); i++)
 	{
 		float Delay = i * OffsetPlayerHandReveal;
 
@@ -262,7 +262,7 @@ void UB2Dealer::Deal()
 	B2WaitGroup WG_GatherUp = B2Transition::GetNextWaitGroup();
 
 	// Player cards gather up
-	for (size_t i = 0; i < Arena->PlayerHand->Size(); i++)
+	for (size_t i = 0; i < Arena->PlayerHand->Count(); i++)
 	{
 		float Delay = DelayPreShuffleGatherUp;
 		FVector CenterPosition = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(3).Position, Arena->PlayerHand->GetTransformForIndex(4).Position, 0.5f) + (i * FVector(0, 0, CARD_STACKING_OFFSET));
@@ -298,7 +298,7 @@ void UB2Dealer::Deal()
 	}
 
 	// Opponents cards gather up
-	for (size_t i = 0; i < Arena->OpponentHand->Size(); i++)
+	for (size_t i = 0; i < Arena->OpponentHand->Count(); i++)
 	{
 		float Delay = DelayPreShuffleGatherUp;
 		FVector CenterPosition = FMath::Lerp(Arena->OpponentHand->GetTransformForIndex(3).Position, Arena->OpponentHand->GetTransformForIndex(4).Position, 0.5f) + (i * FVector(0, 0, CARD_STACKING_OFFSET));
@@ -347,7 +347,7 @@ void UB2Dealer::Deal()
 	TArray<FString> SortedPlayerHand = Arena->PlayerHand->GetSortedIDsDescending();
 
 	// Player cards shuffle
-	for (size_t i = 0; i < Arena->PlayerHand->Size(); i++)
+	for (size_t i = 0; i < Arena->PlayerHand->Count(); i++)
 	{
 		float Delay = DelayShuffleSteps;
 
@@ -472,7 +472,7 @@ void UB2Dealer::Deal()
 		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationShuffleSteps, Delay);
 		Card->QueueTransition(Transition);
 
-		Delay = (Arena->PlayerHand->Size() * OffsetShuffleSpread) - IndexAfterSort * OffsetShuffleSpread;
+		Delay = (Arena->PlayerHand->Count() * OffsetShuffleSpread) - IndexAfterSort * OffsetShuffleSpread;
 
 		// Transition 7
 		Position = B2TPosition
@@ -499,7 +499,7 @@ void UB2Dealer::Deal()
 	TArray<FString> SortedOpponentHand = Arena->OpponentHand->GetSortedIDsDescending();
 
 	// Opponents cards shuffle
-	for (size_t i = 0; i < Arena->OpponentHand->Size(); i++)
+	for (size_t i = 0; i < Arena->OpponentHand->Count(); i++)
 	{
 		float Delay = DelayShuffleSteps;
 
@@ -575,7 +575,7 @@ void UB2Dealer::Deal()
 		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationShuffleSteps, Delay);
 		Card->QueueTransition(Transition);
 
-		Delay = (Arena->OpponentHand->Size() * OffsetShuffleSpread) - IndexAfterSort * OffsetShuffleSpread;
+		Delay = (Arena->OpponentHand->Count() * OffsetShuffleSpread) - IndexAfterSort * OffsetShuffleSpread;
 
 		// Transition 4
 		Position = B2TPosition
@@ -619,7 +619,7 @@ void UB2Dealer::MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlo
 	TargetSlot->Add(Card);
 
 	// Get target transform
-	FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(TargetSlot->Size() - 1);
+	FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(TargetSlot->Count() - 1);
 
 	B2TPosition Position
 	{

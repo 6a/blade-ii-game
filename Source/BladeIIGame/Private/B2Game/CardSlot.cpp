@@ -6,7 +6,7 @@ UCardSlot::UCardSlot()
 	BaseTransform = FB2Transform(GetComponentLocation(), GetComponentRotation());
 }
 
-UINT UCardSlot::Size() const
+UINT UCardSlot::Count() const
 {
 	return Cards.Num();
 }
@@ -116,14 +116,14 @@ ACard* UCardSlot::RemoveByID(FString ID)
 
 const FB2Transform UCardSlot::GetTransformForIndex(UINT Index) const
 {
-	FB2Transform transform;
+	FB2Transform Transform = BaseTransform;
 	
 	if (CardTransforms.IsValidIndex(Index))
 	{
-		transform = CardTransforms[Index];
+		Transform = CardTransforms[Index];
 	}
 
-	return transform;
+	return Transform;
 }
 
 void UCardSlot::UpdateCardOrder()
