@@ -8,7 +8,6 @@
 struct B2Predicate_SortCardsByDistanceAscending
 {
 	FVector RootLocation;
-
  	
 	/* @param RootLocation - The location from which the distance calculations will be performed */
 	B2Predicate_SortCardsByDistanceAscending(const FVector& RootLocation)
