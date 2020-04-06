@@ -47,6 +47,8 @@ ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectIniti
 
 	EngineState = EEngineState::Initialisation;
 
+	UIEffectLayer = NewObject<UB2UIEffectLayer>(this, TEXT("UI Effect Layer"));
+
 	B2Utility::LogInfo("GameMode initialized");
 }
 
@@ -63,6 +65,9 @@ void ABladeIIGameGameMode::StartPlay()
 	RegisterEventListeners();
 
 	SetupSelector();
+
+
+	UIEffectLayer->Initialise();
 
 	B2Utility::LogInfo("ABladeIIGameGameModeBase::StartPlay");
 }

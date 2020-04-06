@@ -9,6 +9,7 @@
 #include "B2Engine/GameState.h"
 #include "B2Engine/Cards.h"
 #include "B2Engine/LocalPlayerInput.h"
+#include "B2Engine/UIEffectLayer.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
 
@@ -63,6 +64,10 @@ private:
 	/* Pointer to the local player input receiver */
 	UPROPERTY()
 	ALocalPlayerInput* LocalPlayerInput;
+
+	/* Pointer to the UI effects layer */
+	UPROPERTY()
+	UB2UIEffectLayer* UIEffectLayer;
 
 	/* Pointer to the cardfactory that will be used throughout this match */
 	B2CardFactory* CardFactory;

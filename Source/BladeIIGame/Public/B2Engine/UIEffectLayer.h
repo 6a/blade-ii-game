@@ -15,6 +15,7 @@ class UB2UIEffectLayer : public UObject
 	GENERATED_BODY()
 
 public:
+	UB2UIEffectLayer();
 
 	/* Initialise this instance and attach the effects layer UI to the HUD */
 	void Initialise();
