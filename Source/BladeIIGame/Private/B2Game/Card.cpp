@@ -10,6 +10,8 @@ ACard::ACard()
 
 	ID = FGuid::NewGuid().ToString();
 
+	bIsActive = true;
+
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -34,9 +36,14 @@ const FString ACard::GetID() const
 	return ID;
 }
 
-const UCardSlot* ACard::GetAnchor() const
+void ACard::SetActive(bool bNewActive)
 {
-	return Anchor;
+	bIsActive = bNewActive;
+}
+
+bool ACard::IsActive()
+{
+	return bIsActive;
 }
 
 // Called every frame

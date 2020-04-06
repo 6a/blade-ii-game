@@ -16,5 +16,15 @@ public:
 	virtual void End() override;
 
 	virtual EGamePhase GetStateType() override { return EGamePhase::PlayerTurn; }
+
+private:
+	/* Returns the card currently under the cursor to its original transform */
+	void SetCurrentCardToOriginalTransform();
+
+	/* Returns the card currently under the cursor to its selected transform */
+	void SetCurrentCardToSelectedTransform();
+
+	/* Returns the card currently under the cursor to its pre effect transform */
+	void SetCurrentCardToPreEffectTransform();
 };
 

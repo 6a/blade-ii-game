@@ -37,8 +37,14 @@ public:
 	/* Returns the ID for this card */
 	const FString GetID() const;
 
-	/* Returns the ID for this card */
-	const class UCardSlot* GetAnchor() const;
+	/**
+	 * Change the active state for this card.
+	 * @param bNewActive - The new State
+	 */
+	void SetActive(bool bNewActive);
+
+	/* Returns true if this card is currently active */
+	bool IsActive();
 
 protected:
 	virtual void Tick(float DeltaTime) override;
@@ -51,6 +57,5 @@ private:
 	/* The randomly generated ID for this card */
 	FString ID;
 
-	/* The anchor to which this card is currently attached to */
-	UCardSlot* Anchor;
+	bool bIsActive;
 };

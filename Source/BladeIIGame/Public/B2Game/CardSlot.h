@@ -65,6 +65,12 @@ public:
 	virtual ACard* RemoveByID(FString ID);
 
 	/**
+	 * Get a reference to the last card in the slot. For the field, its the lastest one placed, for hand its the furthest from the deck, for the deck its the top one
+	 * @returns A pointer to the card
+	 */
+	virtual ACard* GetLast();
+
+	/**
 	 * Return the position + rotation that a card with the index "Index" should have.
 	 * @param Index - The index for which the transform will be returned
 	 * @returns FB2Transform for index "Index"

@@ -12,6 +12,14 @@ GPSM_Phase_DrawToEmptyField::GPSM_Phase_DrawToEmptyField()
 void GPSM_Phase_DrawToEmptyField::Init(ABladeIIGameGameMode* GameMode)
 {
 	GPSM_Phase::Init(GameMode);
+
+	FVector NewSelectorPosition = GameModeInstance->GetArena()->PlayerDeck->GetTransformForIndex(GameModeInstance->GetArena()->PlayerDeck->Count() - 1).Position;
+
+	GameModeInstance->GetCursor()->SetActorLocationAndRotation(NewSelectorPosition, FRotator::ZeroRotator);
+	GameModeInstance->GetCursor()->ToggleActorVisibility(true);
+
+	GameModeInstance->GetGameState()->bAcceptPlayerInput = true;
+	GameModeInstance->GetGameState()->CursorPosition = ECardSlot::PlayerDeck;
 }
 
 void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
@@ -20,55 +28,41 @@ void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
 
 	if (GameModeInstance->GetGameState()->bAcceptPlayerInput)
 	{
-		if (GameModeInstance->GetCursor()->IsVisible())
+		EButton Button;
+		while (GameModeInstance->GetLocalPlayerInput()->ButtonInputQueue.Dequeue(Button))
 		{
-			EButton Button;
-			while (GameModeInstance->GetLocalPlayerInput()->ButtonInputQueue.Dequeue(Button))
+			if (GameModeInstance->GetGameState()->CursorPosition == ECardSlot::PlayerDeck)
 			{
-				if (GameModeInstance->GetGameState()->CursorPosition == ECardSlot::PlayerDeck)
+				// Early exit if we try to navigate off from the deck - shouldnt be able to do that
+				if ((Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
 				{
-					// Early exit if we try to navigate off from the deck - shouldnt be able to do that
-					if ((Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
-					{
-						continue;
-					}
+					continue;
+				}
 
-					switch (Button)
-					{
-					case EButton::Menu:
-						// Handle menu open / close etc
-						break;
-					case EButton::Select:
-						// TODO What do we do when one or both of the deck runs out of cards??? Need to test this.
-						// For now we can just send a console message and early exit.
+				switch (Button)
+				{
+				case EButton::Menu:
+					// Handle menu open / close etc
+					break;
+				case EButton::Select:
+					GameModeInstance->GetCursor()->ToggleActorVisibility(false);
 
-						uint32 PlayerDeckSize = GameModeInstance->GetArena()->PlayerDeck->Count();
-						uint32 OpponentDeckSize = GameModeInstance->GetArena()->OpponentDeck->Count();
+					// From player deck to player field
+					UCardSlot* CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::PlayerDeck);
+					UCardSlot* TargetSlot = GameModeInstance->GetArena()->PlayerField;
 
-						if (PlayerDeckSize == 0 || Orient_Horizontal == 0)
-						{
-							continue;
-						}
+					GameModeInstance->GetDealer()->MoveFromDeck(CurrentSlot, GameModeInstance->GetArena()->PlayerDeck->Count() - 1, TargetSlot, false);
+					GameModeInstance->GetGameState()->Cards.PlayerField.Push(GameModeInstance->GetGameState()->Cards.PlayerDeck.Pop());
 
-						GameModeInstance->GetCursor()->ToggleActorVisibility(false);
+					// From opponent deck to opponent field
+					CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::OpponentDeck);
+					TargetSlot = GameModeInstance->GetArena()->OpponentField;
 
-						// From player deck to player field
-						UCardSlot* CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::PlayerDeck);
-						UCardSlot* TargetSlot = GameModeInstance->GetArena()->PlayerField;
+					GameModeInstance->GetDealer()->MoveFromDeck(CurrentSlot, GameModeInstance->GetArena()->OpponentDeck->Count() - 1, TargetSlot);
+					GameModeInstance->GetGameState()->Cards.OpponentField.Push(GameModeInstance->GetGameState()->Cards.OpponentDeck.Pop());
 
-						GameModeInstance->GetDealer()->MoveFromDeck(CurrentSlot, GameModeInstance->GetArena()->PlayerDeck->Count() - 1, TargetSlot, false);
-						GameModeInstance->GetGameState()->Cards.PlayerField.Push(GameModeInstance->GetGameState()->Cards.PlayerDeck.Pop());
-
-						// From opponent deck to opponent field
-						CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::OpponentDeck);
-						TargetSlot = GameModeInstance->GetArena()->OpponentField;
-
-						GameModeInstance->GetDealer()->MoveFromDeck(CurrentSlot, GameModeInstance->GetArena()->OpponentDeck->Count() - 1, TargetSlot);
-						GameModeInstance->GetGameState()->Cards.OpponentField.Push(GameModeInstance->GetGameState()->Cards.OpponentDeck.Pop());
-						
-						GameModeInstance->GetGameState()->bAcceptPlayerInput = false;
-						break;
-					}
+					GameModeInstance->GetGameState()->bAcceptPlayerInput = false;
+					break;
 				}
 			}
 		}

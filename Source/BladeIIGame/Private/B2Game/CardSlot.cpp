@@ -120,6 +120,18 @@ ACard* UCardSlot::RemoveByID(FString ID)
 	return Card;
 }
 
+ACard* UCardSlot::GetLast()
+{
+	ACard* Card = nullptr;
+
+	if (Count() > 0)
+	{
+		Card = Cards[Count() - 1];
+	}
+
+	return Card;
+}
+
 const FB2Transform UCardSlot::GetTransformForIndex(UINT Index) const
 {
 	FB2Transform Transform = BaseTransform;

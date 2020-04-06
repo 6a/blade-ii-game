@@ -329,16 +329,24 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 			// Change state to the turn of the player with the highest score, or each draw another on draw
 			if (GameState->PlayerScore == GameState->OpponentScore)
 			{
+				// Edge case - what do we do if the deck(s) are empty?
+				uint32 PlayerDeckSize = Arena->PlayerDeck->Count();
+				uint32 OpponentDeckSize = Arena->OpponentDeck->Count();
+
+				if (PlayerDeckSize == 0 || OpponentDeckSize == 0)
+				{
+					B2Utility::LogWarning("Either the player deck, or the opponent deck is empty!");
+
+					// TODO do we end the game or something? Probably send it to end state...
+
+					return;
+				}
+
 				// Lets go round again.wav
 				GameState->Turn = ETurn::Undecided;
 
-				FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Count() - 1).Position;
-
-				Cursor->SetActorLocationAndRotation(SelectorStartingPosition, FRotator::ZeroRotator);
-				Cursor->ToggleActorVisibility(true);
-
-				GameState->bAcceptPlayerInput = true;
-				GameState->CursorPosition = ECardSlot::PlayerDeck;
+				// Switch state machine to drawing from empty field
+				GPSM->ChangeState<GPSM_Phase_DrawToEmptyField>();
 
 			}
 			else if (GameState->PlayerScore > GameState->OpponentScore)
@@ -353,13 +361,24 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 			}
 			else
 			{
-				// Switch game state to opponent
-				GameState->Turn = ETurn::Opponent;
+				//// Switch game state to opponent
+				//GameState->Turn = ETurn::Opponent;
 
-				// Switch state machine to opponent turn
-				GPSM->ChangeState<GPSM_Phase_WaitingForOpponentMove>();
+				//// Switch state machine to opponent turn
+				//GPSM->ChangeState<GPSM_Phase_WaitingForOpponentMove>();
+
+				//// Fire off any animations / on screen stuff...
+
+				// For testing
+				// TODO remove and revert to above code
+				// Switch game state to player turn
+				GameState->Turn = ETurn::Player;
+
+				// Switch state machine to player turn
+				GPSM->ChangeState<GPSM_Phase_PlayerTurn>();
 
 				// Fire off any animations / on screen stuff...
+
 			}
 		}
 		break;
