@@ -21,5 +21,5 @@ struct B2Predicate_SortCardsByDistanceAscending
 		float SquareDistanceRHS = FVector::DistSquared(RootLocation, CardRHS.GetActorLocation());
 
 		return SquareDistanceLHS < SquareDistanceRHS;
-	}	
+	}
 };
