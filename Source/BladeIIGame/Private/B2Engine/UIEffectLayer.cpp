@@ -15,6 +15,8 @@ UB2UIEffectLayer::UB2UIEffectLayer()
 	{
 		EffectsLayerWidgetClass = ClassFinder.Class;
 	}
+
+	if (EffectsLayerWidget) EffectsLayerWidget->OnEffectFinished.AddDynamic(this, &UB2UIEffectLayer::HandleEffectFinished);
 }
 
 void UB2UIEffectLayer::Initialise()
@@ -34,4 +36,9 @@ void UB2UIEffectLayer::Initialise()
 void UB2UIEffectLayer::Tick(float DeltaSeconds)
 {
 
+}
+
+void UB2UIEffectLayer::HandleEffectFinished()
+{
+	if (OnEffectFinished.IsBound()) OnEffectFinished.Broadcast();
 }

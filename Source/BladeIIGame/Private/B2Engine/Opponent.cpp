@@ -12,7 +12,7 @@ void UB2Opponent::Tick(float DeltaSeconds)
 
 			break;
 		case EPayload::Cards:
-			OnCardsReceived.Broadcast(ServerUpdate.Cards);
+			if (OnCardsReceived.IsBound()) OnCardsReceived.Broadcast(ServerUpdate.Cards);
 			break;
 		case EPayload::Move:
 

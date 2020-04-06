@@ -658,14 +658,14 @@ void UB2Dealer::Tick(float DeltaSeconds)
 			Arena->OpponentHand->UpdateCardOrder();
 
 			// Fire the event and reset this wait group so we dont keep entering this part
-			OnDealerEvent.Broadcast(EDealerEvent::CardsDealt);
+			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::CardsDealt);
 			WaitGroupDealFinished = B2WaitGroupNone;
 		}
 
 		if (WaitGroupCardMoveFinished == CurrentWaitGroup)
 		{
 			// Fire the event and reset this wait group so we dont keep entering this part
-			OnDealerEvent.Broadcast(EDealerEvent::CardPlaced);
+			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::CardPlaced);
 			WaitGroupCardMoveFinished = B2WaitGroupNone;
 		}
 	}

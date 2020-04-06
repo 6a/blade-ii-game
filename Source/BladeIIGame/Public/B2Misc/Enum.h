@@ -119,3 +119,18 @@ enum class ETurn : uint8
 	Player UMETA(DisplayName = "Player"),
 	Opponent UMETA(DisplayName = "Opponent")
 };
+
+/* EEffect represents different UI effects, such as blast, and victory/defeat */
+UENUM(BlueprintType)
+enum class EEffect : uint8
+{
+	Rod UMETA(DisplayName = "Rod"),
+	Bolt UMETA(DisplayName = "Bolt Target"),
+	Mirror UMETA(DisplayName = "Mirror"),
+	Blast UMETA(DisplayName = "Blast"),
+	BlastTarget UMETA(DisplayName = "Blast Target"),
+	Force UMETA(DisplayName = "Force"),
+	Draw UMETA(DisplayName = "Draw"),
+	Win UMETA(DisplayName = "Win"),
+	Loss UMETA(DisplayName = "Loss"),
+};

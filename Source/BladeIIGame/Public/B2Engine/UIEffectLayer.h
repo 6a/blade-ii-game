@@ -6,15 +6,15 @@
 
 #include "UIEffectLayer.generated.h"
 
-// TODO remove or use - leaving here so i can add some delegates later
-// DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReceivedDelegate, const FB2Move&, Move);
-
 UCLASS()
 class UB2UIEffectLayer : public UObject
 {
 	GENERATED_BODY()
 
 public:
+	/* Event for when this effect finished playing */
+	FEffectFinishedDelegate OnEffectFinished;
+
 	UB2UIEffectLayer();
 
 	/* Initialise this instance and attach the effects layer UI to the HUD */
@@ -31,5 +31,8 @@ private:
 
 	UPROPERTY()
 	UEffectsLayerWidget* EffectsLayerWidget;
+
+	UFUNCTION()
+	void HandleEffectFinished();
 };
 
