@@ -1,6 +1,7 @@
+#include "B2Game/CardSlot.h"
+
 #include "Algo/Reverse.h"
 
-#include "B2Game/CardSlot.h"
 #include "B2Predicate/SortCardsByDistanceAscending.h"
 #include "B2Predicate/SortCardsByTypeAscending.h"
 
