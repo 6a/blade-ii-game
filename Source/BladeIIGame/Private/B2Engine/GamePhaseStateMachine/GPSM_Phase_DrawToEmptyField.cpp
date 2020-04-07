@@ -4,6 +4,8 @@
 
 #include "B2GameMode/BladeIIGameGameMode.h"
 
+const FVector ARC_ON_DRAW_FROM_DECK = FVector(0, 0, 12);
+
 GPSM_Phase_DrawToEmptyField::GPSM_Phase_DrawToEmptyField()
 {
 	GPSM_Phase::GPSM_Phase();
@@ -55,14 +57,14 @@ void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
 					UCardSlot* CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::PlayerDeck);
 					UCardSlot* TargetSlot = GameModeInstance->GetArena()->PlayerField;
 
-					GameModeInstance->GetDealer()->MoveFromDeck(CurrentSlot, GameModeInstance->GetArena()->PlayerDeck->Count() - 1, TargetSlot, false);
+					GameModeInstance->GetDealer()->Move(CurrentSlot, GameModeInstance->GetArena()->PlayerDeck->Count() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
 					GameModeInstance->GetGameState()->Cards.PlayerField.Push(GameModeInstance->GetGameState()->Cards.PlayerDeck.Pop());
 
 					// From opponent deck to opponent field
 					CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::OpponentDeck);
 					TargetSlot = GameModeInstance->GetArena()->OpponentField;
 
-					GameModeInstance->GetDealer()->MoveFromDeck(CurrentSlot, GameModeInstance->GetArena()->OpponentDeck->Count() - 1, TargetSlot);
+					GameModeInstance->GetDealer()->Move(CurrentSlot, GameModeInstance->GetArena()->OpponentDeck->Count() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
 					GameModeInstance->GetGameState()->Cards.OpponentField.Push(GameModeInstance->GetGameState()->Cards.OpponentDeck.Pop());
 
 					GameModeInstance->GetGameState()->bAcceptPlayerInput = false;

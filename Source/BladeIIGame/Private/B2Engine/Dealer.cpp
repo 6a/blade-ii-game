@@ -9,6 +9,8 @@ const size_t DECK_CAPACITY = 15;
 const size_t HAND_CAPACITY = 10;
 const size_t FIELD_CAPACITY = 15;
 const float CARD_STACKING_OFFSET = 0.09f;
+const float MAX_MOVE_TRANSITION_DURATION = 0.8f;
+const float MAX_MOVE_SQ_DISTANCE = 3267.789551f;
 
 UB2Dealer::UB2Dealer()
 {
@@ -599,33 +601,34 @@ void UB2Dealer::Deal()
 	}
 }
 
-void UB2Dealer::MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot, bool bUseWaitGroup)
+void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot, const FVector& Arc, bool bUseWaitGroup)
 {
 	const float DelayOnStart = 0.2f;
-	const float DurationIntoDeck = 0.4f;
-
-	B2WaitGroup MoveWaitGroup = bUseWaitGroup ? B2Transition::GetNextWaitGroup() : B2WaitGroupNone;
-	if (bUseWaitGroup) WaitGroupCardMoveFinished = MoveWaitGroup + 1;
-
-	float Delay = DelayOnStart;
 
 	// Get a pointer to the target card
 	ACard* Card = SourceSlot->GetCardByIndex(SourceIndex);
 
-	// Remove it from the source slot
+	// Calculate how long the transition should be
+	const FVector SourceCardPosition = Card->GetActorLocation();
+	const FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(TargetSlot->Count() - 1);
+	const float TransitionDuration = MAX_MOVE_TRANSITION_DURATION * (FVector::DistSquared(SourceCardPosition, TargetTransform.Position) / MAX_MOVE_SQ_DISTANCE);
+
+	// Determine the wait group to use, and increment the finished wait group if required
+	B2WaitGroup MoveWaitGroup = bUseWaitGroup ? B2Transition::GetNextWaitGroup() : B2WaitGroupNone;
+	if (bUseWaitGroup) WaitGroupCardMoveFinished = MoveWaitGroup + 1;
+
+	// Remove the card from the source slot
 	SourceSlot->RemoveByIndex(SourceIndex);
 
 	// Add it to the target slot
 	TargetSlot->Add(Card);
 
-	// Get target transform
-	FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(TargetSlot->Count() - 1);
-
+	// Transition 1
 	B2TPosition Position
 	{
 		Card->GetActorLocation(),
 		TargetTransform.Position,
-		FVector(0, 0, 12.f),
+		Arc,
 		EEase::EaseInOut,
 	};
 
@@ -637,7 +640,7 @@ void UB2Dealer::MoveFromDeck(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlo
 	};
 
 	// Add the transition to the transition queue
-	B2Transition Transition = B2Transition(MoveWaitGroup, Position, Rotation, DurationIntoDeck, Delay);
+	B2Transition Transition = B2Transition(MoveWaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
 	Card->QueueTransition(Transition);
 }
 
