@@ -24,6 +24,8 @@ class BLADEIIGAME_API ABladeIIGameGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+	ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer);
+
 	virtual void StartPlay() override;
 
 	virtual void Tick(float DeltaSeconds) override;
@@ -41,21 +43,10 @@ public:
 	B2GameState* GetGameState() const { return GameState; }
 	EEngineState GetEngineState() const { return EngineState; }
 
-protected:
-	ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer);
-
 private:
-	/* Pointer to the opponent that will be used throughout this match */
-	UPROPERTY()
-	UB2Opponent* Opponent;
-
 	/* Pointer to the arena that will be used throughout this match */
 	UPROPERTY()
 	AArena* Arena;
-
-	/* Pointer the dealer that will be used throughout this match */
-	UPROPERTY()
-	UB2Dealer* Dealer;
 
 	/* Pointer to the card selector that will be used throughout this match */
 	UPROPERTY()
@@ -64,6 +55,14 @@ private:
 	/* Pointer to the local player input receiver */
 	UPROPERTY()
 	ALocalPlayerInput* LocalPlayerInput;
+
+	/* Pointer the dealer that will be used throughout this match */
+	UPROPERTY()
+	UB2Dealer* Dealer;
+
+	/* Pointer to the opponent that will be used throughout this match */
+	UPROPERTY()
+	UB2Opponent* Opponent;
 
 	/* Pointer to the UI effects layer */
 	UPROPERTY()

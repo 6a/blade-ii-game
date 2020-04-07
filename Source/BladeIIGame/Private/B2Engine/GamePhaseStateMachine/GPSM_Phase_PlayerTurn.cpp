@@ -26,6 +26,10 @@ void GPSM_Phase_PlayerTurn::Init(ABladeIIGameGameMode* GameMode)
 	GameModeInstance->GetGameState()->bAcceptPlayerInput = true;
 	GameModeInstance->GetGameState()->CursorPosition = ECardSlot::PlayerHand;
 	GameModeInstance->GetGameState()->CursorSlotIndex = 0;
+
+	uint32 CurrentPlayerScore = GameModeInstance->GetGameState()->PlayerScore;
+	uint32 CurrentOpponentScore = GameModeInstance->GetGameState()->OpponentScore;
+	GameModeInstance->GetArena()->ScoreDisplay->Update(CurrentPlayerScore, CurrentOpponentScore);
 }
 
 void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)

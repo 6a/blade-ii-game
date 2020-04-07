@@ -20,6 +20,10 @@ void GPSM_Phase_DrawToEmptyField::Init(ABladeIIGameGameMode* GameMode)
 
 	GameModeInstance->GetGameState()->bAcceptPlayerInput = true;
 	GameModeInstance->GetGameState()->CursorPosition = ECardSlot::PlayerDeck;
+	GameModeInstance->GetGameState()->PlayerScore = 0;
+	GameModeInstance->GetGameState()->OpponentScore = 0;
+
+	GameModeInstance->GetArena()->ScoreDisplay->Update(0, 0);
 }
 
 void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)

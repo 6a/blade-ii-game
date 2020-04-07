@@ -3,12 +3,12 @@
 #include "EngineUtils.h"
 #include "UObject/UObjectGlobals.h"
 
+#include "B2GameMode/BladeIIGameInstance.h"
 #include "B2Engine/AIOpponent.h"
 #include "B2Engine/NetOpponent.h"
 #include "B2Engine/LaunchConfig.h"
 #include "B2Misc/Transition.h"
 #include "B2Misc/Utility.h"
-#include "B2GameMode/BladeIIGameInstance.h"
 
 // Game phase state machines
 #include "B2Engine/GamePhaseStateMachine/GPSM_Phase_DrawToEmptyField.h"
@@ -17,6 +17,23 @@
 #include "B2Engine/GamePhaseStateMachine/GPSM_Phase_WaitingForOpponentMove.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
+
+ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer)
+{
+	DefaultPawnClass = ALocalPlayerInput::StaticClass();
+
+	SetupLaunchConfig(ObjectInitializer);
+
+	SetupCardFactory();
+
+	SetupGPSM();
+
+	EngineState = EEngineState::Initialisation;
+
+	UIEffectLayer = NewObject<UB2UIEffectLayer>(this, TEXT("UI Effect Layer"));
+
+	B2Utility::LogInfo("GameMode initialized");
+}
 
 void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 {
@@ -35,23 +52,6 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 	LocalPlayerInput->ButtonInputQueue.Empty();
 }
 
-ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer)
-{
-	DefaultPawnClass = ALocalPlayerInput::StaticClass();
-
-	SetupLaunchConfig(ObjectInitializer);
-	
-	SetupCardFactory();
-
-	SetupGPSM();
-
-	EngineState = EEngineState::Initialisation;
-
-	UIEffectLayer = NewObject<UB2UIEffectLayer>(this, TEXT("UI Effect Layer"));
-
-	B2Utility::LogInfo("GameMode initialized");
-}
-
 void ABladeIIGameGameMode::StartPlay()
 {
 	Super::StartPlay();
@@ -65,7 +65,6 @@ void ABladeIIGameGameMode::StartPlay()
 	RegisterEventListeners();
 
 	SetupSelector();
-
 
 	UIEffectLayer->Initialise();
 

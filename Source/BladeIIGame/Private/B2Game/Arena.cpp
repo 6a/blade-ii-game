@@ -51,6 +51,10 @@ AArena::AArena()
 	OpponentField = CreateDefaultSubobject<UFieldSlot>(TEXT("Opponent Field"));
 	OpponentField->SetupAttachment(Slots);
 	OpponentField->SetType(ECardSlot::OpponentField);
+
+	// Score display
+	ScoreDisplay = CreateDefaultSubobject<UScoreDisplay>(TEXT("Score Display"));
+	ScoreDisplay->SetupAttachment(MainMesh);
 }
 
 // Called when the game starts or when spawned

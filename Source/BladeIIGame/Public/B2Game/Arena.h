@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 
 #include "B2Game/CardSlot.h"
+#include "B2Game/ScoreDisplay.h"
 
 #include "Arena.generated.h"
 
@@ -60,6 +61,10 @@ public:
 	/* Slot for opponents field slots */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCardSlot* OpponentField;
+
+	/* Score display component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UScoreDisplay* ScoreDisplay;
 
 	AArena();
 
