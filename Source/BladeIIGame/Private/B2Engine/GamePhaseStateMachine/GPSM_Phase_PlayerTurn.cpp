@@ -99,7 +99,22 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 
 					if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect)
 					{
-						
+						if (bUsedRodEffect)
+						{
+
+						}
+						else if (bUsedBoltEffect)
+						{
+							GameModeInstance->GetDealer()->Bolt(SelectedCard);
+						}
+						else if (bUsedMirrorEffect)
+						{
+
+						}
+						else
+						{
+
+						}
 					}
 					else
 					{

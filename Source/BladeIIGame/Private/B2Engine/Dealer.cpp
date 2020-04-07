@@ -12,6 +12,7 @@ const float CARD_STACKING_OFFSET = 0.09f;
 const float MIN_MOVE_TRANSITION_DURATION = 0.3f;
 const float MAX_MOVE_TRANSITION_DURATION = 1.4f;
 const float MAX_MOVE_SQ_DISTANCE = 3267.789551f;
+const float CARD_POP_OUT_DISTANCE = 2.f;
 
 UB2Dealer::UB2Dealer()
 {
@@ -643,6 +644,37 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(MoveWaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
+	Card->QueueTransition(Transition);
+}
+
+void UB2Dealer::Bolt(ACard* Card)
+{
+	const float DelayOnStart = 0.2f;
+	const float TransitionDuration = 0.2f;
+
+	B2WaitGroup BoltWaitGroup = B2Transition::GetNextWaitGroup();
+	WaitGroupBoltFinished = BoltWaitGroup + 1;
+
+	FVector TargetPosition = Card->GetActorLocation() + ((Card->GetActorRotation().Vector().RotateAngleAxis(90, FVector::UpVector).GetSafeNormal()) * CARD_POP_OUT_DISTANCE);
+
+	// Transition 1
+	B2TPosition Position
+	{
+		Card->GetActorLocation(),
+		TargetPosition,
+		FVector::ZeroVector,
+		EEase::EaseInOut,
+	};
+
+	B2TRotation Rotation
+	{
+		Card->GetActorRotation(),
+		Card->GetActorRotation(),
+		EEase::EaseInOut,
+	};
+
+	// Add the transition to the transition queue
+	B2Transition Transition = B2Transition(BoltWaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
 	Card->QueueTransition(Transition);
 }
 
