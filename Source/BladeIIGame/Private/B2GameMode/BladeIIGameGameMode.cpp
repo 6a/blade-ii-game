@@ -244,9 +244,13 @@ int32 ABladeIIGameGameMode::AggregateScore(UCardSlot* Slot) const
 		{
 			Total *= 2;
 		}
+		else if (Card->Type >= ECard::Bolt)
+		{
+			Total += 1;
+		}
 		else
 		{
-			Total += static_cast<uint32>(Card->Type);
+			Total += (static_cast<uint32>(Card->Type) + 1);
 		}
 	}
 

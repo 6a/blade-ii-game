@@ -4,6 +4,8 @@
 
 #include "B2GameMode/BladeIIGameGameMode.h"
 
+const FVector ARC_ON_MOVE = FVector(0, 0, 4);
+
 GPSM_Phase_PlayerTurn::GPSM_Phase_PlayerTurn()
 {
 	GPSM_Phase::GPSM_Phase();
@@ -105,7 +107,7 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 						UCardSlot* CurrentSlot = GameModeInstance->GetArena()->PlayerHand;
 						UCardSlot* TargetSlot = GameModeInstance->GetArena()->PlayerField;
 
-						GameModeInstance->GetDealer()->Move(CurrentSlot, GameModeInstance->GetGameState()->CursorSlotIndex, TargetSlot, FVector::ZeroVector);
+						GameModeInstance->GetDealer()->Move(CurrentSlot, GameModeInstance->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_MOVE);
 
 						// Update the card state
 						ECard CardToRemove = GameModeInstance->GetGameState()->Cards.PlayerDeck[GameModeInstance->GetGameState()->CursorSlotIndex];

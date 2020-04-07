@@ -9,8 +9,8 @@ const size_t DECK_CAPACITY = 15;
 const size_t HAND_CAPACITY = 10;
 const size_t FIELD_CAPACITY = 15;
 const float CARD_STACKING_OFFSET = 0.09f;
-const float MIN_MOVE_TRANSITION_DURATION = 0.5f;
-const float MAX_MOVE_TRANSITION_DURATION = 2.f;
+const float MIN_MOVE_TRANSITION_DURATION = 0.3f;
+const float MAX_MOVE_TRANSITION_DURATION = 1.4f;
 const float MAX_MOVE_SQ_DISTANCE = 3267.789551f;
 
 UB2Dealer::UB2Dealer()
