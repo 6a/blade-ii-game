@@ -15,6 +15,7 @@
 #include "B2Engine/GamePhaseStateMachine/GPSM_Phase_WaitingForInitialDeal.h"
 #include "B2Engine/GamePhaseStateMachine/GPSM_Phase_PlayerTurn.h"
 #include "B2Engine/GamePhaseStateMachine/GPSM_Phase_WaitingForOpponentMove.h"
+#include "B2Engine/GamePhaseStateMachine/GPSM_PHASE_PlayerBolt.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
@@ -240,17 +241,20 @@ int32 ABladeIIGameGameMode::AggregateScore(UCardSlot* Slot) const
 	{
 		ACard* Card = Slot->GetCardByIndex(i);
 
-		if (Card->Type > ECard::Force)
+		if (Card->IsActive())
 		{
-			Total *= 2;
-		}
-		else if (Card->Type >= ECard::Bolt)
-		{
-			Total += 1;
-		}
-		else
-		{
-			Total += (static_cast<uint32>(Card->Type) + 1);
+			if (Card->Type > ECard::Force)
+			{
+				Total *= 2;
+			}
+			else if (Card->Type >= ECard::Bolt)
+			{
+				Total += 1;
+			}
+			else
+			{
+				Total += (static_cast<uint32>(Card->Type) + 1);
+			}
 		}
 	}
 
@@ -359,8 +363,6 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 				
 				// Switch state machine to player turn
 				GPSM->ChangeState<GPSM_Phase_PlayerTurn>();
-
-				// Fire off any animations / on screen stuff...
 			}
 			else
 			{
@@ -379,11 +381,20 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 
 				// Switch state machine to player turn
 				GPSM->ChangeState<GPSM_Phase_PlayerTurn>();
-
-				// Fire off any animations / on screen stuff...
-
 			}
 		}
+		break;
+	case EDealerEvent::BoltReady:
+		if (GameState->Turn == ETurn::Player)
+		{
+			// Switch state machine to player bolt
+			GPSM->ChangeState<GPSM_Phase_PlayerBolt>();
+		}
+		else
+		{
+
+		}
+			
 		break;
 	}
 }

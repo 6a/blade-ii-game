@@ -66,7 +66,8 @@ UENUM(BlueprintType)
 enum class EDealerEvent : uint8
 {
 	CardsDealt UMETA(DisplayName = "Cards Dealt"),
-	CardPlaced UMETA(DisplayName = "Card Placed")
+	CardPlaced UMETA(DisplayName = "Card Placed"),
+	BoltReady UMETA(DisplayName = "Player Bolt Ready"),
 };
 
 /* EEngineState represents the current state of the engine (as in, what it is doing - init, dealing, in-play etc */
@@ -88,7 +89,9 @@ enum class EGamePhase : uint8
 	PlayerTurn UMETA(DisplayName = "The players turn"),
 	WaitingForOpponentMove UMETA(DisplayName = "Waiting for the opponents move to be received"),
 	SelectingFromPlayerHand UMETA(DisplayName = "Selecting a card from the local players hand"),
-	SelectingFromOpponentHand UMETA(DisplayName = "Selecting a card from the opponents hand")
+	SelectingFromOpponentHand UMETA(DisplayName = "Selecting a card from the opponents hand"),
+	PlayerBolt UMETA(DisplayName = "Player bolt"),
+	OpponentBolt UMETA(DisplayName = "Opponent bolt"),
 };
 
 /* EPayload represents the various types of data once can send/receive to and from a server */

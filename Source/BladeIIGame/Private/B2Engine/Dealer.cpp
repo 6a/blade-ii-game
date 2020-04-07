@@ -688,7 +688,7 @@ void UB2Dealer::Tick(float DeltaSeconds)
 		// Various wait groups checked with if else - wait groups are not constant so cant use a switch statement
 
 		// Fire a callback when the dealing transition has finished
-		if (WaitGroupDealFinished == CurrentWaitGroup)
+		if (CurrentWaitGroup == WaitGroupDealFinished)
 		{
 			// Also re-sort the hands as their orders were messed up when shuffling
 			Arena->PlayerHand->UpdateCardOrder();
@@ -699,11 +699,18 @@ void UB2Dealer::Tick(float DeltaSeconds)
 			WaitGroupDealFinished = B2WaitGroupNone;
 		}
 
-		if (WaitGroupCardMoveFinished == CurrentWaitGroup)
+		if (CurrentWaitGroup == WaitGroupCardMoveFinished)
 		{
 			// Fire the event and reset this wait group so we dont keep entering this part
 			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::CardPlaced);
 			WaitGroupCardMoveFinished = B2WaitGroupNone;
+		}
+
+		if (CurrentWaitGroup == WaitGroupBoltFinished)
+		{
+			// Fire the event and reset this wait group so we dont keep entering this part
+			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::BoltReady);
+			WaitGroupBoltFinished = B2WaitGroupNone;
 		}
 	}
 }
