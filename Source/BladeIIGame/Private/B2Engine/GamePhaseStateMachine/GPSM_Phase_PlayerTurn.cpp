@@ -97,28 +97,29 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 
 					if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect)
 					{
-
+						
 					}
 					else
 					{
+						// From player hand to player field
+						UCardSlot* CurrentSlot = GameModeInstance->GetArena()->PlayerHand;
+						UCardSlot* TargetSlot = GameModeInstance->GetArena()->PlayerField;
 
+						GameModeInstance->GetDealer()->Move(CurrentSlot, GameModeInstance->GetGameState()->CursorSlotIndex, TargetSlot, FVector::ZeroVector);
+
+						// Update the card state
+						ECard CardToRemove = GameModeInstance->GetGameState()->Cards.PlayerDeck[GameModeInstance->GetGameState()->CursorSlotIndex];
+						GameModeInstance->GetGameState()->Cards.PlayerDeck.RemoveAt(GameModeInstance->GetGameState()->CursorSlotIndex, 1, false);
+						GameModeInstance->GetGameState()->Cards.PlayerField.Push(CardToRemove);
+
+						// Inform the opponent server that a new move was made
+
+						// Update the game state if required (such as ending the game)
+
+						// Send the opponent server any instructions (such as game over)
 					}
 
-					//// From player hand to player field
-					//UCardSlot* CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::PlayerDeck);
-					//UCardSlot* TargetSlot = GameModeInstance->GetArena()->PlayerField;
-
-					//GameModeInstance->GetDealer()->MoveFromDeck(CurrentSlot, GameModeInstance->GetArena()->PlayerDeck->Count() - 1, TargetSlot, false);
-					//GameModeInstance->GetGameState()->Cards.PlayerField.Push(GameModeInstance->GetGameState()->Cards.PlayerDeck.Pop());
-
-					//// From opponent deck to opponent field
-					//CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::OpponentDeck);
-					//TargetSlot = GameModeInstance->GetArena()->OpponentField;
-
-					//GameModeInstance->GetDealer()->MoveFromDeck(CurrentSlot, GameModeInstance->GetArena()->OpponentDeck->Count() - 1, TargetSlot);
-					//GameModeInstance->GetGameState()->Cards.OpponentField.Push(GameModeInstance->GetGameState()->Cards.OpponentDeck.Pop());
-
-					//GameModeInstance->GetGameState()->bAcceptPlayerInput = false;
+					GameModeInstance->GetGameState()->bAcceptPlayerInput = false;
 					break;
 				}
 			}

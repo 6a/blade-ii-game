@@ -94,9 +94,9 @@ protected:
 	/* A container for the current stack of cards on this anchor */
 	TArray<ACard*> Cards;
 
-	/* Transform from which all positional calculations will be based on */
-	FB2Transform BaseTransform;
-
 	/* The slot type for this instance. Should be set after creation */
 	ECardSlot Type;
+
+	/* Returns the transform of the first slot */
+	const FB2Transform GetBaseTransform()const;
 };

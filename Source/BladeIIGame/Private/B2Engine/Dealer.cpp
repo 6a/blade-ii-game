@@ -9,7 +9,8 @@ const size_t DECK_CAPACITY = 15;
 const size_t HAND_CAPACITY = 10;
 const size_t FIELD_CAPACITY = 15;
 const float CARD_STACKING_OFFSET = 0.09f;
-const float MAX_MOVE_TRANSITION_DURATION = 0.8f;
+const float MIN_MOVE_TRANSITION_DURATION = 0.5f;
+const float MAX_MOVE_TRANSITION_DURATION = 2.f;
 const float MAX_MOVE_SQ_DISTANCE = 3267.789551f;
 
 UB2Dealer::UB2Dealer()
@@ -610,8 +611,9 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 
 	// Calculate how long the transition should be
 	const FVector SourceCardPosition = Card->GetActorLocation();
-	const FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(TargetSlot->Count() - 1);
-	const float TransitionDuration = MAX_MOVE_TRANSITION_DURATION * (FVector::DistSquared(SourceCardPosition, TargetTransform.Position) / MAX_MOVE_SQ_DISTANCE);
+	const FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(TargetSlot->Count());
+	const float RatioOfMaxMoveDuration = FVector::DistSquared(SourceCardPosition, TargetTransform.Position) / MAX_MOVE_SQ_DISTANCE;
+	const float TransitionDuration = FMath::Clamp(MAX_MOVE_TRANSITION_DURATION * RatioOfMaxMoveDuration, MIN_MOVE_TRANSITION_DURATION, MAX_MOVE_TRANSITION_DURATION);
 
 	// Determine the wait group to use, and increment the finished wait group if required
 	B2WaitGroup MoveWaitGroup = bUseWaitGroup ? B2Transition::GetNextWaitGroup() : B2WaitGroupNone;

@@ -7,7 +7,7 @@
 
 UCardSlot::UCardSlot()
 {
-	BaseTransform = FB2Transform(GetComponentLocation(), GetComponentRotation());
+
 }
 
 UINT UCardSlot::Count() const
@@ -134,7 +134,7 @@ ACard* UCardSlot::GetLast()
 
 const FB2Transform UCardSlot::GetTransformForIndex(UINT Index) const
 {
-	FB2Transform Transform = BaseTransform;
+	FB2Transform Transform = GetBaseTransform();
 	
 	if (CardTransforms.IsValidIndex(Index))
 	{
@@ -161,4 +161,9 @@ void UCardSlot::SetType(ECardSlot SlotType)
 ECardSlot UCardSlot::GetType() const
 {
 	return Type;
+}
+
+const FB2Transform UCardSlot::GetBaseTransform() const
+{
+	return FB2Transform(GetComponentLocation(), GetComponentRotation());
 }
