@@ -17,17 +17,24 @@ void GPSM_Phase_DrawToEmptyField::Init(ABladeIIGameGameMode* GameMode)
 
 	ABladeIIGameGameMode* GI = GameModeInstance;
 
-	FVector NewSelectorPosition = GI->GetArena()->PlayerDeck->GetTransformForIndex(GI->GetArena()->PlayerDeck->Count() - 1).Position;
+	// If there are cards on the field, clear them
+	if (GI->GetArena()->PlayerField->Count() + GI->GetArena()->OpponentField->Count() > 0)
+	{
+		GI->GetDealer()->ClearField();
+	}
+	else
+	{
+		FVector NewSelectorPosition = GI->GetArena()->PlayerDeck->GetTransformForIndex(GI->GetArena()->PlayerDeck->Count() - 1).Position;
 
-	GI->GetCursor()->SetActorLocationAndRotation(NewSelectorPosition, FRotator::ZeroRotator);
-	GI->GetCursor()->ToggleActorVisibility(true);
+		GI->GetCursor()->SetActorLocationAndRotation(NewSelectorPosition, FRotator::ZeroRotator);
+		GI->GetCursor()->ToggleActorVisibility(true);
+		GI->GetGameState()->bAcceptPlayerInput = true;
+		GI->GetGameState()->CursorPosition = ECardSlot::PlayerDeck;
+		GI->GetGameState()->PlayerScore = 0;
+		GI->GetGameState()->OpponentScore = 0;
 
-	GI->GetGameState()->bAcceptPlayerInput = true;
-	GI->GetGameState()->CursorPosition = ECardSlot::PlayerDeck;
-	GI->GetGameState()->PlayerScore = 0;
-	GI->GetGameState()->OpponentScore = 0;
-
-	GI->GetArena()->ScoreDisplay->Update(0, 0);
+		GI->GetArena()->ScoreDisplay->Update(0, 0);
+	}
 }
 
 void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)

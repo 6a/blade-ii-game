@@ -82,13 +82,18 @@ void B2Transition::Tick(float DeltaTime)
 	}
 
 	/* Calculate the step for this frame and increment the current alpha */
-	float Step = Duration == 0 ? 1 : LERP_MAX / (Duration / DeltaTime);
+	float Step = LERP_MAX / (Duration / DeltaTime);
 
 	// If there is some time to wait, do so, decrementing the wait time and exiting early
 	if (RemainingDelay > 0)
 	{
 		RemainingDelay = FMath::Max(RemainingDelay - Step, 0.f);
 		return;
+	}
+
+	if (Duration == 0)
+	{
+		Step = 1;
 	}
 
 	/* Calculate and update the alpha value */

@@ -20,6 +20,9 @@ UB2Dealer::UB2Dealer()
 
 	// Set all event-use waitgroups to none;
 	WaitGroupDealFinished = B2WaitGroupNone;
+	WaitGroupCardMoveFinished = B2WaitGroupNone;
+	WaitGroupClearFinished = B2WaitGroupNone;
+	WaitGroupEffectReady = B2WaitGroupNone;
 
 	NextEffectEvent = EDealerEvent::None;
 
@@ -609,8 +612,8 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 {
 	const float DelayOnStart = 0.2f;
 
-	// Get a pointer to the target card
-	ACard* Card = SourceSlot->GetCardByIndex(SourceIndex);
+	// Get the target card
+	ACard* Card = SourceSlot->RemoveByIndex(SourceIndex);
 
 	// Calculate how long the transition should be
 	const FVector SourceCardPosition = Card->GetActorLocation();
@@ -621,9 +624,6 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 	// Determine the wait group to use, and increment the finished wait group if required
 	B2WaitGroup MoveWaitGroup = bUseWaitGroup ? B2Transition::GetNextWaitGroup() : B2WaitGroupNone;
 	if (bUseWaitGroup) WaitGroupCardMoveFinished = MoveWaitGroup + 1;
-
-	// Remove the card from the source slot
-	SourceSlot->RemoveByIndex(SourceIndex);
 
 	// Add it to the target slot
 	TargetSlot->Add(Card);
@@ -661,12 +661,109 @@ void UB2Dealer::OpponentEffectCard(ACard* Card)
 	EffectCard(Card, Offset);
 }
 
+void UB2Dealer::ClearField()
+{
+	const float DelayOnStart = 0.5f;
+	const float ClearTransitionDuration = 0.5f;
+
+	// Determine the wait group to use, and increment the finished wait group
+	
+	B2WaitGroup ClearWaitGroup = B2Transition::GetNextWaitGroup();
+	B2WaitGroup PostDelayWaitGroup = B2Transition::GetNextWaitGroup();
+	WaitGroupClearFinished = PostDelayWaitGroup + 1;
+
+	FVector PlayerCardTargetPosition = Arena->PlayerDiscard->GetTransformForIndex(0).Position;
+	for (int32 i = Arena->PlayerField->Count() - 1; i >= 0; i--)
+	{
+		ACard* Card = Arena->PlayerField->RemoveByIndex(i);
+		Arena->PlayerDiscard->Add(Card);
+
+		// Transition 1
+		B2TPosition Position
+		{
+			Card->GetActorLocation(),
+			PlayerCardTargetPosition,
+			FVector::ZeroVector,
+			EEase::EaseIn,
+		};
+
+		B2TRotation Rotation
+		{
+			Card->GetActorRotation(),
+			Card->GetActorRotation(),
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(ClearWaitGroup, Position, Rotation, ClearTransitionDuration, DelayOnStart);
+		Card->QueueTransition(Transition);
+	}
+
+	FVector OpponentCardTargetPosition = Arena->OpponentDiscard->GetTransformForIndex(0).Position;
+
+	for (int32 i = Arena->OpponentField->Count() - 1; i >= 0; i--)
+	{
+		ACard* Card = Arena->OpponentField->RemoveByIndex(i);
+		Arena->OpponentDiscard->Add(Card);
+
+		// Transition 1
+		B2TPosition Position
+		{
+			Card->GetActorLocation(),
+			OpponentCardTargetPosition,
+			FVector::ZeroVector,
+			EEase::EaseIn,
+		};
+
+		B2TRotation Rotation
+		{
+			Card->GetActorRotation(),
+			Card->GetActorRotation(),
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(ClearWaitGroup, Position, Rotation, ClearTransitionDuration, DelayOnStart);
+		Card->QueueTransition(Transition);
+	}
+
+	// Add a delay in so that there is some time between the cards being cleared and the next round starting
+	const float AddedDelay = 1.f;
+
+	ACard* PCard = Arena->PlayerDiscard->GetCardByIndex(0);
+	ACard* OCard = Arena->OpponentDiscard->GetCardByIndex(0);
+
+	ACard* DelayCard = PCard ? PCard : OCard;
+
+	// Transition 2
+	B2TPosition Position
+	{
+		OpponentCardTargetPosition,
+		OpponentCardTargetPosition,
+		FVector::ZeroVector,
+		EEase::EaseIn,
+	};
+
+	B2TRotation Rotation
+	{
+		DelayCard->GetActorRotation(),
+		DelayCard->GetActorRotation(),
+		EEase::EaseInOut,
+	};
+
+	// Add the transition to the transition queue
+	B2Transition Transition = B2Transition(PostDelayWaitGroup, Position, Rotation, AddedDelay, 0);
+	DelayCard->QueueTransition(Transition);
+}
+
 void UB2Dealer::Tick(float DeltaSeconds)
 {
 	// Start processing callbacks, but only the cards were dealt
 	if (bCardsDealt)
 	{
 		B2WaitGroup CurrentWaitGroup = B2Transition::GetCurrentWaitGroup();
+
+		//B2Utility::LogWarning(FString::Printf(TEXT("[[[%d | %d ]]]"), CurrentWaitGroup, WaitGroupCardMoveFinished));
 
 		// Various wait groups checked with if else - wait groups are not constant so cant use a switch statement
 
@@ -687,6 +784,13 @@ void UB2Dealer::Tick(float DeltaSeconds)
 			// Fire the event and reset this wait group so we dont keep entering this part
 			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::CardPlaced);
 			WaitGroupCardMoveFinished = B2WaitGroupNone;
+		}
+
+		if (CurrentWaitGroup == WaitGroupClearFinished)
+		{
+			// Fire the event and reset this wait group so we dont keep entering this part
+			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::CardPlaced);
+			WaitGroupClearFinished = B2WaitGroupNone;
 		}
 
 		if (CurrentWaitGroup == WaitGroupEffectReady)

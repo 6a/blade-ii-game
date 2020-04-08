@@ -48,6 +48,9 @@ public:
 	 */
 	void OpponentEffectCard(ACard* Card);
 
+	/* Clears the field of any cards */
+	void ClearField();
+
 	/* Tick the dealer so that it can perform tasks such as calling-back after transitions are finished etc. */
 	void Tick(float DeltaSeconds);
 private:
@@ -58,6 +61,7 @@ private:
 	/* Waitgroups for firing various events */
 	B2WaitGroup WaitGroupDealFinished;
 	B2WaitGroup WaitGroupCardMoveFinished;
+	B2WaitGroup WaitGroupClearFinished;
 	B2WaitGroup WaitGroupEffectReady;
 
 	/* The type of event to fire for the next effect activation event */

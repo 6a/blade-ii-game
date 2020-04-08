@@ -16,14 +16,14 @@ const B2ServerUpdate B2AIServer::GetNextUpdate()
 		// Player Deck
 		for (int i = 14; i >= 0; --i)
 		{
-			ECard Card = static_cast<ECard>(FMath::RandRange(7, 9));
+			ECard Card = static_cast<ECard>(FMath::RandRange(7, 8));
 			Payload.Cards.PlayerDeck.Add(Card);
 		}
 
 		// Opponent Deck
 		for (int i = 14; i >= 0; --i)
 		{
-			ECard Card = static_cast<ECard>(FMath::RandRange(0, MAX_ECARD_VALUE));
+			ECard Card = static_cast<ECard>(FMath::RandRange(7, 8));
 			Payload.Cards.OpponentDeck.Add(Card);
 		}
 	}

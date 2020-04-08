@@ -426,6 +426,7 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 				// Switch state machine to drawing from empty field
 				GPSM->ChangeState<GPSM_Phase_DrawToEmptyField>();
 
+				B2Utility::LogWarning(TEXT("GG"));
 			}
 			else if (GameState->PlayerScore > GameState->OpponentScore)
 			{
