@@ -14,6 +14,10 @@ void GPSM_Phase_PlayerBolt::Init(ABladeIIGameGameMode* GameMode)
 	GPSM_Phase::Init(GameMode);
 
 	// Play bolt animation at opponents last card position
+	EEffect Effect = EEffect::Bolt;
+	FVector TargetWorldPosition = GameModeInstance->GetArena()->OpponentField->GetLast()->GetActorLocation();
+
+	GameModeInstance->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 0.5f, 0.5f);
 }
 
 void GPSM_Phase_PlayerBolt::Tick(float DeltaSeconds)

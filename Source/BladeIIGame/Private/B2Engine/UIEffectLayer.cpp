@@ -16,7 +16,7 @@ UB2UIEffectLayer::UB2UIEffectLayer()
 		EffectsLayerWidgetClass = ClassFinder.Class;
 	}
 
-	if (EffectsLayerWidget) EffectsLayerWidget->OnEffectFinished.AddDynamic(this, &UB2UIEffectLayer::HandleEffectFinished);
+	if (EffectsLayerWidget) EffectsLayerWidget->OnEffectFinished.AddDynamic(this, &UB2UIEffectLayer::HandleEffectFinishedEvent);
 }
 
 void UB2UIEffectLayer::Initialise()
@@ -27,10 +27,12 @@ void UB2UIEffectLayer::Initialise()
 		if (EffectsLayerWidget)
 		{
 			EffectsLayerWidget->AddToViewport();
+			EffectsLayerWidget->Initialise();
 		}
 	}
 
-	// TODO finish implementation, add test stuff to widget so we can actually see it etc.
+	// Event listeners
+	EffectsLayerWidget->OnEffectFinished.AddDynamic(this, &UB2UIEffectLayer::HandleEffectFinishedEvent);
 }
 
 void UB2UIEffectLayer::Tick(float DeltaSeconds)
@@ -38,7 +40,12 @@ void UB2UIEffectLayer::Tick(float DeltaSeconds)
 
 }
 
-void UB2UIEffectLayer::HandleEffectFinished()
+void UB2UIEffectLayer::Play(EEffect Effect, const FVector* TargetWorldPosition, float StartDelay, float PostDelay)
+{
+	EffectsLayerWidget->Play(Effect, TargetWorldPosition, StartDelay, PostDelay);
+}
+
+void UB2UIEffectLayer::HandleEffectFinishedEvent()
 {
 	if (OnEffectFinished.IsBound()) OnEffectFinished.Broadcast();
 }

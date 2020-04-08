@@ -26,6 +26,15 @@ public:
 	 */
 	virtual void Tick(float DeltaSeconds);
 
+	/**
+	 * Play the effect.
+	 * @param Effect - The effect to play
+	 * @param TargetWorldPosition - The World position at which to play the effect (will be translated into screen space internally). Set to null to default to center
+	 * @param StartDelay - How long to wait before playing the effect
+	 * @param PostDelay - How long to wait after the effect has finished, before triggering the effect finished callback
+	 */
+	void Play(EEffect Effect, const FVector* TargetWorldPosition = nullptr, float StartDelay = 0.f, float PostDelay = 0.f);
+
 private:
 	TSubclassOf<UEffectsLayerWidget> EffectsLayerWidgetClass;
 
@@ -33,6 +42,6 @@ private:
 	UEffectsLayerWidget* EffectsLayerWidget;
 
 	UFUNCTION()
-	void HandleEffectFinished();
+	void HandleEffectFinishedEvent();
 };
 

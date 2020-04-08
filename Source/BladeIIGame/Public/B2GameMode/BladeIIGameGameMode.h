@@ -34,11 +34,13 @@ public:
 	UCardSlot* GetCardSlot(ECardSlot Slot) const;
 
 	/* Getters for various references */
-	UB2Opponent* GetOpponent() const { return Opponent; }
 	AArena* GetArena() const { return Arena; }
-	UB2Dealer* GetDealer() const { return Dealer; }
 	ACardSelector* GetCursor() const { return Cursor; }
 	ALocalPlayerInput* GetLocalPlayerInput() const { return LocalPlayerInput; }
+	UB2Dealer* GetDealer() const { return Dealer; }
+	UB2Opponent* GetOpponent() const { return Opponent; }
+	UB2UIEffectLayer* GetEffectLayer() const { return UIEffectLayer; }
+	
 	B2CardFactory* GetCardFactory() const { return CardFactory; }
 	B2GameState* GetGameState() const { return GameState; }
 	EEngineState GetEngineState() const { return EngineState; }

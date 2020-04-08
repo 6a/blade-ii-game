@@ -38,6 +38,17 @@ ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectIniti
 
 void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 {
+	if (!GetLocalPlayerInput()->ButtonInputQueue.IsEmpty())
+	{
+		B2Utility::LogInfo(FString::Printf(TEXT("DPI Scale: %f"), GEngine->GameViewport->GetDPIScale()));
+
+		int32 ScreenWidth;
+		int32 ScreenHeight;
+		GetWorld()->GetFirstPlayerController()->GetViewportSize(ScreenWidth, ScreenHeight);
+
+		B2Utility::LogInfo(FString::Printf(TEXT("Screensize: [%d, %d]"), ScreenWidth, ScreenHeight));
+	}
+
 	if (EngineState > EEngineState::Initialisation)
 	{
 		Dealer->Tick(DeltaSeconds);
@@ -52,6 +63,11 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 
 	LocalPlayerInput->ButtonInputQueue.Empty();
 }
+
+
+#include "Engine/Engine.h"
+#include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
+#include "Runtime/Engine/Classes/Engine/RendererSettings.h"
 
 void ABladeIIGameGameMode::StartPlay()
 {
@@ -68,8 +84,6 @@ void ABladeIIGameGameMode::StartPlay()
 	SetupSelector();
 
 	UIEffectLayer->Initialise();
-
-	B2Utility::LogInfo("ABladeIIGameGameModeBase::StartPlay");
 }
 
 void ABladeIIGameGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)

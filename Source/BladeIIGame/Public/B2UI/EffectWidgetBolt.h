@@ -1,17 +1,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "B2UI/EffectWidget.h"
 
-
-
-#include "EffectWidgetBlast.generated.h"
+#include "EffectWidgetBolt.generated.h"
 
 UCLASS()
-class BLADEIIGAME_API UEffectWidgetBlast : public UEffectWidget
+class BLADEIIGAME_API UEffectWidgetBolt : public UEffectWidget
 {
 	GENERATED_BODY()
-
+	
 public:
 
 	/**
@@ -21,4 +20,10 @@ public:
 	 * @param InPostDelay - How long to wait after the effect has finished, before triggering the effect finished callback
 	 */
 	virtual void Play(const FVector2D& InTargetScreenPosition, float StartDelay, float InPostDelay);
+
+private:
+
+	/* Run the animation for this widget */
+	UFUNCTION()
+	void RunAnimation();
 };
