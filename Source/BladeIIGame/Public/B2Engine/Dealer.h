@@ -37,10 +37,16 @@ public:
 	void Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot, const FVector& Arc, bool bUseWaitGroup = true);
 
 	/**
-	 * Bolt the target card with the bolt card specified
-	 * @param Card - The bolt card
+	 * Move the players current card from the hand up to the pre-effect offset
+	 * @param Card - The card
 	 */
-	void Bolt(ACard* Card);
+	void PlayerEffectCard(ACard* Card);
+
+	/**
+	 * Move the opponents current card from the hand up to the pre-effect offset
+	 * @param Card - The card
+	 */
+	void OpponentEffectCard(ACard* Card);
 
 	/* Tick the dealer so that it can perform tasks such as calling-back after transitions are finished etc. */
 	void Tick(float DeltaSeconds);
@@ -52,7 +58,16 @@ private:
 	/* Waitgroups for firing various events */
 	B2WaitGroup WaitGroupDealFinished;
 	B2WaitGroup WaitGroupCardMoveFinished;
-	B2WaitGroup WaitGroupBoltFinished;
+	B2WaitGroup WaitGroupEffectReady;
 
+	/* The type of event to fire for the next effect activation event */
+	EDealerEvent NextEffectEvent;
+
+	/**
+	 * Helper function for effect transition
+	 * @param Card - The bolt card
+	 * @param Card - The bolt card
+	 */
+	void EffectCard(ACard* Card, FVector Offset);
 };
 

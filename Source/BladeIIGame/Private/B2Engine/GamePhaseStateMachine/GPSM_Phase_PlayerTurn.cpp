@@ -97,24 +97,9 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 					bool bUsedBlastEffect = (SelectedCard->Type == ECard::Blast);
 					bool bUsedForceEffect = (SelectedCard->Type == ECard::Force);
 
-					if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect)
+					if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect || bUsedForceEffect)
 					{
-						if (bUsedRodEffect)
-						{
-
-						}
-						else if (bUsedBoltEffect)
-						{
-							GameModeInstance->GetDealer()->Bolt(SelectedCard);
-						}
-						else if (bUsedMirrorEffect)
-						{
-
-						}
-						else
-						{
-
-						}
+						GameModeInstance->GetDealer()->PlayerEffectCard(SelectedCard);
 					}
 					else
 					{
@@ -128,7 +113,14 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 						ECard CardToRemove = GameModeInstance->GetGameState()->Cards.PlayerDeck[GameModeInstance->GetGameState()->CursorSlotIndex];
 						GameModeInstance->GetGameState()->Cards.PlayerDeck.RemoveAt(GameModeInstance->GetGameState()->CursorSlotIndex, 1, false);
 						GameModeInstance->GetGameState()->Cards.PlayerField.Push(CardToRemove);
+					}
 
+					if (bUsedBlastEffect)
+					{
+						// handle blast effects differently as they have an additional stag (card selection)
+					}
+					else
+					{
 						// Inform the opponent server that a new move was made
 
 						// Update the game state if required (such as ending the game)
@@ -149,32 +141,4 @@ void GPSM_Phase_PlayerTurn::End()
 	GPSM_Phase::End();
 
 
-}
-
-void GPSM_Phase_PlayerTurn::SetCurrentCardToOriginalTransform()
-{
-	ACard* CurrentCard = GameModeInstance->GetArena()->PlayerHand->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
-
-	if (CurrentCard)
-	{
-		FB2Transform NewTransform = GameModeInstance->GetArena()->PlayerHand->GetTransformForIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
-		CurrentCard->SetActorLocationAndRotation(NewTransform.Position, NewTransform.Rotation);
-	}
-}
-
-void GPSM_Phase_PlayerTurn::SetCurrentCardToSelectedTransform()
-{
-	ACard* CurrentCard = GameModeInstance->GetArena()->PlayerHand->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
-
-	if (CurrentCard)
-	{
-		FB2Transform NewTransform = GameModeInstance->GetArena()->PlayerHand->GetTransformForIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
-		NewTransform.Position += GameModeInstance->GetCursor()->OFFSET_WHEN_SELECTED;
-
-		CurrentCard->SetActorLocationAndRotation(NewTransform.Position, NewTransform.Rotation);
-	}
-}
-
-void GPSM_Phase_PlayerTurn::SetCurrentCardToPreEffectTransform()
-{
 }

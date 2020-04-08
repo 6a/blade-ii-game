@@ -16,6 +16,7 @@
 #include "B2Engine/GamePhaseStateMachine/GPSM_Phase_PlayerTurn.h"
 #include "B2Engine/GamePhaseStateMachine/GPSM_Phase_WaitingForOpponentMove.h"
 #include "B2Engine/GamePhaseStateMachine/GPSM_PHASE_PlayerBolt.h"
+#include "B2Engine/GamePhaseStateMachine/GPSM_PHASE_PlayerBlast.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
@@ -38,17 +39,6 @@ ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectIniti
 
 void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 {
-	if (!GetLocalPlayerInput()->ButtonInputQueue.IsEmpty())
-	{
-		B2Utility::LogInfo(FString::Printf(TEXT("DPI Scale: %f"), GEngine->GameViewport->GetDPIScale()));
-
-		int32 ScreenWidth;
-		int32 ScreenHeight;
-		GetWorld()->GetFirstPlayerController()->GetViewportSize(ScreenWidth, ScreenHeight);
-
-		B2Utility::LogInfo(FString::Printf(TEXT("Screensize: [%d, %d]"), ScreenWidth, ScreenHeight));
-	}
-
 	if (EngineState > EEngineState::Initialisation)
 	{
 		Dealer->Tick(DeltaSeconds);
@@ -374,7 +364,7 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 			{
 				// Switch game state to player turn
 				GameState->Turn = ETurn::Player;
-				
+
 				// Switch state machine to player turn
 				GPSM->ChangeState<GPSM_Phase_PlayerTurn>();
 			}
@@ -398,17 +388,40 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 			}
 		}
 		break;
-	case EDealerEvent::BoltReady:
-		if (GameState->Turn == ETurn::Player)
-		{
-			// Switch state machine to player bolt
-			GPSM->ChangeState<GPSM_Phase_PlayerBolt>();
-		}
-		else
-		{
+	case EDealerEvent::EffectReady:
+		ECard Type = GetCardSlot(GameState->CursorPosition)->GetCardByIndex(GameState->CursorSlotIndex)->Type;
 
+		switch (Type)
+		{
+		case ECard::ElliotsOrbalStaff:
+			break;
+		case ECard::Bolt:
+			if (GameState->Turn == ETurn::Player)
+			{
+				// Switch state machine to player bolt
+				GPSM->ChangeState<GPSM_Phase_PlayerBolt>();
+			}
+			else
+			{
+
+			}
+			break;
+		case ECard::Mirror:
+			break;
+		case ECard::Blast:
+			if (GameState->Turn == ETurn::Player)
+			{
+				// Switch state machine to player blast
+				GPSM->ChangeState<GPSM_Phase_PlayerBlast>();
+			}
+			else
+			{
+
+			}
+		case ECard::Force:
+			break;
 		}
-			
+
 		break;
 	}
 }

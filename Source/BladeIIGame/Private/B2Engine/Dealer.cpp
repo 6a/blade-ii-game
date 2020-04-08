@@ -21,6 +21,8 @@ UB2Dealer::UB2Dealer()
 	// Set all event-use waitgroups to none;
 	WaitGroupDealFinished = B2WaitGroupNone;
 
+	NextEffectEvent = EDealerEvent::None;
+
 	B2Transition::ResetStatic();
 }
 
@@ -647,35 +649,16 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 	Card->QueueTransition(Transition);
 }
 
-void UB2Dealer::Bolt(ACard* Card)
+void UB2Dealer::PlayerEffectCard(ACard* Card)
 {
-	const float DelayOnStart = 0.2f;
-	const float TransitionDuration = 0.2f;
+	FVector Offset = (Card->GetActorRotation().Vector().RotateAngleAxis(90, FVector::UpVector).GetSafeNormal()) * CARD_POP_OUT_DISTANCE;
+	EffectCard(Card, Offset);
+}
 
-	B2WaitGroup BoltWaitGroup = B2Transition::GetNextWaitGroup();
-	WaitGroupBoltFinished = BoltWaitGroup + 1;
-
-	FVector TargetPosition = Card->GetActorLocation() + ((Card->GetActorRotation().Vector().RotateAngleAxis(90, FVector::UpVector).GetSafeNormal()) * CARD_POP_OUT_DISTANCE);
-
-	// Transition 1
-	B2TPosition Position
-	{
-		Card->GetActorLocation(),
-		TargetPosition,
-		FVector::ZeroVector,
-		EEase::EaseInOut,
-	};
-
-	B2TRotation Rotation
-	{
-		Card->GetActorRotation(),
-		Card->GetActorRotation(),
-		EEase::EaseInOut,
-	};
-
-	// Add the transition to the transition queue
-	B2Transition Transition = B2Transition(BoltWaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
-	Card->QueueTransition(Transition);
+void UB2Dealer::OpponentEffectCard(ACard* Card)
+{
+	FVector Offset = (Card->GetActorRotation().Vector().RotateAngleAxis(-90, FVector::UpVector).GetSafeNormal()) * CARD_POP_OUT_DISTANCE;
+	EffectCard(Card, Offset);
 }
 
 void UB2Dealer::Tick(float DeltaSeconds)
@@ -706,11 +689,42 @@ void UB2Dealer::Tick(float DeltaSeconds)
 			WaitGroupCardMoveFinished = B2WaitGroupNone;
 		}
 
-		if (CurrentWaitGroup == WaitGroupBoltFinished)
+		if (CurrentWaitGroup == WaitGroupEffectReady)
 		{
 			// Fire the event and reset this wait group so we dont keep entering this part
-			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::BoltReady);
-			WaitGroupBoltFinished = B2WaitGroupNone;
+			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::EffectReady);
+			WaitGroupEffectReady = B2WaitGroupNone;
 		}
 	}
+}
+
+void UB2Dealer::EffectCard(ACard* Card, FVector Offset)
+{
+	const float DelayOnStart = 0.2f;
+	const float TransitionDuration = 0.2f;
+
+	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
+	WaitGroupEffectReady = WaitGroup + 1;
+
+	FVector TargetPosition = Card->GetActorLocation() + Offset;
+
+	// Transition 1
+	B2TPosition Position
+	{
+		Card->GetActorLocation(),
+		TargetPosition,
+		FVector::ZeroVector,
+		EEase::EaseInOut,
+	};
+
+	B2TRotation Rotation
+	{
+		Card->GetActorRotation(),
+		Card->GetActorRotation(),
+		EEase::EaseInOut,
+	};
+
+	// Add the transition to the transition queue
+	B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
+	Card->QueueTransition(Transition);
 }

@@ -65,9 +65,10 @@ enum class ECardSlot : uint8
 UENUM(BlueprintType)
 enum class EDealerEvent : uint8
 {
+	None UMETA(DisplayName = "Default value"),
 	CardsDealt UMETA(DisplayName = "Cards Dealt"),
 	CardPlaced UMETA(DisplayName = "Card Placed"),
-	BoltReady UMETA(DisplayName = "Player Bolt Ready"),
+	EffectReady UMETA(DisplayName = "Card pre-effect transition finished"),
 };
 
 /* EEngineState represents the current state of the engine (as in, what it is doing - init, dealing, in-play etc */

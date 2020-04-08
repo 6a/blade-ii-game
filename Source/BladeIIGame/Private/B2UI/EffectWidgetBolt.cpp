@@ -1,6 +1,5 @@
 #include "B2UI/EffectWidgetBolt.h"
 
-#include "Components/WidgetSwitcherSlot.h"
 #include "TimerManager.h"
 
 void UEffectWidgetBolt::Play(const FVector2D& InTargetScreenPosition, float StartDelay, float InPostDelay)
@@ -30,8 +29,6 @@ void UEffectWidgetBolt::RunAnimation()
 	FWidgetTransform CurrentTransform(RenderTransform);
 	CurrentTransform.Translation = TargetScreenPosition;
 	SetRenderTransform(CurrentTransform);
-
-	SetRenderOpacity(1);
 
 	PlayAnimation(EffectAnimation);
 }

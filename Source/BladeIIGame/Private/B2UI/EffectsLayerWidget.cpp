@@ -6,15 +6,11 @@ void UEffectsLayerWidget::Initialise()
 {
     Blast->OnEffectFinished.AddDynamic(this, &UEffectsLayerWidget::HandleEffectFinishedEvent);
     Bolt->OnEffectFinished.AddDynamic(this, &UEffectsLayerWidget::HandleEffectFinishedEvent);
-
-    B2Utility::LogWarning("!");
 }
 
 void UEffectsLayerWidget::Play(EEffect Effect, const FVector* TargetWorldPosition, float StartDelay, float PostDelay)
 {
     FVector2D Position = TargetWorldPosition ? WorldToScreenOffset(*TargetWorldPosition) : GetCenterOffset();
-
-    B2Utility::LogWarning(*Position.ToString());
 
 	switch (Effect)
 	{
@@ -27,6 +23,8 @@ void UEffectsLayerWidget::Play(EEffect Effect, const FVector* TargetWorldPositio
     case EEffect::Mirror:
         break;
     case EEffect::Blast:
+        Blast->Play(Position, StartDelay, PostDelay);
+        EffectSwitcher->SetActiveWidget(Blast);
         break;
     case EEffect::BlastTarget:
         break;
