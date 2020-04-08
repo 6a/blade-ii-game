@@ -16,5 +16,13 @@ public:
 	virtual void End() override;
 
 	virtual EGamePhase GetStateType() override { return EGamePhase::PlayerBolt; }
+
+private:
+
+	/* The time at which to call the finish function */
+	float TimeToCallFinishFunction;
+
+	/* Whether or not the finish function needs to be called */
+	bool bIsPendingFinishCall;
 };
 

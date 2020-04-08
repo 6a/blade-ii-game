@@ -54,37 +54,41 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 				switch (Button)
 				{
 				case EButton::NavigateLeft:
-					if (GI->GetGameState()->CursorSlotIndex > 0)
-					{
-						// Return the currently selected card to its original transform
-						SetCurrentCardToOriginalTransform();
+				{
+					uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex > 0 ? GI->GetGameState()->CursorSlotIndex - 1 : GI->GetArena()->PlayerHand->Count() - 1;
 
-						GI->GetGameState()->CursorSlotIndex--;
+					// Return the currently selected card to its original transform
+					SetCurrentCardToOriginalTransform();
 
-						FB2Transform TargetTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
-						TargetTransform.Position += Cursor->OFFSET_WHEN_SELECTED;
-						Cursor->SetActorLocationAndRotation(TargetTransform.Position , TargetTransform.Rotation);
+					GI->GetGameState()->CursorSlotIndex = NewCursorIndex;
 
-						// Raise the newly selected card by the offset
-						SetCurrentCardToSelectedTransform();
-					}
+					FB2Transform TargetTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
+					TargetTransform.Position += Cursor->OFFSET_WHEN_SELECTED;
+					Cursor->SetActorLocationAndRotation(TargetTransform.Position, TargetTransform.Rotation);
+
+					// Raise the newly selected card by the offset
+					SetCurrentCardToSelectedTransform();
+
 					break;
+				}
 				case EButton::NavigateRight:
-					if (GI->GetGameState()->CursorSlotIndex < GI->GetArena()->PlayerHand->Count() - 1)
-					{
-						// Return the currently selected card to its original transform
-						SetCurrentCardToOriginalTransform();
+				{
+					uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex < GI->GetArena()->PlayerHand->Count() - 1 ? GI->GetGameState()->CursorSlotIndex + 1 : 0;
 
-						GI->GetGameState()->CursorSlotIndex++;
+					// Return the currently selected card to its original transform
+					SetCurrentCardToOriginalTransform();
 
-						FB2Transform TargetTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
-						TargetTransform.Position += Cursor->OFFSET_WHEN_SELECTED;
-						Cursor->SetActorLocationAndRotation(TargetTransform.Position, TargetTransform.Rotation);
+					GI->GetGameState()->CursorSlotIndex = NewCursorIndex;
 
-						// Raise the newly selected card by the offset
-						SetCurrentCardToSelectedTransform();
-					}
+					FB2Transform TargetTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
+					TargetTransform.Position += Cursor->OFFSET_WHEN_SELECTED;
+					Cursor->SetActorLocationAndRotation(TargetTransform.Position, TargetTransform.Rotation);
+
+					// Raise the newly selected card by the offset
+					SetCurrentCardToSelectedTransform();
+
 					break;
+				}
 				case EButton::Menu:
 					// Handle menu open / close etc
 					break;
