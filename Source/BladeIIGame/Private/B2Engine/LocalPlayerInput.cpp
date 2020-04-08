@@ -1,13 +1,20 @@
 #include "B2Engine/LocalPlayerInput.h"
 
+#include "Engine/World.h"
 #include "Components/InputComponent.h"
 
 #include "B2Misc/Utility.h"
+
+const float NAV_POLL_DELAY = 0.25f;
+const float NAV_POLL_INTERVAL = 0.125f;
 
 ALocalPlayerInput::ALocalPlayerInput()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	bIsLeftNavDown = bIsRightNavDown = false;
+	NavButtonPriority = ENavButton::None;
+	NextPollTime = 0;
 }
 
 void ALocalPlayerInput::BeginPlay()
@@ -27,18 +34,54 @@ void ALocalPlayerInput::OnMouseButtonLeft()
 	B2Utility::LogInfo(FString::Format(TEXT("Mouse Clicked @ [{0} {1}]"), { PreviousMousePosition.X, PreviousMousePosition.Y }));
 }
 
-void ALocalPlayerInput::OnNavivateLeftPressed()
+void ALocalPlayerInput::OnNavigateLeftPressed()
 {
 	ButtonInputQueue.Enqueue(EButton::NavigateLeft);
+
+	NavButtonPriority = ENavButton::Left;
+	bIsLeftNavDown = true;
+
+	if (!bIsRightNavDown) NextPollTime = GetWorld()->GetTimeSeconds() + NAV_POLL_INTERVAL + NAV_POLL_DELAY;
 
 	B2Utility::LogInfo(TEXT("Navigate Left Pressed"));
 }
 
-void ALocalPlayerInput::OnNavivateRightPressed()
+void ALocalPlayerInput::OnNavigateRightPressed()
 {
 	ButtonInputQueue.Enqueue(EButton::NavigateRight);
 
+	NavButtonPriority = ENavButton::Right;
+	bIsRightNavDown = true;
+
+	if (!bIsLeftNavDown) NextPollTime = GetWorld()->GetTimeSeconds() + NAV_POLL_INTERVAL + NAV_POLL_DELAY;
+
 	B2Utility::LogInfo(TEXT("Navigate Right Pressed"));
+}
+
+void ALocalPlayerInput::OnNavigateLeftReleased()
+{
+	bIsLeftNavDown = false;
+	if (bIsRightNavDown)
+	{
+		NavButtonPriority = ENavButton::Right;
+	}
+	else
+	{
+		NavButtonPriority = ENavButton::None;
+	}
+}
+
+void ALocalPlayerInput::OnNavigateRightReleased()
+{
+	bIsRightNavDown = false;
+	if (bIsLeftNavDown)
+	{
+		NavButtonPriority = ENavButton::Left;
+	}
+	else
+	{
+		NavButtonPriority = ENavButton::None;
+	}
 }
 
 void ALocalPlayerInput::OnSelectPressed()
@@ -72,11 +115,33 @@ void ALocalPlayerInput::UpdateMousePosition()
 	}
 }
 
+void ALocalPlayerInput::HandleNavigationPolling()
+{
+	if (NavButtonPriority == ENavButton::Left)
+	{
+		if (GetWorld()->GetTimeSeconds() > NextPollTime)
+		{
+			ButtonInputQueue.Enqueue(EButton::NavigateLeft);
+			NextPollTime = GetWorld()->GetTimeSeconds() + NAV_POLL_INTERVAL;
+		}
+	}
+	else if (NavButtonPriority == ENavButton::Right)
+	{
+		if (GetWorld()->GetTimeSeconds() > NextPollTime)
+		{
+			ButtonInputQueue.Enqueue(EButton::NavigateRight);
+			NextPollTime = GetWorld()->GetTimeSeconds() + NAV_POLL_INTERVAL;
+		}
+	}
+}
+
 void ALocalPlayerInput::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	UpdateMousePosition();
+
+	HandleNavigationPolling();
 }
 
 void ALocalPlayerInput::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -96,8 +161,10 @@ void ALocalPlayerInput::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     InputComponent->BindAction("Menu", IE_Pressed, this, &ALocalPlayerInput::OnMenuPressed);
 
 	/* Bind the Navigation buttons */
-	InputComponent->BindAction("NavigateRight", IE_Pressed, this, &ALocalPlayerInput::OnNavivateRightPressed);
-	InputComponent->BindAction("NavigateLeft", IE_Pressed, this, &ALocalPlayerInput::OnNavivateLeftPressed);
+	InputComponent->BindAction("NavigateRight", IE_Pressed, this, &ALocalPlayerInput::OnNavigateRightPressed);
+	InputComponent->BindAction("NavigateLeft", IE_Pressed, this, &ALocalPlayerInput::OnNavigateLeftPressed);
+	InputComponent->BindAction("NavigateRight", IE_Released, this, &ALocalPlayerInput::OnNavigateRightReleased);
+	InputComponent->BindAction("NavigateLeft", IE_Released, this, &ALocalPlayerInput::OnNavigateLeftReleased);
 
 	/* Bind Selct button */
 	InputComponent->BindAction("Select", IE_Pressed, this, &ALocalPlayerInput::OnSelectPressed);

@@ -31,21 +31,38 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	enum ENavButton
+	{
+		None,
+		Left,
+		Right
+	};
+
 	/* Casted version of APawns standard controller  */
 	APlayerController* PlayerController;
 
 	/* Mouse position during the previous frame */
 	FVector2D PreviousMousePosition;
 
+	/* For nav button polling */
+	bool bIsLeftNavDown;
+	bool bIsRightNavDown;
+	ENavButton NavButtonPriority;
+	float NextPollTime;
+
 	/* Updates the current mouse position */
 	void UpdateMousePosition();
 
-	// Various callbacks
+	/* Handle polling for the navigation buttons so they can "repeat" when held down */
+	void HandleNavigationPolling();
 
+	// Various callbacks
 	void OnMenuPressed();
 	void OnMouseButtonLeft();
-	void OnNavivateLeftPressed();
-	void OnNavivateRightPressed();
+	void OnNavigateLeftPressed();
+	void OnNavigateRightPressed();
+	void OnNavigateLeftReleased();
+	void OnNavigateRightReleased();
 	void OnSelectPressed();
 	void OnMouseMoved(const FVector2D& NewMousePosition);
 
