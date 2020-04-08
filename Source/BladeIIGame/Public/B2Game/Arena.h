@@ -50,6 +50,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCardSlot* PlayerField;
 
+	/* Slot for local players discard slots */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCardSlot* PlayerDiscard;
+
 	/* Slot for opponents deck slot */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCardSlot* OpponentDeck;
@@ -61,6 +65,10 @@ public:
 	/* Slot for opponents field slots */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCardSlot* OpponentField;
+
+	/* Slot for opponents discard slots */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCardSlot* OpponentDiscard;
 
 	/* Score display component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

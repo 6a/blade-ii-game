@@ -101,16 +101,10 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 					bool bUsedBlastEffect = (SelectedCard->Type == ECard::Blast);
 					bool bUsedForceEffect = (SelectedCard->Type == ECard::Force);
 
-					// Get the card thats about to be manipulated
-					ECard CardToMove = GI->GetGameState()->Cards.PlayerHand[GI->GetGameState()->CursorSlotIndex];
-					GI->GetGameState()->Cards.PlayerHand.RemoveAt(GI->GetGameState()->CursorSlotIndex, 1, false);
-
 					if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect || bUsedForceEffect)
 					{
 						GI->GetDealer()->PlayerEffectCard(SelectedCard);
 
-						// Update cards in game state
-						GI->GetGameState()->Cards.PlayerDiscard.Push(CardToMove);
 					}
 					else
 					{
@@ -120,8 +114,6 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 
 						GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_MOVE);
 
-						// Update cards in game state
-						GI->GetGameState()->Cards.PlayerField.Push(CardToMove);
 					}
 
 					if (bUsedBlastEffect)

@@ -2,12 +2,14 @@
 
 #include "TimerManager.h"
 
+#include "B2Misc/Utility.h"
+
 void UEffectWidgetBolt::Play(const FVector2D& InTargetScreenPosition, float StartDelay, float InPostDelay)
 {
 	Super::Play(InTargetScreenPosition, StartDelay, InPostDelay);
 
 	// Offset the target screen position as I havent been able to figure out how to center the damn pivot reeeeeee
-	TargetScreenPosition.X -= (GetDesiredSize().X / 2);
+	TargetScreenPosition.X -= (Width / 2.f);
 
 	if (GetWorld()->GetTimerManager().TimerExists(DelayedPlayHandle))
 	{

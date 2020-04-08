@@ -269,6 +269,65 @@ int32 ABladeIIGameGameMode::AggregateScore(UCardSlot* Slot) const
 	return Total;
 }
 
+void ABladeIIGameGameMode::UpdateCardState()
+{
+	// Player Deck
+	GameState->Cards.PlayerDeck.Empty(Arena->PlayerDeck->Count());
+	for (size_t i = 0; i < Arena->PlayerDeck->Count(); i++)
+	{
+		GameState->Cards.PlayerDeck.Add(Arena->PlayerDeck->GetCardByIndex(i)->Type);
+	}
+
+	// Player Hand
+	GameState->Cards.PlayerHand.Empty(Arena->PlayerHand->Count());
+	for (size_t i = 0; i < Arena->PlayerHand->Count(); i++)
+	{
+		GameState->Cards.PlayerHand.Add(Arena->PlayerHand->GetCardByIndex(i)->Type);
+	}
+
+	// Player Field
+	GameState->Cards.PlayerField.Empty(Arena->PlayerField->Count());
+	for (size_t i = 0; i < Arena->PlayerField->Count(); i++)
+	{
+		GameState->Cards.PlayerField.Add(Arena->PlayerField->GetCardByIndex(i)->Type);
+	}
+
+	// Player Discard
+	GameState->Cards.PlayerDiscard.Empty(Arena->PlayerDiscard->Count());
+	for (size_t i = 0; i < Arena->PlayerDiscard->Count(); i++)
+	{
+		GameState->Cards.PlayerDiscard.Add(Arena->PlayerDiscard->GetCardByIndex(i)->Type);
+	}
+
+	// Opponent Deck
+	GameState->Cards.OpponentDeck.Empty(Arena->OpponentDeck->Count());
+	for (size_t i = 0; i < Arena->OpponentDeck->Count(); i++)
+	{
+		GameState->Cards.OpponentDeck.Add(Arena->OpponentDeck->GetCardByIndex(i)->Type);
+	}
+
+	// Opponent Hand
+	GameState->Cards.OpponentHand.Empty(Arena->OpponentHand->Count());
+	for (size_t i = 0; i < Arena->OpponentHand->Count(); i++)
+	{
+		GameState->Cards.OpponentHand.Add(Arena->OpponentHand->GetCardByIndex(i)->Type);
+	}
+
+	// Opponent Field
+	GameState->Cards.OpponentField.Empty(Arena->OpponentField->Count());
+	for (size_t i = 0; i < Arena->OpponentField->Count(); i++)
+	{
+		GameState->Cards.OpponentField.Add(Arena->OpponentField->GetCardByIndex(i)->Type);
+	}
+
+	// Opponent Discard
+	GameState->Cards.OpponentDiscard.Empty(Arena->OpponentDiscard->Count());
+	for (size_t i = 0; i < Arena->OpponentDiscard->Count(); i++)
+	{
+		GameState->Cards.OpponentDiscard.Add(Arena->OpponentDiscard->GetCardByIndex(i)->Type);
+	}
+}
+
 UCardSlot* ABladeIIGameGameMode::GetCardSlot(ECardSlot Slot) const
 {
 	UCardSlot* CardSlot = nullptr;
@@ -329,6 +388,8 @@ void ABladeIIGameGameMode::HandleInstructionReceived(EInstruction Instruction)
 
 void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 {
+	UpdateCardState();
+
 	switch (Event)
 	{
 	case EDealerEvent::CardsDealt:

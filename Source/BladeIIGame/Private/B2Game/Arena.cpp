@@ -40,6 +40,10 @@ AArena::AArena()
 	PlayerField->SetupAttachment(Slots);
 	PlayerField->SetType(ECardSlot::PlayerField);
 
+	PlayerDiscard = CreateDefaultSubobject<UCardSlot>(TEXT("Player Discard"));
+	PlayerDiscard->SetupAttachment(Slots);
+	PlayerDiscard->SetType(ECardSlot::PlayerDiscard);
+
 	OpponentDeck = CreateDefaultSubobject<UDeckSlot>(TEXT("Opponent Deck"));
 	OpponentDeck->SetupAttachment(Slots);
 	OpponentDeck->SetType(ECardSlot::OpponentDeck);
@@ -51,6 +55,10 @@ AArena::AArena()
 	OpponentField = CreateDefaultSubobject<UFieldSlot>(TEXT("Opponent Field"));
 	OpponentField->SetupAttachment(Slots);
 	OpponentField->SetType(ECardSlot::OpponentField);
+
+	OpponentDiscard = CreateDefaultSubobject<UCardSlot>(TEXT("Opponent Discard"));
+	OpponentDiscard->SetupAttachment(Slots);
+	OpponentDiscard->SetType(ECardSlot::OpponentDiscard);
 
 	// Score display
 	ScoreDisplay = CreateDefaultSubobject<UScoreDisplay>(TEXT("Score Display"));

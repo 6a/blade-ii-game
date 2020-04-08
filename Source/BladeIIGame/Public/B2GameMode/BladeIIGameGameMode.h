@@ -43,6 +43,9 @@ public:
 	 */
 	int32 AggregateScore(UCardSlot* Slot) const;
 
+	/* Update the cards in the game state */
+	void UpdateCardState();
+
 	/* Getters for various references */
 	AArena* GetArena() const { return Arena; }
 	ACardSelector* GetCursor() const { return Cursor; }

@@ -19,7 +19,7 @@ void GPSM_Phase_PlayerBolt::Init(ABladeIIGameGameMode* GameMode)
 	EEffect Effect = EEffect::Bolt;
 	FVector TargetWorldPosition = GI->GetArena()->OpponentField->GetLast()->GetActorLocation();
 
-	GI->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 0.5f, 0.5f);
+	GI->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 0.f, 0.0f);
 }
 
 void GPSM_Phase_PlayerBolt::Tick(float DeltaSeconds)
@@ -38,7 +38,7 @@ void GPSM_Phase_PlayerBolt::Tick(float DeltaSeconds)
 		TargetCard->SetActive(false);
 
 		// Flip the target card
-		TargetCard->AddActorLocalRotation(FRotator(0, 180, 0));
+		TargetCard->AddActorWorldRotation(FRotator(180, 0, 0), false, nullptr, ETeleportType::TeleportPhysics);
 
 		// Remove the bolt card from the players hand
 		SelectedCard->SetActorHiddenInGame(true);
@@ -49,6 +49,10 @@ void GPSM_Phase_PlayerBolt::Tick(float DeltaSeconds)
 
 		// Update card slots 
 		GI->GetArena()->PlayerHand->RemoveByID(SelectedCard->GetID());
+		GI->GetArena()->PlayerDiscard->Add(SelectedCard);
+
+		GI->GetArena()->OpponentField->RemoveByID(TargetCard->GetID());
+		GI->GetArena()->OpponentDiscard->Add(TargetCard);
 
 		// Signal to the game mode that the turn has finished
 		GI->FinishTurn();

@@ -62,14 +62,12 @@ void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
 					UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
 
 					GI->GetDealer()->Move(CurrentSlot, GI->GetArena()->PlayerDeck->Count() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
-					GI->GetGameState()->Cards.PlayerField.Push(GI->GetGameState()->Cards.PlayerDeck.Pop());
 
 					// From opponent deck to opponent field
 					CurrentSlot = GI->GetCardSlot(ECardSlot::OpponentDeck);
 					TargetSlot = GI->GetArena()->OpponentField;
 
 					GI->GetDealer()->Move(CurrentSlot, GI->GetArena()->OpponentDeck->Count() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
-					GI->GetGameState()->Cards.OpponentField.Push(GI->GetGameState()->Cards.OpponentDeck.Pop());
 
 					GI->GetGameState()->bAcceptPlayerInput = false;
 					break;
