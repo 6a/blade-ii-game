@@ -13,13 +13,25 @@ void GPSM_Phase_PlayerBlast::Init(ABladeIIGameGameMode* GameMode)
 {
 	GPSM_Phase::Init(GameMode);
 
+	ABladeIIGameGameMode* GI = GameModeInstance;
+
 	// Play blast animation in the center of the screen
-	GameModeInstance->GetEffectLayer()->Play(EEffect::Blast, nullptr, 0.5f, 0.5f);
+	GI->GetEffectLayer()->Play(EEffect::Blast, nullptr, 0.0f, 0.5f);
 }
 
 void GPSM_Phase_PlayerBlast::Tick(float DeltaSeconds)
 {
 	GPSM_Phase::Tick(DeltaSeconds);
+
+	ABladeIIGameGameMode* GI = GameModeInstance;
+
+	if (GI->GetGameState()->bPendingEffectRequiresAction)
+	{
+		// Perform the rest of the blast sequence
+
+
+		GI->GetGameState()->bPendingEffectRequiresAction = false;
+	}
 }
 
 void GPSM_Phase_PlayerBlast::End()

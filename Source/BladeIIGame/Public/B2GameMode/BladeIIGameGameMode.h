@@ -30,8 +30,18 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	/* Informs the engine that the current turn has finished */
+	void FinishTurn();
+
 	/* Get a reference to the card slot of the specified type */
 	UCardSlot* GetCardSlot(ECardSlot Slot) const;
+
+	/**
+	 * Add up all the card values for a particular card slot
+	 * @param Slot - The slot to aggregate the score for
+	 * @return The aggregate score
+	 */
+	int32 AggregateScore(UCardSlot* Slot) const;
 
 	/* Getters for various references */
 	AArena* GetArena() const { return Arena; }
@@ -115,13 +125,6 @@ private:
 	/* Performs whatever is required for when the game enters play (post deal) */
 	void OnCardsDealt();
 
-	/**
-	 * Add up all the card values for a particular card slot
-	 * @param Slot - The slot to aggregate the score for
-	 * @return The aggregate score
-	 */
-	int32 AggregateScore(UCardSlot* Slot) const;
-
 	/* Event listeners */
 
 	/**
@@ -150,5 +153,9 @@ private:
 	 * @param Event - The update type
 	 */
 	UFUNCTION()
-	void HandleEventUpdate(EDealerEvent Event);
+	void HandleDealerEvent(EDealerEvent Event);
+
+	/* Event handler for updates from the UI effect layer */
+	UFUNCTION()
+	void HandleUIAnimationCompletionEvent();
 };

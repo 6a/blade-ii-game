@@ -11,4 +11,6 @@ B2GameState::B2GameState(const FB2Cards& Cards)
 	CursorSlotIndex = 0;
 
 	Turn = ETurn::Undecided;
+	
+	bPendingEffectRequiresAction = false;
 }

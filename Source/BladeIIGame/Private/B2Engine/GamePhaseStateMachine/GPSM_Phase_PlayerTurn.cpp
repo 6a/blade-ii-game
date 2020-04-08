@@ -15,9 +15,11 @@ void GPSM_Phase_PlayerTurn::Init(ABladeIIGameGameMode* GameMode)
 {
 	GPSM_Phase::Init(GameMode);
 
-	ACardSelector* Cursor = GameModeInstance->GetCursor();
+	ABladeIIGameGameMode* GI = GameModeInstance;
 
-	FB2Transform NewSelectorTransform = GameModeInstance->GetArena()->PlayerHand->GetTransformForIndex(0);
+	ACardSelector* Cursor = GI->GetCursor();
+
+	FB2Transform NewSelectorTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(0);
 	NewSelectorTransform.Position += Cursor->OFFSET_WHEN_SELECTED;
 
 	Cursor->SetActorLocationAndRotation(NewSelectorTransform.Position, NewSelectorTransform.Rotation);
@@ -25,39 +27,41 @@ void GPSM_Phase_PlayerTurn::Init(ABladeIIGameGameMode* GameMode)
 
 	SetCurrentCardToSelectedTransform();
 
-	GameModeInstance->GetGameState()->bAcceptPlayerInput = true;
-	GameModeInstance->GetGameState()->CursorPosition = ECardSlot::PlayerHand;
-	GameModeInstance->GetGameState()->CursorSlotIndex = 0;
+	GI->GetGameState()->bAcceptPlayerInput = true;
+	GI->GetGameState()->CursorPosition = ECardSlot::PlayerHand;
+	GI->GetGameState()->CursorSlotIndex = 0;
 
-	uint32 CurrentPlayerScore = GameModeInstance->GetGameState()->PlayerScore;
-	uint32 CurrentOpponentScore = GameModeInstance->GetGameState()->OpponentScore;
-	GameModeInstance->GetArena()->ScoreDisplay->Update(CurrentPlayerScore, CurrentOpponentScore);
+	uint32 CurrentPlayerScore = GI->GetGameState()->PlayerScore;
+	uint32 CurrentOpponentScore = GI->GetGameState()->OpponentScore;
+	GI->GetArena()->ScoreDisplay->Update(CurrentPlayerScore, CurrentOpponentScore);
 }
 
 void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 {
 	GPSM_Phase::Tick(DeltaSeconds);
 
-	if (GameModeInstance->GetGameState()->bAcceptPlayerInput)
+	ABladeIIGameGameMode* GI = GameModeInstance;
+
+	if (GI->GetGameState()->bAcceptPlayerInput)
 	{
 		EButton Button;
-		while (GameModeInstance->GetLocalPlayerInput()->ButtonInputQueue.Dequeue(Button))
+		while (GI->GetLocalPlayerInput()->ButtonInputQueue.Dequeue(Button))
 		{
-			ACardSelector* Cursor = GameModeInstance->GetCursor();
+			ACardSelector* Cursor = GI->GetCursor();
 
-			if (GameModeInstance->GetGameState()->CursorPosition == ECardSlot::PlayerHand)
+			if (GI->GetGameState()->CursorPosition == ECardSlot::PlayerHand)
 			{
 				switch (Button)
 				{
 				case EButton::NavigateLeft:
-					if (GameModeInstance->GetGameState()->CursorSlotIndex > 0)
+					if (GI->GetGameState()->CursorSlotIndex > 0)
 					{
 						// Return the currently selected card to its original transform
 						SetCurrentCardToOriginalTransform();
 
-						GameModeInstance->GetGameState()->CursorSlotIndex--;
+						GI->GetGameState()->CursorSlotIndex--;
 
-						FB2Transform TargetTransform = GameModeInstance->GetArena()->PlayerHand->GetTransformForIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
+						FB2Transform TargetTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
 						TargetTransform.Position += Cursor->OFFSET_WHEN_SELECTED;
 						Cursor->SetActorLocationAndRotation(TargetTransform.Position , TargetTransform.Rotation);
 
@@ -66,14 +70,14 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 					}
 					break;
 				case EButton::NavigateRight:
-					if (GameModeInstance->GetGameState()->CursorSlotIndex < GameModeInstance->GetArena()->PlayerHand->Count() - 1)
+					if (GI->GetGameState()->CursorSlotIndex < GI->GetArena()->PlayerHand->Count() - 1)
 					{
 						// Return the currently selected card to its original transform
 						SetCurrentCardToOriginalTransform();
 
-						GameModeInstance->GetGameState()->CursorSlotIndex++;
+						GI->GetGameState()->CursorSlotIndex++;
 
-						FB2Transform TargetTransform = GameModeInstance->GetArena()->PlayerHand->GetTransformForIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
+						FB2Transform TargetTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
 						TargetTransform.Position += Cursor->OFFSET_WHEN_SELECTED;
 						Cursor->SetActorLocationAndRotation(TargetTransform.Position, TargetTransform.Rotation);
 
@@ -85,50 +89,55 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 					// Handle menu open / close etc
 					break;
 				case EButton::Select:
-					GameModeInstance->GetCursor()->ToggleActorVisibility(false);
+					GI->GetCursor()->ToggleActorVisibility(false);
 
-					ACard* SelectedCard = GameModeInstance->GetArena()->PlayerHand->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
+					ACard* SelectedCard = GI->GetArena()->PlayerHand->GetCardByIndex(GI->GetGameState()->CursorSlotIndex);
 
 					// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 					// Here we also check for effects that occurred, so we can use them to branch later
-					bool bUsedRodEffect = (SelectedCard->Type == ECard::ElliotsOrbalStaff && !GameModeInstance->GetArena()->PlayerField->GetLast()->IsActive());
+					bool bUsedRodEffect = (SelectedCard->Type == ECard::ElliotsOrbalStaff && !GI->GetArena()->PlayerField->GetLast()->IsActive());
 					bool bUsedBoltEffect = (SelectedCard->Type == ECard::Bolt);
 					bool bUsedMirrorEffect = (SelectedCard->Type == ECard::Mirror);
 					bool bUsedBlastEffect = (SelectedCard->Type == ECard::Blast);
 					bool bUsedForceEffect = (SelectedCard->Type == ECard::Force);
 
+					// Get the card thats about to be manipulated
+					ECard CardToMove = GI->GetGameState()->Cards.PlayerHand[GI->GetGameState()->CursorSlotIndex];
+					GI->GetGameState()->Cards.PlayerHand.RemoveAt(GI->GetGameState()->CursorSlotIndex, 1, false);
+
 					if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect || bUsedForceEffect)
 					{
-						GameModeInstance->GetDealer()->PlayerEffectCard(SelectedCard);
+						GI->GetDealer()->PlayerEffectCard(SelectedCard);
+
+						// Update cards in game state
+						GI->GetGameState()->Cards.PlayerDiscard.Push(CardToMove);
 					}
 					else
 					{
 						// From player hand to player field
-						UCardSlot* CurrentSlot = GameModeInstance->GetArena()->PlayerHand;
-						UCardSlot* TargetSlot = GameModeInstance->GetArena()->PlayerField;
+						UCardSlot* CurrentSlot = GI->GetArena()->PlayerHand;
+						UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
 
-						GameModeInstance->GetDealer()->Move(CurrentSlot, GameModeInstance->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_MOVE);
+						GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_MOVE);
 
-						// Update the card state
-						ECard CardToRemove = GameModeInstance->GetGameState()->Cards.PlayerDeck[GameModeInstance->GetGameState()->CursorSlotIndex];
-						GameModeInstance->GetGameState()->Cards.PlayerDeck.RemoveAt(GameModeInstance->GetGameState()->CursorSlotIndex, 1, false);
-						GameModeInstance->GetGameState()->Cards.PlayerField.Push(CardToRemove);
+						// Update cards in game state
+						GI->GetGameState()->Cards.PlayerField.Push(CardToMove);
 					}
 
 					if (bUsedBlastEffect)
 					{
-						// handle blast effects differently as they have an additional stag (card selection)
+						// handle blast effects differently as they have an additional stage (card selection)
 					}
 					else
 					{
 						// Inform the opponent server that a new move was made
 
-						// Update the game state if required (such as ending the game)
+						// Update the engine state if required (such as ending the game)
 
 						// Send the opponent server any instructions (such as game over)
 					}
 
-					GameModeInstance->GetGameState()->bAcceptPlayerInput = false;
+					GI->GetGameState()->bAcceptPlayerInput = false;
 					break;
 				}
 			}

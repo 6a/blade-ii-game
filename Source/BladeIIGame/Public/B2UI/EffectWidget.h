@@ -28,16 +28,26 @@ protected:
 	/* Timer handle for any delayed plays */
 	FTimerHandle DelayedPlayHandle;
 
+	/* Timer handle for any delayed animation completion events */
+	FTimerHandle DelayedCompletionBroadcastHandle;
+
 	/* The screen position to center the widget to during play */
 	FVector2D TargetScreenPosition;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidgetAnimOptional))
 	class UWidgetAnimation* EffectAnimation;
 
+	/* Callback for when an animation is considered to be finished */
+	UFUNCTION(BlueprintCallable, Category = "Events")
+	void OnEffectReady();
+
 private:
 	/* The time (in seconds) to delay the effect finished callback */
 	float PostDelay;
 
-	/* Callback for when an animation finishes */
-	virtual void OnAnimationFinished_Implementation(const UWidgetAnimation* EffectAnimation) override;
+	/* Helper for delaying completion events */
+	UFUNCTION()
+	void OnEffectFinishedBroadcast();
+
+
 };

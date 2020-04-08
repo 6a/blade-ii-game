@@ -54,10 +54,12 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 	LocalPlayerInput->ButtonInputQueue.Empty();
 }
 
+void ABladeIIGameGameMode::FinishTurn()
+{
+	FString Turn = GameState->Turn == ETurn::Player ? TEXT("Player's") : TEXT("Opponent's");
 
-#include "Engine/Engine.h"
-#include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
-#include "Runtime/Engine/Classes/Engine/RendererSettings.h"
+	B2Utility::LogWarning(FString::Printf(TEXT("[%s] turn finished"), *Turn));
+}
 
 void ABladeIIGameGameMode::StartPlay()
 {
@@ -74,6 +76,8 @@ void ABladeIIGameGameMode::StartPlay()
 	SetupSelector();
 
 	UIEffectLayer->Initialise();
+
+	UIEffectLayer->OnEffectFinished.AddDynamic(this, &ABladeIIGameGameMode::HandleUIAnimationCompletionEvent);
 }
 
 void ABladeIIGameGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)
@@ -150,7 +154,7 @@ void ABladeIIGameGameMode::RegisterEventListeners()
 	Opponent->OnCardsReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleCardsReceived);
 
 	// From Dealer
-	Dealer->OnDealerEvent.AddDynamic(this, &ABladeIIGameGameMode::HandleEventUpdate);
+	Dealer->OnDealerEvent.AddDynamic(this, &ABladeIIGameGameMode::HandleDealerEvent);
 }
 
 void ABladeIIGameGameMode::FindArena()
@@ -323,7 +327,7 @@ void ABladeIIGameGameMode::HandleInstructionReceived(EInstruction Instruction)
 
 }
 
-void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
+void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 {
 	switch (Event)
 	{
@@ -424,4 +428,9 @@ void ABladeIIGameGameMode::HandleEventUpdate(EDealerEvent Event)
 
 		break;
 	}
+}
+
+void ABladeIIGameGameMode::HandleUIAnimationCompletionEvent()
+{
+	GameState->bPendingEffectRequiresAction = true;
 }

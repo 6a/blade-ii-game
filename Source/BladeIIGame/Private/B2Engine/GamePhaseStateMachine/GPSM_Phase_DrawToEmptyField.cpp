@@ -15,29 +15,33 @@ void GPSM_Phase_DrawToEmptyField::Init(ABladeIIGameGameMode* GameMode)
 {
 	GPSM_Phase::Init(GameMode);
 
-	FVector NewSelectorPosition = GameModeInstance->GetArena()->PlayerDeck->GetTransformForIndex(GameModeInstance->GetArena()->PlayerDeck->Count() - 1).Position;
+	ABladeIIGameGameMode* GI = GameModeInstance;
 
-	GameModeInstance->GetCursor()->SetActorLocationAndRotation(NewSelectorPosition, FRotator::ZeroRotator);
-	GameModeInstance->GetCursor()->ToggleActorVisibility(true);
+	FVector NewSelectorPosition = GI->GetArena()->PlayerDeck->GetTransformForIndex(GI->GetArena()->PlayerDeck->Count() - 1).Position;
 
-	GameModeInstance->GetGameState()->bAcceptPlayerInput = true;
-	GameModeInstance->GetGameState()->CursorPosition = ECardSlot::PlayerDeck;
-	GameModeInstance->GetGameState()->PlayerScore = 0;
-	GameModeInstance->GetGameState()->OpponentScore = 0;
+	GI->GetCursor()->SetActorLocationAndRotation(NewSelectorPosition, FRotator::ZeroRotator);
+	GI->GetCursor()->ToggleActorVisibility(true);
 
-	GameModeInstance->GetArena()->ScoreDisplay->Update(0, 0);
+	GI->GetGameState()->bAcceptPlayerInput = true;
+	GI->GetGameState()->CursorPosition = ECardSlot::PlayerDeck;
+	GI->GetGameState()->PlayerScore = 0;
+	GI->GetGameState()->OpponentScore = 0;
+
+	GI->GetArena()->ScoreDisplay->Update(0, 0);
 }
 
 void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
 {
 	GPSM_Phase::Tick(DeltaSeconds);
 
-	if (GameModeInstance->GetGameState()->bAcceptPlayerInput)
+	ABladeIIGameGameMode* GI = GameModeInstance;
+
+	if (GI->GetGameState()->bAcceptPlayerInput)
 	{
 		EButton Button;
-		while (GameModeInstance->GetLocalPlayerInput()->ButtonInputQueue.Dequeue(Button))
+		while (GI->GetLocalPlayerInput()->ButtonInputQueue.Dequeue(Button))
 		{
-			if (GameModeInstance->GetGameState()->CursorPosition == ECardSlot::PlayerDeck)
+			if (GI->GetGameState()->CursorPosition == ECardSlot::PlayerDeck)
 			{
 				// Early exit if we try to navigate off from the deck - shouldnt be able to do that
 				if ((Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
@@ -51,23 +55,23 @@ void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
 					// Handle menu open / close etc
 					break;
 				case EButton::Select:
-					GameModeInstance->GetCursor()->ToggleActorVisibility(false);
+					GI->GetCursor()->ToggleActorVisibility(false);
 
 					// From player deck to player field
-					UCardSlot* CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::PlayerDeck);
-					UCardSlot* TargetSlot = GameModeInstance->GetArena()->PlayerField;
+					UCardSlot* CurrentSlot = GI->GetCardSlot(ECardSlot::PlayerDeck);
+					UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
 
-					GameModeInstance->GetDealer()->Move(CurrentSlot, GameModeInstance->GetArena()->PlayerDeck->Count() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
-					GameModeInstance->GetGameState()->Cards.PlayerField.Push(GameModeInstance->GetGameState()->Cards.PlayerDeck.Pop());
+					GI->GetDealer()->Move(CurrentSlot, GI->GetArena()->PlayerDeck->Count() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
+					GI->GetGameState()->Cards.PlayerField.Push(GI->GetGameState()->Cards.PlayerDeck.Pop());
 
 					// From opponent deck to opponent field
-					CurrentSlot = GameModeInstance->GetCardSlot(ECardSlot::OpponentDeck);
-					TargetSlot = GameModeInstance->GetArena()->OpponentField;
+					CurrentSlot = GI->GetCardSlot(ECardSlot::OpponentDeck);
+					TargetSlot = GI->GetArena()->OpponentField;
 
-					GameModeInstance->GetDealer()->Move(CurrentSlot, GameModeInstance->GetArena()->OpponentDeck->Count() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
-					GameModeInstance->GetGameState()->Cards.OpponentField.Push(GameModeInstance->GetGameState()->Cards.OpponentDeck.Pop());
+					GI->GetDealer()->Move(CurrentSlot, GI->GetArena()->OpponentDeck->Count() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
+					GI->GetGameState()->Cards.OpponentField.Push(GI->GetGameState()->Cards.OpponentDeck.Pop());
 
-					GameModeInstance->GetGameState()->bAcceptPlayerInput = false;
+					GI->GetGameState()->bAcceptPlayerInput = false;
 					break;
 				}
 			}

@@ -23,5 +23,8 @@ struct B2GameState
 
 	// Turn
 	ETurn Turn;
+
+	// Effect pending bool (should be set to false once checked)
+	bool bPendingEffectRequiresAction;
 };
 

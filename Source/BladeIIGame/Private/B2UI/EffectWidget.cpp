@@ -1,5 +1,7 @@
 #include "B2UI/EffectWidget.h"
 
+#include "TimerManager.h"
+
 #include "B2Misc/Utility.h"
 
 void UEffectWidget::Play(const FVector2D& InTargetScreenPosition, float StartDelay, float InPostDelay)
@@ -8,9 +10,24 @@ void UEffectWidget::Play(const FVector2D& InTargetScreenPosition, float StartDel
 	PostDelay = InPostDelay;
 }
 
-void UEffectWidget::OnAnimationFinished_Implementation(const UWidgetAnimation* Animation)
+void UEffectWidget::OnEffectFinishedBroadcast()
 {
 	if (OnEffectFinished.IsBound()) OnEffectFinished.Broadcast();
+}
 
-	B2Utility::LogInfo("EffectAnimation playback event handled");
+void UEffectWidget::OnEffectReady()
+{
+	if (GetWorld()->GetTimerManager().TimerExists(DelayedPlayHandle))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(DelayedPlayHandle);
+	}
+
+	if (PostDelay > 0)
+	{
+		GetWorld()->GetTimerManager().SetTimer(DelayedPlayHandle, this, &UEffectWidget::OnEffectFinishedBroadcast, PostDelay, false);
+	}
+	else
+	{
+		OnEffectFinishedBroadcast();
+	}
 }
