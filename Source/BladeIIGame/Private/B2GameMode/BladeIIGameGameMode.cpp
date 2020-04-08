@@ -56,6 +56,8 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 
 void ABladeIIGameGameMode::FinishTurn()
 {
+	UpdateCardState();
+
 	FString Turn = GameState->Turn == ETurn::Player ? TEXT("Player's") : TEXT("Opponent's");
 
 	B2Utility::LogWarning(FString::Printf(TEXT("[%s] turn finished"), *Turn));
