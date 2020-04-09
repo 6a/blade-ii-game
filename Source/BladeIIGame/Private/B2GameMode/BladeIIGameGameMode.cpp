@@ -7,7 +7,7 @@
 #include "B2Engine/AIOpponent.h"
 #include "B2Engine/NetOpponent.h"
 #include "B2Engine/LaunchConfig.h"
-#include "B2Misc/Transition.h"
+#include "B2Engine/Transition.h"
 #include "B2Misc/Utility.h"
 
 // Game phase state machines
