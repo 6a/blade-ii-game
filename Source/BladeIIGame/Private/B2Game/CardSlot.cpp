@@ -10,8 +10,9 @@ UCardSlot::UCardSlot()
 
 }
 
-UINT UCardSlot::Num() const
+uint32 UCardSlot::Num() const
 {
+	// Lets just pray that num never returns less than zero or larger than (MAX INT)
 	return Cards.Num();
 }
 
@@ -46,7 +47,7 @@ void UCardSlot::Add(ACard* Card)
 	Cards.Add(Card);
 }
 
-ACard* UCardSlot::GetCardByIndex(UINT N)
+ACard* UCardSlot::GetCardByIndex(uint32 N)
 {
 	ACard* Card = nullptr;
 
@@ -90,7 +91,7 @@ int UCardSlot::GetIndexByID(FString ID)
 	return OutIndex;
 }
 
-ACard* UCardSlot::RemoveByIndex(UINT N)
+ACard* UCardSlot::RemoveByIndex(uint32 N)
 {
 	ACard* Card = nullptr;
 
@@ -144,7 +145,7 @@ ACard* UCardSlot::GetFirst()
 	return Card;
 }
 
-const FB2Transform UCardSlot::GetTransformForIndex(UINT Index) const
+const FB2Transform UCardSlot::GetTransformForIndex(uint32 Index) const
 {
 	FB2Transform Transform = GetBaseTransform();
 	

@@ -20,7 +20,7 @@ public:
 	* @param N - The index of the card to remove
 	* @returns A pointer to the removed card
 	*/
-	virtual ACard* RemoveByIndex(UINT N) override;
+	virtual ACard* RemoveByIndex(uint32 N) override;
 
 	/**
 	 * Remove the card with the specified ID

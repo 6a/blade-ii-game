@@ -18,7 +18,7 @@ public:
 	UCardSlot();
 
 	/* Returns the current stack size (i.e. the number of cards on this anchor) */
-	UINT Num() const;
+	uint32 Num() const;
 
 	/* Returns an array of the card ID's, in ascending order */
 	TArray<FString> GetSortedIDsAscending();
@@ -34,7 +34,7 @@ public:
 	 * @param N - The index of the card to get
 	 * @returns A pointer to the card
 	 */
-	virtual ACard* GetCardByIndex(UINT N);
+	virtual ACard* GetCardByIndex(uint32 N);
 
 	/**
 	 * Get the card with the specified ID
@@ -55,7 +55,7 @@ public:
 	 * @param N - The index of the card to remove
 	 * @returns A pointer to the removed card
 	 */
-	virtual ACard* RemoveByIndex(UINT N);
+	virtual ACard* RemoveByIndex(uint32 N);
 
 	/**
 	 * Remove the card with the specified ID
@@ -81,7 +81,7 @@ public:
 	 * @param Index - The index for which the transform will be returned
 	 * @returns FB2Transform for index "Index"
 	 */
-	const virtual FB2Transform GetTransformForIndex(UINT Index) const;
+	const virtual FB2Transform GetTransformForIndex(uint32 Index) const;
 
 	/* Updates the internal container so that the cards are in the right order */
 	virtual void UpdateCardOrder();

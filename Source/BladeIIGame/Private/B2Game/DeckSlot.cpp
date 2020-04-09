@@ -6,7 +6,7 @@ void UDeckSlot::Add(ACard* Card)
 	Super::Add(Card);
 }
 
-ACard* UDeckSlot::RemoveByIndex(UINT N)
+ACard* UDeckSlot::RemoveByIndex(uint32 N)
 {
 
 	return Super::RemoveByIndex(N);

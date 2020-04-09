@@ -6,7 +6,7 @@ void UHandSlot::Add(ACard* Card)
 	Super::Add(Card);
 }
 
-ACard* UHandSlot::RemoveByIndex(UINT N)
+ACard* UHandSlot::RemoveByIndex(uint32 N)
 {
 
 	return Super::RemoveByIndex(N);

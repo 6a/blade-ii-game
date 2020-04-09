@@ -6,7 +6,7 @@ void UFieldSlot::Add(ACard* Card)
 	Super::Add(Card);
 }
 
-ACard* UFieldSlot::RemoveByIndex(UINT N)
+ACard* UFieldSlot::RemoveByIndex(uint32 N)
 {
 
 	return Super::RemoveByIndex(N);
