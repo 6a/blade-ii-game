@@ -18,13 +18,13 @@ void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	// If there are cards on the field, clear them
-	if (GI->GetArena()->PlayerField->Count() + GI->GetArena()->OpponentField->Count() > 0)
+	if (GI->GetArena()->PlayerField->Num() + GI->GetArena()->OpponentField->Num() > 0)
 	{
 		GI->GetDealer()->ClearField();
 	}
 	else
 	{
-		FVector NewSelectorPosition = GI->GetArena()->PlayerDeck->GetTransformForIndex(GI->GetArena()->PlayerDeck->Count() - 1).Position;
+		FVector NewSelectorPosition = GI->GetArena()->PlayerDeck->GetTransformForIndex(GI->GetArena()->PlayerDeck->Num() - 1).Position;
 
 		GI->GetCursor()->SetActorLocationAndRotation(NewSelectorPosition, FRotator::ZeroRotator);
 		GI->GetCursor()->ToggleActorVisibility(true);
@@ -64,13 +64,13 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 					UCardSlot* CurrentSlot = GI->GetCardSlot(ECardSlot::PlayerDeck);
 					UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
 
-					GI->GetDealer()->Move(CurrentSlot, GI->GetArena()->PlayerDeck->Count() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
+					GI->GetDealer()->Move(CurrentSlot, GI->GetArena()->PlayerDeck->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
 
 					// From opponent deck to opponent field
 					CurrentSlot = GI->GetCardSlot(ECardSlot::OpponentDeck);
 					TargetSlot = GI->GetArena()->OpponentField;
 
-					GI->GetDealer()->Move(CurrentSlot, GI->GetArena()->OpponentDeck->Count() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
+					GI->GetDealer()->Move(CurrentSlot, GI->GetArena()->OpponentDeck->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
 
 					GI->GetGameState()->bAcceptPlayerInput = false;
 					break;

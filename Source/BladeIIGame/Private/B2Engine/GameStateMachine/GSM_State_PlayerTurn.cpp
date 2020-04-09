@@ -55,7 +55,7 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				{
 				case EInput::NavigateLeft:
 				{
-					uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex > 0 ? GI->GetGameState()->CursorSlotIndex - 1 : GI->GetArena()->PlayerHand->Count() - 1;
+					uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex > 0 ? GI->GetGameState()->CursorSlotIndex - 1 : GI->GetArena()->PlayerHand->Num() - 1;
 
 					// Return the currently selected card to its original transform
 					SetCurrentCardToOriginalTransform();
@@ -73,7 +73,7 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				}
 				case EInput::NavigateRight:
 				{
-					uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex < GI->GetArena()->PlayerHand->Count() - 1 ? GI->GetGameState()->CursorSlotIndex + 1 : 0;
+					uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex < GI->GetArena()->PlayerHand->Num() - 1 ? GI->GetGameState()->CursorSlotIndex + 1 : 0;
 
 					// Return the currently selected card to its original transform
 					SetCurrentCardToOriginalTransform();

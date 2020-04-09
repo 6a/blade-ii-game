@@ -10,7 +10,7 @@ UCardSlot::UCardSlot()
 
 }
 
-UINT UCardSlot::Count() const
+UINT UCardSlot::Num() const
 {
 	return Cards.Num();
 }
@@ -124,7 +124,7 @@ ACard* UCardSlot::GetLast()
 {
 	ACard* Card = nullptr;
 
-	if (Count() > 0)
+	if (Num() > 0)
 	{
 		Card = Cards.Last();
 	}
@@ -136,7 +136,7 @@ ACard* UCardSlot::GetFirst()
 {
 	ACard* Card = nullptr;
 
-	if (Count() > 0)
+	if (Num() > 0)
 	{
 		Card = Cards[0];
 	}

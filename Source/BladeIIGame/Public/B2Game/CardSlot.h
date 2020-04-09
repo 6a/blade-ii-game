@@ -18,7 +18,7 @@ public:
 	UCardSlot();
 
 	/* Returns the current stack size (i.e. the number of cards on this anchor) */
-	UINT Count() const;
+	UINT Num() const;
 
 	/* Returns an array of the card ID's, in ascending order */
 	TArray<FString> GetSortedIDsAscending();

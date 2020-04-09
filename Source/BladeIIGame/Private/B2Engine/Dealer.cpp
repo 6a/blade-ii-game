@@ -234,7 +234,7 @@ void UB2Dealer::Deal()
 	B2WaitGroup WG_PlayerHandReveal = B2Transition::GetNextWaitGroup();
 
 	// Player cards reveal
-	for (size_t i = 0; i < Arena->PlayerHand->Count(); i++)
+	for (size_t i = 0; i < Arena->PlayerHand->Num(); i++)
 	{
 		float Delay = i * OffsetPlayerHandReveal;
 
@@ -271,7 +271,7 @@ void UB2Dealer::Deal()
 	B2WaitGroup WG_GatherUp = B2Transition::GetNextWaitGroup();
 
 	// Player cards gather up
-	for (size_t i = 0; i < Arena->PlayerHand->Count(); i++)
+	for (size_t i = 0; i < Arena->PlayerHand->Num(); i++)
 	{
 		float Delay = DelayPreShuffleGatherUp;
 		FVector CenterPosition = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(3).Position, Arena->PlayerHand->GetTransformForIndex(4).Position, 0.5f) + (i * FVector(0, 0, CARD_STACKING_OFFSET));
@@ -307,7 +307,7 @@ void UB2Dealer::Deal()
 	}
 
 	// Opponents cards gather up
-	for (size_t i = 0; i < Arena->OpponentHand->Count(); i++)
+	for (size_t i = 0; i < Arena->OpponentHand->Num(); i++)
 	{
 		float Delay = DelayPreShuffleGatherUp;
 		FVector CenterPosition = FMath::Lerp(Arena->OpponentHand->GetTransformForIndex(3).Position, Arena->OpponentHand->GetTransformForIndex(4).Position, 0.5f) + (i * FVector(0, 0, CARD_STACKING_OFFSET));
@@ -356,7 +356,7 @@ void UB2Dealer::Deal()
 	TArray<FString> SortedPlayerHand = Arena->PlayerHand->GetSortedIDsDescending();
 
 	// Player cards shuffle
-	for (size_t i = 0; i < Arena->PlayerHand->Count(); i++)
+	for (size_t i = 0; i < Arena->PlayerHand->Num(); i++)
 	{
 		float Delay = DelayShuffleSteps;
 
@@ -481,7 +481,7 @@ void UB2Dealer::Deal()
 		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationShuffleSteps, Delay);
 		Card->QueueTransition(Transition);
 
-		Delay = (Arena->PlayerHand->Count() * OffsetShuffleSpread) - IndexAfterSort * OffsetShuffleSpread;
+		Delay = (Arena->PlayerHand->Num() * OffsetShuffleSpread) - IndexAfterSort * OffsetShuffleSpread;
 
 		// Transition 7
 		Position = B2TPosition
@@ -508,7 +508,7 @@ void UB2Dealer::Deal()
 	TArray<FString> SortedOpponentHand = Arena->OpponentHand->GetSortedIDsDescending();
 
 	// Opponents cards shuffle
-	for (size_t i = 0; i < Arena->OpponentHand->Count(); i++)
+	for (size_t i = 0; i < Arena->OpponentHand->Num(); i++)
 	{
 		float Delay = DelayShuffleSteps;
 
@@ -584,7 +584,7 @@ void UB2Dealer::Deal()
 		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationShuffleSteps, Delay);
 		Card->QueueTransition(Transition);
 
-		Delay = (Arena->OpponentHand->Count() * OffsetShuffleSpread) - IndexAfterSort * OffsetShuffleSpread;
+		Delay = (Arena->OpponentHand->Num() * OffsetShuffleSpread) - IndexAfterSort * OffsetShuffleSpread;
 
 		// Transition 4
 		Position = B2TPosition
@@ -617,7 +617,7 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 
 	// Calculate how long the transition should be
 	const FVector SourceCardPosition = Card->GetActorLocation();
-	const FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(TargetSlot->Count());
+	const FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(TargetSlot->Num());
 	const float RatioOfMaxMoveDuration = FVector::DistSquared(SourceCardPosition, TargetTransform.Position) / MAX_MOVE_SQ_DISTANCE;
 	const float TransitionDuration = FMath::Clamp(MAX_MOVE_TRANSITION_DURATION * RatioOfMaxMoveDuration, MIN_MOVE_TRANSITION_DURATION, MAX_MOVE_TRANSITION_DURATION);
 
@@ -673,7 +673,7 @@ void UB2Dealer::ClearField()
 	WaitGroupClearFinished = PostDelayWaitGroup + 1;
 
 	FVector PlayerCardTargetPosition = Arena->PlayerDiscard->GetTransformForIndex(0).Position;
-	for (int32 i = Arena->PlayerField->Count() - 1; i >= 0; i--)
+	for (int32 i = Arena->PlayerField->Num() - 1; i >= 0; i--)
 	{
 		ACard* Card = Arena->PlayerField->RemoveByIndex(i);
 		Arena->PlayerDiscard->Add(Card);
@@ -701,7 +701,7 @@ void UB2Dealer::ClearField()
 
 	FVector OpponentCardTargetPosition = Arena->OpponentDiscard->GetTransformForIndex(0).Position;
 
-	for (int32 i = Arena->OpponentField->Count() - 1; i >= 0; i--)
+	for (int32 i = Arena->OpponentField->Num() - 1; i >= 0; i--)
 	{
 		ACard* Card = Arena->OpponentField->RemoveByIndex(i);
 		Arena->OpponentDiscard->Add(Card);
