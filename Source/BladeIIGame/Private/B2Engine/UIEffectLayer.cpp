@@ -6,7 +6,7 @@
 
 #include "B2Utility/Log.h"
 
-const FString EFFECTS_LAYER_BLUEPRINT = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_EffectsLayerWidget'";
+const FString EFFECTS_LAYER_BLUEPRINT = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_EffectsLayer'";
 
 UB2UIEffectLayer::UB2UIEffectLayer()
 {
@@ -23,7 +23,7 @@ void UB2UIEffectLayer::Initialise()
 {
 	if (EffectsLayerWidgetClass)
 	{
-		EffectsLayerWidget = CreateWidget<UEffectsLayerWidget>(GetWorld()->GetGameInstance(), EffectsLayerWidgetClass, TEXT("Effects Layer Widget"));
+		EffectsLayerWidget = CreateWidget<UEffectsLayerWidget>(GetWorld()->GetGameInstance(), EffectsLayerWidgetClass, TEXT("UI Effects Layer"));
 		if (EffectsLayerWidget)
 		{
 			EffectsLayerWidget->AddToViewport();
