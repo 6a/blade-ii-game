@@ -2,7 +2,7 @@
 
 #include "TimerManager.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
 
 void UEffectWidget::Play(const FVector2D& InTargetScreenPosition, float StartDelay, float InPostDelay)
 {

@@ -8,7 +8,7 @@
 #include "B2Engine/NetOpponent.h"
 #include "B2Engine/LaunchConfig.h"
 #include "B2Engine/Transition.h"
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
 
 // Game phase state machines
 #include "B2Engine/GameStateMachine/GSM_State_DrawToEmptyField.h"

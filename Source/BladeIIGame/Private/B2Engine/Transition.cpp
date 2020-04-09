@@ -2,7 +2,7 @@
 
 #include "Math/UnrealMathUtility.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
 
 const float LERP_MIN = 0.f;
 const float LERP_MAX = 1.f;

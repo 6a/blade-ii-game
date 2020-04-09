@@ -2,7 +2,7 @@
 
 #include "Kismet/KismetMathLibrary.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
 
 // Class scope values
 const size_t DECK_CAPACITY = 15;

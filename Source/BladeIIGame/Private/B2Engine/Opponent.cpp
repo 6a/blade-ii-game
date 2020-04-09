@@ -1,6 +1,6 @@
 #include "B2Engine/Opponent.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
 
 void UB2Opponent::Tick(float DeltaSeconds)
 {

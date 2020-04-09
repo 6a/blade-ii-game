@@ -1,23 +1,4 @@
-#include "B2Misc/Utility.h"
-
-const void B2Utility::LogInfo(const FString& message)
-{
-#if B2_SHOW_DEBUG
-	UE_LOG(LogTemp, Warning, TEXT("[INFO][%s] %s"), *B2Utility::GetTimestamp(), *message);
-#endif
-}
-
-const void B2Utility::LogWarning(const FString& message)
-{
-#if B2_SHOW_DEBUG
-	UE_LOG(LogTemp, Warning, TEXT("[WARNING][%s] %s"), *B2Utility::GetTimestamp(), *message);
-#endif
-}
-
-const void B2Utility::LogBool(bool bInBool)
-{
-	LogWarning(FString::Printf(TEXT("Bool Value: %s"), bInBool ? TEXT("True") : TEXT("False")));
-}
+#include "B2Utility/String.h"
 
 const FString B2Utility::GetTimestamp()
 {
@@ -25,7 +6,7 @@ const FString B2Utility::GetTimestamp()
 	return FString::Printf(TEXT("%02d:%02d:%02d:%03d"), Now.GetHour(), Now.GetMinute(), Now.GetSecond(), Now.GetMillisecond());
 }
 
-const FString B2Utility::EnumToString(ECard Card)
+const FString B2Utility::CardEnumToString(ECard Card)
 {
 	switch (Card)
 	{

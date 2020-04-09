@@ -2,7 +2,8 @@
 
 #include "Materials/MaterialInstanceDynamic.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
+#include "B2Utility/String.h"
 
 B2CardFactory::B2CardFactory(const B2CardFactoryConfig& CardFactoryConfig)
 {
@@ -19,8 +20,8 @@ B2CardFactory::~B2CardFactory()
 ACard* B2CardFactory::Make(const ECard& Card, const FVector& StartingPosition, const FRotator& StartingRotation)
 {
 	ACard* SpawnedCard = World->SpawnActor<ACard>(CardActorClass, StartingPosition, StartingRotation);
-	SpawnedCard->Rename(*B2Utility::EnumToString(Card));
-	SpawnedCard->SetActorLabel(*B2Utility::EnumToString(Card));
+	SpawnedCard->Rename(*B2Utility::CardEnumToString(Card));
+	SpawnedCard->SetActorLabel(*B2Utility::CardEnumToString(Card));
 	SpawnedCard->Type = Card;
 
 	UMaterialInstanceDynamic* MaterialFront = UMaterialInstanceDynamic::Create(SpawnedCard->Mesh->GetMaterial(0), NULL);

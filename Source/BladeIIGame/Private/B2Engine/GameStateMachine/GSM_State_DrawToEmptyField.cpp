@@ -1,6 +1,6 @@
 #include "B2Engine/GameStateMachine/GSM_State_DrawToEmptyField.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
 
 #include "B2GameMode/BladeIIGameMode.h"
 

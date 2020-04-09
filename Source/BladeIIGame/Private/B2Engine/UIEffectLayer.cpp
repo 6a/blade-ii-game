@@ -4,7 +4,7 @@
 #include "Engine/GameInstance.h"
 #include "UObject/ConstructorHelpers.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
 
 const FString EFFECTS_LAYER_BLUEPRINT = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_EffectsLayerWidget'";
 

@@ -3,7 +3,7 @@
 #include "Engine/World.h"
 #include "Components/InputComponent.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
 
 const float NAV_POLL_DELAY = 0.25f;
 const float NAV_POLL_INTERVAL = 0.125f;

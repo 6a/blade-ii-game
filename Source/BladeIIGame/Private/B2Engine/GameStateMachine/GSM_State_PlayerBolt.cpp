@@ -2,7 +2,7 @@
 
 #include "TimerManager.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
 
 #include "B2GameMode/BladeIIGameMode.h"
 

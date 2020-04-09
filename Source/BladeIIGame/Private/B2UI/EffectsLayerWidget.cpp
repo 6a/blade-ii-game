@@ -1,6 +1,6 @@
 #include "B2UI/EffectsLayerWidget.h"
 
-#include "B2Misc/Utility.h"
+#include "B2Utility/Log.h"
 
 void UEffectsLayerWidget::Initialise()
 {
