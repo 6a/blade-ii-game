@@ -1,21 +1,21 @@
-#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_DrawToEmptyField.h"
+#include "B2Engine/GameStateMachine/GSM_State_DrawToEmptyField.h"
 
 #include "B2Misc/Utility.h"
 
-#include "B2GameMode/BladeIIGameGameMode.h"
+#include "B2GameMode/BladeIIGameMode.h"
 
 const FVector ARC_ON_DRAW_FROM_DECK = FVector(0, 0, 12);
 
-GPSM_Phase_DrawToEmptyField::GPSM_Phase_DrawToEmptyField()
+GSM_State_DrawToEmptyField::GSM_State_DrawToEmptyField()
 {
-	GPSM_Phase::GPSM_Phase();
+	GSM_State::GSM_State();
 }
 
-void GPSM_Phase_DrawToEmptyField::Init(ABladeIIGameGameMode* GameMode)
+void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 {
-	GPSM_Phase::Init(GameMode);
+	GSM_State::Init(GameMode);
 
-	ABladeIIGameGameMode* GI = GameModeInstance;
+	ABladeIIGameMode* GI = GameModeInstance;
 
 	// If there are cards on the field, clear them
 	if (GI->GetArena()->PlayerField->Count() + GI->GetArena()->OpponentField->Count() > 0)
@@ -33,11 +33,11 @@ void GPSM_Phase_DrawToEmptyField::Init(ABladeIIGameGameMode* GameMode)
 	}
 }
 
-void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
+void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 {
-	GPSM_Phase::Tick(DeltaSeconds);
+	GSM_State::Tick(DeltaSeconds);
 
-	ABladeIIGameGameMode* GI = GameModeInstance;
+	ABladeIIGameMode* GI = GameModeInstance;
 
 	if (GI->GetGameState()->bAcceptPlayerInput)
 	{
@@ -80,9 +80,9 @@ void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
 	}
 }
 
-void GPSM_Phase_DrawToEmptyField::End()
+void GSM_State_DrawToEmptyField::End()
 {
-	GPSM_Phase::End();
+	GSM_State::End();
 
 
 }

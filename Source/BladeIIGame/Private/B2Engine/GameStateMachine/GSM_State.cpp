@@ -1,33 +1,33 @@
-#include "B2Engine/GamePhaseStateMachine/GPSM_Phase.h"
+#include "B2Engine/GameStateMachine/GSM_State.h"
 
-#include "B2GameMode/BladeIIGameGameMode.h"
+#include "B2GameMode/BladeIIGameMode.h"
 
-GPSM_Phase::GPSM_Phase()
+GSM_State::GSM_State()
 {
 
 }
 
-void GPSM_Phase::Init(ABladeIIGameGameMode* GameMode)
+void GSM_State::Init(ABladeIIGameMode* GameMode)
 {
 	GameModeInstance = GameMode;
 }
 
-void GPSM_Phase::Tick(float DeltaSeconds)
+void GSM_State::Tick(float DeltaSeconds)
 {
 
 }
 
-void GPSM_Phase::End()
+void GSM_State::End()
 {
 
 }
 
-EGameState GPSM_Phase::Type() const
+EGameState GSM_State::Type() const
 {
 	return EGameState::WaitingForInitialDeal;
 }
 
-void GPSM_Phase::SetCurrentCardToOriginalTransform()
+void GSM_State::SetCurrentCardToOriginalTransform()
 {
 	ACard* CurrentCard = GameModeInstance->GetArena()->PlayerHand->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
 
@@ -38,7 +38,7 @@ void GPSM_Phase::SetCurrentCardToOriginalTransform()
 	}
 }
 
-void GPSM_Phase::SetCurrentCardToSelectedTransform()
+void GSM_State::SetCurrentCardToSelectedTransform()
 {
 	ACard* CurrentCard = GameModeInstance->GetArena()->PlayerHand->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
 
@@ -51,6 +51,6 @@ void GPSM_Phase::SetCurrentCardToSelectedTransform()
 	}
 }
 
-void GPSM_Phase::SetCurrentCardToPreEffectTransform()
+void GSM_State::SetCurrentCardToPreEffectTransform()
 {
 }

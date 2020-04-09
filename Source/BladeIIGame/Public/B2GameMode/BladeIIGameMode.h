@@ -10,22 +10,20 @@
 #include "B2Engine/Cards.h"
 #include "B2Engine/LocalPlayerInput.h"
 #include "B2Engine/UIEffectLayer.h"
+#include "B2Engine/GameStateMachine/GSM.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
 #include "B2Misc/Enum/EngineStateEnum.h"
 
-// Game Phase State Machine
-#include "B2Engine/GamePhaseStateMachine/GPSM.h"
-
-#include "BladeIIGameGameMode.generated.h"
+#include "BladeIIGameMode.generated.h"
 
 UCLASS()
-class BLADEIIGAME_API ABladeIIGameGameMode : public AGameMode
+class BLADEIIGAME_API ABladeIIGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
 public:
-	ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer);
+	ABladeIIGameMode(const FObjectInitializer& ObjectInitializer);
 
 	virtual void StartPlay() override;
 
@@ -57,7 +55,6 @@ public:
 	
 	B2CardFactory* GetCardFactory() const { return CardFactory; }
 	B2GameState* GetGameState() const { return GameState; }
-	EEngineState GetEngineState() const { return EngineState; }
 
 private:
 	/* Pointer to the arena that will be used throughout this match */
@@ -87,8 +84,8 @@ private:
 	/* Pointer to the cardfactory that will be used throughout this match */
 	B2CardFactory* CardFactory;
 
-	/* The gameplay state machine instance */
-	B2GPSM* GPSM;
+	/* The gamestate state machine instance */
+	B2GameStateMachine* GSM;
 
 	/* The current state of the game */
 	B2GameState* GameState;

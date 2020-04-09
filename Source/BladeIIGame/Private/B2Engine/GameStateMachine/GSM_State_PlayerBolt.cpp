@@ -1,21 +1,21 @@
-#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_PlayerBolt.h"
+#include "B2Engine/GameStateMachine/GSM_State_PlayerBolt.h"
 
 #include "TimerManager.h"
 
 #include "B2Misc/Utility.h"
 
-#include "B2GameMode/BladeIIGameGameMode.h"
+#include "B2GameMode/BladeIIGameMode.h"
 
-GPSM_Phase_PlayerBolt::GPSM_Phase_PlayerBolt()
+GSM_State_PlayerBolt::GSM_State_PlayerBolt()
 {
-	GPSM_Phase::GPSM_Phase();
+	GSM_State::GSM_State();
 }
 
-void GPSM_Phase_PlayerBolt::Init(ABladeIIGameGameMode* GameMode)
+void GSM_State_PlayerBolt::Init(ABladeIIGameMode* GameMode)
 {
-	GPSM_Phase::Init(GameMode);
+	GSM_State::Init(GameMode);
 
-	ABladeIIGameGameMode* GI = GameModeInstance;
+	ABladeIIGameMode* GI = GameModeInstance;
 
 	// Play bolt animation at opponents last card position
 	EUIEffect Effect = EUIEffect::Bolt;
@@ -25,11 +25,11 @@ void GPSM_Phase_PlayerBolt::Init(ABladeIIGameGameMode* GameMode)
 	bIsPendingFinishCall = false;
 }
 
-void GPSM_Phase_PlayerBolt::Tick(float DeltaSeconds)
+void GSM_State_PlayerBolt::Tick(float DeltaSeconds)
 {
-	GPSM_Phase::Tick(DeltaSeconds);
+	GSM_State::Tick(DeltaSeconds);
 
-	ABladeIIGameGameMode* GI = GameModeInstance;
+	ABladeIIGameMode* GI = GameModeInstance;
 
 	if (GI->GetGameState()->bPendingEffectRequiresAction)
 	{
@@ -76,9 +76,9 @@ void GPSM_Phase_PlayerBolt::Tick(float DeltaSeconds)
 	}
 }
 
-void GPSM_Phase_PlayerBolt::End()
+void GSM_State_PlayerBolt::End()
 {
-	GPSM_Phase::End();
+	GSM_State::End();
 
 
 }

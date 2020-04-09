@@ -4,12 +4,12 @@
 
 #include "../../B2Misc/Enum/GameStateEnum.h"
 
-class GPSM_Phase
+class GSM_State
 {
 public:
-	GPSM_Phase();
+	GSM_State();
 
-	virtual void Init(class ABladeIIGameGameMode* GameMode);
+	virtual void Init(class ABladeIIGameMode* GameMode);
 
 	virtual void Tick(float DeltaSeconds);
 
@@ -19,7 +19,7 @@ public:
 
 protected:
 	UPROPERTY()
-	class ABladeIIGameGameMode* GameModeInstance;
+	class ABladeIIGameMode* GameModeInstance;
 
 	/* Returns the card currently under the cursor to its original transform */
 	void SetCurrentCardToOriginalTransform();

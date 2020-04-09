@@ -1,4 +1,4 @@
-#include "B2GameMode/BladeIIGameGameMode.h"
+#include "B2GameMode/BladeIIGameMode.h"
 
 #include "EngineUtils.h"
 #include "UObject/UObjectGlobals.h"
@@ -11,16 +11,16 @@
 #include "B2Misc/Utility.h"
 
 // Game phase state machines
-#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_DrawToEmptyField.h"
-#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_WaitingForInitialDeal.h"
-#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_PlayerTurn.h"
-#include "B2Engine/GamePhaseStateMachine/GPSM_Phase_WaitingForOpponentMove.h"
-#include "B2Engine/GamePhaseStateMachine/GPSM_PHASE_PlayerBolt.h"
-#include "B2Engine/GamePhaseStateMachine/GPSM_PHASE_PlayerBlast.h"
+#include "B2Engine/GameStateMachine/GSM_State_DrawToEmptyField.h"
+#include "B2Engine/GameStateMachine/GSM_State_WaitingForInitialDeal.h"
+#include "B2Engine/GameStateMachine/GSM_State_PlayerTurn.h"
+#include "B2Engine/GameStateMachine/GSM_State_WaitingForOpponentMove.h"
+#include "B2Engine/GameStateMachine/GSM_State_PlayerBolt.h"
+#include "B2Engine/GameStateMachine/GSM_State_PlayerBlast.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
-ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectInitializer)
+ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 {
 	DefaultPawnClass = ALocalPlayerInput::StaticClass();
 
@@ -37,7 +37,7 @@ ABladeIIGameGameMode::ABladeIIGameGameMode(const FObjectInitializer& ObjectIniti
 	B2Utility::LogInfo("GameMode initialized");
 }
 
-void ABladeIIGameGameMode::Tick(float DeltaSeconds)
+void ABladeIIGameMode::Tick(float DeltaSeconds)
 {
 	if (EngineState > EEngineState::Initialisation)
 	{
@@ -48,13 +48,13 @@ void ABladeIIGameGameMode::Tick(float DeltaSeconds)
 
 	if (EngineState >= EEngineState::InPlay)
 	{
-		GPSM->Tick(DeltaSeconds);
+		GSM->Tick(DeltaSeconds);
 	}
 
 	LocalPlayerInput->ButtonInputQueue.Empty();
 }
 
-void ABladeIIGameGameMode::FinishTurn()
+void ABladeIIGameMode::FinishTurn()
 {
 	UpdateCardState();
 
@@ -63,7 +63,7 @@ void ABladeIIGameGameMode::FinishTurn()
 	B2Utility::LogWarning(FString::Printf(TEXT("[%s] turn finished"), *Turn));
 }
 
-void ABladeIIGameGameMode::StartPlay()
+void ABladeIIGameMode::StartPlay()
 {
 	Super::StartPlay();
 
@@ -79,10 +79,10 @@ void ABladeIIGameGameMode::StartPlay()
 
 	UIEffectLayer->Initialise();
 
-	UIEffectLayer->OnEffectFinished.AddDynamic(this, &ABladeIIGameGameMode::HandleUIAnimationCompletionEvent);
+	UIEffectLayer->OnEffectFinished.AddDynamic(this, &ABladeIIGameMode::HandleUIAnimationCompletionEvent);
 }
 
-void ABladeIIGameGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)
+void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)
 {
 	// Read the launch config
 	B2LaunchConfig LaunchConfig("Launch.conf");
@@ -104,7 +104,7 @@ void ABladeIIGameGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectIni
 	}
 }
 
-void ABladeIIGameGameMode::SetupCardFactory()
+void ABladeIIGameMode::SetupCardFactory()
 {
 	// Load card config (textures to use, etc)
 	B2CardFactoryConfig B2CardFactoryConfig;
@@ -140,26 +140,26 @@ void ABladeIIGameGameMode::SetupCardFactory()
 	CardFactory = new B2CardFactory(B2CardFactoryConfig);
 }
 
-void ABladeIIGameGameMode::SetupGPSM()
+void ABladeIIGameMode::SetupGPSM()
 {
-	GPSM = new B2GPSM(this);
-	GPSM->ChangeState<GPSM_Phase_WaitingForInitialDeal>();
+	GSM = new B2GameStateMachine(this);
+	GSM->ChangeState<GSM_State_WaitingForInitialDeal>();
 }
 
-void ABladeIIGameGameMode::RegisterEventListeners()
+void ABladeIIGameMode::RegisterEventListeners()
 {
 	// Register event listeners
 
 	// From Opponent
-	Opponent->OnMoveReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleMoveReceived);
-	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleInstructionReceived);
-	Opponent->OnCardsReceived.AddDynamic(this, &ABladeIIGameGameMode::HandleCardsReceived);
+	Opponent->OnMoveReceived.AddDynamic(this, &ABladeIIGameMode::HandleMoveReceived);
+	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameMode::HandleInstructionReceived);
+	Opponent->OnCardsReceived.AddDynamic(this, &ABladeIIGameMode::HandleCardsReceived);
 
 	// From Dealer
-	Dealer->OnDealerEvent.AddDynamic(this, &ABladeIIGameGameMode::HandleDealerEvent);
+	Dealer->OnDealerEvent.AddDynamic(this, &ABladeIIGameMode::HandleDealerEvent);
 }
 
-void ABladeIIGameGameMode::FindArena()
+void ABladeIIGameMode::FindArena()
 {
 	// Try to get a reference to the arena
 	for (TActorIterator<AArena> ArenaIter(GetWorld()); ArenaIter; ++ArenaIter)
@@ -174,7 +174,7 @@ void ABladeIIGameGameMode::FindArena()
 	check(Arena);
 }
 
-void ABladeIIGameGameMode::FindLocalPlayerInput()
+void ABladeIIGameMode::FindLocalPlayerInput()
 {
 	// Try to get a reference to the local player input actor
 	for (TActorIterator<ALocalPlayerInput> InputIter(GetWorld()); InputIter; ++InputIter)
@@ -189,13 +189,13 @@ void ABladeIIGameGameMode::FindLocalPlayerInput()
 	check(LocalPlayerInput);
 }
 
-void ABladeIIGameGameMode::SetupDealer()
+void ABladeIIGameMode::SetupDealer()
 {
 	Dealer = NewObject<UB2Dealer>(this, TEXT("Dealer"));
 	Dealer->Arena = Arena;
 }
 
-void ABladeIIGameGameMode::SetupSelector()
+void ABladeIIGameMode::SetupSelector()
 {
 	UObject* CardSelectorActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BladeIIGame/Blueprints/GameObjects/BP_CardSelector.BP_CardSelector"));
 	ensureMsgf(CardSelectorActor, TEXT("Could not load card selector actor - static load failed"));
@@ -209,7 +209,7 @@ void ABladeIIGameGameMode::SetupSelector()
 	Cursor = GetWorld()->SpawnActor<ACardSelector>(CardSelectorClass, FVector::ZeroVector, FRotator::ZeroRotator);
 }
 
-void ABladeIIGameGameMode::InitialiseBoard()
+void ABladeIIGameMode::InitialiseBoard()
 {
 	// Player Deck
 	for (int i = 0; i < GameState->Cards.PlayerDeck.Num(); ++i)
@@ -228,7 +228,7 @@ void ABladeIIGameGameMode::InitialiseBoard()
 	}
 }
 
-void ABladeIIGameGameMode::OnCardsDealt()
+void ABladeIIGameMode::OnCardsDealt()
 {
 	FVector SelectorStartingPosition = Arena->PlayerDeck->GetTransformForIndex(Arena->PlayerDeck->Count() - 1).Position;
 
@@ -238,12 +238,12 @@ void ABladeIIGameGameMode::OnCardsDealt()
 	GameState->bAcceptPlayerInput = true;
 	GameState->CursorPosition = ECardSlot::PlayerDeck;
 
-	GPSM->ChangeState<GPSM_Phase_DrawToEmptyField>();
+	GSM->ChangeState<GSM_State_DrawToEmptyField>();
 
 	EngineState = EEngineState::InPlay;
 }
 
-int32 ABladeIIGameGameMode::AggregateScore(UCardSlot* Slot) const
+int32 ABladeIIGameMode::AggregateScore(UCardSlot* Slot) const
 {
 	int32 Total = 0;
 
@@ -271,7 +271,7 @@ int32 ABladeIIGameGameMode::AggregateScore(UCardSlot* Slot) const
 	return Total;
 }
 
-void ABladeIIGameGameMode::UpdateCardState()
+void ABladeIIGameMode::UpdateCardState()
 {
 	// Player Deck
 	GameState->Cards.PlayerDeck.Empty(Arena->PlayerDeck->Count());
@@ -336,7 +336,7 @@ void ABladeIIGameGameMode::UpdateCardState()
 	Arena->ScoreDisplay->Update(GameState->PlayerScore, GameState->OpponentScore);
 }
 
-UCardSlot* ABladeIIGameGameMode::GetCardSlot(ECardSlot Slot) const
+UCardSlot* ABladeIIGameMode::GetCardSlot(ECardSlot Slot) const
 {
 	UCardSlot* CardSlot = nullptr;
 
@@ -373,7 +373,7 @@ UCardSlot* ABladeIIGameGameMode::GetCardSlot(ECardSlot Slot) const
 	return CardSlot;
 }
 
-void ABladeIIGameGameMode::HandleCardsReceived(const FB2Cards& Cards)
+void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
 	GameState = new B2GameState(Cards);
 
@@ -384,17 +384,17 @@ void ABladeIIGameGameMode::HandleCardsReceived(const FB2Cards& Cards)
 	Dealer->Deal();
 }
 
-void ABladeIIGameGameMode::HandleMoveReceived(const FB2Move& Move)
+void ABladeIIGameMode::HandleMoveReceived(const FB2Move& Move)
 {
 
 }
 
-void ABladeIIGameGameMode::HandleInstructionReceived(EInstruction Instruction)
+void ABladeIIGameMode::HandleInstructionReceived(EInstruction Instruction)
 {
 
 }
 
-void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
+void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 {
 	UpdateCardState();
 
@@ -404,7 +404,7 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 		OnCardsDealt();
 		break;
 	case EDealerEvent::CardPlaced:
-		if (GPSM->IsCurrentState(EGameState::DrawToEmptyField))
+		if (GSM->IsCurrentState(EGameState::DrawToEmptyField))
 		{
 			// Change state to the turn of the player with the highest score, or each draw another on draw
 			if (GameState->PlayerScore == GameState->OpponentScore)
@@ -426,9 +426,7 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 				GameState->Turn = ETurn::Undecided;
 
 				// Switch state machine to drawing from empty field
-				GPSM->ChangeState<GPSM_Phase_DrawToEmptyField>();
-
-				B2Utility::LogWarning(TEXT("GG"));
+				GSM->ChangeState<GSM_State_DrawToEmptyField>();
 			}
 			else if (GameState->PlayerScore > GameState->OpponentScore)
 			{
@@ -436,7 +434,7 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 				GameState->Turn = ETurn::Player;
 
 				// Switch state machine to player turn
-				GPSM->ChangeState<GPSM_Phase_PlayerTurn>();
+				GSM->ChangeState<GSM_State_PlayerTurn>();
 			}
 			else
 			{
@@ -444,7 +442,7 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 				//GameState->Turn = ETurn::Opponent;
 
 				//// Switch state machine to opponent turn
-				//GPSM->ChangeState<GPSM_Phase_WaitingForOpponentMove>();
+				//GSM->ChangeState<GSM_State_WaitingForOpponentMove>();
 
 				//// Fire off any animations / on screen stuff...
 
@@ -454,7 +452,7 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 				GameState->Turn = ETurn::Player;
 
 				// Switch state machine to player turn
-				GPSM->ChangeState<GPSM_Phase_PlayerTurn>();
+				GSM->ChangeState<GSM_State_PlayerTurn>();
 			}
 		}
 		break;
@@ -469,7 +467,7 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 			if (GameState->Turn == ETurn::Player)
 			{
 				// Switch state machine to player bolt
-				GPSM->ChangeState<GPSM_Phase_PlayerBolt>();
+				GSM->ChangeState<GSM_State_PlayerBolt>();
 			}
 			else
 			{
@@ -482,7 +480,7 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 			if (GameState->Turn == ETurn::Player)
 			{
 				// Switch state machine to player blast
-				GPSM->ChangeState<GPSM_Phase_PlayerBlast>();
+				GSM->ChangeState<GSM_State_PlayerBlast>();
 			}
 			else
 			{
@@ -496,7 +494,7 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 	}
 }
 
-void ABladeIIGameGameMode::HandleUIAnimationCompletionEvent()
+void ABladeIIGameMode::HandleUIAnimationCompletionEvent()
 {
 	GameState->bPendingEffectRequiresAction = true;
 }

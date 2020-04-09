@@ -2,14 +2,14 @@
 
 #include "CoreMinimal.h"
 
-#include "GPSM_Phase.h"
+#include "GSM_State.h"
 
-class GPSM_Phase_PlayerBlast : public GPSM_Phase
+class GSM_State_PlayerBlast : public GSM_State
 {
 public:
-	GPSM_Phase_PlayerBlast();
+	GSM_State_PlayerBlast();
 
-	virtual void Init(class ABladeIIGameGameMode* GameMode) override;
+	virtual void Init(class ABladeIIGameMode* GameMode) override;
 
 	virtual void Tick(float DeltaSeconds) override;
 

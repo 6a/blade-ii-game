@@ -1,23 +1,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GPSM_Phase.h"
+#include "GSM_State.h"
 
-class B2GPSM
+class B2GameStateMachine
 {
 public:
-	B2GPSM(class ABladeIIGameGameMode* GameMode);
+	B2GameStateMachine(class ABladeIIGameMode* GameMode);
 
 	/**
 	 * Ends the current state, and changes to the type of the template argument
-	 * @param GPSM_StateType - The state to switch to
+	 * @param GSM_State - The state to switch to
 	 */
-	template<class GPSM_StateType>
+	template<class GSM_State>
 	void ChangeState()
 	{
 		if (CurrentState) CurrentState->End();
 
-		CurrentState = new GPSM_StateType();
+		CurrentState = new GSM_State();
 		CurrentState->Init(GameModeInstance);
 	}
 
@@ -35,7 +35,7 @@ public:
 
 private:
 	UPROPERTY()
-	class ABladeIIGameGameMode* GameModeInstance;
+	class ABladeIIGameMode* GameModeInstance;
 
-	GPSM_Phase* CurrentState;
+	GSM_State* CurrentState;
 };
