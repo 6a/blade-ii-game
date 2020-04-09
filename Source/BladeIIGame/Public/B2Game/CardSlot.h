@@ -71,6 +71,12 @@ public:
 	virtual ACard* GetLast();
 
 	/**
+	 * Get a reference to the first card in the slot. For the field, its the first one placed, for hand its the closest from the deck, for the deck its the bottom one
+	 * @returns A pointer to the card
+	 */
+	virtual ACard* GetFirst();
+
+	/**
 	 * Return the position + rotation that a card with the index "Index" should have.
 	 * @param Index - The index for which the transform will be returned
 	 * @returns FB2Transform for index "Index"

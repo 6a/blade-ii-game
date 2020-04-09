@@ -730,8 +730,8 @@ void UB2Dealer::ClearField()
 	// Add a delay in so that there is some time between the cards being cleared and the next round starting
 	const float AddedDelay = 1.f;
 
-	ACard* PCard = Arena->PlayerDiscard->GetCardByIndex(0);
-	ACard* OCard = Arena->OpponentDiscard->GetCardByIndex(0);
+	ACard* PCard = Arena->PlayerDiscard->GetFirst();
+	ACard* OCard = Arena->OpponentDiscard->GetFirst();
 
 	ACard* DelayCard = PCard ? PCard : OCard;
 

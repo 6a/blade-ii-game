@@ -126,7 +126,19 @@ ACard* UCardSlot::GetLast()
 
 	if (Count() > 0)
 	{
-		Card = Cards[Count() - 1];
+		Card = Cards.Last();
+	}
+
+	return Card;
+}
+
+ACard* UCardSlot::GetFirst()
+{
+	ACard* Card = nullptr;
+
+	if (Count() > 0)
+	{
+		Card = Cards[0];
 	}
 
 	return Card;
