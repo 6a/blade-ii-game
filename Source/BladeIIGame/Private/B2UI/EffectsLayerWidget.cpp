@@ -1,5 +1,7 @@
 #include "B2UI/EffectsLayerWidget.h"
 
+#include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
+
 #include "B2Utility/Log.h"
 
 void UEffectsLayerWidget::Initialise()
@@ -84,5 +86,16 @@ FVector2D UEffectsLayerWidget::WorldToScreenOffset(FVector WorldPosition) const
 
     ScreenPosition.Y = -(ScreenHeight - ScreenPosition.Y);
 
-    return ScreenPosition;
+    return ScreenPosition * GetUIScale(LocalPlayerController);
+}
+
+float UEffectsLayerWidget::GetUIScale(APlayerController *LocalPlayerController) const
+{
+    // Ref: https://gist.github.com/JonathanADaley/151f26b145981336371b73def45209e7
+
+    FIntVector ViewportSize;
+
+    LocalPlayerController->GetViewportSize(ViewportSize.X, ViewportSize.Y);
+
+    return GetDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())->GetDPIScaleBasedOnSize(FIntPoint(ViewportSize.X, ViewportSize.Y));
 }

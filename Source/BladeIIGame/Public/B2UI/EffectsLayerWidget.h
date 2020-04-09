@@ -58,4 +58,7 @@ private:
 	 * @return The screen-space position
 	 */
 	FVector2D WorldToScreenOffset(FVector WorldPosition) const;
+
+	/* Returns the current UI scale */
+	float GetUIScale(APlayerController* LocalPlayerController) const;
 };
