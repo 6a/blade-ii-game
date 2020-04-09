@@ -30,10 +30,6 @@ void GPSM_Phase_DrawToEmptyField::Init(ABladeIIGameGameMode* GameMode)
 		GI->GetCursor()->ToggleActorVisibility(true);
 		GI->GetGameState()->bAcceptPlayerInput = true;
 		GI->GetGameState()->CursorPosition = ECardSlot::PlayerDeck;
-		GI->GetGameState()->PlayerScore = 0;
-		GI->GetGameState()->OpponentScore = 0;
-
-		GI->GetArena()->ScoreDisplay->Update(0, 0);
 	}
 }
 

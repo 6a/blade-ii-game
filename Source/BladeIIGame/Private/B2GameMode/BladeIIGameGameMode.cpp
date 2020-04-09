@@ -328,6 +328,12 @@ void ABladeIIGameGameMode::UpdateCardState()
 	{
 		GameState->Cards.OpponentDiscard.Add(Arena->OpponentDiscard->GetCardByIndex(i)->Type);
 	}
+
+	// Update scores
+	GameState->PlayerScore = AggregateScore(Arena->PlayerField);
+	GameState->OpponentScore = AggregateScore(Arena->OpponentField);
+
+	Arena->ScoreDisplay->Update(GameState->PlayerScore, GameState->OpponentScore);
 }
 
 UCardSlot* ABladeIIGameGameMode::GetCardSlot(ECardSlot Slot) const
@@ -400,10 +406,6 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 	case EDealerEvent::CardPlaced:
 		if (GPSM->IsCurrentState(EGamePhase::DrawToEmptyField))
 		{
-			// Update scores
-			GameState->PlayerScore = AggregateScore(Arena->PlayerField);
-			GameState->OpponentScore = AggregateScore(Arena->OpponentField);
-
 			// Change state to the turn of the player with the highest score, or each draw another on draw
 			if (GameState->PlayerScore == GameState->OpponentScore)
 			{
