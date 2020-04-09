@@ -25,9 +25,9 @@ public:
 	 * Returns true if the specified state is the same as the current state
 	 * @param State - The state to compare
 	 */
-    bool IsCurrentState(EGamePhase State)
+    bool IsCurrentState(EGameState State)
 	{
-		return State == CurrentState->GetStateType();
+		return State == CurrentState->Type();
 	}
 
 	/* Progress the current state of the state machine */

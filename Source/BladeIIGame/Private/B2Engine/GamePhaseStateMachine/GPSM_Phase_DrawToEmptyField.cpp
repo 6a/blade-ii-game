@@ -41,23 +41,23 @@ void GPSM_Phase_DrawToEmptyField::Tick(float DeltaSeconds)
 
 	if (GI->GetGameState()->bAcceptPlayerInput)
 	{
-		EButton Button;
+		EInput Button;
 		while (GI->GetLocalPlayerInput()->ButtonInputQueue.Dequeue(Button))
 		{
 			if (GI->GetGameState()->CursorPosition == ECardSlot::PlayerDeck)
 			{
 				// Early exit if we try to navigate off from the deck - shouldnt be able to do that
-				if ((Button == EButton::NavigateLeft || Button == EButton::NavigateRight))
+				if ((Button == EInput::NavigateLeft || Button == EInput::NavigateRight))
 				{
 					continue;
 				}
 
 				switch (Button)
 				{
-				case EButton::Menu:
+				case EInput::Menu:
 					// Handle menu open / close etc
 					break;
-				case EButton::Select:
+				case EInput::Select:
 					GI->GetCursor()->ToggleActorVisibility(false);
 
 					// From player deck to player field

@@ -4,7 +4,8 @@
 
 #include "B2Engine/Move.h"
 #include "B2Engine/Cards.h"
-#include "B2Misc/Enum.h"
+#include "B2Misc/Enum/PayloadEnum.h"
+#include "B2Misc/Enum/InstructionEnum.h"
 
 struct B2ServerUpdate
 {

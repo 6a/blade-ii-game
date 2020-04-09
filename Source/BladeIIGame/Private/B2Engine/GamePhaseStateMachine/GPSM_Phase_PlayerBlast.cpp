@@ -16,7 +16,7 @@ void GPSM_Phase_PlayerBlast::Init(ABladeIIGameGameMode* GameMode)
 	ABladeIIGameGameMode* GI = GameModeInstance;
 
 	// Play blast animation in the center of the screen
-	GI->GetEffectLayer()->Play(EEffect::Blast, nullptr, 0.0f, 0.5f);
+	GI->GetEffectLayer()->Play(EUIEffect::Blast, nullptr, 0.0f, 0.5f);
 }
 
 void GPSM_Phase_PlayerBlast::Tick(float DeltaSeconds)

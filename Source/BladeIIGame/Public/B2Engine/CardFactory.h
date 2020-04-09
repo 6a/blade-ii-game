@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "B2Game/Card.h"
-#include "B2Misc/Enum.h"
+#include "B2Misc/Enum/CardEnum.h"
 
 /* A wrapper for a card factory's initialization parameters */
 struct B2CardFactoryConfig

@@ -404,7 +404,7 @@ void ABladeIIGameGameMode::HandleDealerEvent(EDealerEvent Event)
 		OnCardsDealt();
 		break;
 	case EDealerEvent::CardPlaced:
-		if (GPSM->IsCurrentState(EGamePhase::DrawToEmptyField))
+		if (GPSM->IsCurrentState(EGameState::DrawToEmptyField))
 		{
 			// Change state to the turn of the player with the highest score, or each draw another on draw
 			if (GameState->PlayerScore == GameState->OpponentScore)

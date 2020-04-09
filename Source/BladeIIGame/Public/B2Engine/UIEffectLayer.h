@@ -33,7 +33,7 @@ public:
 	 * @param StartDelay - How long to wait before playing the effect
 	 * @param PostDelay - How long to wait after the effect has finished, before triggering the effect finished callback
 	 */
-	void Play(EEffect Effect, const FVector* TargetWorldPosition = nullptr, float StartDelay = 0.f, float PostDelay = 0.f);
+	void Play(EUIEffect Effect, const FVector* TargetWorldPosition = nullptr, float StartDelay = 0.f, float PostDelay = 0.f);
 
 private:
 	TSubclassOf<UEffectsLayerWidget> EffectsLayerWidgetClass;

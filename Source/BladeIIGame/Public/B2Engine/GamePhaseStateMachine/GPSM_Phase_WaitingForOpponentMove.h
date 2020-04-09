@@ -15,6 +15,6 @@ public:
 
 	virtual void End() override;
 
-	virtual EGamePhase GetStateType() override { return EGamePhase::WaitingForOpponentMove; }
+	virtual EGameState Type() const override { return EGameState::WaitingForOpponentMove; }
 };
 

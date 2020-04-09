@@ -40,7 +40,7 @@ void UB2UIEffectLayer::Tick(float DeltaSeconds)
 
 }
 
-void UB2UIEffectLayer::Play(EEffect Effect, const FVector* TargetWorldPosition, float StartDelay, float PostDelay)
+void UB2UIEffectLayer::Play(EUIEffect Effect, const FVector* TargetWorldPosition, float StartDelay, float PostDelay)
 {
 	EffectsLayerWidget->Play(Effect, TargetWorldPosition, StartDelay, PostDelay);
 }

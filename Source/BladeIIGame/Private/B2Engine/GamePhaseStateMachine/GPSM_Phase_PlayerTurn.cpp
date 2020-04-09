@@ -44,7 +44,7 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 
 	if (GI->GetGameState()->bAcceptPlayerInput)
 	{
-		EButton Button;
+		EInput Button;
 		while (GI->GetLocalPlayerInput()->ButtonInputQueue.Dequeue(Button))
 		{
 			ACardSelector* Cursor = GI->GetCursor();
@@ -53,7 +53,7 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 			{
 				switch (Button)
 				{
-				case EButton::NavigateLeft:
+				case EInput::NavigateLeft:
 				{
 					uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex > 0 ? GI->GetGameState()->CursorSlotIndex - 1 : GI->GetArena()->PlayerHand->Count() - 1;
 
@@ -71,7 +71,7 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 
 					break;
 				}
-				case EButton::NavigateRight:
+				case EInput::NavigateRight:
 				{
 					uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex < GI->GetArena()->PlayerHand->Count() - 1 ? GI->GetGameState()->CursorSlotIndex + 1 : 0;
 
@@ -89,10 +89,10 @@ void GPSM_Phase_PlayerTurn::Tick(float DeltaSeconds)
 
 					break;
 				}
-				case EButton::Menu:
+				case EInput::Menu:
 					// Handle menu open / close etc
 					break;
-				case EButton::Select:
+				case EInput::Select:
 					GI->GetCursor()->ToggleActorVisibility(false);
 
 					ACard* SelectedCard = GI->GetArena()->PlayerHand->GetCardByIndex(GI->GetGameState()->CursorSlotIndex);

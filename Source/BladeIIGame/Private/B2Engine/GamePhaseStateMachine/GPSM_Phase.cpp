@@ -22,9 +22,9 @@ void GPSM_Phase::End()
 
 }
 
-EGamePhase GPSM_Phase::GetStateType()
+EGameState GPSM_Phase::Type() const
 {
-	return EGamePhase::WaitingForInitialDeal;
+	return EGameState::WaitingForInitialDeal;
 }
 
 void GPSM_Phase::SetCurrentCardToOriginalTransform()

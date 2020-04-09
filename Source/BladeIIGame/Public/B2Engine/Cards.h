@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "B2Misc/Enum.h"
+#include "B2Misc/Enum/CardEnum.h"
 #include "Cards.generated.h"
 
 USTRUCT()

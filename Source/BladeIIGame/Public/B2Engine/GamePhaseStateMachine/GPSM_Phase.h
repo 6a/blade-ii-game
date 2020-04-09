@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "../../B2Misc/Enum.h"
+#include "../../B2Misc/Enum/GameStateEnum.h"
 
 class GPSM_Phase
 {
@@ -15,7 +15,7 @@ public:
 
 	virtual void End();
 
-	virtual EGamePhase GetStateType();
+	virtual EGameState Type() const;
 
 protected:
 	UPROPERTY()

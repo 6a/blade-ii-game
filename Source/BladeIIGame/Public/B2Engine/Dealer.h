@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "B2Game/Arena.h"
-#include "B2Misc/Enum.h"
+#include "B2Misc/Enum/DealerEventEnum.h"
 
 #include "Dealer.generated.h"
 

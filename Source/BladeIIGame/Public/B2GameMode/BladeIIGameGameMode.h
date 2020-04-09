@@ -12,6 +12,7 @@
 #include "B2Engine/UIEffectLayer.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
+#include "B2Misc/Enum/EngineStateEnum.h"
 
 // Game Phase State Machine
 #include "B2Engine/GamePhaseStateMachine/GPSM.h"

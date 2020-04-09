@@ -5,7 +5,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Containers/Queue.h"
 
-#include "B2Misc/Enum.h"
+#include "B2Misc/Enum/InputEnum.h"
 
 #include "LocalPlayerInput.generated.h"
 
@@ -15,7 +15,7 @@ class BLADEIIGAME_API ALocalPlayerInput : public APawn
 	GENERATED_BODY()
 
 public:
-	TQueue<EButton> ButtonInputQueue;
+	TQueue<EInput> ButtonInputQueue;
 
 	ALocalPlayerInput();
 
@@ -31,7 +31,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	enum ENavButton
+	enum class ENavButton : uint8
 	{
 		None,
 		Left,

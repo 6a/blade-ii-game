@@ -24,7 +24,7 @@ void ALocalPlayerInput::BeginPlay()
 
 void ALocalPlayerInput::OnMenuPressed()
 {
-	ButtonInputQueue.Enqueue(EButton::Menu);
+	ButtonInputQueue.Enqueue(EInput::Menu);
 
 	B2Utility::LogInfo(TEXT("Menu Pressed"));
 }
@@ -36,7 +36,7 @@ void ALocalPlayerInput::OnMouseButtonLeft()
 
 void ALocalPlayerInput::OnNavigateLeftPressed()
 {
-	ButtonInputQueue.Enqueue(EButton::NavigateLeft);
+	ButtonInputQueue.Enqueue(EInput::NavigateLeft);
 
 	NavButtonPriority = ENavButton::Left;
 	bIsLeftNavDown = true;
@@ -48,7 +48,7 @@ void ALocalPlayerInput::OnNavigateLeftPressed()
 
 void ALocalPlayerInput::OnNavigateRightPressed()
 {
-	ButtonInputQueue.Enqueue(EButton::NavigateRight);
+	ButtonInputQueue.Enqueue(EInput::NavigateRight);
 
 	NavButtonPriority = ENavButton::Right;
 	bIsRightNavDown = true;
@@ -86,7 +86,7 @@ void ALocalPlayerInput::OnNavigateRightReleased()
 
 void ALocalPlayerInput::OnSelectPressed()
 {
-	ButtonInputQueue.Enqueue(EButton::Select);
+	ButtonInputQueue.Enqueue(EInput::Select);
 
 	B2Utility::LogInfo(TEXT("Select Pressed"));
 }
@@ -121,7 +121,7 @@ void ALocalPlayerInput::HandleNavigationPolling()
 	{
 		if (GetWorld()->GetTimeSeconds() > NextPollTime)
 		{
-			ButtonInputQueue.Enqueue(EButton::NavigateLeft);
+			ButtonInputQueue.Enqueue(EInput::NavigateLeft);
 			NextPollTime = GetWorld()->GetTimeSeconds() + NAV_POLL_INTERVAL;
 		}
 	}
@@ -129,7 +129,7 @@ void ALocalPlayerInput::HandleNavigationPolling()
 	{
 		if (GetWorld()->GetTimeSeconds() > NextPollTime)
 		{
-			ButtonInputQueue.Enqueue(EButton::NavigateRight);
+			ButtonInputQueue.Enqueue(EInput::NavigateRight);
 			NextPollTime = GetWorld()->GetTimeSeconds() + NAV_POLL_INTERVAL;
 		}
 	}

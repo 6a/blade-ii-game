@@ -8,33 +8,33 @@ void UEffectsLayerWidget::Initialise()
     Bolt->OnEffectFinished.AddDynamic(this, &UEffectsLayerWidget::HandleEffectFinishedEvent);
 }
 
-void UEffectsLayerWidget::Play(EEffect Effect, const FVector* TargetWorldPosition, float StartDelay, float PostDelay)
+void UEffectsLayerWidget::Play(EUIEffect Effect, const FVector* TargetWorldPosition, float StartDelay, float PostDelay)
 {
     FVector2D Position = TargetWorldPosition ? WorldToScreenOffset(*TargetWorldPosition) : GetCenterOffset();
 
 	switch (Effect)
 	{
-    case EEffect::Rod:
+    case EUIEffect::Rod:
         break;
-    case EEffect::Bolt:
+    case EUIEffect::Bolt:
         Bolt->Play(Position, StartDelay, PostDelay);
         EffectSwitcher->SetActiveWidget(Bolt);
         break;
-    case EEffect::Mirror:
+    case EUIEffect::Mirror:
         break;
-    case EEffect::Blast:
+    case EUIEffect::Blast:
         Blast->Play(Position, StartDelay, PostDelay);
         EffectSwitcher->SetActiveWidget(Blast);
         break;
-    case EEffect::BlastTarget:
+    case EUIEffect::BlastTarget:
         break;
-    case EEffect::Force:
+    case EUIEffect::Force:
         break;
-    case EEffect::Draw:
+    case EUIEffect::Draw:
         break;
-    case EEffect::Win:
+    case EUIEffect::Win:
         break;
-    case EEffect::Loss:
+    case EUIEffect::Loss:
         break;
     default:
         break;

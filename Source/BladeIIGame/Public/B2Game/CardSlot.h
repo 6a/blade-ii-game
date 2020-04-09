@@ -5,7 +5,7 @@
 
 #include "Card.h"
 #include "Transform.h"
-#include "B2Misc/Enum.h"
+#include "B2Misc/Enum/CardSlotEnum.h"
 
 #include "CardSlot.generated.h"
 
