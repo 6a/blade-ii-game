@@ -82,5 +82,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-
+	/* Score display component */
+	UPROPERTY()
+	USceneComponent* CardRoot;
 };

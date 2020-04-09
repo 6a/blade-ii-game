@@ -63,6 +63,10 @@ AArena::AArena()
 	// Score display
 	ScoreDisplay = CreateDefaultSubobject<UScoreDisplay>(TEXT("Score Display"));
 	ScoreDisplay->SetupAttachment(MainMesh);
+
+	// Card root
+	CardRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Card Root"));
+	CardRoot->SetupAttachment(MainMesh);
 }
 
 // Called when the game starts or when spawned

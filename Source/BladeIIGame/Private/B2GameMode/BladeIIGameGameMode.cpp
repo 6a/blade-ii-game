@@ -22,17 +22,13 @@ const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 {
+	EngineState = EEngineState::Initialisation;
+
 	DefaultPawnClass = ALocalPlayerInput::StaticClass();
 
 	SetupLaunchConfig(ObjectInitializer);
 
-	SetupCardFactory();
-
-	SetupGPSM();
-
-	EngineState = EEngineState::Initialisation;
-
-	UIEffectLayer = NewObject<UB2UIEffectLayer>(this, TEXT("UI Effect Layer"));
+	CreateGSM();
 
 	B2Utility::LogInfo("GameMode initialized");
 }
@@ -69,17 +65,17 @@ void ABladeIIGameMode::StartPlay()
 
 	FindArena();
 
+	SetupCardFactory();
+
 	SetupDealer();
+
+	SetupSelector();
+
+	SetupUIEffectLayer();
 
 	FindLocalPlayerInput();
 
 	RegisterEventListeners();
-
-	SetupSelector();
-
-	UIEffectLayer->Initialise();
-
-	UIEffectLayer->OnEffectFinished.AddDynamic(this, &ABladeIIGameMode::HandleUIAnimationCompletionEvent);
 }
 
 void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)
@@ -140,7 +136,7 @@ void ABladeIIGameMode::SetupCardFactory()
 	CardFactory = new B2CardFactory(B2CardFactoryConfig);
 }
 
-void ABladeIIGameMode::SetupGPSM()
+void ABladeIIGameMode::CreateGSM()
 {
 	GSM = new B2GameStateMachine(this);
 	GSM->ChangeState<GSM_State_WaitingForInitialDeal>();
@@ -207,6 +203,15 @@ void ABladeIIGameMode::SetupSelector()
 	ensureMsgf(CardSelectorClass, TEXT("Could not get class from card selector blueprint"));
 
 	Cursor = GetWorld()->SpawnActor<ACardSelector>(CardSelectorClass, FVector::ZeroVector, FRotator::ZeroRotator);
+}
+
+void ABladeIIGameMode::SetupUIEffectLayer()
+{
+	UIEffectLayer = NewObject<UB2UIEffectLayer>(this, TEXT("UI Effect Layer"));
+
+	UIEffectLayer->Initialise();
+
+	UIEffectLayer->OnEffectFinished.AddDynamic(this, &ABladeIIGameMode::HandleUIAnimationCompletionEvent);
 }
 
 void ABladeIIGameMode::InitialiseBoard()

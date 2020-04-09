@@ -103,7 +103,7 @@ private:
 	void SetupCardFactory();
 
 	/* Set up the gameplay state machine */
-	void SetupGPSM();
+	void CreateGSM();
 
 	/* Set up any event listeners */
 	void RegisterEventListeners();
@@ -119,6 +119,9 @@ private:
 
 	/* Set up the card selector actor */
 	void SetupSelector();
+
+	/* Set up the UI Effect layer */
+	void SetupUIEffectLayer();
 
 	/* Set the board state based on the current state */
 	void InitialiseBoard();
