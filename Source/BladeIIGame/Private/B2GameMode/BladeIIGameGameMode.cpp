@@ -133,7 +133,7 @@ void ABladeIIGameMode::SetupCardFactory()
 	/* Pointer to current world */
 	B2CardFactoryConfig.World = GetWorld();
 
-	CardFactory = new B2CardFactory(B2CardFactoryConfig);
+	CardFactory = new B2CardFactory(B2CardFactoryConfig, Arena);
 }
 
 void ABladeIIGameMode::CreateGSM()

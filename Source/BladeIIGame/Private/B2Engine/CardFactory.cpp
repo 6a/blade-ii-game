@@ -5,7 +5,8 @@
 #include "B2Utility/Log.h"
 #include "B2Utility/String.h"
 
-B2CardFactory::B2CardFactory(const B2CardFactoryConfig& CardFactoryConfig)
+B2CardFactory::B2CardFactory(const B2CardFactoryConfig& CardFactoryConfig, AArena* Arena)
+	: Arena(Arena)
 {
 	LoadConfig(CardFactoryConfig);
 
@@ -35,6 +36,8 @@ ACard* B2CardFactory::Make(const ECard& Card, const FVector& StartingPosition, c
 
 	SpawnedCard->Mesh->SetMaterial(0, MaterialFront);
 	SpawnedCard->Mesh->SetMaterial(1, MaterialBack);
+
+	Arena->AttachCard(SpawnedCard);
 
 	return SpawnedCard;
 }

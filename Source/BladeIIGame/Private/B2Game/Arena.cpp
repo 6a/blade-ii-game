@@ -83,3 +83,7 @@ void AArena::Tick(float DeltaTime)
 
 }
 
+void AArena::AttachCard(ACard* Card)
+{
+	Card->AttachToComponent(CardRoot, FAttachmentTransformRules::KeepWorldTransform);
+}

@@ -78,6 +78,12 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	/**
+	 * Attaches the specified card to the card root
+	 * @param Card - The card to attach
+	 */
+	void AttachCard(ACard* Card);
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "B2Game/Card.h"
+#include "B2Game/Arena.h"
 #include "B2Enum/CardEnum.h"
 
 /* A wrapper for a card factory's initialization parameters */
@@ -24,8 +25,9 @@ public:
 	/**
 	 * Initialize this card factory with the specified configuration.
 	 * @param CardFactoryConfig - The configuration for this card factory
+	 * @param Arena - A pointer to the arena
 	 */
-	B2CardFactory(const B2CardFactoryConfig& CardFactoryConfig);
+	B2CardFactory(const B2CardFactoryConfig& CardFactoryConfig, AArena* Arena);
 
 	~B2CardFactory();
 
@@ -50,6 +52,9 @@ private:
 
 	/* Pointer to current world object */
 	UWorld* World;
+
+	/* Pointer to the current arena actor */
+	AArena* Arena;
 
 	/**
 	 * Load all the required classes, textures etc.
