@@ -5,7 +5,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Containers/Queue.h"
 
-#include "B2Misc/Enum/InputEnum.h"
+#include "B2Enum/InputEnum.h"
 
 #include "LocalPlayerInput.generated.h"
 

@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "B2Misc/Enum/EaseEnum.h"
+#include "B2Enum/EaseEnum.h"
 
 typedef int64 B2WaitGroup;
 const B2WaitGroup B2WaitGroupNone = -1;

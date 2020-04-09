@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "../../B2Misc/Enum/GameStateEnum.h"
+#include "../../B2Enum/GameStateEnum.h"
 
 class GSM_State
 {

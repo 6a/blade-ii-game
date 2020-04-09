@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "Opponent.h"
-#include "B2Misc/Enum/AIDifficultyEnum.h"
+#include "B2Enum/AIDifficultyEnum.h"
 
 #include "AIOpponent.generated.h"
 

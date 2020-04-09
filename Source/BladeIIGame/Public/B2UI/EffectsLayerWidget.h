@@ -5,7 +5,7 @@
 #include "Components/WidgetSwitcher.h"
 
 #include "EffectWidget.h"
-#include "B2Misc/Enum/UIEffectEnum.h"
+#include "B2Enum/UIEffectEnum.h"
 
 #include "EffectsLayerWidget.generated.h"
 

@@ -3,8 +3,8 @@
 #include "CoreMinimal.h"
 
 #include "Cards.h"
-#include "B2Misc/Enum/CardSlotEnum.h"
-#include "B2Misc/Enum/TurnEnum.h"
+#include "B2Enum/CardSlotEnum.h"
+#include "B2Enum/TurnEnum.h"
 
 struct B2GameState
 {

@@ -13,7 +13,7 @@
 #include "B2Engine/GameStateMachine/GSM.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
-#include "B2Misc/Enum/EngineStateEnum.h"
+#include "B2Enum/EngineStateEnum.h"
 
 #include "BladeIIGameMode.generated.h"
 

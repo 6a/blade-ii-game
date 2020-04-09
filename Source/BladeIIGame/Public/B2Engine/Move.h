@@ -2,8 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#include "B2Misc/Enum/CardEnum.h"
-#include "B2Misc/Enum/CardSlotEnum.h"
+#include "B2Enum/CardEnum.h"
+#include "B2Enum/CardSlotEnum.h"
 #include "Move.generated.h"
 
 USTRUCT()
