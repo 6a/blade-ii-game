@@ -1,0 +1,129 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+	
+		{
+			"name": "BladeIIGame (Debug)",
+			"request": "launch",
+			"preLaunchTask": "BladeIIGame Win64 Debug Build",
+			"program": "D:\\.sc\\github\\blade-ii-game\\Binaries\\Win64\\UE4-Win64-Debug.exe",
+			"args": [
+			],
+			"cwd": "D:\\Software\\UE4\\UE_4.22\\UE_4.24",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "BladeIIGame (DebugGame)",
+			"request": "launch",
+			"preLaunchTask": "BladeIIGame Win64 DebugGame Build",
+			"program": "D:\\.sc\\github\\blade-ii-game\\Binaries\\Win64\\UE4-Win64-DebugGame.exe",
+			"args": [
+			],
+			"cwd": "D:\\Software\\UE4\\UE_4.22\\UE_4.24",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "BladeIIGame (Development)",
+			"request": "launch",
+			"preLaunchTask": "BladeIIGame Win64 Development Build",
+			"program": "D:\\.sc\\github\\blade-ii-game\\Binaries\\Win64\\UE4.exe",
+			"args": [
+			],
+			"cwd": "D:\\Software\\UE4\\UE_4.22\\UE_4.24",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "BladeIIGame (Shipping)",
+			"request": "launch",
+			"preLaunchTask": "BladeIIGame Win64 Shipping Build",
+			"program": "D:\\.sc\\github\\blade-ii-game\\Binaries\\Win64\\UE4-Win64-Shipping.exe",
+			"args": [
+			],
+			"cwd": "D:\\Software\\UE4\\UE_4.22\\UE_4.24",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "BladeIIGame (Test)",
+			"request": "launch",
+			"preLaunchTask": "BladeIIGame Win64 Test Build",
+			"program": "D:\\.sc\\github\\blade-ii-game\\Binaries\\Win64\\UE4-Win64-Test.exe",
+			"args": [
+			],
+			"cwd": "D:\\Software\\UE4\\UE_4.22\\UE_4.24",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "BladeIIGameEditor (Debug)",
+			"request": "launch",
+			"preLaunchTask": "BladeIIGameEditor Win64 Debug Build",
+			"program": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Binaries\\Win64\\UE4Editor-Win64-Debug.exe",
+			"args": [
+				"D:\\.sc\\github\\blade-ii-game\\BladeIIGame.uproject"
+			],
+			"cwd": "D:\\Software\\UE4\\UE_4.22\\UE_4.24",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "BladeIIGameEditor (DebugGame)",
+			"request": "launch",
+			"preLaunchTask": "BladeIIGameEditor Win64 DebugGame Build",
+			"program": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Binaries\\Win64\\UE4Editor-Win64-DebugGame.exe",
+			"args": [
+				"D:\\.sc\\github\\blade-ii-game\\BladeIIGame.uproject"
+			],
+			"cwd": "D:\\Software\\UE4\\UE_4.22\\UE_4.24",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "BladeIIGameEditor (Development)",
+			"request": "launch",
+			"preLaunchTask": "BladeIIGameEditor Win64 Development Build",
+			"program": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Binaries\\Win64\\UE4Editor.exe",
+			"args": [
+				"D:\\.sc\\github\\blade-ii-game\\BladeIIGame.uproject"
+			],
+			"cwd": "D:\\Software\\UE4\\UE_4.22\\UE_4.24",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "Generate Project Files",
+			"type": "clr",
+			"request": "launch",
+			"program": "D:\\Software\\UE4\\UE_4.22\\UE_4.24\\Engine\\Binaries\\DotNET\\UnrealBuildTool.exe",
+			"console": "externalTerminal",
+			"args": [
+				"-projectfiles",
+				"-vscode",
+				"-project=\"D:\\.sc\\github\\blade-ii-game\\BladeIIGame.uproject\"",
+				"-game",
+				"-engine"
+			],
+			"internalConsoleOptions": "openOnSessionStart",
+			"cwd": "D:\\Software\\UE4\\UE_4.22\\UE_4.24"
+		}
+	]
+}

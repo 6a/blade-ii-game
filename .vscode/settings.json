@@ -1,0 +1,10 @@
+{
+	"files.exclude": {
+		"D:/.sc/github/blade-ii-game/.git": true,
+		"D:/.sc/github/blade-ii-game/.vs": true,
+		"D:/.sc/github/blade-ii-game/.vscode": true,
+		"D:/.sc/github/blade-ii-game/Content": true,
+		"D:/.sc/github/blade-ii-game/Intermediate": true,
+		"D:/.sc/github/blade-ii-game/Saved": true
+	}
+}
