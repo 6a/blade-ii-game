@@ -6,6 +6,7 @@
 
 #include "B2UI/EffectWidget.h"
 #include "B2Enum/UIEffectEnum.h"
+#include "B2Enum/UIEffectEventEnum.h"
 
 #include "EffectsLayerWidget.generated.h"
 
@@ -16,7 +17,7 @@ class BLADEIIGAME_API UEffectsLayerWidget : public UUserWidget
 
 public:
 	/* Event for when this effect finished playing */
-	FEffectFinishedDelegate OnEffectFinished;
+	FEffectEventDelegate OnEffectEvent;
 
 	void Initialise();
 
@@ -44,7 +45,7 @@ private:
 
 	/* Handle any effect finish events for the attached effect widgets */
 	UFUNCTION()
-	void HandleEffectFinishedEvent();
+	void HandleEffectEvent(EUIEffectEvent Event);
 
 	/**
 	 * Returns the center position of the screen (viewport)

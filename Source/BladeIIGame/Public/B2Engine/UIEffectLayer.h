@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "B2UI/EffectsLayerWidget.h"
+#include "B2Enum/UIEffectEventEnum.h"
 
 #include "UIEffectLayer.generated.h"
 
@@ -12,8 +13,7 @@ class UB2UIEffectLayer : public UObject
 	GENERATED_BODY()
 
 public:
-	/* Event for when this effect finished playing */
-	FEffectFinishedDelegate OnEffectFinished;
+	TQueue<EUIEffectEvent> EventQueue;
 
 	UB2UIEffectLayer();
 
@@ -42,6 +42,6 @@ private:
 	UEffectsLayerWidget* EffectsLayerWidget;
 
 	UFUNCTION()
-	void HandleEffectFinishedEvent();
+	void HandleEffectEvent(EUIEffectEvent Event);
 };
 

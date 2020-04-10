@@ -12,10 +12,15 @@ void UEffectWidget::Play(const FVector2D& InTargetScreenPosition, float StartDel
 
 void UEffectWidget::OnEffectFinishedBroadcast()
 {
-	if (OnEffectFinished.IsBound()) OnEffectFinished.Broadcast();
+	if (OnEffectEvent.IsBound()) OnEffectEvent.Broadcast(EUIEffectEvent::Finished);
 }
 
-void UEffectWidget::OnEffectReady()
+void UEffectWidget::EffectReady()
+{
+
+}
+
+void UEffectWidget::EffectFinished()
 {
 	if (GetWorld()->GetTimerManager().TimerExists(DelayedPlayHandle))
 	{

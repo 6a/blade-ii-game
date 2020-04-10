@@ -48,6 +48,7 @@ void ABladeIIGameMode::Tick(float DeltaSeconds)
 	}
 
 	LocalPlayerInput->ButtonInputQueue.Empty();
+	UIEffectLayer->EventQueue.Empty();
 }
 
 void ABladeIIGameMode::FinishTurn()
@@ -210,8 +211,6 @@ void ABladeIIGameMode::SetupUIEffectLayer()
 	UIEffectLayer = NewObject<UB2UIEffectLayer>(this, TEXT("UI Effect Layer"));
 
 	UIEffectLayer->Initialise();
-
-	UIEffectLayer->OnEffectFinished.AddDynamic(this, &ABladeIIGameMode::HandleUIAnimationCompletionEvent);
 }
 
 void ABladeIIGameMode::InitialiseBoard()
@@ -498,9 +497,4 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 
 		break;
 	}
-}
-
-void ABladeIIGameMode::HandleUIAnimationCompletionEvent()
-{
-	GameState->bPendingEffectRequiresAction = true;
 }

@@ -14,6 +14,7 @@
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
 #include "B2Enum/EngineStateEnum.h"
+#include "B2Enum/UIEffectEventEnum.h"
 
 #include "BladeIIGameMode.generated.h"
 
@@ -158,8 +159,4 @@ private:
 	 */
 	UFUNCTION()
 	void HandleDealerEvent(EDealerEvent Event);
-
-	/* Event handler for updates from the UI effect layer */
-	UFUNCTION()
-	void HandleUIAnimationCompletionEvent();
 };

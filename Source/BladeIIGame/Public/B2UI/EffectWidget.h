@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "B2Enum/UIEffectEventEnum.h"
 
 #include "EffectWidget.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEffectFinishedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEffectEventDelegate, EUIEffectEvent, Event);
 
 UCLASS()
 class BLADEIIGAME_API UEffectWidget : public UUserWidget
@@ -13,8 +14,8 @@ class BLADEIIGAME_API UEffectWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	/* Event for when this effect finished playing */
-	FEffectFinishedDelegate OnEffectFinished;
+	/* Event for when this effect is eithe ready or finished */
+	FEffectEventDelegate OnEffectEvent;
 
 	/**
 	 * Play the effect at the specified world position
@@ -41,9 +42,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
 	int32 Width;
 
+	/* Callback for when an animation is considered to be ready to active the effect */
+	UFUNCTION(BlueprintCallable, Category = "Events")
+	void EffectReady();
+
 	/* Callback for when an animation is considered to be finished */
 	UFUNCTION(BlueprintCallable, Category = "Events")
-	void OnEffectReady();
+	void EffectFinished();
 
 private:
 	/* The time (in seconds) to delay the effect finished callback */

@@ -6,8 +6,8 @@
 
 void UEffectsLayerWidget::Initialise()
 {
-    Blast->OnEffectFinished.AddDynamic(this, &UEffectsLayerWidget::HandleEffectFinishedEvent);
-    Bolt->OnEffectFinished.AddDynamic(this, &UEffectsLayerWidget::HandleEffectFinishedEvent);
+    Blast->OnEffectEvent.AddDynamic(this, &UEffectsLayerWidget::HandleEffectEvent);
+    Bolt->OnEffectEvent.AddDynamic(this, &UEffectsLayerWidget::HandleEffectEvent);
 }
 
 void UEffectsLayerWidget::Play(EUIEffect Effect, const FVector* TargetWorldPosition, float StartDelay, float PostDelay)
@@ -43,9 +43,9 @@ void UEffectsLayerWidget::Play(EUIEffect Effect, const FVector* TargetWorldPosit
 	}
 }
 
-void UEffectsLayerWidget::HandleEffectFinishedEvent()
+void UEffectsLayerWidget::HandleEffectEvent(EUIEffectEvent Event)
 {
-    if (OnEffectFinished.IsBound()) OnEffectFinished.Broadcast();
+    if (OnEffectEvent.IsBound()) OnEffectEvent.Broadcast(Event);
 }
 
 FVector2D UEffectsLayerWidget::GetCenterOffset() const

@@ -16,7 +16,7 @@ UB2UIEffectLayer::UB2UIEffectLayer()
 		EffectsLayerWidgetClass = ClassFinder.Class;
 	}
 
-	if (EffectsLayerWidget) EffectsLayerWidget->OnEffectFinished.AddDynamic(this, &UB2UIEffectLayer::HandleEffectFinishedEvent);
+	if (EffectsLayerWidget) EffectsLayerWidget->OnEffectEvent.AddDynamic(this, &UB2UIEffectLayer::HandleEffectEvent);
 }
 
 void UB2UIEffectLayer::Initialise()
@@ -32,7 +32,7 @@ void UB2UIEffectLayer::Initialise()
 	}
 
 	// Event listeners
-	EffectsLayerWidget->OnEffectFinished.AddDynamic(this, &UB2UIEffectLayer::HandleEffectFinishedEvent);
+	EffectsLayerWidget->OnEffectEvent.AddDynamic(this, &UB2UIEffectLayer::HandleEffectEvent);
 }
 
 void UB2UIEffectLayer::Tick(float DeltaSeconds)
@@ -45,7 +45,7 @@ void UB2UIEffectLayer::Play(EUIEffect Effect, const FVector* TargetWorldPosition
 	EffectsLayerWidget->Play(Effect, TargetWorldPosition, StartDelay, PostDelay);
 }
 
-void UB2UIEffectLayer::HandleEffectFinishedEvent()
+void UB2UIEffectLayer::HandleEffectEvent(EUIEffectEvent Event)
 {
-	if (OnEffectFinished.IsBound()) OnEffectFinished.Broadcast();
+	EventQueue.Enqueue(Event);
 }
