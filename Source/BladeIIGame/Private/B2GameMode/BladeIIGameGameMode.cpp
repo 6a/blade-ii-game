@@ -386,7 +386,8 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 
 	EngineState = EEngineState::Dealing;
 
-	Dealer->Deal();
+	// Dealer->Deal();
+	Dealer->FastDeal();
 }
 
 void ABladeIIGameMode::HandleMoveReceived(const FB2Move& Move)

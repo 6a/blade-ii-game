@@ -608,6 +608,116 @@ void UB2Dealer::Deal()
 	}
 }
 
+void UB2Dealer::FastDeal() 
+{
+	if (bCardsDealt)
+	{
+		B2Utility::LogWarning("Cards have already been dealt - cannot deal again");
+		return;
+	}
+
+	check(Arena);
+
+	bCardsDealt = true;
+
+	B2WaitGroup WG_Final = B2Transition::GetNextWaitGroup();
+
+	// Set the waitgroup for dealing
+	WaitGroupDealFinished = WG_Final + 1;
+
+	const float DelayOnStart = 0.5f;
+
+	// Player cards - into deck
+	for (int i = DECK_CAPACITY - 1; i >= 0; i--)
+	{
+		float Delay = DelayOnStart;
+
+		// Grab the card and slap it onto correlating hand slot position
+		ACard* Card = Arena->PlayerDeck->RemoveByIndex(i);
+
+		FVector TargetPosition;
+		FRotator TargetRotation;
+
+		if (i > 4)
+		{
+			TargetPosition = Arena->PlayerHand->GetTransformForIndex(i - 5).Position;
+			TargetRotation = Arena->PlayerHand->GetTransformForIndex(i - 5).Rotation;
+			Arena->PlayerHand->Add(Card);
+		}
+		else
+		{
+			TargetPosition = Arena->PlayerDeck->GetTransformForIndex(i).Position;
+			TargetRotation = Arena->PlayerDeck->GetTransformForIndex(i).Rotation;
+			Arena->PlayerDeck->Add(Card);
+		}
+
+		// Transition 1
+		B2TPosition Position
+		{
+			Card->GetActorLocation(),
+			TargetPosition,
+			FVector(0, 0, 0),
+			EEase::Linear,
+		};
+
+		B2TRotation Rotation
+		{
+			Card->GetActorRotation(),
+			TargetRotation,
+			EEase::Linear,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(WG_Final, Position, Rotation, 0.1f, Delay);
+		Card->QueueTransition(Transition);
+	}
+
+	// Opponent cards - into deck
+	for (int i = DECK_CAPACITY - 1; i >= 0; i--)
+	{
+		float Delay = DelayOnStart;
+
+		// Grab the card and slap it onto correlating hand slot position
+		ACard* Card = Arena->OpponentDeck->RemoveByIndex(i);
+
+		FVector TargetPosition;
+		FRotator TargetRotation;
+
+		if (i > 4)
+		{
+			TargetPosition = Arena->OpponentHand->GetTransformForIndex(i - 5).Position;
+			TargetRotation = Arena->OpponentHand->GetTransformForIndex(i - 5).Rotation;
+			Arena->OpponentHand->Add(Card);
+		}
+		else
+		{
+			TargetPosition = Arena->OpponentDeck->GetTransformForIndex(i).Position;
+			TargetRotation = Arena->OpponentDeck->GetTransformForIndex(i).Rotation;
+			Arena->OpponentDeck->Add(Card);
+		}
+
+		// Transition 1
+		B2TPosition Position
+		{
+			Card->GetActorLocation(),
+			TargetPosition,
+			FVector(0, 0, 0),
+			EEase::Linear,
+		};
+
+		B2TRotation Rotation
+		{
+			Card->GetActorRotation(),
+			TargetRotation,
+			EEase::Linear,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(WG_Final, Position, Rotation, 0.1f, Delay);
+		Card->QueueTransition(Transition);
+	}
+}
+
 void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot, const FVector& Arc, bool bUseWaitGroup)
 {
 	const float DelayOnStart = 0.2f;
@@ -762,8 +872,6 @@ void UB2Dealer::Tick(float DeltaSeconds)
 	if (bCardsDealt)
 	{
 		B2WaitGroup CurrentWaitGroup = B2Transition::GetCurrentWaitGroup();
-
-		//B2Utility::LogWarning(FString::Printf(TEXT("[[[%d | %d ]]]"), CurrentWaitGroup, WaitGroupCardMoveFinished));
 
 		// Various wait groups checked with if else - wait groups are not constant so cant use a switch statement
 

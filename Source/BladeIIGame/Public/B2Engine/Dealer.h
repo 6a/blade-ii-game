@@ -26,6 +26,9 @@ public:
 	/* Deal the cards out onto the arena. Can only be called once */
 	void Deal();
 
+	/* Deal onto the board immediately with minimal delay - for testing */
+	void FastDeal();
+
 	/**
 	 * Move a card from the source slot + index to the target slot (at the next available position).
 	 * @param SourceSlot - The CardSlot from which to get the card
