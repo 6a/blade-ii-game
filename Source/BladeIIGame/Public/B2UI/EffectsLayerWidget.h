@@ -4,7 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetSwitcher.h"
 
-#include "EffectWidget.h"
+#include "B2UI/EffectWidget.h"
 #include "B2Enum/UIEffectEnum.h"
 
 #include "EffectsLayerWidget.generated.h"
@@ -59,6 +59,10 @@ private:
 	 */
 	FVector2D WorldToScreenOffset(FVector WorldPosition) const;
 
-	/* Returns the current UI scale */
+	/**
+	 * Returns the UI scale based on the current screen resolution
+	 * @param LocalPlayerController - A pointer to the local player controller
+	 * @return The UI scale
+	 */
 	float GetUIScale(APlayerController* LocalPlayerController) const;
 };
