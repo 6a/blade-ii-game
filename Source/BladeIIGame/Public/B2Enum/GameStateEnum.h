@@ -14,4 +14,6 @@ enum class EGameState : uint8
 	SelectingFromOpponentHand UMETA(DisplayName = "Selecting a card from the opponents hand"),
 	PlayerBolt UMETA(DisplayName = "Player bolt"),
 	OpponentBolt UMETA(DisplayName = "Opponent bolt"),
+	PlayerBlast UMETA(DisplayName = "Player bolt"),
+	OpponentBlast UMETA(DisplayName = "Opponent bolt"),
 };

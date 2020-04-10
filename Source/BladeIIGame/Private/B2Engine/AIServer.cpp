@@ -11,7 +11,7 @@ const B2ServerUpdate B2AIServer::GetNextUpdate()
 	{
 		bCardsSent = true;
 		Payload.Type = EPayload::Cards;
-		Payload.Cards = BoltTest();
+		Payload.Cards = BlastTest();
 	}
 
 	return Payload;
@@ -24,6 +24,19 @@ FB2Cards B2AIServer::BoltTest() const
 	for (int i = 14; i >= 0; i--)
 	{
 		Cards.PlayerDeck.Add(ECard::Bolt);
+		Cards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+	}
+
+	return Cards;
+}
+
+FB2Cards B2AIServer::BlastTest() const
+{
+	FB2Cards Cards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		Cards.PlayerDeck.Add(ECard::Blast);
 		Cards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
 	}
 

@@ -18,11 +18,5 @@ public:
 	virtual EGameState Type() const override { return EGameState::PlayerBolt; }
 
 private:
-
-	/* The time at which to call the finish function */
-	float TimeToCallFinishFunction;
-
-	/* Whether or not the finish function needs to be called */
-	bool bIsPendingFinishCall;
 };
 

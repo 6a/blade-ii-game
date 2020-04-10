@@ -15,6 +15,6 @@ public:
 
 	virtual void End() override;
 
-	virtual EGameState Type() const override { return EGameState::PlayerBolt; }
+	virtual EGameState Type() const override { return EGameState::PlayerBlast; }
 };
 

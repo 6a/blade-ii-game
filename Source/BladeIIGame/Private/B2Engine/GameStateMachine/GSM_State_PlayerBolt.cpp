@@ -21,8 +21,6 @@ void GSM_State_PlayerBolt::Init(ABladeIIGameMode* GameMode)
 	EUIEffect Effect = EUIEffect::Bolt;
 	FVector TargetWorldPosition = GI->GetArena()->OpponentField->GetLast()->GetActorLocation();
 	GI->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 0.25f, 0.4f);
-
-	bIsPendingFinishCall = false;
 }
 
 void GSM_State_PlayerBolt::Tick(float DeltaSeconds)
@@ -66,20 +64,6 @@ void GSM_State_PlayerBolt::Tick(float DeltaSeconds)
 
 			// Signal to the game mode that the turn has finished
 			GI->FinishTurn();
-		}
-	}
-
-	if (GI->GetGameState()->bPendingEffectRequiresAction)
-	{
-
-	}
-	else if (bIsPendingFinishCall)
-	{
-		if (GI->GetWorld()->GetTimeSeconds() > TimeToCallFinishFunction)
-		{
-
-
-			bIsPendingFinishCall = false;
 		}
 	}
 }

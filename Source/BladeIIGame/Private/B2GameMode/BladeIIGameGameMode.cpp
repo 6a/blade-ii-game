@@ -54,6 +54,15 @@ void ABladeIIGameMode::Tick(float DeltaSeconds)
 void ABladeIIGameMode::FinishTurn()
 {
 	UpdateCardState();
+	
+	if (GSM->IsCurrentState(EGameState::PlayerBlast))
+	{
+		// Set to player blast select state
+	}
+	else if (GSM->IsCurrentState(EGameState::OpponentBlast))
+	{
+		// Set to opponent blast select state
+	}
 
 	FString Turn = GameState->Turn == ETurn::Player ? TEXT("Player's") : TEXT("Opponent's");
 

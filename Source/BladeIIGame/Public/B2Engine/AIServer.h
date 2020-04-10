@@ -16,4 +16,5 @@ private:
 
 	/* Testing card setups */
 	FB2Cards BoltTest() const;
+	FB2Cards BlastTest() const;
 };
