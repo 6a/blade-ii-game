@@ -13,4 +13,7 @@ class B2AIServer : public B2Server
 private:
 	/* TODO testing only - remove later  */
 	bool bCardsSent = false;
+
+	/* Testing card setups */
+	FB2Cards BoltTest() const;
 };

@@ -6,27 +6,26 @@ const B2ServerUpdate B2AIServer::GetNextUpdate()
 {
 	B2ServerUpdate Payload = B2Server::GetNextUpdate();
 
-	// Current has a test implementation that just sends random cards
+	// Currently has a test implementation that just sends random cards
 	if (!bCardsSent)
 	{
 		bCardsSent = true;
 		Payload.Type = EPayload::Cards;
-		Payload.Cards = FB2Cards();
-
-		// Player Deck
-		for (int i = 14; i >= 0; --i)
-		{
-			ECard Card = static_cast<ECard>(ECard::Bolt);
-			Payload.Cards.PlayerDeck.Add(Card);
-		}
-
-		// Opponent Deck
-		for (int i = 14; i >= 0; --i)
-		{
-			ECard Card = static_cast<ECard>(FMath::RandRange(0, MAX_ECARD_VALUE));
-			Payload.Cards.OpponentDeck.Add(Card);
-		}
+		Payload.Cards = BoltTest();
 	}
 
 	return Payload;
+}
+
+FB2Cards B2AIServer::BoltTest() const
+{
+	FB2Cards Cards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		Cards.PlayerDeck.Add(ECard::Bolt);
+		Cards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+	}
+
+	return Cards;
 }
