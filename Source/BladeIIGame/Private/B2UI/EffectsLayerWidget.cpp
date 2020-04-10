@@ -50,22 +50,8 @@ void UEffectsLayerWidget::HandleEffectFinishedEvent()
 
 FVector2D UEffectsLayerWidget::GetCenterOffset() const
 {
-    APlayerController* LocalPlayerController = GetWorld()->GetFirstPlayerController();
-
-    FVector2D ScreenPosition;
-
-    if (LocalPlayerController)
-    {
-        int32 ScreenWidth;
-        int32 ScreenHeight;
-
-        LocalPlayerController->GetViewportSize(ScreenWidth, ScreenHeight);
-
-        ScreenPosition.X = ScreenWidth / 2.0f;
-        ScreenPosition.Y = ScreenHeight - (ScreenHeight / 2.0f);
-    }
-
-    return ScreenPosition;
+    // All the effect widgets should be centered now so a position of [0, 0] is the default
+    return FVector2D::ZeroVector;
 }
 
 FVector2D UEffectsLayerWidget::WorldToScreenOffset(FVector WorldPosition) const
@@ -84,9 +70,13 @@ FVector2D UEffectsLayerWidget::WorldToScreenOffset(FVector WorldPosition) const
 
     LocalPlayerController->GetViewportSize(ScreenWidth, ScreenHeight);
 
-    ScreenPosition.Y = -(ScreenHeight - ScreenPosition.Y);
+    ScreenPosition.X -= ScreenWidth / 2;
+    ScreenPosition.Y -= ScreenHeight / 2;
+    ScreenPosition /= GetUIScale(LocalPlayerController);
 
-    return ScreenPosition * GetUIScale(LocalPlayerController);
+    B2Utility::LogInfo(ScreenPosition.ToString());
+
+    return ScreenPosition;
 }
 
 float UEffectsLayerWidget::GetUIScale(APlayerController *LocalPlayerController) const

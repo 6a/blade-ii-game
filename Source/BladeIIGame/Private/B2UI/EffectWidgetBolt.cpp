@@ -8,9 +8,6 @@ void UEffectWidgetBolt::Play(const FVector2D& InTargetScreenPosition, float Star
 {
 	Super::Play(InTargetScreenPosition, StartDelay, InPostDelay);
 
-	// Offset the target screen position as I havent been able to figure out how to center the damn pivot reeeeeee
-	TargetScreenPosition.X -= (Width / 2.f);
-
 	if (GetWorld()->GetTimerManager().TimerExists(DelayedPlayHandle))
 	{
 		GetWorld()->GetTimerManager().ClearTimer(DelayedPlayHandle);
@@ -26,11 +23,28 @@ void UEffectWidgetBolt::Play(const FVector2D& InTargetScreenPosition, float Star
 	}
 }
 
+
+#include "Components/WidgetSwitcherSlot.h"
+
 void UEffectWidgetBolt::RunAnimation()
 {
-	FWidgetTransform CurrentTransform(RenderTransform);
-	CurrentTransform.Translation = TargetScreenPosition;
-	SetRenderTransform(CurrentTransform);
+	UWidgetSwitcherSlot* WSSlot = Cast<UWidgetSwitcherSlot>(Slot);
+
+	float NewX = TargetScreenPosition.X / 2;
+	float NewY = TargetScreenPosition.Y / 2;
+
+	if (WSSlot)
+	{
+		FMargin NewMargin
+		{
+			NewX,		// Left
+			NewY,		// Top
+			-NewX,		// Right
+			-NewY		// Bottom
+		};
+
+		WSSlot->SetPadding(NewMargin);
+	}
 
 	PlayAnimation(EffectAnimation);
 }

@@ -16,7 +16,7 @@ const B2ServerUpdate B2AIServer::GetNextUpdate()
 		// Player Deck
 		for (int i = 14; i >= 0; --i)
 		{
-			ECard Card = static_cast<ECard>(FMath::RandRange(0, MAX_ECARD_VALUE));
+			ECard Card = static_cast<ECard>(ECard::Bolt);
 			Payload.Cards.PlayerDeck.Add(Card);
 		}
 
