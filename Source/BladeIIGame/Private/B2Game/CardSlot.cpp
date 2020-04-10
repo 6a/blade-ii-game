@@ -121,6 +121,19 @@ ACard* UCardSlot::RemoveByID(FString ID)
 	return Card;
 }
 
+ACard* UCardSlot::RemoveLast()
+{
+	ACard* Card = nullptr;
+
+	if (Num() > 0)
+	{
+		Card = RemoveByIndex(Num() - 1);
+	}
+
+	return Card;
+
+}
+
 ACard* UCardSlot::GetLast()
 {
 	ACard* Card = nullptr;
@@ -155,6 +168,19 @@ const FB2Transform UCardSlot::GetTransformForIndex(uint32 Index) const
 	}
 
 	return Transform;
+}
+
+const FB2Transform UCardSlot::GetNextTransform() const
+{
+	uint32 TransformIndex = Num();
+
+	if (!CardTransforms.IsValidIndex(TransformIndex))
+	{
+		TransformIndex = CardTransforms.Num() - 1;
+	}
+
+
+	return CardTransforms[TransformIndex];
 }
 
 void UCardSlot::UpdateCardOrder()

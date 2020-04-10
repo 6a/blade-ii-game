@@ -17,7 +17,7 @@ void UEffectWidget::OnEffectFinishedBroadcast()
 
 void UEffectWidget::EffectReady()
 {
-
+	if (OnEffectEvent.IsBound()) OnEffectEvent.Broadcast(EUIEffectEvent::Ready);
 }
 
 void UEffectWidget::EffectFinished()

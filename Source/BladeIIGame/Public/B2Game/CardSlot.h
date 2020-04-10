@@ -51,6 +51,18 @@ public:
 	virtual int GetIndexByID(FString ID);
 
 	/**
+	 * Get a reference to the last card in the slot. For the field, its the lastest one placed, for hand its the furthest from the deck, for the deck its the top one
+	 * @returns A pointer to the card
+	 */
+	virtual ACard* GetLast();
+
+	/**
+	 * Get a reference to the first card in the slot. For the field, its the first one placed, for hand its the closest from the deck, for the deck its the bottom one
+	 * @returns A pointer to the card
+	 */
+	virtual ACard* GetFirst();
+
+	/**
 	 * Remove the card at index N 
 	 * @param N - The index of the card to remove
 	 * @returns A pointer to the removed card
@@ -65,16 +77,10 @@ public:
 	virtual ACard* RemoveByID(FString ID);
 
 	/**
-	 * Get a reference to the last card in the slot. For the field, its the lastest one placed, for hand its the furthest from the deck, for the deck its the top one
-	 * @returns A pointer to the card
+	 * Remove the last card in this slot
+	 * @returns A pointer to the removed card
 	 */
-	virtual ACard* GetLast();
-
-	/**
-	 * Get a reference to the first card in the slot. For the field, its the first one placed, for hand its the closest from the deck, for the deck its the bottom one
-	 * @returns A pointer to the card
-	 */
-	virtual ACard* GetFirst();
+	virtual ACard* RemoveLast();
 
 	/**
 	 * Return the position + rotation that a card with the index "Index" should have.
@@ -82,6 +88,12 @@ public:
 	 * @returns FB2Transform for index "Index"
 	 */
 	const virtual FB2Transform GetTransformForIndex(uint32 Index) const;
+
+	/**
+	 * Return the next available (empty) position's transform
+	 * @returns the next available position's transform
+	 */
+	const virtual FB2Transform GetNextTransform() const;
 
 	/* Updates the internal container so that the cards are in the right order */
 	virtual void UpdateCardOrder();
