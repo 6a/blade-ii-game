@@ -35,11 +35,11 @@ protected:
 
 	/* Positions for the players score */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Configuration)
-	TArray<FVector> PlayerScoreDigitPositions;
+	FVector PlayerDigitAnchor;
 
 	/* Positions for the opponents score */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Configuration)
-	TArray<FVector> OpponentScoreDigitPositions;
+	FVector OpponentDigitAnchor;
 
 private:
 	/* Root scene component for digit pool */

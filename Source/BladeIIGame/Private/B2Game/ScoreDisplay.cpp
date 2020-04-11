@@ -8,6 +8,7 @@ const uint32 DIGIT_MAX = 9;
 const uint32 DIGIT_POOL_SIZE = 4;
 const FString DIGIT_PATH_ROOT = "StaticMesh'/Game/BladeIIGame/Meshes/Digits/SM_Digit__";
 const FVector HIDDEN_DIGIT_LOCATION = FVector(0, 0, -20);
+const float SPACING = 0.5f;
 
 UScoreDisplay::UScoreDisplay()
 {
@@ -35,7 +36,7 @@ UScoreDisplay::UScoreDisplay()
 		}
 	}
 
-	CurrentPlayerScore = CurrentOpponentScore = INT32_MAX;
+	CurrentPlayerScore = CurrentOpponentScore = UINT32_MAX;
 }
 
 void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
@@ -78,7 +79,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 
 		if (Digits.Num() == 1)
 		{
-			FVector Position = (PlayerScoreDigitPositions[0] + PlayerScoreDigitPositions[1]) / 2;
+			FVector Position = PlayerDigitAnchor;
 			Digits[0]->SetWorldLocation(Position);
 			Digits[0]->SetVisibility(true);
 
@@ -86,9 +87,15 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 		}
 		else
 		{
-			for (size_t i = 0; i < 2; i++)
+			float TotalDigitWidth = Digits[0]->Bounds.GetBox().GetSize().X + Digits[1]->Bounds.GetBox().GetSize().X;
+			TotalDigitWidth += SPACING;
+
+			FVector Offset = FVector(TotalDigitWidth * 0.5f, 0, 0);
+			TArray<FVector> NewPositions = { PlayerDigitAnchor + Offset, PlayerDigitAnchor - Offset };
+
+			for (size_t i = 0; i < NewPositions.Num(); i++)
 			{
-				Digits[i]->SetWorldLocation(PlayerScoreDigitPositions[1-i]);
+				Digits[i]->SetWorldLocation(NewPositions[i]);
 				Digits[i]->SetVisibility(true);
 				PlayerDigits.Add(Digits[i]);
 			}
@@ -129,7 +136,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 
 		if (Digits.Num() == 1)
 		{
-			FVector Position = (OpponentScoreDigitPositions[0] + OpponentScoreDigitPositions[1]) / 2;
+			FVector Position = OpponentDigitAnchor;
 			Digits[0]->SetWorldLocation(Position);
 			Digits[0]->SetVisibility(true);
 
@@ -137,9 +144,15 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 		}
 		else
 		{
-			for (size_t i = 0; i < 2; i++)
+			float TotalDigitWidth = Digits[0]->Bounds.GetBox().GetSize().X + Digits[1]->Bounds.GetBox().GetSize().X;
+			TotalDigitWidth += SPACING;
+
+			FVector Offset = FVector(TotalDigitWidth * 0.5f, 0, 0);
+			TArray<FVector> NewPositions = { OpponentDigitAnchor + Offset, OpponentDigitAnchor - Offset };
+
+			for (size_t i = 0; i < NewPositions.Num(); i++)
 			{
-				Digits[i]->SetWorldLocation(OpponentScoreDigitPositions[1 - i]);
+				Digits[i]->SetWorldLocation(NewPositions[i]);
 				Digits[i]->SetVisibility(true);
 				OpponentDigits.Add(Digits[i]);
 			}
