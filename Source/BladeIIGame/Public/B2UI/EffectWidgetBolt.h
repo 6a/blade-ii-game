@@ -24,6 +24,5 @@ public:
 private:
 
 	/* Run the animation for this widget */
-	UFUNCTION()
-	void RunAnimation();
+	virtual void RunAnimation() override;
 };

@@ -16,11 +16,11 @@ void UEffectWidget::Play(const FVector2D& InTargetScreenPosition, float StartDel
 
 	if (StartDelay > 0)
 	{
-		GetWorld()->GetTimerManager().SetTimer(DelayedPlayHandle, RunAnimationCallback, StartDelay, false);
+		GetWorld()->GetTimerManager().SetTimer(DelayedPlayHandle, this, &UEffectWidget::RunAnimation, StartDelay, false);
 	}
 	else
 	{
-		RunAnimationCallback.ExecuteIfBound();
+		RunAnimation();
 	}
 }
 

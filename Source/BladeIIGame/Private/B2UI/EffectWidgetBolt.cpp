@@ -7,8 +7,6 @@
 
 void UEffectWidgetBolt::Play(const FVector2D& InTargetScreenPosition, float StartDelay, float InPostDelay)
 {
-	RunAnimationCallback.BindUFunction(this, FName("RunAnimation"));
-
 	Super::Play(InTargetScreenPosition, StartDelay, InPostDelay);
 }
 
