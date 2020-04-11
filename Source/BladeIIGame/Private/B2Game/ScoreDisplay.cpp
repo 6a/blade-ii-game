@@ -121,7 +121,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 			TotalDigitWidth += SPACING;
 
 			FVector Offset = FVector(TotalDigitWidth * 0.5f, 0, 0);
-			TArray<FVector> NewPositions = { PlayerDigitAnchor + Offset, PlayerDigitAnchor - Offset };
+			TArray<FVector> NewPositions = { PlayerDigitAnchor - Offset, PlayerDigitAnchor + Offset };
 
 			for (size_t i = 0; i < NewPositions.Num(); i++)
 			{
@@ -178,7 +178,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 			TotalDigitWidth += SPACING;
 
 			FVector Offset = FVector(TotalDigitWidth * 0.5f, 0, 0);
-			TArray<FVector> NewPositions = { OpponentDigitAnchor + Offset, OpponentDigitAnchor - Offset };
+			TArray<FVector> NewPositions = { PlayerDigitAnchor - Offset, PlayerDigitAnchor + Offset };
 
 			for (size_t i = 0; i < NewPositions.Num(); i++)
 			{
@@ -190,10 +190,20 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 	}
 }
 
-void UScoreDisplay::Highlight(ETurn Turn)
+void UScoreDisplay::Highlight(EPlayer Target)
 {
+	// Only change if the incoming value is different to the current
+	if (Target == CurrentlyHighlightTarget)
+	{
+		return;
+	}
+	else
+	{
+		CurrentlyHighlightTarget = Target;
+	}
+
 	// Reset all digits to the standard mesh
-	// One of these calls may be redundant (when Turn is NOT undecided) but there should be any overhead
+	// One of these calls may be redundant (when Target is NOT undecided) but there should be any overhead
 	// As both changes are before the next render call anyway
 	for (UStaticMeshComponent * SMC : PlayerDigits)
 	{
@@ -209,7 +219,7 @@ void UScoreDisplay::Highlight(ETurn Turn)
 	DigitHighlighter->SetVisibility(false);
 	DigitHighlighter->SetWorldLocation(HIDDEN_LOCATION);
 
-	if (Turn == ETurn::Player)
+	if (Target == EPlayer::Player)
 	{
 		for (UStaticMeshComponent* SMC : PlayerDigits)
 		{
@@ -219,7 +229,7 @@ void UScoreDisplay::Highlight(ETurn Turn)
 		DigitHighlighter->SetVisibility(true);
 		DigitHighlighter->SetWorldLocation(PlayerDigitAnchor);
 	}
-	else if (Turn == ETurn::Opponent)
+	else if (Target == EPlayer::Opponent)
 	{
 		for (UStaticMeshComponent* SMC : OpponentDigits)
 		{
