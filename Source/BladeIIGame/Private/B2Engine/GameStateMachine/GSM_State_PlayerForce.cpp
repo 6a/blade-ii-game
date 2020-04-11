@@ -25,7 +25,7 @@ void GSM_State_PlayerForce::Init(ABladeIIGameMode* GameMode)
 	ACard* CurrentForceCard = RemoveCurrentCard();
 
 	// TODO implement 0.4s delay with animations (scale and alpha needed it seems)
-	CurrentForceCard->SetActive(false);
+	CurrentForceCard->SetActorHiddenInGame(true);
 
 	FB2Transform NewTransform = GI->GetArena()->PlayerField->GetNextTransform();
 	CurrentForceCard->SetActorLocationAndRotation(NewTransform.Position, NewTransform.Rotation);
@@ -45,14 +45,12 @@ void GSM_State_PlayerForce::Tick(float DeltaSeconds)
 		{
 			GI->UpdateCardState();
 
-
+			// Get the placed force card - TODO animate
+			ACard* UsedForceCard = GI->GetArena()->PlayerField->GetLast();
+			UsedForceCard->SetActorHiddenInGame(false);
 		}
 		else if (Event == EUIEffectEvent::Finished)
 		{
-			// Remove the bolt card from the players hand
-			ACard* UsedForceCard = GetCurrentCard();
-			UsedForceCard->SetActive(true);
-
 			// Signal to the game mode that the turn has finished
 			GI->FinishTurn();
 		}

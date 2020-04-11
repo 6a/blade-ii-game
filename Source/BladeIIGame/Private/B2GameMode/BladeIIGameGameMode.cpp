@@ -267,7 +267,7 @@ int32 ABladeIIGameMode::AggregateScore(UCardSlot* Slot) const
 
 		if (Card->IsActive())
 		{
-			if (Card->Type > ECard::Force)
+			if (Card->Type == ECard::Force && i > 0)
 			{
 				Total *= 2;
 			}

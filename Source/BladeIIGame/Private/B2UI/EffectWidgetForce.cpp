@@ -30,7 +30,5 @@ void UEffectWidgetForce::RunAnimation()
 		WSSlot->SetPadding(NewMargin);
 	}
 
-	B2Utility::LogWarning("FFFF");
-
 	PlayAnimation(EffectAnimation);
 }

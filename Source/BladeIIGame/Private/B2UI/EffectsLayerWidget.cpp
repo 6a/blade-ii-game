@@ -6,8 +6,12 @@
 
 void UEffectsLayerWidget::Initialise()
 {
-    Blast->OnEffectEvent.AddDynamic(this, &UEffectsLayerWidget::HandleEffectEvent);
+    Rod->OnEffectEvent.AddDynamic(this, &UEffectsLayerWidget::HandleEffectEvent);
     Bolt->OnEffectEvent.AddDynamic(this, &UEffectsLayerWidget::HandleEffectEvent);
+    Mirror->OnEffectEvent.AddDynamic(this, &UEffectsLayerWidget::HandleEffectEvent);
+    Blast->OnEffectEvent.AddDynamic(this, &UEffectsLayerWidget::HandleEffectEvent);
+    BlastTarget->OnEffectEvent.AddDynamic(this, &UEffectsLayerWidget::HandleEffectEvent);
+    Force->OnEffectEvent.AddDynamic(this, &UEffectsLayerWidget::HandleEffectEvent);
 }
 
 void UEffectsLayerWidget::Play(EUIEffect Effect, const FVector* TargetWorldPosition, float StartDelay, float PostDelay)
