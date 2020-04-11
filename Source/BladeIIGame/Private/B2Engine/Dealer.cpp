@@ -812,8 +812,7 @@ void UB2Dealer::Mirror()
 
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
 
-	// For this transition, we need to get all the cards in advance, as we need to immediately update their orders in the cardslot
-	// so that the score can be recalculated
+	// Perform all the swaps in advance
 
 	TArray<ACard*> PlayerField = Arena->PlayerField->RemoveAll();
 	TArray<ACard*> OpponentField = Arena->OpponentField->RemoveAll();
