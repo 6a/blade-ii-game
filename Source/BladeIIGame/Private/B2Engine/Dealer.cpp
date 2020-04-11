@@ -836,7 +836,7 @@ void UB2Dealer::Mirror()
 		B2TRotation Rotation
 		{
 			Card->GetActorRotation(),
-			TargetTransform.Rotation + FRotator(0, 180, 0),
+			TargetTransform.Rotation,
 			EEase::EaseInOut,
 		};
 
@@ -861,7 +861,7 @@ void UB2Dealer::Mirror()
 		B2TRotation Rotation
 		{
 			Card->GetActorRotation(),
-			TargetTransform.Rotation + FRotator(0, -180, 0),
+			TargetTransform.Rotation,
 			EEase::EaseInOut,
 		};
 
