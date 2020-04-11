@@ -12,15 +12,6 @@ AArena::AArena()
 	MainMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Arena Mesh"));
 	RootComponent = MainMesh;
 
-	DividerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Divider Mesh"));
-	DividerMesh->SetupAttachment(MainMesh);
-
-	VSBadgeBody = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VS Badge Body"));
-	VSBadgeBody->SetupAttachment(MainMesh);
-
-	VSBadgeText = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VS Badge Text"));
-	VSBadgeText->SetupAttachment(MainMesh);
-
 	Slots = CreateDefaultSubobject<USceneComponent>(TEXT("Card Slots"));
 	Slots->SetupAttachment(MainMesh);
 
