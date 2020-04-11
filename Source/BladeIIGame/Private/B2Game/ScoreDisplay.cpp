@@ -7,7 +7,10 @@
 const uint32 DIGIT_MAX = 9;
 const uint32 DIGIT_POOL_SIZE = 4;
 const FString DIGIT_PATH_ROOT = "StaticMesh'/Game/BladeIIGame/Meshes/Digits/SM_Digit__";
-const FVector HIDDEN_DIGIT_LOCATION = FVector(0, 0, -20);
+const FString DIGIT_HIGHLIGHT_PATH = "StaticMesh'/Game/BladeIIGame/Meshes/Digits/SM_Digit_Highlight'";
+const FString MATERIAL_STANDARD_PATH = "MaterialInstanceConstant'/Game/BladeIIGame/Materials/MI_Digit'";
+const FString MATERIAL_HIGHLIGHT_PATH = "MaterialInstanceConstant'/Game/BladeIIGame/Materials/MI_Digits_Highlight'";
+const FVector HIDDEN_LOCATION = FVector(0, 0, -20);
 const float SPACING = 0.5f;
 
 UScoreDisplay::UScoreDisplay()
@@ -36,6 +39,33 @@ UScoreDisplay::UScoreDisplay()
 		}
 	}
 
+	// Set up digit highliter
+	DigitHighlighter = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Digit Highlighter"));
+	DigitHighlighter->SetupAttachment(this);
+	DigitHighlighter->SetVisibility(false);
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> HighlighterMeshFinder(*DIGIT_HIGHLIGHT_PATH);
+	if (HighlighterMeshFinder.Succeeded())
+	{
+		UStaticMesh* StaticMesh = HighlighterMeshFinder.Object;
+		DigitHighlighter->SetStaticMesh(StaticMesh);
+		DigitHighlighter->bCastDynamicShadow = false;
+	}
+
+	// Find digit materials
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> MaterialStandardFinder(*MATERIAL_STANDARD_PATH);
+	if (MaterialStandardFinder.Succeeded())
+	{
+		DigitMaterialStandard = MaterialStandardFinder.Object;
+	}
+
+	// Find digit materials
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> MaterialHighlightFinder(*MATERIAL_HIGHLIGHT_PATH);
+	if (MaterialHighlightFinder.Succeeded())
+	{
+		DigitMaterialHighlight = MaterialHighlightFinder.Object;
+	}
+
 	CurrentPlayerScore = CurrentOpponentScore = UINT32_MAX;
 }
 
@@ -53,7 +83,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 		// Clear
 		for (size_t i = 0; i < PlayerDigits.Num(); i++)
 		{
-			PlayerDigits[i]->SetWorldLocation(HIDDEN_DIGIT_LOCATION);
+			PlayerDigits[i]->SetWorldLocation(HIDDEN_LOCATION);
 			PlayerDigits[i]->SetVisibility(false);
 		}
 
@@ -87,7 +117,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 		}
 		else
 		{
-			float TotalDigitWidth = Digits[0]->Bounds.GetBox().GetSize().X + Digits[1]->Bounds.GetBox().GetSize().X;
+			float TotalDigitWidth = Digits[0]->Bounds.GetBox().GetSize().X / 2 + Digits[1]->Bounds.GetBox().GetSize().X / 2;
 			TotalDigitWidth += SPACING;
 
 			FVector Offset = FVector(TotalDigitWidth * 0.5f, 0, 0);
@@ -110,7 +140,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 		// Clear
 		for (size_t i = 0; i < OpponentDigits.Num(); i++)
 		{
-			OpponentDigits[i]->SetWorldLocation(HIDDEN_DIGIT_LOCATION);
+			OpponentDigits[i]->SetWorldLocation(HIDDEN_LOCATION);
 			OpponentDigits[i]->SetVisibility(false);
 		}
 
@@ -144,7 +174,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 		}
 		else
 		{
-			float TotalDigitWidth = Digits[0]->Bounds.GetBox().GetSize().X + Digits[1]->Bounds.GetBox().GetSize().X;
+			float TotalDigitWidth = Digits[0]->Bounds.GetBox().GetSize().X / 2 + Digits[1]->Bounds.GetBox().GetSize().X / 2;
 			TotalDigitWidth += SPACING;
 
 			FVector Offset = FVector(TotalDigitWidth * 0.5f, 0, 0);
@@ -157,5 +187,46 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 				OpponentDigits.Add(Digits[i]);
 			}
 		}
+	}
+}
+
+void UScoreDisplay::Highlight(ETurn Turn)
+{
+	// Reset all digits to the standard mesh
+	// One of these calls may be redundant (when Turn is NOT undecided) but there should be any overhead
+	// As both changes are before the next render call anyway
+	for (UStaticMeshComponent * SMC : PlayerDigits)
+	{
+		SMC->SetMaterial(0, DigitMaterialStandard);
+	}
+
+	for (UStaticMeshComponent * SMC : OpponentDigits)
+	{
+		SMC->SetMaterial(0, DigitMaterialStandard);
+	}
+
+	// Hide highlighter - again, possibly redundant when not undecided, but easier to switch off, and switch back on if needed
+	DigitHighlighter->SetVisibility(false);
+	DigitHighlighter->SetWorldLocation(HIDDEN_LOCATION);
+
+	if (Turn == ETurn::Player)
+	{
+		for (UStaticMeshComponent* SMC : PlayerDigits)
+		{
+			SMC->SetMaterial(0, DigitMaterialHighlight);
+		}
+
+		DigitHighlighter->SetVisibility(true);
+		DigitHighlighter->SetWorldLocation(PlayerDigitAnchor);
+	}
+	else if (Turn == ETurn::Opponent)
+	{
+		for (UStaticMeshComponent* SMC : OpponentDigits)
+		{
+			SMC->SetMaterial(0, DigitMaterialHighlight);
+		}
+
+		DigitHighlighter->SetVisibility(true);
+		DigitHighlighter->SetWorldLocation(OpponentDigitAnchor);
 	}
 }

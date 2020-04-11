@@ -56,36 +56,14 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				case EInput::NavigateLeft:
 				{
 					uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex > 0 ? GI->GetGameState()->CursorSlotIndex - 1 : GI->GetArena()->PlayerHand->Num() - 1;
-
-					// Return the currently selected card to its original transform
-					SetCurrentCardToOriginalTransform();
-
-					GI->GetGameState()->CursorSlotIndex = NewCursorIndex;
-
-					FB2Transform TargetTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
-					TargetTransform.Position += Cursor->OFFSET_WHEN_SELECTED;
-					Cursor->SetActorLocationAndRotation(TargetTransform.Position, TargetTransform.Rotation);
-
-					// Raise the newly selected card by the offset
-					SetCurrentCardToSelectedTransform();
-
+					UpdateSelection(NewCursorIndex);
+					
 					break;
 				}
 				case EInput::NavigateRight:
 				{
 					uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex < GI->GetArena()->PlayerHand->Num() - 1 ? GI->GetGameState()->CursorSlotIndex + 1 : 0;
-
-					// Return the currently selected card to its original transform
-					SetCurrentCardToOriginalTransform();
-
-					GI->GetGameState()->CursorSlotIndex = NewCursorIndex;
-
-					FB2Transform TargetTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
-					TargetTransform.Position += Cursor->OFFSET_WHEN_SELECTED;
-					Cursor->SetActorLocationAndRotation(TargetTransform.Position, TargetTransform.Rotation);
-
-					// Raise the newly selected card by the offset
-					SetCurrentCardToSelectedTransform();
+					UpdateSelection(NewCursorIndex);
 
 					break;
 				}
@@ -95,7 +73,7 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				case EInput::Select:
 					GI->GetCursor()->ToggleActorVisibility(false);
 
-					ACard* SelectedCard = GI->GetArena()->PlayerHand->GetCardByIndex(GI->GetGameState()->CursorSlotIndex);
+					ACard* SelectedCard = GetCurrentCard();
 
 					// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 					// Here we also check for effects that occurred, so we can use them to branch later
@@ -146,4 +124,28 @@ void GSM_State_PlayerTurn::End()
 	GSM_State::End();
 
 
+}
+
+void GSM_State_PlayerTurn::UpdateSelection(uint32 NewCursorIndex)
+{
+	ABladeIIGameMode* GI = GameModeInstance;
+
+	// Return the currently selected card to its original transform
+	SetCurrentCardToOriginalTransform();
+
+	GI->GetGameState()->CursorSlotIndex = NewCursorIndex;
+
+	FB2Transform TargetTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
+	TargetTransform.Position += GI->GetCursor()->OFFSET_WHEN_SELECTED;
+	GI->GetCursor()->SetActorLocationAndRotation(TargetTransform.Position, TargetTransform.Rotation);
+
+	// Raise the newly selected card by the offset
+	SetCurrentCardToSelectedTransform();
+
+	// Force card edge case
+	ACard* CurrentCard = GetCurrentCard();
+	if (CurrentCard->Type == ECard::Force)
+	{
+
+	}
 }

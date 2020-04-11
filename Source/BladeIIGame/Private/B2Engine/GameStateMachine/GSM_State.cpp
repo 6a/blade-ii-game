@@ -29,23 +29,27 @@ EGameState GSM_State::Type() const
 
 void GSM_State::SetCurrentCardToOriginalTransform()
 {
-	ACard* CurrentCard = GameModeInstance->GetArena()->PlayerHand->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
+	ABladeIIGameMode* GI = GameModeInstance;
+
+	ACard* CurrentCard = GetCurrentCard();
 
 	if (CurrentCard)
 	{
-		FB2Transform NewTransform = GameModeInstance->GetArena()->PlayerHand->GetTransformForIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
+		FB2Transform NewTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
 		CurrentCard->SetActorLocationAndRotation(NewTransform.Position, NewTransform.Rotation);
 	}
 }
 
 void GSM_State::SetCurrentCardToSelectedTransform()
 {
-	ACard* CurrentCard = GameModeInstance->GetArena()->PlayerHand->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
+	ABladeIIGameMode* GI = GameModeInstance;
+
+	ACard* CurrentCard = GetCurrentCard();
 
 	if (CurrentCard)
 	{
-		FB2Transform NewTransform = GameModeInstance->GetArena()->PlayerHand->GetTransformForIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
-		NewTransform.Position += GameModeInstance->GetCursor()->OFFSET_WHEN_SELECTED;
+		FB2Transform NewTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
+		NewTransform.Position += GI->GetCursor()->OFFSET_WHEN_SELECTED;
 
 		CurrentCard->SetActorLocationAndRotation(NewTransform.Position, NewTransform.Rotation);
 	}
@@ -53,4 +57,18 @@ void GSM_State::SetCurrentCardToSelectedTransform()
 
 void GSM_State::SetCurrentCardToPreEffectTransform()
 {
+}
+
+ACard* GSM_State::GetCurrentCard()
+{
+	ABladeIIGameMode* GI = GameModeInstance;
+
+	return GI->GetArena()->PlayerHand->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
+}
+
+ACard* GSM_State::RemoveCurrentCard()
+{
+	ABladeIIGameMode* GI = GameModeInstance;
+
+	return GI->GetArena()->PlayerHand->RemoveByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
 }

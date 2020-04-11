@@ -17,6 +17,7 @@
 #include "B2Engine/GameStateMachine/GSM_State_WaitingForOpponentMove.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBolt.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBlast.h"
+#include "B2Engine/GameStateMachine/GSM_State_PlayerForce.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
@@ -203,7 +204,7 @@ void ABladeIIGameMode::SetupDealer()
 
 void ABladeIIGameMode::SetupSelector()
 {
-	UObject* CardSelectorActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BladeIIGame/Blueprints/GameObjects/BP_CardSelector.BP_CardSelector"));
+	UObject* CardSelectorActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card_Cursor.BP_Card_Cursor'"));
 	ensureMsgf(CardSelectorActor, TEXT("Could not load card selector actor - static load failed"));
 
 	UBlueprint* CardSelectorBlueprint = Cast<UBlueprint>(CardSelectorActor);
@@ -501,6 +502,15 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 
 			}
 		case ECard::Force:
+			if (GameState->Turn == ETurn::Player)
+			{
+				// Switch state machine to player force
+				GSM->ChangeState<GSM_State_PlayerForce>();
+			}
+			else
+			{
+
+			}
 			break;
 		}
 

@@ -16,5 +16,10 @@ public:
 	virtual void End() override;
 
 	virtual EGameState Type() const override { return EGameState::PlayerTurn; }
+
+private:
+
+	/* Update the hand to display the currently selected card */
+	void UpdateSelection(uint32 NewCursorIndex);
 };
 

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "../../B2Enum/GameStateEnum.h"
+#include "../../B2Game/Card.h"
 
 class GSM_State
 {
@@ -21,6 +22,18 @@ protected:
 	UPROPERTY()
 	class ABladeIIGameMode* GameModeInstance;
 
+	/**
+	 * Get a pointer to the currently selected card
+	 * @return A pointer to the card
+	 */
+	ACard* GetCurrentCard();
+
+	/**
+	 * Remove the current card from its slot
+	 * @return A pointer to the card
+	 */
+	ACard* RemoveCurrentCard();
+
 	/* Returns the card currently under the cursor to its original transform */
 	void SetCurrentCardToOriginalTransform();
 
@@ -29,5 +42,6 @@ protected:
 
 	/* Returns the card currently under the cursor to its pre effect transform */
 	void SetCurrentCardToPreEffectTransform();
+
 };
 

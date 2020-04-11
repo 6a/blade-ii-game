@@ -4,6 +4,8 @@
 
 #include "Components/SceneComponent.h"
 
+#include "B2Enum/TurnEnum.h"
+
 #include "ScoreDisplay.generated.h"
 
 USTRUCT()
@@ -31,6 +33,12 @@ public:
 	 */
 	void Update(uint32 PlayerScore, uint32 OpponentScore);
 
+	/**
+	 * Highlight a score (for force)
+	 * @param Turn - Who's turn it is - set to undecided to disable
+	 */
+	void Highlight(ETurn Turn);
+
 protected:
 
 	/* Positions for the players score */
@@ -57,6 +65,18 @@ private:
 	/* Static mesh digits for the opponent */
 	UPROPERTY()
 	TArray<UStaticMeshComponent*> OpponentDigits;
+
+	/* Static mesh score highlighter (for force effect) */
+	UPROPERTY()
+	UStaticMeshComponent* DigitHighlighter;
+
+	/* Standard digit material */
+	UPROPERTY()
+	UMaterialInstance* DigitMaterialStandard;
+
+	/* Highlight digit material */
+	UPROPERTY()
+	UMaterialInstance* DigitMaterialHighlight;
 
 	uint32 CurrentPlayerScore;
 	uint32 CurrentOpponentScore;
