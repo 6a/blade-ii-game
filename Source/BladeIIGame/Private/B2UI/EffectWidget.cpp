@@ -1,6 +1,7 @@
 #include "B2UI/EffectWidget.h"
 
 #include "TimerManager.h"
+#include "Components/WidgetSwitcherSlot.h"
 
 #include "B2Utility/Log.h"
 
@@ -27,6 +28,34 @@ void UEffectWidget::Play(const FVector2D& InTargetScreenPosition, float StartDel
 void UEffectWidget::OnEffectFinishedBroadcast()
 {
 	if (OnEffectEvent.IsBound()) OnEffectEvent.Broadcast(EUIEffectEvent::Finished);
+}
+
+void UEffectWidget::RunAnimation()
+{
+	PlayAnimation(EffectAnimation);
+}
+
+void UEffectWidget::RunAnimationAtTargetScreenPosition()
+{
+	UWidgetSwitcherSlot* WSSlot = Cast<UWidgetSwitcherSlot>(Slot);
+
+	float NewX = TargetScreenPosition.X / 2;
+	float NewY = TargetScreenPosition.Y / 2;
+
+	if (WSSlot)
+	{
+		FMargin NewMargin
+		{
+			NewX,		// Left
+			NewY,		// Top
+			-NewX,		// Right
+			-NewY		// Bottom
+		};
+
+		WSSlot->SetPadding(NewMargin);
+	}
+
+	PlayAnimation(EffectAnimation);
 }
 
 void UEffectWidget::EffectReady()

@@ -6,8 +6,3 @@ void UEffectWidgetBlast::Play(const FVector2D& InTargetScreenPosition, float Sta
 {
 	Super::Play(InTargetScreenPosition, StartDelay, InPostDelay);
 }
-
-void UEffectWidgetBlast::RunAnimation()
-{
-	PlayAnimation(EffectAnimation);
-}

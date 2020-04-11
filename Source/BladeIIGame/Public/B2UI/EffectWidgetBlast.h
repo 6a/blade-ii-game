@@ -20,9 +20,4 @@ public:
 	 * @param InPostDelay - How long to wait after the effect has finished, before triggering the effect finished callback
 	 */
 	virtual void Play(const FVector2D& InTargetScreenPosition, float StartDelay, float InPostDelay);
-
-private:
-
-	/* Run the animation for this widget */
-	virtual void RunAnimation() override;
 };

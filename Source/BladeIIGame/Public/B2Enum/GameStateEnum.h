@@ -12,6 +12,8 @@ enum class EGameState : uint8
 	WaitingForOpponentMove UMETA(DisplayName = "Waiting for the opponents move to be received"),
 	SelectingFromPlayerHand UMETA(DisplayName = "Selecting a card from the local players hand"),
 	SelectingFromOpponentHand UMETA(DisplayName = "Selecting a card from the opponents hand"),
+	PlayerRod UMETA(DisplayName = "Player Rod"),
+	OpponentRod UMETA(DisplayName = "Opponent Rod"),
 	PlayerBolt UMETA(DisplayName = "Player Bolt"),
 	OpponentBolt UMETA(DisplayName = "Opponent Bolt"),
 	PlayerBlast UMETA(DisplayName = "Player Blast"),

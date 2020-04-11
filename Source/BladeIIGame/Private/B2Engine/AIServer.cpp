@@ -11,7 +11,7 @@ const B2ServerUpdate B2AIServer::GetNextUpdate()
 	{
 		bCardsSent = true;
 		Payload.Type = EPayload::Cards;
-		Payload.Cards = ForceTest();
+		Payload.Cards = RodTest();
 	}
 
 	return Payload;
@@ -50,6 +50,21 @@ FB2Cards B2AIServer::ForceTest() const
 	for (int i = 14; i >= 0; i--)
 	{
 		ECard Type = static_cast<bool>(FMath::RandRange(0, 1)) ? ECard::Force : ECard::GaiusSpear;
+
+		Cards.PlayerDeck.Add(Type);
+		Cards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+	}
+
+	return Cards;
+}
+
+FB2Cards B2AIServer::RodTest() const
+{
+	FB2Cards Cards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		ECard Type = static_cast<bool>(FMath::RandRange(0, 1)) ? ECard::ElliotsOrbalStaff : ECard::GaiusSpear;
 
 		Cards.PlayerDeck.Add(Type);
 		Cards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));

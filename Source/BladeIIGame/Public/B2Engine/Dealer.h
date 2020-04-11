@@ -40,16 +40,23 @@ public:
 	void Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot, const FVector& Arc, bool bUseWaitGroup = true);
 
 	/**
-	 * Move the players current card from the hand up to the pre-effect offset
+	 * Move the specified card from the hand up to the pre-effect offset
 	 * @param Card - The card
 	 */
 	void PlayerEffectCard(ACard* Card);
 
 	/**
-	 * Move the opponents current card from the hand up to the pre-effect offset
+	 * Move the specified current card from the hand up to the pre-effect offset
 	 * @param Card - The card
 	 */
 	void OpponentEffectCard(ACard* Card);
+
+	/**
+	 * Flip the specified card - Should only be called for cards on the field
+	 * @param Card - The card
+	 * @param bNewActive - Where the card will be active or not after the flip
+	 */
+	void FlipFieldCard(ACard* Card, bool bNewActive, float Delay = 0.f);
 
 	/* Clears the field of any cards */
 	void ClearField();
@@ -71,9 +78,9 @@ private:
 	EDealerEvent NextEffectEvent;
 
 	/**
-	 * Helper function for effect transition
-	 * @param Card - The bolt card
-	 * @param Card - The bolt card
+	 * Helper function for effect card transition
+	 * @param Card - The card
+	 * @param Offset - The offset
 	 */
 	void EffectCard(ACard* Card, FVector Offset);
 };

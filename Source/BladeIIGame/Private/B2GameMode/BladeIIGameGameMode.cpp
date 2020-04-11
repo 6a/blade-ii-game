@@ -18,6 +18,7 @@
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBolt.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBlast.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerForce.h"
+#include "B2Engine/GameStateMachine/GSM_State_PlayerRod.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
@@ -433,6 +434,7 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 					B2Utility::LogWarning("Either the player deck, or the opponent deck is empty!");
 
 					// TODO do we end the game or something? Probably send it to end state...
+					// TODO 2 looks like you just start drawing from the hand. do we get to choose? i guess so
 
 					return;
 				}
@@ -477,6 +479,15 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 		switch (Type)
 		{
 		case ECard::ElliotsOrbalStaff:
+			if (GameState->Turn == EPlayer::Player)
+			{
+				// Switch state machine to player rod
+				GSM->ChangeState<GSM_State_PlayerRod>();
+			}
+			else
+			{
+
+			}
 			break;
 		case ECard::Bolt:
 			if (GameState->Turn == EPlayer::Player)

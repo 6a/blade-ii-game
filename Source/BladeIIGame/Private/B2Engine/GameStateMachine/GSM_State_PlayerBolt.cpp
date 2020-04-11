@@ -42,7 +42,7 @@ void GSM_State_PlayerBolt::Tick(float DeltaSeconds)
 			TargetCard->SetActive(false);
 
 			// Flip the target card
-			TargetCard->AddActorWorldRotation(FRotator(180, 0, 0), false, nullptr, ETeleportType::TeleportPhysics);
+			GI->GetDealer()->FlipFieldCard(TargetCard, true, 0.0f);
 
 			// Update score
 			GI->GetGameState()->OpponentScore = GI->AggregateScore(GI->GetArena()->OpponentField);

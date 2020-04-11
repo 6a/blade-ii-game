@@ -13,6 +13,7 @@ const float MIN_MOVE_TRANSITION_DURATION = 0.3f;
 const float MAX_MOVE_TRANSITION_DURATION = 1.4f;
 const float MAX_MOVE_SQ_DISTANCE = 3267.789551f;
 const float CARD_POP_OUT_DISTANCE = 2.f;
+const FVector CARD_FLIP_ARC = FVector(0, 0, 6);
 
 UB2Dealer::UB2Dealer()
 {
@@ -769,6 +770,38 @@ void UB2Dealer::OpponentEffectCard(ACard* Card)
 {
 	FVector Offset = (Card->GetActorRotation().Vector().RotateAngleAxis(-90, FVector::UpVector).GetSafeNormal()) * CARD_POP_OUT_DISTANCE;
 	EffectCard(Card, Offset);
+}
+
+void UB2Dealer::FlipFieldCard(ACard* Card, bool bNewActive, float Delay)
+{
+	Card->SetActive(bNewActive);
+
+	const float DelayOnStart = Delay;
+	const float TransitionDuration = 0.4f;
+
+	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
+
+	FRotator TargetRotation = Card->GetActorRotation() + FRotator(180, 0, 0);
+
+	// Transition 1
+	B2TPosition Position
+	{
+		Card->GetActorLocation(),
+		Card->GetActorLocation(),
+		CARD_FLIP_ARC,
+		EEase::EaseInOut,
+	};
+
+	B2TRotation Rotation
+	{
+		Card->GetActorRotation(),
+		TargetRotation,
+		EEase::EaseInOut,
+	};
+
+	// Add the transition to the transition queue
+	B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
+	Card->QueueTransition(Transition);
 }
 
 void UB2Dealer::ClearField()

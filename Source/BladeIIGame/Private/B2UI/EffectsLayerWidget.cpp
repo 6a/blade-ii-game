@@ -21,18 +21,24 @@ void UEffectsLayerWidget::Play(EUIEffect Effect, const FVector* TargetWorldPosit
 	switch (Effect)
 	{
     case EUIEffect::Rod:
+        Rod->Play(Position, StartDelay, PostDelay);
+        EffectSwitcher->SetActiveWidget(Rod);
         break;
     case EUIEffect::Bolt:
         Bolt->Play(Position, StartDelay, PostDelay);
         EffectSwitcher->SetActiveWidget(Bolt);
         break;
     case EUIEffect::Mirror:
+        Mirror->Play(Position, StartDelay, PostDelay);
+        EffectSwitcher->SetActiveWidget(Mirror);
         break;
     case EUIEffect::Blast:
         Blast->Play(Position, StartDelay, PostDelay);
         EffectSwitcher->SetActiveWidget(Blast);
         break;
     case EUIEffect::BlastTarget:
+        BlastTarget->Play(Position, StartDelay, PostDelay);
+        EffectSwitcher->SetActiveWidget(BlastTarget);
         break;
     case EUIEffect::Force:
         Force->Play(Position, StartDelay, PostDelay);
