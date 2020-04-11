@@ -31,6 +31,15 @@ void GSM_State_PlayerTurn::Init(ABladeIIGameMode* GameMode)
 	GI->GetGameState()->CursorPosition = ECardSlot::PlayerHand;
 	GI->GetGameState()->CursorSlotIndex = 0;
 
+	ACard* CurrentCard = GI->GetArena()->PlayerHand->GetCardByIndex(0);
+	if (CurrentCard)
+	{
+		if (CurrentCard->Type == ECard::Force)
+		{
+			GI->GetArena()->ScoreDisplay->Highlight(ETurn::Player);
+		}
+	}
+
 	uint32 CurrentPlayerScore = GI->GetGameState()->PlayerScore;
 	uint32 CurrentOpponentScore = GI->GetGameState()->OpponentScore;
 	GI->GetArena()->ScoreDisplay->Update(CurrentPlayerScore, CurrentOpponentScore);
