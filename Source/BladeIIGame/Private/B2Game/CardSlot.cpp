@@ -4,6 +4,7 @@
 
 #include "B2Predicate/SortCardsByDistanceAscending.h"
 #include "B2Predicate/SortCardsByTypeAscending.h"
+#include "..\..\Public\B2Game\CardSlot.h"
 
 UCardSlot::UCardSlot()
 {
@@ -45,6 +46,11 @@ TArray<FString> UCardSlot::GetSortedIDsDescending()
 void UCardSlot::Add(ACard* Card)
 {
 	Cards.Add(Card);
+}
+
+void UCardSlot::Add(TArray<ACard*> InCards)
+{
+	Cards.Append(InCards);
 }
 
 ACard* UCardSlot::GetCardByIndex(uint32 N)
@@ -156,6 +162,15 @@ ACard* UCardSlot::GetFirst()
 	}
 
 	return Card;
+}
+
+TArray<ACard*> UCardSlot::RemoveAll()
+{
+	TArray<ACard*> OutArray = TArray<ACard*>(Cards);
+
+	Cards.Empty();
+
+	return OutArray;
 }
 
 const FB2Transform UCardSlot::GetTransformForIndex(uint32 Index) const

@@ -43,15 +43,6 @@ void GSM_State_PlayerTurn::Init(ABladeIIGameMode* GameMode)
 	uint32 CurrentPlayerScore = GI->GetGameState()->PlayerScore;
 	uint32 CurrentOpponentScore = GI->GetGameState()->OpponentScore;
 	GI->GetArena()->ScoreDisplay->Update(CurrentPlayerScore, CurrentOpponentScore);
-
-	// TODO remove
-	// Test code to auto bolt the players first field card
-	ACard* CardToBolt = CurrentCard = GI->GetArena()->PlayerField->GetFirst();
-	if (CardToBolt)
-	{
-		GI->GetDealer()->FlipFieldCard(CardToBolt, false, 0.5f);
-		GI->UpdateCardState();
-	}
 }
 
 void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
@@ -113,7 +104,6 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 						UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
 
 						GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_MOVE);
-
 					}
 
 					if (bUsedBlastEffect)

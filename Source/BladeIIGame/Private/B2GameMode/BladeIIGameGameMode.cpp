@@ -15,10 +15,12 @@
 #include "B2Engine/GameStateMachine/GSM_State_WaitingForInitialDeal.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerTurn.h"
 #include "B2Engine/GameStateMachine/GSM_State_WaitingForOpponentMove.h"
+#include "B2Engine/GameStateMachine/GSM_State_PlayerRod.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBolt.h"
+#include "B2Engine/GameStateMachine/GSM_State_PlayerMirror.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBlast.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerForce.h"
-#include "B2Engine/GameStateMachine/GSM_State_PlayerRod.h"
+
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
@@ -501,6 +503,15 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 			}
 			break;
 		case ECard::Mirror:
+			if (GameState->Turn == EPlayer::Player)
+			{
+				// Switch state machine to player force
+				GSM->ChangeState<GSM_State_PlayerMirror>();
+			}
+			else
+			{
+
+			}
 			break;
 		case ECard::Blast:
 			if (GameState->Turn == EPlayer::Player)

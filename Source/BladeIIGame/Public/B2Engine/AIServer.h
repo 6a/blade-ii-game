@@ -19,4 +19,5 @@ private:
 	FB2Cards BlastTest() const;
 	FB2Cards ForceTest() const;
 	FB2Cards RodTest() const;
+	FB2Cards MirrorTest() const;
 };

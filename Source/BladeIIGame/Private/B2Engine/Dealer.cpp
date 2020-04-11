@@ -14,6 +14,7 @@ const float MAX_MOVE_TRANSITION_DURATION = 1.4f;
 const float MAX_MOVE_SQ_DISTANCE = 3267.789551f;
 const float CARD_POP_OUT_DISTANCE = 2.f;
 const FVector CARD_FLIP_ARC = FVector(0, 0, 6);
+const FVector MIRROR_ARC = FVector(0, 0, 4);
 
 UB2Dealer::UB2Dealer()
 {
@@ -802,6 +803,73 @@ void UB2Dealer::FlipFieldCard(ACard* Card, bool bNewActive, float Delay)
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
 	Card->QueueTransition(Transition);
+}
+
+void UB2Dealer::Mirror()
+{
+	const float DelayOnStart = 0;
+	const float MirrorDuration = 0.7f;
+
+	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
+
+	// For this transition, we need to get all the cards in advance, as we need to immediately update their orders in the cardslot
+	// so that the score can be recalculated
+
+	TArray<ACard*> PlayerField = Arena->PlayerField->RemoveAll();
+	TArray<ACard*> OpponentField = Arena->OpponentField->RemoveAll();
+
+	Arena->PlayerField->Add(OpponentField);
+	Arena->OpponentField->Add(PlayerField);
+
+	for (size_t i = 0; i < PlayerField.Num(); i++)
+	{
+		ACard* Card = PlayerField[i];
+		FB2Transform TargetTransform = Arena->OpponentField->GetTransformForIndex(i);
+
+		B2TPosition Position
+		{
+			Card->GetActorLocation(),
+			TargetTransform.Position,
+			MIRROR_ARC,
+			EEase::EaseInOut,
+		};
+
+		B2TRotation Rotation
+		{
+			Card->GetActorRotation(),
+			TargetTransform.Rotation + FRotator(0, 180, 0),
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, MirrorDuration, DelayOnStart);
+		Card->QueueTransition(Transition);
+	}
+
+	for (size_t i = 0; i < OpponentField.Num(); i++)
+	{
+		ACard* Card = OpponentField[i];
+		FB2Transform TargetTransform = Arena->PlayerField->GetTransformForIndex(i);
+
+		B2TPosition Position
+		{
+			Card->GetActorLocation(),
+			TargetTransform.Position,
+			MIRROR_ARC,
+			EEase::EaseInOut,
+		};
+
+		B2TRotation Rotation
+		{
+			Card->GetActorRotation(),
+			TargetTransform.Rotation + FRotator(0, -180, 0),
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, MirrorDuration, DelayOnStart);
+		Card->QueueTransition(Transition);
+	}
 }
 
 void UB2Dealer::ClearField()

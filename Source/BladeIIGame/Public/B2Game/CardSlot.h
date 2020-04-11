@@ -29,6 +29,9 @@ public:
 	/* Add the specified card */
 	virtual void Add(ACard* Card);
 
+	/* Add all the specified cards, in sequence */
+	virtual void Add(TArray <ACard*> Cards);
+
 	/**
 	 * Get the card at index N
 	 * @param N - The index of the card to get
@@ -81,6 +84,12 @@ public:
 	 * @returns A pointer to the removed card
 	 */
 	virtual ACard* RemoveLast();
+
+	/**
+	 * Remove all the cards from this slot
+	 * @returns An array of pointers to all the removed cards
+	 */
+	virtual TArray<ACard*> RemoveAll();
 
 	/**
 	 * Return the position + rotation that a card with the index "Index" should have.

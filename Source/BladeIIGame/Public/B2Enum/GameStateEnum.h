@@ -16,6 +16,8 @@ enum class EGameState : uint8
 	OpponentRod UMETA(DisplayName = "Opponent Rod"),
 	PlayerBolt UMETA(DisplayName = "Player Bolt"),
 	OpponentBolt UMETA(DisplayName = "Opponent Bolt"),
+	PlayerMirror UMETA(DisplayName = "Player Mirror"),
+	OpponentMirror UMETA(DisplayName = "Opponent Mirror"),
 	PlayerBlast UMETA(DisplayName = "Player Blast"),
 	OpponentBlast UMETA(DisplayName = "Opponent Blast"),
 	PlayerForce UMETA(DisplayName = "Player Force"),

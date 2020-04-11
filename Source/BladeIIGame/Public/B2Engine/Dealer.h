@@ -58,6 +58,12 @@ public:
 	 */
 	void FlipFieldCard(ACard* Card, bool bNewActive, float Delay = 0.f);
 
+	/**
+	 * Performs the mirror flip transition immediately
+	 * @note This also updates the card positions internally, and immedaitely, so the score can be recalculated as soon as its called
+	 */
+	void Mirror();
+
 	/* Clears the field of any cards */
 	void ClearField();
 
