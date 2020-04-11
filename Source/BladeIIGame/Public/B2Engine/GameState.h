@@ -4,7 +4,7 @@
 
 #include "Cards.h"
 #include "B2Enum/CardSlotEnum.h"
-#include "B2Enum/TurnEnum.h"
+#include "B2Enum/PlayerEnum.h"
 
 struct B2GameState
 {
@@ -23,7 +23,7 @@ struct B2GameState
 	uint32 CursorSlotIndex;
 
 	// Turn
-	ETurn Turn;
+	EPlayer Turn;
 
 	// Effect pending bool (should be set to false once checked)
 	bool bPendingEffectRequiresAction;

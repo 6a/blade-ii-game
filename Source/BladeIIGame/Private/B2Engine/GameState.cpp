@@ -10,7 +10,7 @@ B2GameState::B2GameState(const FB2Cards& Cards)
 	CursorPosition = ECardSlot::PlayerDeck;
 	CursorSlotIndex = 0;
 
-	Turn = ETurn::Undecided;
+	Turn = EPlayer::Undecided;
 	
 	bPendingEffectRequiresAction = false;
 }

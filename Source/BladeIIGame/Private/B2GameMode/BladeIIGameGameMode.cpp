@@ -65,7 +65,7 @@ void ABladeIIGameMode::FinishTurn()
 		// Set to opponent blast select state
 	}
 
-	FString Turn = GameState->Turn == ETurn::Player ? TEXT("Player's") : TEXT("Opponent's");
+	FString Turn = GameState->Turn == EPlayer::Player ? TEXT("Player's") : TEXT("Opponent's");
 
 	B2Utility::LogWarning(FString::Printf(TEXT("[%s] turn finished"), *Turn));
 }
@@ -438,7 +438,7 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 				}
 
 				// Lets go round again.wav
-				GameState->Turn = ETurn::Undecided;
+				GameState->Turn = EPlayer::Undecided;
 
 				// Switch state machine to drawing from empty field
 				GSM->ChangeState<GSM_State_DrawToEmptyField>();
@@ -446,7 +446,7 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 			else if (GameState->PlayerScore > GameState->OpponentScore)
 			{
 				// Switch game state to player turn
-				GameState->Turn = ETurn::Player;
+				GameState->Turn = EPlayer::Player;
 
 				// Switch state machine to player turn
 				GSM->ChangeState<GSM_State_PlayerTurn>();
@@ -454,7 +454,7 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 			else
 			{
 				//// Switch game state to opponent
-				//GameState->Turn = ETurn::Opponent;
+				//GameState->Turn = EPlayer::Opponent;
 
 				//// Switch state machine to opponent turn
 				//GSM->ChangeState<GSM_State_WaitingForOpponentMove>();
@@ -464,7 +464,7 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 				// For testing
 				// TODO remove and revert to above code
 				// Switch game state to player turn
-				GameState->Turn = ETurn::Player;
+				GameState->Turn = EPlayer::Player;
 
 				// Switch state machine to player turn
 				GSM->ChangeState<GSM_State_PlayerTurn>();
@@ -479,7 +479,7 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 		case ECard::ElliotsOrbalStaff:
 			break;
 		case ECard::Bolt:
-			if (GameState->Turn == ETurn::Player)
+			if (GameState->Turn == EPlayer::Player)
 			{
 				// Switch state machine to player bolt
 				GSM->ChangeState<GSM_State_PlayerBolt>();
@@ -492,7 +492,7 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 		case ECard::Mirror:
 			break;
 		case ECard::Blast:
-			if (GameState->Turn == ETurn::Player)
+			if (GameState->Turn == EPlayer::Player)
 			{
 				// Switch state machine to player blast
 				GSM->ChangeState<GSM_State_PlayerBlast>();
@@ -502,7 +502,7 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 
 			}
 		case ECard::Force:
-			if (GameState->Turn == ETurn::Player)
+			if (GameState->Turn == EPlayer::Player)
 			{
 				// Switch state machine to player force
 				GSM->ChangeState<GSM_State_PlayerForce>();

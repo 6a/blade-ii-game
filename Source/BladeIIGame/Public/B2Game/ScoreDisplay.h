@@ -4,7 +4,7 @@
 
 #include "Components/SceneComponent.h"
 
-#include "B2Enum/TurnEnum.h"
+#include "B2Enum/PlayerEnum.h"
 
 #include "ScoreDisplay.generated.h"
 
@@ -37,7 +37,7 @@ public:
 	 * Highlight a score (for force)
 	 * @param Turn - Who's turn it is - set to undecided to disable
 	 */
-	void Highlight(ETurn Turn);
+	void Highlight(EPlayer Turn);
 
 protected:
 
@@ -78,6 +78,8 @@ private:
 	UPROPERTY()
 	UMaterialInstance* DigitMaterialHighlight;
 
+	// State
 	uint32 CurrentPlayerScore;
 	uint32 CurrentOpponentScore;
+	EPlayer CurrentlyHighlightTarget;
 };

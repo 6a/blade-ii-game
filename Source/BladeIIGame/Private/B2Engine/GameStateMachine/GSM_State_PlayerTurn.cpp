@@ -36,7 +36,7 @@ void GSM_State_PlayerTurn::Init(ABladeIIGameMode* GameMode)
 	{
 		if (CurrentCard->Type == ECard::Force)
 		{
-			GI->GetArena()->ScoreDisplay->Highlight(ETurn::Player);
+			GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Player);
 		}
 	}
 
@@ -95,7 +95,7 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 					if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect || bUsedForceEffect)
 					{
 						GI->GetDealer()->PlayerEffectCard(SelectedCard);
-
+						GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Undecided);
 					}
 					else
 					{
@@ -156,11 +156,11 @@ void GSM_State_PlayerTurn::UpdateSelection(uint32 NewCursorIndex)
 	if (CurrentCard->Type == ECard::Force)
 	{
 		// Set the force indicator
-		GI->GetArena()->ScoreDisplay->Highlight(ETurn::Player);
+		GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Player);
 	}
 	else
 	{
 		// Set the force indicator
-		GI->GetArena()->ScoreDisplay->Highlight(ETurn::Undecided);
+		GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Undecided);
 	}
 }
