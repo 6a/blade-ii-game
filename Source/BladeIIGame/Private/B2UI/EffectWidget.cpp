@@ -8,6 +8,20 @@ void UEffectWidget::Play(const FVector2D& InTargetScreenPosition, float StartDel
 {
 	TargetScreenPosition = InTargetScreenPosition;
 	PostDelay = InPostDelay;
+
+	if (GetWorld()->GetTimerManager().TimerExists(DelayedPlayHandle))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(DelayedPlayHandle);
+	}
+
+	if (StartDelay > 0)
+	{
+		GetWorld()->GetTimerManager().SetTimer(DelayedPlayHandle, RunAnimationCallback, StartDelay, false);
+	}
+	else
+	{
+		RunAnimationCallback.ExecuteIfBound();
+	}
 }
 
 void UEffectWidget::OnEffectFinishedBroadcast()

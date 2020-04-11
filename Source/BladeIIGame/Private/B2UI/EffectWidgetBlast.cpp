@@ -4,21 +4,9 @@
 
 void UEffectWidgetBlast::Play(const FVector2D& InTargetScreenPosition, float StartDelay, float InPostDelay)
 {
+	RunAnimationCallback.BindUFunction(this, FName("RunAnimation"));
+
 	Super::Play(InTargetScreenPosition, StartDelay, InPostDelay);
-
-	if (GetWorld()->GetTimerManager().TimerExists(DelayedPlayHandle))
-	{
-		GetWorld()->GetTimerManager().ClearTimer(DelayedPlayHandle);
-	}
-
-	if (StartDelay > 0)
-	{
-		GetWorld()->GetTimerManager().SetTimer(DelayedPlayHandle, this, &UEffectWidgetBlast::RunAnimation, StartDelay, false);
-	}
-	else
-	{
-		RunAnimation();
-	}
 }
 
 void UEffectWidgetBlast::RunAnimation()

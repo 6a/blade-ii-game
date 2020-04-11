@@ -38,6 +38,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidgetAnimOptional))
 	class UWidgetAnimation* EffectAnimation;
 
+	/* The callback method for this animation */
+	FTimerDynamicDelegate RunAnimationCallback;
+
 	/* The width of the widest portion of this widget. Used by some widgets to offset from the center due to shitty pivots */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
 	int32 Width;

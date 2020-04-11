@@ -36,12 +36,28 @@ private:
 	UWidgetSwitcher* EffectSwitcher;
 
 	/* Effect widgets */
-	UPROPERTY(meta = (BindWidget))
-	UEffectWidget* Blast;
+	UPROPERTY(meta = (BindWidgetOptional))
+	UEffectWidget* Rod;
 
 	/* Effect widgets */
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidgetOptional))
 	UEffectWidget* Bolt;
+
+	/* Effect widgets */
+	UPROPERTY(meta = (BindWidgetOptional))
+	UEffectWidget* Mirror;
+
+	/* Effect widgets */
+	UPROPERTY(meta = (BindWidgetOptional))
+	UEffectWidget* Blast;
+
+		/* Effect widgets */
+	UPROPERTY(meta = (BindWidgetOptional))
+	UEffectWidget* BlastTarget;
+
+	/* Effect widgets */
+	UPROPERTY(meta = (BindWidgetOptional))
+	UEffectWidget* Force;
 
 	/* Handle any effect finish events for the attached effect widgets */
 	UFUNCTION()

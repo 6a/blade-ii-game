@@ -31,6 +31,8 @@ void UEffectsLayerWidget::Play(EUIEffect Effect, const FVector* TargetWorldPosit
     case EUIEffect::BlastTarget:
         break;
     case EUIEffect::Force:
+        Force->Play(Position, StartDelay, PostDelay);
+        EffectSwitcher->SetActiveWidget(Force);
         break;
     case EUIEffect::Draw:
         break;

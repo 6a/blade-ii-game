@@ -17,10 +17,19 @@ void GSM_State_PlayerForce::Init(ABladeIIGameMode* GameMode)
 
 	ABladeIIGameMode* GI = GameModeInstance;
 
-	//// Play bolt animation at opponents last card position
-	//EUIEffect Effect = EUIEffect::Bolt;
-	//FVector TargetWorldPosition = GI->GetArena()->OpponentField->GetLast()->GetActorLocation();
-	//GI->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 0.25f, 0.4f);
+	// Play Force animation at players next free slot
+	EUIEffect Effect = EUIEffect::Force;
+	FVector TargetWorldPosition = GI->GetArena()->PlayerField->GetNextTransform().Position;
+	GI->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 1.0f, 0.4f);
+
+	ACard* CurrentForceCard = RemoveCurrentCard();
+
+	// TODO implement 0.4s delay with animations (scale and alpha needed it seems)
+	CurrentForceCard->SetActive(false);
+
+	FB2Transform NewTransform = GI->GetArena()->PlayerField->GetNextTransform();
+	CurrentForceCard->SetActorLocationAndRotation(NewTransform.Position, NewTransform.Rotation);
+	GI->GetArena()->PlayerField->Add(CurrentForceCard);
 }
 
 void GSM_State_PlayerForce::Tick(float DeltaSeconds)
@@ -34,33 +43,15 @@ void GSM_State_PlayerForce::Tick(float DeltaSeconds)
 	{
 		if (Event == EUIEffectEvent::Ready)
 		{
-			// Get a reference to the cards we will be working on
-			ACard* SelectedCard = GameModeInstance->GetArena()->PlayerHand->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
-			ACard* TargetCard = GameModeInstance->GetArena()->OpponentField->RemoveLast();
+			GI->UpdateCardState();
 
-			// Set target card state to inactive
-			TargetCard->SetActive(false);
 
-			// Flip the target card
-			TargetCard->AddActorWorldRotation(FRotator(180, 0, 0), false, nullptr, ETeleportType::TeleportPhysics);
-
-			// Update score
-			GI->GetGameState()->OpponentScore = GI->AggregateScore(GI->GetArena()->OpponentField);
-			GI->GetArena()->ScoreDisplay->Update(GI->GetGameState()->PlayerScore, GI->GetGameState()->OpponentScore);
-
-			// Update card slots 
-			TargetCard->SetActorLocation(GI->GetArena()->OpponentDiscard->GetNextTransform().Position);
-			GI->GetArena()->OpponentDiscard->Add(TargetCard);
 		}
 		else if (Event == EUIEffectEvent::Finished)
 		{
 			// Remove the bolt card from the players hand
-			ACard* SelectedCard = GI->GetArena()->PlayerHand->RemoveByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
-			SelectedCard->SetActorHiddenInGame(true);
-			SelectedCard->SetActorLocation(GI->GetArena()->PlayerDiscard->GetNextTransform().Position);
-
-			// Update card slots 
-			GI->GetArena()->PlayerDiscard->Add(SelectedCard);
+			ACard* UsedForceCard = GetCurrentCard();
+			UsedForceCard->SetActive(true);
 
 			// Signal to the game mode that the turn has finished
 			GI->FinishTurn();
