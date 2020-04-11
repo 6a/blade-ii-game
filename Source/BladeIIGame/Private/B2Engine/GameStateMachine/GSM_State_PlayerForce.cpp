@@ -17,8 +17,6 @@ void GSM_State_PlayerForce::Init(ABladeIIGameMode* GameMode)
 
 	ABladeIIGameMode* GI = GameModeInstance;
 
-	// 
-
 	//// Play bolt animation at opponents last card position
 	//EUIEffect Effect = EUIEffect::Bolt;
 	//FVector TargetWorldPosition = GI->GetArena()->OpponentField->GetLast()->GetActorLocation();

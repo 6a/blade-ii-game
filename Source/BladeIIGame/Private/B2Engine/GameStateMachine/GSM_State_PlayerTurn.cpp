@@ -146,6 +146,12 @@ void GSM_State_PlayerTurn::UpdateSelection(uint32 NewCursorIndex)
 	ACard* CurrentCard = GetCurrentCard();
 	if (CurrentCard->Type == ECard::Force)
 	{
-
+		// Set the force indicator
+		GI->GetArena()->ScoreDisplay->Highlight(ETurn::Player);
+	}
+	else
+	{
+		// Set the force indicator
+		GI->GetArena()->ScoreDisplay->Highlight(ETurn::Undecided);
 	}
 }
