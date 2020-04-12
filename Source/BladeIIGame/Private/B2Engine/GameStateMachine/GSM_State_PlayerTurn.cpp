@@ -92,6 +92,25 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 
 				if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect || bUsedForceEffect)
 				{
+					// If this was NOT a blast card, send the move to the server - blasts are handled differently and
+					// are updated in thei blast target state
+					if (!bUsedBlastEffect)
+					{
+						// Get source and target slots
+						UCardSlot* CurrentSlot = GI->GetArena()->PlayerHand;
+						UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
+
+						// Send the move to the server
+						FB2Move Move
+						{
+							SelectedCard->Type,
+							CurrentSlot->GetType(),
+							TargetSlot->GetType()
+						};
+
+						GI->GetOpponent()->SendMove(Move);
+					}
+
 					GI->GetDealer()->PlayerEffectCard(SelectedCard);
 					GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Undecided);
 				}
@@ -108,20 +127,19 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 						GI->GetDealer()->ClearSingleFromField(LatestFieldCard);
 					}
 
+					// Send the move to the server
+					FB2Move Move
+					{
+						SelectedCard->Type,
+						CurrentSlot->GetType(),
+						TargetSlot->GetType()
+					};
+
+					GI->GetOpponent()->SendMove(Move);
+
 					GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_MOVE);
-				}
 
-				if (bUsedBlastEffect)
-				{
-					// handle blast effects differently as they have an additional stage (card selection)
-				}
-				else
-				{
-					// Inform the opponent server that a new move was made
-
-					// Update the engine state if required (such as ending the game)
-
-					// Send the opponent server any instructions (such as game over)
+					GI->FinishTurn();
 				}
 
 				GI->GetGameState()->bAcceptPlayerInput = false;

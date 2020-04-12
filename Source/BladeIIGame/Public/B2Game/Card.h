@@ -20,7 +20,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* Mesh;
 
-	/* The type of this cards */
+	/* The type of this card */
 	ECard Type;
 
 	ACard();

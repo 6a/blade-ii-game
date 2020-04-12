@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 
 #include "ServerUpdate.h"
-#include "PlayerUpdate.h"
 
 class B2Server
 {
@@ -18,6 +17,6 @@ public:
 
 private:
 	TArray<B2ServerUpdate> InboundQueue;
-	TArray<B2PlayerUpdate> OutBoundQueue;
+	TArray<B2ServerUpdate> OutBoundQueue;
 };
 

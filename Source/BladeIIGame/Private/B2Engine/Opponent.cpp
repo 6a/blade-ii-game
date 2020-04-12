@@ -6,20 +6,9 @@ void UB2Opponent::Tick(float DeltaSeconds)
 {
 	B2ServerUpdate ServerUpdate = BackEnd->GetNextUpdate();
 
-	switch (ServerUpdate.Type)
+	if (ServerUpdate.Update == EServerUpdate::InstructionCards)
 	{
-		case EPayload::WaitingForInitialDeal:
-
-			break;
-		case EPayload::Cards:
-			if (OnCardsReceived.IsBound()) OnCardsReceived.Broadcast(ServerUpdate.Cards);
-			break;
-		case EPayload::Move:
-
-			break;
-		case EPayload::Instruction:
-
-			break;
+		if (OnCardsReceived.IsBound()) OnCardsReceived.Broadcast(FB2Cards(ServerUpdate.Metadata));
 	}
 }
 

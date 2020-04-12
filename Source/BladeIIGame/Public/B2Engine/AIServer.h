@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Server.h"
+#include "B2Engine/Server.h"
+#include "B2Engine/Cards.h"
 
 class B2AIServer : public B2Server
 {

@@ -6,12 +6,12 @@ const B2ServerUpdate B2AIServer::GetNextUpdate()
 {
 	B2ServerUpdate Payload = B2Server::GetNextUpdate();
 
-	// Currently has a test implementation that just sends random cards
 	if (!bCardsSent)
 	{
+		Payload.Update = EServerUpdate::InstructionCards;
+		Payload.Metadata = BoltTest().GetSerialised(0);
+
 		bCardsSent = true;
-		Payload.Type = EPayload::Cards;
-		Payload.Cards = BlastTest();
 	}
 
 	return Payload;
