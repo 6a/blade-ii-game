@@ -28,4 +28,11 @@ public:
 	 * @returns A pointer to the removed card
 	 */
 	virtual ACard* RemoveByID(FString ID) override;
+
+protected:
+
+	/* The positions for each possible card location, when there is an odd number of cards in the slot */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Configuration)
+	TArray<FB2Transform> CardTransformsOffset;
+
 };

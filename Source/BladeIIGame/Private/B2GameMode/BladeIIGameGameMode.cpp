@@ -82,6 +82,8 @@ void ABladeIIGameMode::StartPlay()
 	FindLocalPlayerInput();
 
 	RegisterEventListeners();
+
+	B2Utility::LogWarning(FString::Printf(TEXT("%f"), FVector::Dist(FVector(-25.668430, -17.709171, 1.045005), FVector(-29.668430, -18.179813, 1.045005))));
 }
 
 void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)
