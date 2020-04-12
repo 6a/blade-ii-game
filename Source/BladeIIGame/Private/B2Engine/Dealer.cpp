@@ -997,6 +997,80 @@ void UB2Dealer::BlastSelect(EPlayer Target)
 	}
 }
 
+void UB2Dealer::BlastCleanup(EPlayer Target)
+{
+	// Early exit with noop if the target is not specified
+	if (Target == EPlayer::Undecided) return;
+
+	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
+	WaitGroupBlastFinished = WaitGroup + 1;
+
+	const float DelayOnStart = 0.0f;
+	const float SpreadDelay = 0.25f;
+	const float StackTransitionDuration = 0.5f;
+	const float SpreadTransitionDuration = 0.5f;
+
+	UCardSlot* TargetSlot = Target == EPlayer::Player ? Arena->PlayerHand : Arena->OpponentHand;
+
+	FVector TargetPosition = FMath::Lerp(TargetSlot->GetTransformForIndex(3).Position, TargetSlot->GetTransformForIndex(4).Position, 0.5f);
+	FRotator TargetRotation = FMath::Lerp(TargetSlot->GetTransformForIndex(4).Rotation, TargetSlot->GetTransformForIndex(5).Rotation, 0.5f);
+
+	for (size_t i = 0; i < TargetSlot->Num(); i++)
+	{
+		if (Target == EPlayer::Player)
+		{
+
+		}
+
+		ACard* Card = TargetSlot->GetCardByIndex(i);
+		
+		// First transition (stack)
+		FVector StackPosition = TargetPosition + FVector(0, 0, i * CARD_STACKING_OFFSET);
+
+		B2TPosition Position
+		{
+			Card->GetActorLocation(),
+			StackPosition,
+			FVector::ZeroVector,
+			EEase::EaseInOut,
+		};
+
+		B2TRotation Rotation
+		{
+			Card->GetActorRotation(),
+			TargetRotation,
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, StackTransitionDuration, DelayOnStart);
+		Card->QueueTransition(Transition);
+
+		// Last transition (spread)
+
+		FB2Transform EndTransform = TargetSlot->GetTransformForIndex(i);
+
+		Position = B2TPosition
+		{
+			Position.EndPosition,
+			EndTransform.Position,
+			FVector::ZeroVector,
+			EEase::EaseInOut,
+		};
+
+		Rotation = B2TRotation
+		{
+			Rotation.EndRotation,
+			EndTransform.Rotation,
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		Transition = B2Transition(WaitGroup, Position, Rotation, SpreadTransitionDuration, SpreadDelay);
+		Card->QueueTransition(Transition);
+	}
+}
+
 void UB2Dealer::ClearField()
 {
 	const float DelayOnStart = 0.5f;
@@ -1112,26 +1186,29 @@ void UB2Dealer::Tick(float DeltaSeconds)
 			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::CardsDealt);
 			WaitGroupDealFinished = B2WaitGroupNone;
 		}
-
-		if (CurrentWaitGroup == WaitGroupCardMoveFinished)
+		else if (CurrentWaitGroup == WaitGroupCardMoveFinished)
 		{
 			// Fire the event and reset this wait group so we dont keep entering this part
 			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::CardPlaced);
 			WaitGroupCardMoveFinished = B2WaitGroupNone;
 		}
-
-		if (CurrentWaitGroup == WaitGroupClearFinished)
+		else if (CurrentWaitGroup == WaitGroupClearFinished)
 		{
 			// Fire the event and reset this wait group so we dont keep entering this part
 			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::CardPlaced);
 			WaitGroupClearFinished = B2WaitGroupNone;
 		}
-
-		if (CurrentWaitGroup == WaitGroupEffectReady)
+		else if (CurrentWaitGroup == WaitGroupEffectReady)
 		{
 			// Fire the event and reset this wait group so we dont keep entering this part
 			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::EffectReady);
 			WaitGroupEffectReady = B2WaitGroupNone;
+		}
+		else if (CurrentWaitGroup == WaitGroupBlastFinished)
+		{
+			// Fire the event and reset this wait group so we dont keep entering this part
+			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::BlastFinished);
+			WaitGroupBlastFinished = B2WaitGroupNone;
 		}
 	}
 }

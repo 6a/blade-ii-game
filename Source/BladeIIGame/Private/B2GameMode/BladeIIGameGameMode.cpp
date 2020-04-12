@@ -261,6 +261,150 @@ void ABladeIIGameMode::OnCardsDealt()
 	EngineState = EEngineState::InPlay;
 }
 
+void ABladeIIGameMode::OnEffectReady()
+{
+	// Blast edge cases -  we should switch to the blast select state from the blast state, or set the bBlastAnimationPending flag from
+	// the blast select state
+	if (GSM->IsCurrentState(EGameState::PlayerBlast))
+	{
+		// Switch to player blast target state
+		GSM->ChangeState<GSM_State_PlayerBlastTarget>();
+
+		return;
+	}
+	else if (GSM->IsCurrentState(EGameState::OpponentBlast))
+	{
+		// Switch to opponent blast target state
+
+		return;
+	}
+	else if (GSM->IsCurrentState(EGameState::OpponentBlastTarget) || GSM->IsCurrentState(EGameState::PlayerBlastTarget))
+	{
+		GameState->bBlastAnimationPending = true;
+		return;
+	}
+
+	ACard* Card = GetCardSlot(GameState->CursorPosition)->GetCardByIndex(GameState->CursorSlotIndex);
+	ECard Type = Card->Type;
+
+	switch (Type)
+	{
+	case ECard::ElliotsOrbalStaff:
+		if (GameState->Turn == EPlayer::Player)
+		{
+			// Switch state machine to player rod
+			GSM->ChangeState<GSM_State_PlayerRod>();
+		}
+		else
+		{
+
+		}
+		break;
+	case ECard::Bolt:
+		if (GameState->Turn == EPlayer::Player)
+		{
+			// Switch state machine to player bolt
+			GSM->ChangeState<GSM_State_PlayerBolt>();
+		}
+		else
+		{
+
+		}
+		break;
+	case ECard::Mirror:
+		if (GameState->Turn == EPlayer::Player)
+		{
+			// Switch state machine to player force
+			GSM->ChangeState<GSM_State_PlayerMirror>();
+		}
+		else
+		{
+
+		}
+		break;
+	case ECard::Blast:
+		GameState->MostRecentBlastCardID = Card->GetID();
+
+		if (GameState->Turn == EPlayer::Player)
+		{
+			// Switch state machine to player blast
+			GSM->ChangeState<GSM_State_PlayerBlast>();
+		}
+		else
+		{
+
+		}
+		break;
+	case ECard::Force:
+		if (GameState->Turn == EPlayer::Player)
+		{
+			// Switch state machine to player force
+			GSM->ChangeState<GSM_State_PlayerForce>();
+		}
+		else
+		{
+
+		}
+		break;
+	}
+}
+
+void ABladeIIGameMode::OnCardPlaced()
+{
+	if (GSM->IsCurrentState(EGameState::DrawToEmptyField))
+	{
+		// Change state to the turn of the player with the highest score, or each draw another on draw
+		if (GameState->PlayerScore == GameState->OpponentScore)
+		{
+			// Edge case - what do we do if the deck(s) are empty?
+			uint32 PlayerDeckSize = Arena->PlayerDeck->Num();
+			uint32 OpponentDeckSize = Arena->OpponentDeck->Num();
+
+			if (PlayerDeckSize == 0 || OpponentDeckSize == 0)
+			{
+				B2Utility::LogWarning("Either the player deck, or the opponent deck is empty!");
+
+				// TODO do we end the game or something? Probably send it to end state...
+				// TODO 2 looks like you just start drawing from the hand. do we get to choose? i guess so
+
+				return;
+			}
+
+			// Lets go round again.wav
+			GameState->Turn = EPlayer::Undecided;
+
+			// Switch state machine to drawing from empty field
+			GSM->ChangeState<GSM_State_DrawToEmptyField>();
+		}
+		else if (GameState->PlayerScore > GameState->OpponentScore)
+		{
+			// Switch game state to player turn
+			GameState->Turn = EPlayer::Player;
+
+			// Switch state machine to player turn
+			GSM->ChangeState<GSM_State_PlayerTurn>();
+		}
+		else
+		{
+			//// Switch game state to opponent
+			//GameState->Turn = EPlayer::Opponent;
+
+			//// Switch state machine to opponent turn
+			//GSM->ChangeState<GSM_State_WaitingForOpponentMove>();
+
+			//// Fire off any animations / on screen stuff...
+
+			// For testing
+			// TODO remove and revert to above code
+			// Switch game state to player turn
+			GameState->Turn = EPlayer::Player;
+
+			// Switch state machine to player turn
+			GSM->ChangeState<GSM_State_PlayerTurn>();
+		}
+	}
+}
+
 int32 ABladeIIGameMode::AggregateScore(UCardSlot* Slot) const
 {
 	int32 Total = 0;
@@ -423,146 +567,13 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 		OnCardsDealt();
 		break;
 	case EDealerEvent::CardPlaced:
-		if (GSM->IsCurrentState(EGameState::DrawToEmptyField))
-		{
-			// Change state to the turn of the player with the highest score, or each draw another on draw
-			if (GameState->PlayerScore == GameState->OpponentScore)
-			{
-				// Edge case - what do we do if the deck(s) are empty?
-				uint32 PlayerDeckSize = Arena->PlayerDeck->Num();
-				uint32 OpponentDeckSize = Arena->OpponentDeck->Num();
-
-				if (PlayerDeckSize == 0 || OpponentDeckSize == 0)
-				{
-					B2Utility::LogWarning("Either the player deck, or the opponent deck is empty!");
-
-					// TODO do we end the game or something? Probably send it to end state...
-					// TODO 2 looks like you just start drawing from the hand. do we get to choose? i guess so
-
-					return;
-				}
-
-				// Lets go round again.wav
-				GameState->Turn = EPlayer::Undecided;
-
-				// Switch state machine to drawing from empty field
-				GSM->ChangeState<GSM_State_DrawToEmptyField>();
-			}
-			else if (GameState->PlayerScore > GameState->OpponentScore)
-			{
-				// Switch game state to player turn
-				GameState->Turn = EPlayer::Player;
-
-				// Switch state machine to player turn
-				GSM->ChangeState<GSM_State_PlayerTurn>();
-			}
-			else
-			{
-				//// Switch game state to opponent
-				//GameState->Turn = EPlayer::Opponent;
-
-				//// Switch state machine to opponent turn
-				//GSM->ChangeState<GSM_State_WaitingForOpponentMove>();
-
-				//// Fire off any animations / on screen stuff...
-
-				// For testing
-				// TODO remove and revert to above code
-				// Switch game state to player turn
-				GameState->Turn = EPlayer::Player;
-
-				// Switch state machine to player turn
-				GSM->ChangeState<GSM_State_PlayerTurn>();
-			}
-		}
+		OnCardPlaced();
 		break;
 	case EDealerEvent::EffectReady:
-
-		// Blast edge cases -  we should switch to the blast select state from the blast state, or set the bBlastAnimationPending flag from
-		// the blast select state
-		if (GSM->IsCurrentState(EGameState::PlayerBlast))
-		{
-			// Switch to player blast target state
-			GSM->ChangeState<GSM_State_PlayerBlastTarget>();
-
-			return;
-		}
-		else if (GSM->IsCurrentState(EGameState::OpponentBlast))
-		{
-			// Switch to opponent blast target state
-
-			return;
-		}
-		else if (GSM->IsCurrentState(EGameState::OpponentBlastTarget) || GSM->IsCurrentState(EGameState::PlayerBlastTarget))
-		{
-			GameState->bBlastAnimationPending = true;
-			return;
-		}
-
-		ACard* Card = GetCardSlot(GameState->CursorPosition)->GetCardByIndex(GameState->CursorSlotIndex);
-		ECard Type = Card->Type;
-
-		switch (Type)
-		{
-		case ECard::ElliotsOrbalStaff:
-			if (GameState->Turn == EPlayer::Player)
-			{
-				// Switch state machine to player rod
-				GSM->ChangeState<GSM_State_PlayerRod>();
-			}
-			else
-			{
-
-			}
-			break;
-		case ECard::Bolt:
-			if (GameState->Turn == EPlayer::Player)
-			{
-				// Switch state machine to player bolt
-				GSM->ChangeState<GSM_State_PlayerBolt>();
-			}
-			else
-			{
-
-			}
-			break;
-		case ECard::Mirror:
-			if (GameState->Turn == EPlayer::Player)
-			{
-				// Switch state machine to player force
-				GSM->ChangeState<GSM_State_PlayerMirror>();
-			}
-			else
-			{
-
-			}
-			break;
-		case ECard::Blast:
-			GameState->MostRecentBlastCardID = Card->GetID();
-
-			if (GameState->Turn == EPlayer::Player)
-			{
-				// Switch state machine to player blast
-				GSM->ChangeState<GSM_State_PlayerBlast>();
-			}
-			else
-			{
-
-			}
-			break;
-		case ECard::Force:
-			if (GameState->Turn == EPlayer::Player)
-			{
-				// Switch state machine to player force
-				GSM->ChangeState<GSM_State_PlayerForce>();
-			}
-			else
-			{
-
-			}
-			break;
-		}
-
+		OnEffectReady();
+		break;
+	case EDealerEvent::BlastFinished:
+		FinishTurn();
 		break;
 	}
 }

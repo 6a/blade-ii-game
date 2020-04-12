@@ -99,7 +99,7 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 				
 				GI->GetArena()->PlayerDiscard->Add(BlastCard);
 
-				GI->FinishTurn();
+				GI->GetDealer()->BlastCleanup(EPlayer::Opponent);
 			}
 		}
 	}

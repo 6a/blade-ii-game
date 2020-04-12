@@ -130,6 +130,12 @@ private:
 	/* Performs whatever is required for when the game enters play (post deal) */
 	void OnCardsDealt();
 
+	/* Performs whatever is required for when the dealer has finished an effect related transition */
+	void OnEffectReady();
+	
+	/* Performs whatever is required for when the dealer has finished moving a card */
+	void OnCardPlaced();
+
 	/* Event listeners */
 
 	/**

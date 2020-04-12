@@ -65,7 +65,7 @@ public:
 	void Mirror();
 
 	/**
-	 * Moves the specified players hand to the pre blast select position
+	 * Moves the specified players hand to the pre blast select position, and shuffles if its the players hand
 	 * @param Target - The player whos hand will be moved
 	 */
 	void PreBlastSelect(EPlayer Target);
@@ -75,6 +75,12 @@ public:
 	 * @param Target - The player whos hand will be moved
 	 */
 	void BlastSelect(EPlayer Target);
+
+	/**
+	 * Returns the specified players hand to the original position, after shuffling
+	 * @param Target - The player whos hand will be moved
+	 */
+	void BlastCleanup(EPlayer Target);
 
 	/* Clears the field of any cards */
 	void ClearField();
@@ -91,6 +97,7 @@ private:
 	B2WaitGroup WaitGroupCardMoveFinished;
 	B2WaitGroup WaitGroupClearFinished;
 	B2WaitGroup WaitGroupEffectReady;
+	B2WaitGroup WaitGroupBlastFinished;
 
 	/* The type of event to fire for the next effect activation event */
 	EDealerEvent NextEffectEvent;
