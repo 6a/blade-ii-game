@@ -1145,6 +1145,7 @@ void UB2Dealer::EffectCard(ACard* Card, FVector Offset)
 	WaitGroupEffectReady = WaitGroup + 1;
 
 	FVector TargetPosition = Card->GetActorLocation() + Offset;
+	FRotator TargetRotation = Card->IsFaceDown() ? Card->GetActorRotation() + FRotator(180, 0, 0) : Card->GetActorRotation();
 
 	// Transition 1
 	B2TPosition Position
@@ -1158,7 +1159,7 @@ void UB2Dealer::EffectCard(ACard* Card, FVector Offset)
 	B2TRotation Rotation
 	{
 		Card->GetActorRotation(),
-		Card->GetActorRotation(),
+		TargetRotation,
 		EEase::EaseInOut,
 	};
 

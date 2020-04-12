@@ -46,6 +46,11 @@ bool ACard::IsActive()
 	return bIsActive;
 }
 
+bool ACard::IsFaceDown()
+{
+	return FVector::DotProduct(GetActorUpVector(), FVector::UpVector) < 0;
+}
+
 // Called every frame
 void ACard::Tick(float DeltaTime)
 {

@@ -46,6 +46,9 @@ public:
 	/* Returns true if this card is currently active */
 	bool IsActive();
 
+	/* Returns true if the card is face-down (such as when its in the opponents hand) */
+	bool IsFaceDown();
+
 protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;

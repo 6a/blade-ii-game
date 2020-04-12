@@ -63,13 +63,46 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 				break;
 			case EInput::Select:
 				GI->GetCursor()->ToggleActorVisibility(false);
-
 				GI->GetGameState()->bAcceptPlayerInput = false;
+
+				GI->GetDealer()->OpponentEffectCard(GetCurrentCard());
 				break;
 			}
 		}
 	}
+	else if (GI->GetGameState()->bBlastAnimationPending)
+	{
+		GI->GetGameState()->bBlastAnimationPending = false;
 
+		FVector TargetLocation = GetCurrentCard()->GetActorLocation();
+		GI->GetEffectLayer()->Play(EUIEffect::BlastTarget, &TargetLocation, 1, 0);
+	}
+	else
+	{
+		EUIEffectEvent Event;
+		while (GI->GetEffectLayer()->EventQueue.Dequeue(Event))
+		{
+			if (Event == EUIEffectEvent::Ready)
+			{
+				// Get a reference to the target card (should be the one that is currently selected
+				ACard* TargetCard = RemoveCurrentCard();
+				TargetCard->SetActorHiddenInGame(true);
+
+				// Update card slots 
+				GI->GetArena()->OpponentDiscard->Add(TargetCard);
+			}
+			else if (Event == EUIEffectEvent::Finished)
+			{
+				// Remove the blast card
+				ACard* BlastCard = GI->GetArena()->PlayerHand->GetCardByID(GI->GetGameState()->MostRecentBlastCardID);
+				BlastCard->SetActorHiddenInGame(true);
+				
+				GI->GetArena()->PlayerDiscard->Add(BlastCard);
+
+				GI->FinishTurn();
+			}
+		}
+	}
 }
 
 void GSM_State_PlayerBlastTarget::End()

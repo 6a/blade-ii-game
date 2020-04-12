@@ -477,9 +477,9 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 		}
 		break;
 	case EDealerEvent::EffectReady:
-		// Blast select state edge case - if the state is currently blast (standard) then entering this case means
-		// that we should switch to the blast select state
 
+		// Blast edge cases -  we should switch to the blast select state from the blast state, or set the bBlastAnimationPending flag from
+		// the blast select state
 		if (GSM->IsCurrentState(EGameState::PlayerBlast))
 		{
 			// Switch to player blast target state
@@ -493,8 +493,14 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 
 			return;
 		}
+		else if (GSM->IsCurrentState(EGameState::OpponentBlastTarget) || GSM->IsCurrentState(EGameState::PlayerBlastTarget))
+		{
+			GameState->bBlastAnimationPending = true;
+			return;
+		}
 
-		ECard Type = GetCardSlot(GameState->CursorPosition)->GetCardByIndex(GameState->CursorSlotIndex)->Type;
+		ACard* Card = GetCardSlot(GameState->CursorPosition)->GetCardByIndex(GameState->CursorSlotIndex);
+		ECard Type = Card->Type;
 
 		switch (Type)
 		{
@@ -532,6 +538,8 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 			}
 			break;
 		case ECard::Blast:
+			GameState->MostRecentBlastCardID = Card->GetID();
+
 			if (GameState->Turn == EPlayer::Player)
 			{
 				// Switch state machine to player blast

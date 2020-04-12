@@ -25,7 +25,10 @@ struct B2GameState
 	// Turn
 	EPlayer Turn;
 
-	// Effect pending bool (should be set to false once checked)
-	bool bPendingEffectRequiresAction;
+	// Blast effect animation (card destruction) pending bool (should be set to false once checked)
+	bool bBlastAnimationPending;
+
+	// The ID of the most recently played blast card (so that it can be removed from the hand it is in)
+	FString MostRecentBlastCardID;
 };
 

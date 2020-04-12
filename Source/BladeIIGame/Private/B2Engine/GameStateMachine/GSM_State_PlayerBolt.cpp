@@ -39,10 +39,7 @@ void GSM_State_PlayerBolt::Tick(float DeltaSeconds)
 			ACard* TargetCard = GameModeInstance->GetArena()->OpponentField->RemoveLast();
 
 			// Set target card state to inactive
-			TargetCard->SetActive(false);
-
-			// Flip the target card
-			GI->GetDealer()->FlipFieldCard(TargetCard, true, 0.0f);
+			GI->GetDealer()->FlipFieldCard(TargetCard, false , 0.0f);
 
 			// Update score
 			GI->GetGameState()->OpponentScore = GI->AggregateScore(GI->GetArena()->OpponentField);
