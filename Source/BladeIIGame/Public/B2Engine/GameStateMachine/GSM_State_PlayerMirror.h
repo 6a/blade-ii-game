@@ -16,7 +16,5 @@ public:
 	virtual void End() override;
 
 	virtual EGameState Type() const override { return EGameState::PlayerMirror; }
-
-private:
 };
 

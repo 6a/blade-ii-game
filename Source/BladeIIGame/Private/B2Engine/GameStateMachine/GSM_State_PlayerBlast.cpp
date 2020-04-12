@@ -16,7 +16,9 @@ void GSM_State_PlayerBlast::Init(ABladeIIGameMode* GameMode)
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	// Play blast animation in the center of the screen
-	GI->GetEffectLayer()->Play(EUIEffect::Blast, nullptr, 0.4f, 0.5f);
+	GI->GetEffectLayer()->Play(EUIEffect::Blast, nullptr, 0.2f, 0.0f);
+
+	GI->GetDealer()->PreBlastSelect(EPlayer::Opponent);
 }
 
 void GSM_State_PlayerBlast::Tick(float DeltaSeconds)
@@ -30,8 +32,7 @@ void GSM_State_PlayerBlast::Tick(float DeltaSeconds)
 	{
 		if (Event == EUIEffectEvent::Finished)
 		{
-			// Signal to the game mode that the turn has finished
-			GI->FinishTurn();
+			GI->GetDealer()->BlastSelect(EPlayer::Opponent);
 		}
 	}
 }

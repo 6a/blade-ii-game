@@ -34,14 +34,18 @@ protected:
 	 */
 	ACard* RemoveCurrentCard();
 
-	/* Returns the card currently under the cursor to its original transform */
-	void SetCurrentCardToOriginalTransform();
+	/**
+	 * Returns the card currently under the cursor to its original transform
+	 * @param bIsBlastSelecting - Whether or not the target cards are raised due to the game being in a blast select state
+	 */
+	void SetCurrentCardToOriginalTransform(bool bIsBlastSelecting = false);
 
-	/* Returns the card currently under the cursor to its selected transform */
+	/* Sets the card currently under the cursor to its selected transform */
 	void SetCurrentCardToSelectedTransform();
 
 	/* Returns the card currently under the cursor to its pre effect transform */
 	void SetCurrentCardToPreEffectTransform();
 
+	virtual void UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecting = false);
 };
 

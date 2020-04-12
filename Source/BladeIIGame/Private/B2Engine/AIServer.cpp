@@ -11,7 +11,7 @@ const B2ServerUpdate B2AIServer::GetNextUpdate()
 	{
 		bCardsSent = true;
 		Payload.Type = EPayload::Cards;
-		Payload.Cards = MirrorTest();
+		Payload.Cards = BlastTest();
 	}
 
 	return Payload;

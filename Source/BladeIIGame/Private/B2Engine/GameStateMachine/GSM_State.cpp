@@ -27,7 +27,7 @@ EGameState GSM_State::Type() const
 	return EGameState::WaitingForInitialDeal;
 }
 
-void GSM_State::SetCurrentCardToOriginalTransform()
+void GSM_State::SetCurrentCardToOriginalTransform(bool bIsBlastSelecting)
 {
 	ABladeIIGameMode* GI = GameModeInstance;
 
@@ -35,7 +35,18 @@ void GSM_State::SetCurrentCardToOriginalTransform()
 
 	if (CurrentCard)
 	{
-		FB2Transform NewTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
+		FB2Transform NewTransform;
+
+		if (bIsBlastSelecting)
+		{
+			NewTransform.Position = CurrentCard->GetActorLocation() - GI->GetCursor()->OFFSET_WHEN_SELECTED * FVector(1, -1, 1);
+			NewTransform.Rotation = CurrentCard->GetActorRotation();
+		}
+		else
+		{
+			NewTransform = GI->GetCardSlot(GI->GetGameState()->CursorPosition)->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
+		}
+
 		CurrentCard->SetActorLocationAndRotation(NewTransform.Position, NewTransform.Rotation);
 	}
 }
@@ -46,12 +57,14 @@ void GSM_State::SetCurrentCardToSelectedTransform()
 
 	ACard* CurrentCard = GetCurrentCard();
 
+	// Used to flip the Y offset if the cursor is on the opponent hand
+	FVector OffsetYMod = FVector(1, GI->GetGameState()->CursorPosition == ECardSlot::OpponentHand ? -1 : 1, 1);
+
 	if (CurrentCard)
 	{
-		FB2Transform NewTransform = GI->GetArena()->PlayerHand->GetTransformForIndex(GI->GetGameState()->CursorSlotIndex);
-		NewTransform.Position += GI->GetCursor()->OFFSET_WHEN_SELECTED;
+		FVector NewPosition = CurrentCard->GetActorLocation() + GI->GetCursor()->OFFSET_WHEN_SELECTED * OffsetYMod;
 
-		CurrentCard->SetActorLocationAndRotation(NewTransform.Position, NewTransform.Rotation);
+		CurrentCard->SetActorLocationAndRotation(NewPosition, CurrentCard->GetActorRotation());
 	}
 }
 
@@ -59,16 +72,43 @@ void GSM_State::SetCurrentCardToPreEffectTransform()
 {
 }
 
+void GSM_State::UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecting)
+{
+	ABladeIIGameMode* GI = GameModeInstance;
+
+	// Return the currently selected card to its original transform
+	SetCurrentCardToOriginalTransform(bIsBlastSelecting);
+
+	GI->GetGameState()->CursorSlotIndex = NewCursorIndex;
+
+	ACard* CurrentCard = GetCurrentCard();
+
+	// Used to flip the Y offset if the cursor is on the opponent hand
+	FVector OffsetYMod = FVector(1, GI->GetGameState()->CursorPosition == ECardSlot::OpponentHand ? -1 : 1, 1);
+
+	// Used to flip the rotation when the cursor is using the opponents side as a reference (as their cards are upside down)
+	FRotator OffsetRotationMod = GI->GetGameState()->CursorPosition == ECardSlot::OpponentHand ? FRotator(180, 0, 0) : FRotator::ZeroRotator;
+
+	FB2Transform TargetTransform;
+	TargetTransform.Position = CurrentCard->GetActorLocation() + GI->GetCursor()->OFFSET_WHEN_SELECTED * OffsetYMod;
+	TargetTransform.Rotation = CurrentCard->GetActorRotation() + OffsetRotationMod;
+	
+	GI->GetCursor()->SetActorLocationAndRotation(TargetTransform.Position, TargetTransform.Rotation);
+
+	// Raise the newly selected card by the offset
+	SetCurrentCardToSelectedTransform();
+}
+
 ACard* GSM_State::GetCurrentCard()
 {
 	ABladeIIGameMode* GI = GameModeInstance;
 
-	return GI->GetArena()->PlayerHand->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
+	return GI->GetCardSlot(GI->GetGameState()->CursorPosition)->GetCardByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
 }
 
 ACard* GSM_State::RemoveCurrentCard()
 {
 	ABladeIIGameMode* GI = GameModeInstance;
 
-	return GI->GetArena()->PlayerHand->RemoveByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
+	return GI->GetCardSlot(GI->GetGameState()->CursorPosition)->RemoveByIndex(GameModeInstance->GetGameState()->CursorSlotIndex);
 }

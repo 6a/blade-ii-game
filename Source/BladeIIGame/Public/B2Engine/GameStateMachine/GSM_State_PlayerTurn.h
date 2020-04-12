@@ -20,6 +20,6 @@ public:
 private:
 
 	/* Update the hand to display the currently selected card */
-	void UpdateSelection(uint32 NewCursorIndex);
+	virtual void UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecting = false) override;
 };
 

@@ -15,6 +15,7 @@ const float MAX_MOVE_SQ_DISTANCE = 3267.789551f;
 const float CARD_POP_OUT_DISTANCE = 2.f;
 const FVector CARD_FLIP_ARC = FVector(0, 0, 6);
 const FVector MIRROR_ARC = FVector(0, 0, 4);
+const FVector RAISED_CARD_OFFSET = FVector(0, 0, 6.f);
 
 UB2Dealer::UB2Dealer()
 {
@@ -373,7 +374,7 @@ void UB2Dealer::Deal()
 		B2TPosition Position
 		{
 			CenterPosition,
-			CenterPosition + FVector(0, 0, 6.f),
+			CenterPosition + RAISED_CARD_OFFSET,
 			FVector(0, 0, 0),
 			EEase::EaseInOut,
 		};
@@ -418,7 +419,7 @@ void UB2Dealer::Deal()
 		int IndexAfterSort = SortedPlayerHand.IndexOfByPredicate([Card](const FString& s) { return s == Card->GetID(); });
 
 		CenterPosition = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(3).Position, Arena->PlayerHand->GetTransformForIndex(4).Position, 0.5f);
-		CenterPosition += FVector(0, 0, 6.f) + (IndexAfterSort * FVector(0, 0, CARD_STACKING_OFFSET));
+		CenterPosition += RAISED_CARD_OFFSET + (IndexAfterSort * FVector(0, 0, CARD_STACKING_OFFSET));
 
 		Position = B2TPosition
 		{
@@ -506,10 +507,7 @@ void UB2Dealer::Deal()
 		Card->QueueTransition(Transition);
 	}
 
-	// Correct order for opponents hand
-	TArray<FString> SortedOpponentHand = Arena->OpponentHand->GetSortedIDsDescending();
-
-	// Opponents cards shuffle
+	// Opponents cards (no shuffle, just place)
 	for (size_t i = 0; i < Arena->OpponentHand->Num(); i++)
 	{
 		float Delay = DelayShuffleSteps;
@@ -525,7 +523,7 @@ void UB2Dealer::Deal()
 		B2TPosition Position
 		{
 			CenterPosition,
-			CenterPosition + FVector(0, 0, 6.f),
+			CenterPosition + RAISED_CARD_OFFSET,
 			FVector(0, 0, 0),
 			EEase::EaseInOut,
 		};
@@ -541,31 +539,9 @@ void UB2Dealer::Deal()
 		B2Transition Transition = B2Transition(WG_Shuffle, Position, Rotation, DurationShuffleSteps, Delay);
 		Card->QueueTransition(Transition);
 
-		// Transition 2 (Sort)
-		int IndexAfterSort = SortedOpponentHand.IndexOfByPredicate([Card](const FString& s) { return s == Card->GetID(); });
-
-		CenterPosition = FMath::Lerp(Arena->OpponentHand->GetTransformForIndex(3).Position, Arena->OpponentHand->GetTransformForIndex(4).Position, 0.5f);
-		CenterPosition += FVector(0, 0, 6.f) + (IndexAfterSort * FVector(0, 0, CARD_STACKING_OFFSET));
-
-		Position = B2TPosition
-		{
-			Position.EndPosition,
-			CenterPosition,
-			FVector(0, 0, 0),
-			EEase::EaseInOut,
-		};
-
-		// Rotation remains unchanged
-
-		// Add the transition to the transition queue
-		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, 0.f, 0.f);
-		Card->QueueTransition(Transition);
-
-		// Post shuffle spread - included so we can reuse the sorted cards
-
-		// Transition 3
+		// Transition 2
 		FVector SpreadStart = Arena->OpponentHand->GetTransformForIndex(0).Position;
-		SpreadStart.Z += IndexAfterSort * CARD_STACKING_OFFSET;
+		SpreadStart.Z += i * CARD_STACKING_OFFSET;
 
 		Position = B2TPosition
 		{
@@ -586,13 +562,13 @@ void UB2Dealer::Deal()
 		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationShuffleSteps, Delay);
 		Card->QueueTransition(Transition);
 
-		Delay = (Arena->OpponentHand->Num() * OffsetShuffleSpread) - IndexAfterSort * OffsetShuffleSpread;
+		Delay = (Arena->OpponentHand->Num() * OffsetShuffleSpread) - i * OffsetShuffleSpread;
 
-		// Transition 4
+		// Transition 3
 		Position = B2TPosition
 		{
 			Position.EndPosition,
-			Arena->OpponentHand->GetTransformForIndex(IndexAfterSort).Position,
+			Arena->OpponentHand->GetTransformForIndex(i).Position,
 			FVector(0, 0, 0),
 			EEase::EaseInOut,
 		};
@@ -600,7 +576,7 @@ void UB2Dealer::Deal()
 		Rotation = B2TRotation
 		{
 			Rotation.EndRotation,
-			Arena->OpponentHand->GetTransformForIndex(IndexAfterSort).Rotation,
+			Arena->OpponentHand->GetTransformForIndex(i).Rotation,
 			EEase::EaseOut,
 		};
 
@@ -763,13 +739,13 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 
 void UB2Dealer::PlayerEffectCard(ACard* Card)
 {
-	FVector Offset = (Card->GetActorRotation().Vector().RotateAngleAxis(90, FVector::UpVector).GetSafeNormal()) * CARD_POP_OUT_DISTANCE;
+	FVector Offset = GetDirectionNormalized(Card, EPlayer::Player) * CARD_POP_OUT_DISTANCE;
 	EffectCard(Card, Offset);
 }
 
 void UB2Dealer::OpponentEffectCard(ACard* Card)
 {
-	FVector Offset = (Card->GetActorRotation().Vector().RotateAngleAxis(-90, FVector::UpVector).GetSafeNormal()) * CARD_POP_OUT_DISTANCE;
+	FVector Offset = GetDirectionNormalized(Card, EPlayer::Opponent) * CARD_POP_OUT_DISTANCE;
 	EffectCard(Card, Offset);
 }
 
@@ -867,6 +843,156 @@ void UB2Dealer::Mirror()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, MirrorDuration, DelayOnStart);
+		Card->QueueTransition(Transition);
+	}
+}
+
+void UB2Dealer::PreBlastSelect(EPlayer Target)
+{
+	// Early exit with noop if the target is not specified
+	if (Target == EPlayer::Undecided) return;
+
+	UCardSlot* TargetSlot = Target == EPlayer::Player ? Arena->PlayerHand : Arena->OpponentHand;
+
+	// Gather to center
+	const float DelayOnStart = 0.45f;
+	const float DelayPrePlayerHandFlip = 0.3f;
+	const float TransitionGatherDuration = 0.45f;
+	const float DurationPlayerHandFlip = 0.3f;
+
+	FVector TargetPosition = FMath::Lerp(TargetSlot->GetTransformForIndex(3).Position, TargetSlot->GetTransformForIndex(4).Position, 0.5f);
+	FRotator TargetRotation = FMath::Lerp(TargetSlot->GetTransformForIndex(4).Rotation, TargetSlot->GetTransformForIndex(5).Rotation, 0.5f);
+
+	for (size_t i = 0; i < TargetSlot->Num(); i++)
+	{
+		ACard* Card = TargetSlot->GetCardByIndex(i);
+		FVector Offset = RAISED_CARD_OFFSET;
+		Offset.Z += (i * CARD_STACKING_OFFSET);
+
+		B2TPosition Position
+		{
+			Card->GetActorLocation(),
+			TargetPosition + Offset,
+			FVector::ZeroVector,
+			EEase::EaseInOut,
+		};
+
+		B2TRotation Rotation
+		{
+			Card->GetActorRotation(),
+			TargetRotation,
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, TransitionGatherDuration, DelayOnStart);
+		Card->QueueTransition(Transition);
+
+		if (Target == EPlayer::Player)
+		{
+			TargetRotation = FMath::Lerp(Arena->PlayerHandReversed->GetTransformForIndex(4).Rotation, Arena->PlayerHandReversed->GetTransformForIndex(5).Rotation, 0.5f);
+
+			float VerticalOffset = (TargetSlot->Num() - 1 - i) * CARD_STACKING_OFFSET;
+
+			Position = B2TPosition
+			{
+				Position.EndPosition,
+				Position.EndPosition - FVector(0, 0, VerticalOffset),
+				FVector(0, 0, 0),
+				EEase::EaseInOut,
+			};
+
+			Rotation = B2TRotation
+			{
+				Rotation.StartRotation,
+				TargetRotation,
+				EEase::EaseInOut,
+			};
+
+			// Add the transition to the transition queue
+			Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationPlayerHandFlip, DelayPrePlayerHandFlip);
+			Card->QueueTransition(Transition);
+		}
+	}
+}
+
+void UB2Dealer::BlastSelect(EPlayer Target)
+{
+	// Early exit with noop if the target is not specified
+	if (Target == EPlayer::Undecided) return;
+
+	UCardSlot* TargetSlot = Target == EPlayer::Player ? Arena->PlayerHand : Arena->OpponentHand;
+
+	const float DelayOnStart = 1;
+	const float DelayPlayerHandFlip = 0.3f;
+	const float DurationPlayerHandFlip = 0.45f;
+	const float DurationSpread = 0.4f;
+
+	// rotaion before spread declared here so it can be reused later
+	FRotator RotationBeforeSpread;
+	if (Target == EPlayer::Player)
+	{
+		RotationBeforeSpread = FMath::Lerp(Arena->PlayerHand->GetTransformForIndex(4).Rotation, Arena->PlayerHand->GetTransformForIndex(5).Rotation, 0.5f);
+	}
+	else
+	{
+		RotationBeforeSpread = FMath::Lerp(Arena->OpponentHand->GetTransformForIndex(4).Rotation, Arena->OpponentHand->GetTransformForIndex(5).Rotation, 0.5f);
+	}
+
+	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
+	WaitGroupEffectReady = WaitGroup + 1;
+
+	for (size_t i = 0; i < TargetSlot->Num(); i++)
+	{
+		ACard* Card = TargetSlot->GetCardByIndex(i);
+
+		// If the target is the players hand, flip the cards
+		if (Target == EPlayer::Player)
+		{
+			float VerticalOffset = CARD_STACKING_OFFSET;
+			
+			B2TPosition Position
+			{
+				Card->GetActorLocation(),
+				Card->GetActorLocation() + FVector(0, 0, VerticalOffset),
+				FVector(0, 0, 0),
+				EEase::EaseInOut,
+			};
+
+			B2TRotation Rotation
+			{
+				Card->GetActorRotation(),
+				RotationBeforeSpread,
+				EEase::EaseInOut,
+			};
+
+			// Add the transition to the transition queue
+			B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationPlayerHandFlip, DelayPlayerHandFlip);
+			Card->QueueTransition(Transition);
+		}
+
+		FVector Offset = GetDirectionNormalized(Card, Target) * CARD_POP_OUT_DISTANCE;
+
+		FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(i);
+		TargetTransform.Position += RAISED_CARD_OFFSET + Offset;
+
+		B2TPosition Position
+		{
+			Card->GetActorLocation(),
+			TargetTransform.Position,
+			FVector::ZeroVector,
+			EEase::EaseInOut,
+		};
+
+		B2TRotation Rotation
+		{
+			RotationBeforeSpread,
+			TargetSlot->GetTransformForIndex(i).Rotation,
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, DurationSpread, DelayOnStart);
 		Card->QueueTransition(Transition);
 	}
 }
@@ -1039,4 +1165,14 @@ void UB2Dealer::EffectCard(ACard* Card, FVector Offset)
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
 	Card->QueueTransition(Transition);
+}
+
+FVector UB2Dealer::GetDirectionNormalized(const ACard* Card, const EPlayer Target) const
+{
+	// Early exit with a zero vector if the player is not specified
+	if (Target == EPlayer::Undecided) return FVector::ZeroVector;
+
+	float Rotation = Target == EPlayer::Player ? 90 : -90;
+
+	return Card->GetActorRotation().Vector().RotateAngleAxis(Rotation, FVector::UpVector).GetSafeNormal();
 }

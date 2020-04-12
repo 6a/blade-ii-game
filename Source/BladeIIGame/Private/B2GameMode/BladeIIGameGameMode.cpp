@@ -19,6 +19,7 @@
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBolt.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerMirror.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBlast.h"
+#include "B2Engine/GameStateMachine/GSM_State_PlayerBlastTarget.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerForce.h"
 
 
@@ -398,8 +399,8 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 
 	EngineState = EEngineState::Dealing;
 
-	 Dealer->Deal();
-	//Dealer->FastDeal();
+	 //Dealer->Deal();
+	Dealer->FastDeal();
 }
 
 void ABladeIIGameMode::HandleMoveReceived(const FB2Move& Move)
@@ -476,6 +477,23 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 		}
 		break;
 	case EDealerEvent::EffectReady:
+		// Blast select state edge case - if the state is currently blast (standard) then entering this case means
+		// that we should switch to the blast select state
+
+		if (GSM->IsCurrentState(EGameState::PlayerBlast))
+		{
+			// Switch to player blast target state
+			GSM->ChangeState<GSM_State_PlayerBlastTarget>();
+
+			return;
+		}
+		else if (GSM->IsCurrentState(EGameState::OpponentBlast))
+		{
+			// Switch to opponent blast target state
+
+			return;
+		}
+
 		ECard Type = GetCardSlot(GameState->CursorPosition)->GetCardByIndex(GameState->CursorSlotIndex)->Type;
 
 		switch (Type)
@@ -523,6 +541,7 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 			{
 
 			}
+			break;
 		case ECard::Force:
 			if (GameState->Turn == EPlayer::Player)
 			{

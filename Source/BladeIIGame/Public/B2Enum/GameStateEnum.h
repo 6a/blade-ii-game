@@ -20,6 +20,8 @@ enum class EGameState : uint8
 	OpponentMirror UMETA(DisplayName = "Opponent Mirror"),
 	PlayerBlast UMETA(DisplayName = "Player Blast"),
 	OpponentBlast UMETA(DisplayName = "Opponent Blast"),
+	PlayerBlastTarget UMETA(DisplayName = "Player Blast Target"),
+	OpponentBlastTarget UMETA(DisplayName = "Opponent Blast Target"),
 	PlayerForce UMETA(DisplayName = "Player Force"),
 	OpponentForce UMETA(DisplayName = "Opponent Force"),
 };

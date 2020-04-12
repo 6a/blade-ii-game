@@ -60,9 +60,21 @@ public:
 
 	/**
 	 * Performs the mirror flip transition immediately
-	 * @note This also updates the card positions internally, and immedaitely, so the score can be recalculated as soon as its called
+	 * @note This also updates the card positions internally, and immediately, so the score can be recalculated as soon as its called
 	 */
 	void Mirror();
+
+	/**
+	 * Moves the specified players hand to the pre blast select position
+	 * @param Target - The player whos hand will be moved
+	 */
+	void PreBlastSelect(EPlayer Target);
+
+	/**
+	 * Moves the specified players hand up to the blast selection position
+	 * @param Target - The player whos hand will be moved
+	 */
+	void BlastSelect(EPlayer Target);
 
 	/* Clears the field of any cards */
 	void ClearField();
@@ -89,5 +101,7 @@ private:
 	 * @param Offset - The offset
 	 */
 	void EffectCard(ACard* Card, FVector Offset);
+
+	FVector GetDirectionNormalized(const ACard* Card, const EPlayer Target) const;
 };
 

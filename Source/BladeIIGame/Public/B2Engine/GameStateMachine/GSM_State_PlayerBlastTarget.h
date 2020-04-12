@@ -4,10 +4,10 @@
 
 #include "GSM_State.h"
 
-class GSM_State_PlayerForce : public GSM_State
+class GSM_State_PlayerBlastTarget : public GSM_State
 {
 public:
-	GSM_State_PlayerForce();
+	GSM_State_PlayerBlastTarget();
 
 	virtual void Init(class ABladeIIGameMode* GameMode) override;
 
@@ -15,6 +15,6 @@ public:
 
 	virtual void End() override;
 
-	virtual EGameState Type() const override { return EGameState::PlayerForce; }
+	virtual EGameState Type() const override { return EGameState::PlayerBlastTarget; }
 };
 
