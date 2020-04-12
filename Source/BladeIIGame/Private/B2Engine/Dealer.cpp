@@ -26,6 +26,7 @@ UB2Dealer::UB2Dealer()
 	WaitGroupCardMoveFinished = B2WaitGroupNone;
 	WaitGroupClearFinished = B2WaitGroupNone;
 	WaitGroupEffectReady = B2WaitGroupNone;
+	WaitGroupBlastFinished = B2WaitGroupNone;
 
 	NextEffectEvent = EDealerEvent::None;
 

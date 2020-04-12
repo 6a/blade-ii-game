@@ -15,7 +15,7 @@ FB2Cards::FB2Cards(const FString& Cards)
 	TArray<FString> OutArray;
 	int32 Count = Cards.ParseIntoArray(OutArray, *DELIMITER);
 
-	ensureMsgf(Count != EXPECTED_PARSED_ARRAY_SIZE, TEXT("Could not parse incoming cards data. Expected %d data entities, received %d"), EXPECTED_PARSED_ARRAY_SIZE, Count);
+	ensureMsgf(Count == EXPECTED_PARSED_ARRAY_SIZE, TEXT("Could not parse incoming cards data. Expected %d data entities, received %d"), EXPECTED_PARSED_ARRAY_SIZE, Count);
 
 	int32 PlayerNumber;
 	ensureMsgf(FDefaultValueHelper::ParseInt(OutArray[0], PlayerNumber), TEXT("Could not parse player number"));

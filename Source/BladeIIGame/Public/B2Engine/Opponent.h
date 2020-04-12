@@ -2,15 +2,13 @@
 
 #include "CoreMinimal.h"
 
-#include "B2Engine/Move.h"
 #include "B2Engine/Server.h"
 #include "B2Engine/Cards.h"
-#include "B2Enum/InstructionEnum.h"
+#include "B2Enum/ServerUpdateEnum.h"
 
 #include "Opponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReceivedDelegate, const FB2Move&, Move);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInstructionReceivedDelegate, EInstruction, Move);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FServerUpdateReceivedDelegate, EServerUpdate, Update, const FString&, MetaData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCardsReceivedDelegate, const FB2Cards&, Cards);
 
 UCLASS()
@@ -19,14 +17,11 @@ class UB2Opponent : public UObject
 	GENERATED_BODY()
 
 public:
-	/* Callback for receiving moves from the server */
-	FMoveReceivedDelegate OnMoveReceived;
-
-	/* Callback for receiving instructions from the server */
-	FInstructionReceivedDelegate OnInstructionReceived;
-
-	/* Callback for when the cards for this game are received from the server */
+	/* Callback for receiving cards from the server */
 	FCardsReceivedDelegate OnCardsReceived;
+
+	/* Callback for when a non-card update is received from the server */
+	FServerUpdateReceivedDelegate OnServerUpdateReceived;
 
 	/**
 	 * Tick this opponent instance.
@@ -35,16 +30,11 @@ public:
 	virtual void Tick(float DeltaSeconds);
 
 	/**
-	 * Send a move to the server.
-	 * @param Move - The move to send
+	 * Send an update to the server
+	 * @param Update - the type of update
+	 * @param Metadata - optional metadata, such as the blast target for the blast effect
 	 */
-	void SendMove(const FB2Move& Move);
-
-	/**
-	 * Send an instruction to the server.
-	 * @param Instruction - The instruction to send
-	 */
-	void SendInstruction(const EInstruction& Instruction);
+	void SendUpdate(EServerUpdate Update, const FString& MetaData = FString()) const;
 
 protected:
 	/* The back end for this opponent. Could be an AI opponent, or a network opponent */

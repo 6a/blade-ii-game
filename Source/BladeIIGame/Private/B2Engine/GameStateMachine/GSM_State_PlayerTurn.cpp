@@ -1,7 +1,5 @@
 #include "B2Engine/GameStateMachine/GSM_State_PlayerTurn.h"
 
-#include "B2Utility/Log.h"
-
 #include "B2GameMode/BladeIIGameMode.h"
 
 const FVector ARC_ON_MOVE = FVector(0, 0, 4);
@@ -92,25 +90,6 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 
 				if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect || bUsedForceEffect)
 				{
-					// If this was NOT a blast card, send the move to the server - blasts are handled differently and
-					// are updated in thei blast target state
-					if (!bUsedBlastEffect)
-					{
-						// Get source and target slots
-						UCardSlot* CurrentSlot = GI->GetArena()->PlayerHand;
-						UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
-
-						// Send the move to the server
-						FB2Move Move
-						{
-							SelectedCard->Type,
-							CurrentSlot->GetType(),
-							TargetSlot->GetType()
-						};
-
-						GI->GetOpponent()->SendMove(Move);
-					}
-
 					GI->GetDealer()->PlayerEffectCard(SelectedCard);
 					GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Undecided);
 				}
@@ -127,19 +106,17 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 						GI->GetDealer()->ClearSingleFromField(LatestFieldCard);
 					}
 
-					// Send the move to the server
-					FB2Move Move
-					{
-						SelectedCard->Type,
-						CurrentSlot->GetType(),
-						TargetSlot->GetType()
-					};
-
-					GI->GetOpponent()->SendMove(Move);
-
 					GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_MOVE);
 
 					GI->FinishTurn();
+				}
+
+				// If this was NOT a blast card, update the server - blasts are handled differently,
+				// updated during the blast target state
+				if (!bUsedBlastEffect)
+				{
+					// Update the server
+					GI->GetOpponent()->SendUpdate(static_cast<EServerUpdate>(SelectedCard->Type));
 				}
 
 				GI->GetGameState()->bAcceptPlayerInput = false;

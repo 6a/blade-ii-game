@@ -60,15 +60,6 @@ void ABladeIIGameMode::FinishTurn()
 {
 	UpdateCardState();
 	
-	if (GSM->IsCurrentState(EGameState::PlayerBlast))
-	{
-		// Set to player blast select state
-	}
-	else if (GSM->IsCurrentState(EGameState::OpponentBlast))
-	{
-		// Set to opponent blast select state
-	}
-
 	FString Turn = GameState->Turn == EPlayer::Player ? TEXT("Player's") : TEXT("Opponent's");
 
 	B2Utility::LogWarning(FString::Printf(TEXT("[%s] turn finished"), *Turn));
@@ -162,8 +153,7 @@ void ABladeIIGameMode::RegisterEventListeners()
 	// Register event listeners
 
 	// From Opponent
-	Opponent->OnMoveReceived.AddDynamic(this, &ABladeIIGameMode::HandleMoveReceived);
-	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameMode::HandleInstructionReceived);
+	Opponent->OnServerUpdateReceived.AddDynamic(this, &ABladeIIGameMode::HandleServerUpdate);
 	Opponent->OnCardsReceived.AddDynamic(this, &ABladeIIGameMode::HandleCardsReceived);
 
 	// From Dealer
@@ -547,12 +537,7 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 	Dealer->FastDeal();
 }
 
-void ABladeIIGameMode::HandleMoveReceived(const FB2Move& Move)
-{
-
-}
-
-void ABladeIIGameMode::HandleInstructionReceived(EInstruction Instruction)
+void ABladeIIGameMode::HandleServerUpdate(EServerUpdate Update, const FString& MetaData)
 {
 
 }

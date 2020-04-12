@@ -65,7 +65,11 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 				GI->GetCursor()->ToggleActorVisibility(false);
 				GI->GetGameState()->bAcceptPlayerInput = false;
 
-				GI->GetDealer()->OpponentEffectCard(GetCurrentCard());
+				ACard* OpponentCard = GetCurrentCard();
+				GI->GetDealer()->OpponentEffectCard(OpponentCard);
+
+				// Update the server
+				GI->GetOpponent()->SendUpdate(EServerUpdate::CardBlast, FString::FromInt(static_cast<uint32>(OpponentCard->Type)));
 				break;
 			}
 		}

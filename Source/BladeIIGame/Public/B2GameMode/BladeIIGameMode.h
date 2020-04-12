@@ -146,18 +146,12 @@ private:
 	void HandleCardsReceived(const FB2Cards& Cards);
 
 	/**
-	 * Event handler for moves received from the server.
-	 * @param Move - The move that was received
+	 * Event handler for receiving an updated from the server
+	 * @param Update - the type of update
+	 * @param Metadata - any metadata
 	 */
 	UFUNCTION()
-	void HandleMoveReceived(const FB2Move& Move);
-
-	/**
-	 * Event handler for instructions from the server.
-	 * @param Instruction - The instruction that was received
-	 */
-	UFUNCTION()
-	void HandleInstructionReceived(EInstruction Instruction);
+	void HandleServerUpdate(EServerUpdate Update, const FString& MetaData);
 
 	/**
 	 * Event handler for updates from the dealer instance.

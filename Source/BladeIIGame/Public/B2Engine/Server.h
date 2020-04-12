@@ -15,6 +15,13 @@ public:
 	 */
 	virtual const B2ServerUpdate GetNextUpdate();
 
+	/**
+	 * Send an update to the server
+	 * @param Update - the type of update
+	 * @param Metadata - optional metadata, such as the blast target for the blast effect
+	 */
+	virtual void SendUpdate(EServerUpdate Update, const FString& MetaData = FString()) const;
+
 private:
 	TArray<B2ServerUpdate> InboundQueue;
 	TArray<B2ServerUpdate> OutBoundQueue;
