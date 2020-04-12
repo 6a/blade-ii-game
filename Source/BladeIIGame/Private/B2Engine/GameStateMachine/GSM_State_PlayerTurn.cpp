@@ -101,6 +101,13 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 					UCardSlot* CurrentSlot = GI->GetArena()->PlayerHand;
 					UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
 
+					// If the fields most recent card is face down, remove it (if we didnt use an effect card the card is now void)
+					ACard* LatestFieldCard = GI->GetArena()->PlayerField->GetLast();
+					if (!LatestFieldCard->IsActive())
+					{
+						GI->GetDealer()->ClearSingleFromField(LatestFieldCard);
+					}
+
 					GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_MOVE);
 				}
 

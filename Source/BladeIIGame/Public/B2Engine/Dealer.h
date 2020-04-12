@@ -82,6 +82,12 @@ public:
 	 */
 	void BlastCleanup(EPlayer Target);
 
+	/**
+	 * Clears the specified card off of the field
+	 * @param Card - The card to clear
+	 */
+	void ClearSingleFromField(ACard* Card) const;
+
 	/* Clears the field of any cards */
 	void ClearField();
 

@@ -1071,6 +1071,40 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 	}
 }
 
+void UB2Dealer::ClearSingleFromField(ACard* Card) const
+{
+	const float DelayOnStart = 0.0f;
+	const float ClearTransitionDuration = 0.5f;
+
+	// Hacky way of quickly checking which direction to send the card, and where it came from
+	bool bIsFromPlayerField = Card->GetActorLocation().X < 0;
+	UCardSlot* TargetSlot = bIsFromPlayerField ? Arena->PlayerDiscard : Arena->OpponentDiscard;
+	UCardSlot* SourceSlot = bIsFromPlayerField ? Arena->PlayerField : Arena->OpponentField;
+	FVector TargetPosition = TargetSlot->GetTransformForIndex(0).Position;
+
+	TargetSlot->Add(SourceSlot->RemoveByID(Card->GetID()));
+
+	// Transition 1
+	B2TPosition Position
+	{
+		Card->GetActorLocation(),
+		TargetPosition,
+		FVector::ZeroVector,
+		EEase::EaseIn,
+	};
+
+	B2TRotation Rotation
+	{
+		Card->GetActorRotation(),
+		Card->GetActorRotation(),
+		EEase::EaseInOut,
+	};
+
+	// Add the transition to the transition queue
+	B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, ClearTransitionDuration, DelayOnStart);
+	Card->QueueTransition(Transition);
+}
+
 void UB2Dealer::ClearField()
 {
 	const float DelayOnStart = 0.5f;
