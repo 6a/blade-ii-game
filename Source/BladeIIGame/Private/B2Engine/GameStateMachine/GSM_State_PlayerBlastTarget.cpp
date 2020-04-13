@@ -98,12 +98,13 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 			else if (Event == EUIEffectEvent::Finished)
 			{
 				// Remove the blast card
-				ACard* BlastCard = GI->GetArena()->PlayerHand->GetCardByID(GI->GetGameState()->MostRecentBlastCardID);
+				ACard* BlastCard = GI->GetArena()->PlayerHand->RemoveByID(GI->GetGameState()->MostRecentBlastCardID);
 				BlastCard->SetActorHiddenInGame(true);
 				
 				GI->GetArena()->PlayerDiscard->Add(BlastCard);
 
 				GI->GetDealer()->BlastCleanup(EPlayer::Opponent);
+				GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
 			}
 		}
 	}

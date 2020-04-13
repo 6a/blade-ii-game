@@ -87,3 +87,16 @@ FB2Cards B2AIServer::MirrorTest() const
 
 	return Cards;
 }
+
+FB2Cards B2AIServer::StandardCardsOnlyTest() const
+{
+	FB2Cards Cards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		Cards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+		Cards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+	}
+
+	return Cards;
+}

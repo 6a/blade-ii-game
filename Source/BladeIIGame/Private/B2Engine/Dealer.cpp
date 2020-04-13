@@ -1,7 +1,5 @@
 #include "B2Engine/Dealer.h"
 
-#include "Kismet/KismetMathLibrary.h"
-
 #include "B2Utility/Log.h"
 
 // Class scope values
@@ -27,8 +25,6 @@ UB2Dealer::UB2Dealer()
 	WaitGroupClearFinished = B2WaitGroupNone;
 	WaitGroupEffectReady = B2WaitGroupNone;
 	WaitGroupBlastFinished = B2WaitGroupNone;
-
-	NextEffectEvent = EDealerEvent::None;
 
 	B2Transition::ResetStatic();
 }
@@ -1069,6 +1065,40 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 		// Add the transition to the transition queue
 		Transition = B2Transition(WaitGroup, Position, Rotation, SpreadTransitionDuration, SpreadDelay);
 		Card->QueueTransition(Transition);
+	}
+}
+
+void UB2Dealer::UpdateHandPositions(EPlayer Target) const
+{
+	const float DelayOnStart = 0.1f;
+	const float TransitionDuration = 0.35f;
+
+	UCardSlot* TargetSlot = Target == EPlayer::Player ? Arena->PlayerHand : Arena->OpponentHand;
+
+	for (size_t i = 0; i < TargetSlot->Num(); i++)
+	{
+		FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(i);
+		ACard* TargetCard = TargetSlot->GetCardByIndex(i);
+
+		// Transition 1
+		B2TPosition Position
+		{
+			TargetCard->GetActorLocation(),
+			TargetTransform.Position,
+			FVector::ZeroVector,
+			EEase::EaseInOut,
+		};
+
+		B2TRotation Rotation
+		{
+			TargetCard->GetActorRotation(),
+			TargetTransform.Rotation,
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, TransitionDuration, DelayOnStart);
+		TargetCard->QueueTransition(Transition);
 	}
 }
 

@@ -107,6 +107,7 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 					}
 
 					GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_MOVE);
+					GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
 
 					GI->FinishTurn();
 				}

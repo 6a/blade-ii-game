@@ -16,20 +16,6 @@ public:
 	virtual void Add(ACard* Card) override;
 
 	/**
-	* Remove the card at index N
-	* @param N - The index of the card to remove
-	* @returns A pointer to the removed card
-	*/
-	virtual ACard* RemoveByIndex(uint32 N) override;
-
-	/**
-	 * Remove the card with the specified ID
-	 * @param ID - The ID of the card to remove
-	 * @returns A pointer to the removed card
-	 */
-	virtual ACard* RemoveByID(FString ID) override;
-
-	/**
 	 * Return the position + rotation that a card with the index "Index" should have.
 	 * @param Index - The index for which the transform will be returned
 	 * @returns FB2Transform for index "Index"
@@ -41,5 +27,10 @@ protected:
 	/* The positions for each possible card location, when there is an odd number of cards in the slot */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Configuration)
 	TArray<FB2Transform> CardTransformsOffset;
+
+private:
+	
+	/* Flag to check if the cards have been dealt. If not, dont offset the card transforms */
+	bool bCardsDealt;
 
 };
