@@ -22,7 +22,6 @@
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBlastTarget.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerForce.h"
 
-
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
