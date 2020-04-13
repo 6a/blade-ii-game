@@ -19,7 +19,7 @@ void GSM_State_PlayerForce::Init(ABladeIIGameMode* GameMode)
 
 	// Play Force animation at players next free slot
 	EUIEffect Effect = EUIEffect::Force;
-	FVector TargetWorldPosition = GI->GetArena()->PlayerField->GetNextTransform().Position;
+	FVector TargetWorldPosition = GI->GetArena()->PlayerField->GetTransformForIndex(14).Position;
 	GI->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 1.0f, 0.4f);
 	
 	ACard* CurrentForceCard = GetCurrentCard();

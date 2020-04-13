@@ -535,8 +535,8 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 
 	EngineState = EEngineState::Dealing;
 
-	 Dealer->Deal();
-	//Dealer->FastDeal();
+	 //Dealer->Deal();
+	Dealer->FastDeal();
 }
 
 void ABladeIIGameMode::HandleServerUpdate(EServerUpdate Update, const FString& MetaData)

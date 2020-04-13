@@ -5,8 +5,6 @@
 #include "Misc/Guid.h"
 #include "UObject/ConstructorHelpers.h"
 
-const float LERP_MAX = 1.f;
-
 ACard::ACard()
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
@@ -108,14 +106,14 @@ void ACard::Tick(float DeltaTime)
 			Step *= -1;
 		}
 
-		OpacityTransitionAlpha = FMath::Clamp(OpacityTransitionAlpha + Step, 0.f, LERP_MAX);
+		OpacityTransitionAlpha = FMath::Clamp(OpacityTransitionAlpha + Step, LERP_MIN, LERP_MAX);
 
-		float CurrentOpacity = FMath::InterpEaseIn(0.f, LERP_MAX, OpacityTransitionAlpha, 2);
+		float CurrentOpacity = FMath::InterpEaseIn(LERP_MIN, LERP_MAX, OpacityTransitionAlpha, EASE_EXPONENT);
 
-		M0->SetScalarParameterValue(TEXT("Opacity"), CurrentOpacity);
-		M1->SetScalarParameterValue(TEXT("Opacity"), CurrentOpacity);
+		M0->SetScalarParameterValue(OPACITY_PARAMETER, CurrentOpacity);
+		M1->SetScalarParameterValue(OPACITY_PARAMETER, CurrentOpacity);
 
-		if (OpacityTransitionAlpha == 1 || OpacityTransitionAlpha == 0)
+		if (OpacityTransitionAlpha == LERP_MAX || OpacityTransitionAlpha == LERP_MIN)
 		{
 			FadeState = EFadeState::None;
 		}

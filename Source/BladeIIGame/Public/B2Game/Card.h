@@ -90,4 +90,10 @@ private:
 	float OpacityTransitionAlpha;
 	float FadeDuration;
 	EFadeState FadeState;
+
+	// Class consts
+	const float LERP_MIN = 0.f;
+	const float LERP_MAX = 1.f;
+	const float EASE_EXPONENT = 2.f;
+	const FName OPACITY_PARAMETER = TEXT("Opacity");
 };

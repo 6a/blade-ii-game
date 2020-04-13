@@ -1068,9 +1068,7 @@ void UB2Dealer::ForceOut(ACard* Card)
 	const float DelayOnStart = 0.4f;
 	const float TransitionDuration = 0.2f;
 
-	// Hacky way of quickly checking which side this card is on
-	bool bIsFromPlayerField = Card->GetActorLocation().X < 0;
-	FVector Target = bIsFromPlayerField ? FORCE_MAX_OFFSET_PLAYER : FORCE_MAX_OFFSET_OPPONENT;
+	FVector Target = CardIsFromPlayerField(Card) ? FORCE_MAX_OFFSET_PLAYER : FORCE_MAX_OFFSET_OPPONENT;
 
 	// Transition 1
 	B2TPosition Position
@@ -1098,9 +1096,7 @@ void UB2Dealer::ForceIn(ACard* Card)
 	const float DelayOnStart = 0.0f;
 	const float TransitionDuration = 0.5f;
 
-	// Hacky way of quickly checking which side this card is on
-	bool bIsFromPlayerField = Card->GetActorLocation().X < 0;
-	FB2Transform TargetTransform = bIsFromPlayerField ? Arena->PlayerField->GetNextTransform() : Arena->OpponentField->GetNextTransform();
+	FB2Transform TargetTransform = CardIsFromPlayerField(Card) ? Arena->PlayerField->GetTransformForIndex(14) : Arena->OpponentField->GetNextTransform();
 
 	// Transition 1
 	B2TPosition Position
@@ -1162,10 +1158,8 @@ void UB2Dealer::ClearSingleFromField(ACard* Card) const
 	const float DelayOnStart = 0.0f;
 	const float ClearTransitionDuration = 0.5f;
 
-	// Hacky way of quickly checking which direction to send the card, and where it came from
-	bool bIsFromPlayerField = Card->GetActorLocation().X < 0;
-	UCardSlot* TargetSlot = bIsFromPlayerField ? Arena->PlayerDiscard : Arena->OpponentDiscard;
-	UCardSlot* SourceSlot = bIsFromPlayerField ? Arena->PlayerField : Arena->OpponentField;
+	UCardSlot* TargetSlot = CardIsFromPlayerField(Card) ? Arena->PlayerDiscard : Arena->OpponentDiscard;
+	UCardSlot* SourceSlot = CardIsFromPlayerField(Card) ? Arena->PlayerField : Arena->OpponentField;
 	FVector TargetPosition = TargetSlot->GetTransformForIndex(0).Position;
 
 	TargetSlot->Add(SourceSlot->RemoveByID(Card->GetID()));
@@ -1373,4 +1367,9 @@ FVector UB2Dealer::GetDirectionNormalized(const ACard* Card, const EPlayer Targe
 	float Rotation = Target == EPlayer::Player ? 90 : -90;
 
 	return Card->GetActorRotation().Vector().RotateAngleAxis(Rotation, FVector::UpVector).GetSafeNormal();
+}
+
+bool UB2Dealer::CardIsFromPlayerField(const ACard* Card) const
+{
+	return Card->GetActorLocation().Y < 0;
 }

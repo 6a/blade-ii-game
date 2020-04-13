@@ -130,6 +130,18 @@ private:
 	 */
 	void EffectCard(ACard* Card, FVector Offset);
 
+	/**
+	 * Helper function that returns the forawrd direction of the specified card, taking into account the owning player
+	 * @param Card - The card
+	 * @param Target - The player to which the card belongs
+	 */
 	FVector GetDirectionNormalized(const ACard* Card, const EPlayer Target) const;
+
+	/**
+	 * Helper function that returns true if the specified card is on the players side of the field
+	 * @param Card - The card
+	 * @warning This is pretty hacky - might need to revisit this but it should be fine unless the arena moves
+	 */
+	bool CardIsFromPlayerField(const ACard* Card) const;
 };
 
