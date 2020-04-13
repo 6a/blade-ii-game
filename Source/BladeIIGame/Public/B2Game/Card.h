@@ -31,6 +31,18 @@ public:
 	 */
 	void QueueTransition(const B2Transition& Transition);
 
+	/**
+	 * Fade the card in over (Duration) seconds
+	 * @param Duration - How long the fade will take
+	 */
+	void FadeIn(float Duration);
+
+	/**
+	 * Fade the card out over (Duration) seconds
+	 * @param Duration - How long the fade will take
+	 */
+	void FadeOut(float Duration);
+
 	/* Returns true if this card is currently transitioning */
 	bool IsTransitioning() const;
 
@@ -44,16 +56,24 @@ public:
 	void SetActive(bool bNewActive);
 
 	/* Returns true if this card is currently active */
-	bool IsActive();
+	bool IsActive() const;
 
 	/* Returns true if the card is face-down (such as when its in the opponents hand) */
-	bool IsFaceDown();
+	bool IsFaceDown() const;
 
 protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 
 private:
+	// Used to describe the current fade state
+	enum EFadeState
+	{
+		None,
+		FadingIn,
+		FadingOut
+	};
+
 	/* The queue of transitions for this card */
 	TQueue<B2Transition> Transitions;
 
@@ -66,7 +86,8 @@ private:
 	/* The original scale of the card, so that we can revert back to it if required */
 	FVector OriginalScale;
 
-	/* The dynamic material instances for this card */
-	UPROPERTY()
-	TArray<UMaterialInstanceDynamic*> MaterialInstances;
+	/* For "opacity" fading (its actually dithered temporal AA) */
+	float OpacityTransitionAlpha;
+	float FadeDuration;
+	EFadeState FadeState;
 };

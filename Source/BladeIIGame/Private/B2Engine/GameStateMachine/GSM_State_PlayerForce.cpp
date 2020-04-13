@@ -24,7 +24,8 @@ void GSM_State_PlayerForce::Init(ABladeIIGameMode* GameMode)
 	
 	ACard* CurrentForceCard = GetCurrentCard();
 	GI->GetDealer()->ForceOut(CurrentForceCard);
-	GI->GetArena()->PlayerField->Add(CurrentForceCard);
+
+	CurrentForceCard->FadeOut(0.4f);
 }
 
 void GSM_State_PlayerForce::Tick(float DeltaSeconds)
@@ -45,6 +46,9 @@ void GSM_State_PlayerForce::Tick(float DeltaSeconds)
 			GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
 
 			GI->GetDealer()->ForceIn(UsedForceCard);
+			UsedForceCard->FadeIn(0.5f);
+
+			GI->GetArena()->PlayerField->Add(UsedForceCard);
 
 			GI->UpdateCardState();
 			

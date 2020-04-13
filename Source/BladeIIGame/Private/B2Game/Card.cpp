@@ -5,6 +5,8 @@
 #include "Misc/Guid.h"
 #include "UObject/ConstructorHelpers.h"
 
+const float LERP_MAX = 1.f;
+
 ACard::ACard()
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
@@ -17,22 +19,32 @@ ACard::ACard()
 	bIsActive = true;
 
 	PrimaryActorTick.bCanEverTick = true;
+
+	OpacityTransitionAlpha = 1;
+	FadeDuration = 0;
+	FadeState = EFadeState::None;
 }
 
 void ACard::BeginPlay()
 {
 	Super::BeginPlay();
-
-	auto M0 = static_cast<UMaterialInstanceDynamic*>(this->Mesh->GetMaterial(0));
-	auto M1 = static_cast<UMaterialInstanceDynamic*>(this->Mesh->GetMaterial(1));
-	
-	MaterialInstances.Add(M0);
-	MaterialInstances.Add(M1);
 }
 
 void ACard::QueueTransition(const B2Transition& Transition)
 {
 	Transitions.Enqueue(Transition);
+}
+
+void ACard::FadeIn(float Duration)
+{
+	FadeDuration = Duration;
+	FadeState = EFadeState::FadingIn;
+}
+
+void ACard::FadeOut(float Duration)
+{
+	FadeDuration = Duration;
+	FadeState = EFadeState::FadingOut;
 }
 
 bool ACard::IsTransitioning() const
@@ -50,12 +62,12 @@ void ACard::SetActive(bool bNewActive)
 	bIsActive = bNewActive;
 }
 
-bool ACard::IsActive()
+bool ACard::IsActive() const
 {
 	return bIsActive;
 }
 
-bool ACard::IsFaceDown()
+bool ACard::IsFaceDown() const
 {
 	return FVector::DotProduct(GetActorUpVector(), FVector::UpVector) < 0;
 }
@@ -81,6 +93,31 @@ void ACard::Tick(float DeltaTime)
 
 			Transitions.Pop();
 			return;
+		}
+	}
+
+	if (FadeState != EFadeState::None)
+	{
+		UMaterialInstanceDynamic* M0 = static_cast<UMaterialInstanceDynamic*>(this->Mesh->GetMaterial(0));
+		UMaterialInstanceDynamic* M1 = static_cast<UMaterialInstanceDynamic*>(this->Mesh->GetMaterial(1));
+
+		float Step = LERP_MAX / (FadeDuration / DeltaTime);
+
+		if (FadeState == EFadeState::FadingOut)
+		{
+			Step *= -1;
+		}
+
+		OpacityTransitionAlpha = FMath::Clamp(OpacityTransitionAlpha + Step, 0.f, LERP_MAX);
+
+		float CurrentOpacity = FMath::InterpEaseIn(0.f, LERP_MAX, OpacityTransitionAlpha, 2);
+
+		M0->SetScalarParameterValue(TEXT("Opacity"), CurrentOpacity);
+		M1->SetScalarParameterValue(TEXT("Opacity"), CurrentOpacity);
+
+		if (OpacityTransitionAlpha == 1 || OpacityTransitionAlpha == 0)
+		{
+			FadeState = EFadeState::None;
 		}
 	}
 }

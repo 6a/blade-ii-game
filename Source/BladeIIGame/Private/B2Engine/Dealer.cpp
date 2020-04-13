@@ -14,8 +14,8 @@ const FVector CARD_STACKING_OFFSET = FVector(0, 0, 0.03f);
 const FVector CARD_FLIP_ARC = FVector(0, 0, 6);
 const FVector MIRROR_ARC = FVector(0, 0, 4);
 const FVector RAISED_CARD_OFFSET = FVector(0, 0, 6.f);
-const FVector FORCE_MAX_OFFSET_PLAYER = FVector(-1, -0.2f, 122);
-const FVector FORCE_MAX_OFFSET_OPPONENT = FVector(1, 0.2f, 122);
+const FVector FORCE_MAX_OFFSET_PLAYER = FVector(-2, -0.4f, 122);
+const FVector FORCE_MAX_OFFSET_OPPONENT = FVector(2, 0.4f, 122);
 
 UB2Dealer::UB2Dealer()
 {
@@ -1096,7 +1096,7 @@ void UB2Dealer::ForceOut(ACard* Card)
 void UB2Dealer::ForceIn(ACard* Card)
 {
 	const float DelayOnStart = 0.0f;
-	const float TransitionDuration = 0.2f;
+	const float TransitionDuration = 0.5f;
 
 	// Hacky way of quickly checking which side this card is on
 	bool bIsFromPlayerField = Card->GetActorLocation().X < 0;
@@ -1115,7 +1115,7 @@ void UB2Dealer::ForceIn(ACard* Card)
 	{
 		Card->GetActorRotation(),
 		TargetTransform.Rotation,
-		EEase::EaseIn,
+		EEase::EaseOut,
 	};
 
 	// Add the transition to the transition queue
