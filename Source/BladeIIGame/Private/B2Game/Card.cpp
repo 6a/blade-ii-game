@@ -1,12 +1,16 @@
 #include "B2Game/Card.h"
 
+#include "Materials/MaterialInstanceDynamic.h"
+
 #include "Misc/Guid.h"
 #include "UObject/ConstructorHelpers.h"
 
 ACard::ACard()
 {
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Card Mesh"));
-	RootComponent = Mesh;
+	Mesh->SetupAttachment(RootComponent);
 
 	ID = FGuid::NewGuid().ToString();
 
@@ -18,7 +22,12 @@ ACard::ACard()
 void ACard::BeginPlay()
 {
 	Super::BeginPlay();
+
+	auto M0 = static_cast<UMaterialInstanceDynamic*>(this->Mesh->GetMaterial(0));
+	auto M1 = static_cast<UMaterialInstanceDynamic*>(this->Mesh->GetMaterial(1));
 	
+	MaterialInstances.Add(M0);
+	MaterialInstances.Add(M1);
 }
 
 void ACard::QueueTransition(const B2Transition& Transition)
@@ -50,8 +59,6 @@ bool ACard::IsFaceDown()
 {
 	return FVector::DotProduct(GetActorUpVector(), FVector::UpVector) < 0;
 }
-
-#include "B2Utility/Log.h"
 
 // Called every frame
 void ACard::Tick(float DeltaTime)

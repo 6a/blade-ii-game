@@ -60,5 +60,13 @@ private:
 	/* The randomly generated ID for this card */
 	FString ID;
 
+	/* Whether this card is active (face up) or not - only really applies when on the field */
 	bool bIsActive;
+
+	/* The original scale of the card, so that we can revert back to it if required */
+	FVector OriginalScale;
+
+	/* The dynamic material instances for this card */
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> MaterialInstances;
 };
