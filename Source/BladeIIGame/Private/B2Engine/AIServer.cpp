@@ -9,7 +9,7 @@ const B2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		Payload.Update = EServerUpdate::InstructionCards;
-		Payload.Metadata = MirrorTest().GetSerialised(0);
+		Payload.Metadata = ForceTest().GetSerialised(0);
 
 		bCardsSent = true;
 	}

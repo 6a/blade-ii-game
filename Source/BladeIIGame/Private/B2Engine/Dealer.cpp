@@ -14,6 +14,8 @@ const FVector CARD_STACKING_OFFSET = FVector(0, 0, 0.03f);
 const FVector CARD_FLIP_ARC = FVector(0, 0, 6);
 const FVector MIRROR_ARC = FVector(0, 0, 4);
 const FVector RAISED_CARD_OFFSET = FVector(0, 0, 6.f);
+const FVector FORCE_MAX_OFFSET_PLAYER = FVector(-1, -0.2f, 122);
+const FVector FORCE_MAX_OFFSET_OPPONENT = FVector(1, 0.2f, 122);
 
 UB2Dealer::UB2Dealer()
 {
@@ -1059,6 +1061,66 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 		Transition = B2Transition(WaitGroup, Position, Rotation, SpreadTransitionDuration, SpreadDelay);
 		Card->QueueTransition(Transition);
 	}
+}
+
+void UB2Dealer::ForceOut(ACard* Card)
+{
+	const float DelayOnStart = 0.4f;
+	const float TransitionDuration = 0.2f;
+
+	// Hacky way of quickly checking which side this card is on
+	bool bIsFromPlayerField = Card->GetActorLocation().X < 0;
+	FVector Target = bIsFromPlayerField ? FORCE_MAX_OFFSET_PLAYER : FORCE_MAX_OFFSET_OPPONENT;
+
+	// Transition 1
+	B2TPosition Position
+	{
+		Card->GetActorLocation(),
+		Target,
+		FVector::ZeroVector,
+		EEase::EaseIn,
+	};
+
+	B2TRotation Rotation
+	{
+		Card->GetActorRotation(),
+		Card->GetActorRotation(),
+		EEase::Linear,
+	};
+
+	// Add the transition to the transition queue
+	B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, TransitionDuration, DelayOnStart);
+	Card->QueueTransition(Transition);
+}
+
+void UB2Dealer::ForceIn(ACard* Card)
+{
+	const float DelayOnStart = 0.0f;
+	const float TransitionDuration = 0.2f;
+
+	// Hacky way of quickly checking which side this card is on
+	bool bIsFromPlayerField = Card->GetActorLocation().X < 0;
+	FB2Transform TargetTransform = bIsFromPlayerField ? Arena->PlayerField->GetNextTransform() : Arena->OpponentField->GetNextTransform();
+
+	// Transition 1
+	B2TPosition Position
+	{
+		Card->GetActorLocation(),
+		TargetTransform.Position,
+		FVector::ZeroVector,
+		EEase::EaseIn,
+	};
+
+	B2TRotation Rotation
+	{
+		Card->GetActorRotation(),
+		TargetTransform.Rotation,
+		EEase::EaseIn,
+	};
+
+	// Add the transition to the transition queue
+	B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, TransitionDuration, DelayOnStart);
+	Card->QueueTransition(Transition);
 }
 
 void UB2Dealer::UpdateHandPositions(EPlayer Target) const

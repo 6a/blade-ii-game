@@ -83,6 +83,18 @@ public:
 	void BlastCleanup(EPlayer Target);
 
 	/**
+	 * Performs the first part of the force animation (flying upwards)
+	 * @param Card - The card to which the animation will be performed
+	 */
+	void ForceOut(ACard* Card);
+
+	/**
+	 * Performs the second part of the force animation (flying downwards)
+	 * @param Card - The card to which the animation will be performed
+	 */
+	void ForceIn(ACard* Card);
+
+	/**
 	 * Moves all the cards in the specified player's hand to their correct location - use after removing a card from the hand
 	 * @param Target - The player whos hand will updated
 	 */

@@ -21,14 +21,9 @@ void GSM_State_PlayerForce::Init(ABladeIIGameMode* GameMode)
 	EUIEffect Effect = EUIEffect::Force;
 	FVector TargetWorldPosition = GI->GetArena()->PlayerField->GetNextTransform().Position;
 	GI->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 1.0f, 0.4f);
-
-	ACard* CurrentForceCard = RemoveCurrentCard();
-
-	// TODO implement 0.4s delay with animations (scale and alpha needed it seems)
-	CurrentForceCard->SetActorHiddenInGame(true);
-
-	FB2Transform NewTransform = GI->GetArena()->PlayerField->GetNextTransform();
-	CurrentForceCard->SetActorLocationAndRotation(NewTransform.Position, NewTransform.Rotation);
+	
+	ACard* CurrentForceCard = GetCurrentCard();
+	GI->GetDealer()->ForceOut(CurrentForceCard);
 	GI->GetArena()->PlayerField->Add(CurrentForceCard);
 }
 
@@ -43,14 +38,16 @@ void GSM_State_PlayerForce::Tick(float DeltaSeconds)
 	{
 		if (Event == EUIEffectEvent::Ready)
 		{
-			GI->UpdateCardState();
+			// Move the played force card down to the field
+			ACard* UsedForceCard = RemoveCurrentCard();
 
 			// Update the card positions in the hand as we have just removed one
 			GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
 
-			// Get the placed force card - TODO animate
-			ACard* UsedForceCard = GI->GetArena()->PlayerField->GetLast();
-			UsedForceCard->SetActorHiddenInGame(false);
+			GI->GetDealer()->ForceIn(UsedForceCard);
+
+			GI->UpdateCardState();
+			
 		}
 		else if (Event == EUIEffectEvent::Finished)
 		{
