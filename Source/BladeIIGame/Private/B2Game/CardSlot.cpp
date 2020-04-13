@@ -194,8 +194,7 @@ const FB2Transform UCardSlot::GetNextTransform() const
 		TransformIndex = CardTransforms.Num() - 1;
 	}
 
-
-	return CardTransforms[TransformIndex];
+	return GetTransformForIndex(TransformIndex);
 }
 
 void UCardSlot::UpdateCardOrder()
