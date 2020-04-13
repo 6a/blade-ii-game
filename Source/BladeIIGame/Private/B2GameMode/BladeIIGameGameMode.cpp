@@ -131,7 +131,7 @@ void ABladeIIGameMode::SetupCardFactory()
 	});
 
 	/* Back and MRS (metallic, roughness, specular) paths */
-	B2CardFactoryConfig.CardBackPath = TEXT("/Game/BladeIIGame/Textures/T_Up_Test.T_Up_Test");
+	B2CardFactoryConfig.CardBackPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Back.T_Card_Back");
 	B2CardFactoryConfig.CardFrontMRSPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Front_MRS.T_Card_Front_MRS");
 	B2CardFactoryConfig.CardBackMRSPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Back_MRS.T_Card_Back_MRS");
 
@@ -345,8 +345,6 @@ void ABladeIIGameMode::OnCardPlaced()
 {
 	if (GSM->IsCurrentState(EGameState::DrawToEmptyField))
 	{
-		Dealer->FlipFieldCard(Arena->PlayerField->GetLast(), false);
-
 		// Change state to the turn of the player with the highest score, or each draw another on draw
 		if (GameState->PlayerScore == GameState->OpponentScore)
 		{
@@ -537,8 +535,8 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 
 	EngineState = EEngineState::Dealing;
 
-	 //Dealer->Deal();
-	Dealer->FastDeal();
+	 Dealer->Deal();
+	//Dealer->FastDeal();
 }
 
 void ABladeIIGameMode::HandleServerUpdate(EServerUpdate Update, const FString& MetaData)

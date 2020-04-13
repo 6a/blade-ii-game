@@ -51,6 +51,8 @@ bool ACard::IsFaceDown()
 	return FVector::DotProduct(GetActorUpVector(), FVector::UpVector) < 0;
 }
 
+#include "B2Utility/Log.h"
+
 // Called every frame
 void ACard::Tick(float DeltaTime)
 {
@@ -59,18 +61,20 @@ void ACard::Tick(float DeltaTime)
 	/* If there is an active transition */
 	if (IsTransitioning())
 	{
-		/* If the transition has now finished, remove it and exit early */
-		if (Transitions.Peek()->Done())
-		{
-			Transitions.Pop();
-			return;
-		}
-
 		/* Tick the transition */
 		Transitions.Peek()->Tick(DeltaTime);
 
 		/* Apply the new values to the card */
 		SetActorLocationAndRotation(Transitions.Peek()->CurrentPosition, Transitions.Peek()->CurrentRotation);
+
+		/* If the transition has now finished, remove it and exit early */
+		if (Transitions.Peek()->Done())
+		{
+			//B2Utility::LogInfo(FString::Printf(TEXT("Card with WG [ %d ] Finished"), Transitions.Peek()->WaitGroup));
+
+			Transitions.Pop();
+			return;
+		}
 	}
 }
 

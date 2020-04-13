@@ -22,4 +22,5 @@ private:
 	FB2Cards RodTest() const;
 	FB2Cards MirrorTest() const;
 	FB2Cards StandardCardsOnlyTest() const;
+	FB2Cards CardOverlapTest() const;
 };

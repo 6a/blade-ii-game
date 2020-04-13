@@ -29,10 +29,10 @@ ACard* B2CardFactory::Make(const ECard& Card, const FVector& StartingPosition, c
 	UMaterialInstanceDynamic* MaterialBack = UMaterialInstanceDynamic::Create(SpawnedCard->Mesh->GetMaterial(1), NULL);
 
 	MaterialFront->SetTextureParameterValue(TEXT("Texture"), GetTexture(Card));
-	MaterialFront->SetTextureParameterValue(TEXT("Metallic / Roughness / Specular Map"), CardFrontMRSTexture);
+	MaterialFront->SetTextureParameterValue(TEXT("MRS Map"), CardFrontMRSTexture);
 
 	MaterialBack->SetTextureParameterValue(TEXT("Texture"), CardBackTexture);
-	MaterialBack->SetTextureParameterValue(TEXT("Metallic / Roughness / Specular Map"), CardBackMRSTexture);
+	MaterialBack->SetTextureParameterValue(TEXT("MRS Map"), CardBackMRSTexture);
 
 	SpawnedCard->Mesh->SetMaterial(0, MaterialFront);
 	SpawnedCard->Mesh->SetMaterial(1, MaterialBack);
