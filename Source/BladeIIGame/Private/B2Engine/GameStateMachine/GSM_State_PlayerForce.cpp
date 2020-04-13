@@ -45,6 +45,9 @@ void GSM_State_PlayerForce::Tick(float DeltaSeconds)
 		{
 			GI->UpdateCardState();
 
+			// Update the card positions in the hand as we have just removed one
+			GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
+
 			// Get the placed force card - TODO animate
 			ACard* UsedForceCard = GI->GetArena()->PlayerField->GetLast();
 			UsedForceCard->SetActorHiddenInGame(false);

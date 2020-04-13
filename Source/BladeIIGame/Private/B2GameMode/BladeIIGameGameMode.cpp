@@ -345,6 +345,8 @@ void ABladeIIGameMode::OnCardPlaced()
 {
 	if (GSM->IsCurrentState(EGameState::DrawToEmptyField))
 	{
+		Dealer->FlipFieldCard(Arena->PlayerField->GetLast(), false);
+
 		// Change state to the turn of the player with the highest score, or each draw another on draw
 		if (GameState->PlayerScore == GameState->OpponentScore)
 		{

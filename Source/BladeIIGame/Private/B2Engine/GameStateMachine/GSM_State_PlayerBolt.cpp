@@ -59,6 +59,9 @@ void GSM_State_PlayerBolt::Tick(float DeltaSeconds)
 			// Update card slots 
 			GI->GetArena()->PlayerDiscard->Add(SelectedCard);
 
+			// Update the card positions in the hand as we have just removed one
+			GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
+
 			// Signal to the game mode that the turn has finished
 			GI->FinishTurn();
 		}

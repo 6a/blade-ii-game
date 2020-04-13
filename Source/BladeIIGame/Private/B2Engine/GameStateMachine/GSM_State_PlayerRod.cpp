@@ -40,11 +40,16 @@ void GSM_State_PlayerRod::Tick(float DeltaSeconds)
 	{
 		if (Event == EUIEffectEvent::Ready)
 		{
-			// Get a reference to the rod that was just used
+			// Remove the rod card from the players hand
 			ACard* SelectedCard = RemoveCurrentCard();
+			SelectedCard->SetActorHiddenInGame(true);
+			SelectedCard->SetActorLocation(GI->GetArena()->PlayerDiscard->GetNextTransform().Position);
 
 			// Update card slots 
 			GI->GetArena()->PlayerDiscard->Add(SelectedCard);
+
+			// Update the card positions in the hand as we have just removed one
+			GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
 		}
 		else if (Event == EUIEffectEvent::Finished)
 		{

@@ -40,6 +40,17 @@ void GSM_State_PlayerMirror::Tick(float DeltaSeconds)
 		}
 		else if (Event == EUIEffectEvent::Finished)
 		{
+			// Remove the mirror card from the players hand
+			ACard* SelectedCard = RemoveCurrentCard();
+			SelectedCard->SetActorHiddenInGame(true);
+			SelectedCard->SetActorLocation(GI->GetArena()->PlayerDiscard->GetNextTransform().Position);
+
+			// Update card slots 
+			GI->GetArena()->PlayerDiscard->Add(SelectedCard);
+
+			// Update the card positions in the hand as we have just removed one
+			GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
+
 			// Signal to the game mode that the turn has finished
 			GI->FinishTurn();
 		}
