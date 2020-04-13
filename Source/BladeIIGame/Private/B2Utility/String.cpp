@@ -1,5 +1,10 @@
 #include "B2Utility/String.h"
 
+#include <iomanip>
+#include <sstream>
+
+const FString HEX_ZERO = "0";
+
 const FString B2Utility::GetTimestamp()
 {
 	auto Now = FDateTime::UtcNow();
@@ -35,4 +40,21 @@ const FString B2Utility::CardEnumToString(ECard Card)
 	}
 
 	return "00 Unknown";
+}
+
+const FString B2Utility::UInt32ToHexString(uint32 InInt)
+{
+	std::stringstream StringStream;
+	StringStream << std::hex << InInt;
+
+	const char* CharArray = StringStream.str().c_str();
+
+	FString OutString = HEX_ZERO;
+
+	if (CharArray)
+	{
+		OutString = FString(StringStream.str().c_str()).ToUpper();
+	}
+
+	return OutString;
 }

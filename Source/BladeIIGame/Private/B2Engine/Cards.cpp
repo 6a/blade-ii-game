@@ -1,7 +1,9 @@
 #include "B2Engine/Cards.h"
 
-
 #include "Misc/DefaultValueHelper.h"
+
+#include "B2Utility/Log.h"
+#include "B2Utility/String.h"
 
 const int32 EXPECTED_PARSED_ARRAY_SIZE = 3;
 const FString DELIMITER = ".";
@@ -20,55 +22,56 @@ FB2Cards::FB2Cards(const FString& Cards)
 	int32 PlayerNumber;
 	ensureMsgf(FDefaultValueHelper::ParseInt(OutArray[0], PlayerNumber), TEXT("Could not parse player number"));
 
-	for (TCHAR Char : OutArray[1])
+	// This parsing method is naiive and assumes that the input string contains consists of (array size) hex values, all of which are less than 16
+	// and therefore only take up 1 char each.
+
+	for (const TCHAR Char : OutArray[1])
 	{
 		FString CharString = FString().AppendChar(Char);
-		int32 OutNumber;
-		ensureMsgf(FDefaultValueHelper::ParseInt(CharString, OutNumber), TEXT("Could not parse player zero card number"));
+		uint32 ParsedInt = FParse::HexNumber(*CharString);
 
 		if (PlayerNumber == 0)
 		{
-			PlayerDeck.Add(static_cast<ECard>(OutNumber));
+			PlayerDeck.Add(static_cast<ECard>(ParsedInt));
 		}
 		else
 		{
-			OpponentDeck.Add(static_cast<ECard>(OutNumber));
+			OpponentDeck.Add(static_cast<ECard>(ParsedInt));
 		}
 	}
 
 	for (TCHAR Char : OutArray[2])
 	{
 		FString CharString = FString().AppendChar(Char);
-		int32 OutNumber;
-		ensureMsgf(FDefaultValueHelper::ParseInt(CharString, OutNumber), TEXT("Could not parse player one card number"));
+		uint32 ParsedInt = FParse::HexNumber(*CharString);
 
 		if (PlayerNumber == 1)
 		{
-			PlayerDeck.Add(static_cast<ECard>(OutNumber));
+			PlayerDeck.Add(static_cast<ECard>(ParsedInt));
 		}
 		else
 		{
-			OpponentDeck.Add(static_cast<ECard>(OutNumber));
+			OpponentDeck.Add(static_cast<ECard>(ParsedInt));
 		}
 	}
 }
 
 const FString FB2Cards::GetSerialised(uint32 PlayerNumber)
 {
-	FString OutString = FString::FromInt(PlayerNumber);
+	FString OutString = B2Utility::UInt32ToHexString(PlayerNumber);
 
 	OutString += DELIMITER;
 
 	for (ECard Card : PlayerDeck)
 	{
-		OutString += FString::FromInt(static_cast<int32>(Card));
+		OutString += B2Utility::UInt32ToHexString(static_cast<uint32>(Card));
 	}
 
 	OutString += DELIMITER;
 
 	for (ECard Card : OpponentDeck)
 	{
-		OutString += FString::FromInt(static_cast<int32>(Card));
+		OutString += B2Utility::UInt32ToHexString(static_cast<int32>(Card));
 	}
 
 	return OutString;

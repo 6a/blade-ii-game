@@ -17,4 +17,6 @@ namespace B2Utility
 	 * @return the card enum as a string
 	 */
 	const FString CardEnumToString(ECard Card);
+
+	const FString UInt32ToHexString(uint32 InInt);
 }
