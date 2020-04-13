@@ -1096,7 +1096,7 @@ void UB2Dealer::ForceIn(ACard* Card)
 	const float DelayOnStart = 0.0f;
 	const float TransitionDuration = 0.5f;
 
-	FB2Transform TargetTransform = CardIsFromPlayerField(Card) ? Arena->PlayerField->GetTransformForIndex(14) : Arena->OpponentField->GetNextTransform();
+	FB2Transform TargetTransform = CardIsFromPlayerField(Card) ? Arena->PlayerField->GetNextTransform() : Arena->OpponentField->GetNextTransform();
 
 	// Transition 1
 	B2TPosition Position
