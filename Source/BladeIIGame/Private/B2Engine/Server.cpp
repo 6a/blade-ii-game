@@ -2,17 +2,28 @@
 
 B2Server::~B2Server()
 {
+	InboundQueue.Empty();
+	OutBoundQueue.Empty();
 }
 
 const FB2ServerUpdate B2Server::GetNextUpdate()
 {
-	return FB2ServerUpdate
+	FB2ServerUpdate OutUpdate
 	{
 		EServerUpdate::None,
 	};
+
+	InboundQueue.Dequeue(OutUpdate);
+
+	return OutUpdate;
 }
 
-void B2Server::SendUpdate(EServerUpdate Update, const FString& MetaData) const
+void B2Server::SendUpdate(EServerUpdate Update, const FString& MetaData)
+{
+	OutBoundQueue.Enqueue(FB2ServerUpdate{Update, MetaData});
+}
+
+void B2Server::Tick(float DeltaSeconds)
 {
 
 }

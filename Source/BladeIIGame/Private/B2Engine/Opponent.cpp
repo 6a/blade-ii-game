@@ -26,4 +26,6 @@ void UB2Opponent::Tick(float DeltaSeconds)
 void UB2Opponent::SendUpdate(EServerUpdate Update, const FString& MetaData) const
 {
 	UE_LOG(LogTemp, Warning, TEXT("SENDING UPDATE TO SERVER"));
+
+	
 }

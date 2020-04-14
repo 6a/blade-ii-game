@@ -2,7 +2,7 @@
 
 #include "B2Game/Card.h"
 
-// Predicate object returns the a card if it has the same type as specified by Type
+// Predicate object that can be used to identify cards that have a score that is equal to, or greater than, the specified value
 struct B2Predicate_HasCardOfHighEnoughValue
 {
 	uint32 Min;
@@ -11,6 +11,6 @@ struct B2Predicate_HasCardOfHighEnoughValue
 
 	/* Find function (finds as described above) */
 	bool operator()(ECard Card) const {
-		return ACard::TypeToValue(Card) > Min;
+		return ACard::TypeToValue(Card) >= Min;
 	}
 };

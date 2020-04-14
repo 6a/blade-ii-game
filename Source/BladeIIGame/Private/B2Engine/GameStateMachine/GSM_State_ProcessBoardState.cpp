@@ -34,14 +34,14 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	TArray<ECard> OpponentField = GameState->Cards.OpponentField;
 
 	// Check if either local player or the opponent won after the most recent move
-	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, OpponentHand, OpponentField, PlayerDeckCount);
+	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, OpponentHand, OpponentField, OpponentDeckCount);
 	if (LocalPlayerOutcome != EWinCondition::None)
 	{
 		GI->VictoryAchieved(EPlayer::Player, LocalPlayerOutcome);
 		return;
 	}
 	
-	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, PlayerHand, PlayerField, OpponentDeckCount);
+	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, PlayerHand, PlayerField, PlayerDeckCount);
 	if (OpponentOutcome != EWinCondition::None)
 	{
 		GI->VictoryAchieved(EPlayer::Opponent, OpponentOutcome);
@@ -81,6 +81,9 @@ void GSM_State_ProcessBoardState::End()
 EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, TArray<ECard> OppositePlayerHand, TArray<ECard> OppositePlayerField, uint32 OppositePlayerDeckCount) const
 {
 	// Logically this is kind of backwards but it works in my head
+
+	// TODO perhaps we need to handle the case where a player ends up in an unwinnable position after the first draw. 
+	// If this happens, we should probably just redraw instead.
 
 	// Early exit if the opponent only has effect cards left, as this is an auto win regardless
 	if (!OppositePlayerHand.ContainsByPredicate<B2Predicate_IsNotEffectCard>(B2Predicate_IsNotEffectCard()))
