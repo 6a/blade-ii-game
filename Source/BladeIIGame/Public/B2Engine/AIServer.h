@@ -23,4 +23,5 @@ private:
 	FB2Cards MirrorTest() const;
 	FB2Cards StandardCardsOnlyTest() const;
 	FB2Cards CardOverlapTest() const;
+	FB2Cards DupeTest() const;
 };

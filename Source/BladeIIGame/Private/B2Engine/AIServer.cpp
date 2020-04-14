@@ -9,7 +9,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		Payload.Update = EServerUpdate::InstructionCards;
-		Payload.Metadata = ForceTest().GetSerialised(0);
+		Payload.Metadata = DupeTest().GetSerialised(0);
 
 		bCardsSent = true;
 	}
@@ -109,6 +109,19 @@ FB2Cards B2AIServer::CardOverlapTest() const
 	{
 		Cards.PlayerDeck.Add(static_cast<ECard>(FMath::Clamp(i, 0, 9)));
 		Cards.OpponentDeck.Add(ECard::Force);
+	}
+
+	return Cards;
+}
+
+FB2Cards B2AIServer::DupeTest() const
+{
+	FB2Cards Cards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		Cards.PlayerDeck.Add(ECard::LaurasGreatsword);
+		Cards.OpponentDeck.Add(ECard::LaurasGreatsword);
 	}
 
 	return Cards;
