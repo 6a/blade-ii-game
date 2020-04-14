@@ -56,7 +56,7 @@ void GSM_State_PlayerForce::Tick(float DeltaSeconds)
 		else if (Event == EUIEffectEvent::Finished)
 		{
 			// Signal to the game mode that the turn has finished
-			GI->FinishTurn();
+			GI->EndState();
 		}
 	}
 }

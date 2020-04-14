@@ -52,7 +52,7 @@ void GSM_State_PlayerMirror::Tick(float DeltaSeconds)
 			GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
 
 			// Signal to the game mode that the turn has finished
-			GI->FinishTurn();
+			GI->EndState();
 		}
 	}
 }

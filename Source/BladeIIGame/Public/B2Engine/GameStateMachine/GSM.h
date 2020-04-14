@@ -30,6 +30,15 @@ public:
 		return State == CurrentState->Type();
 	}
 
+	/**
+	 * Returns an enum representing the current state
+	 * @return The current state
+	 */
+	EGameState GetCurrentState()
+	{
+		return CurrentState->Type();
+	}
+
 	/* Progress the current state of the state machine */
 	void Tick(float DeltaSeconds);
 

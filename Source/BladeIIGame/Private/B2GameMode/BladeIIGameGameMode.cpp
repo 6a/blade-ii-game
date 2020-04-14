@@ -56,12 +56,11 @@ void ABladeIIGameMode::Tick(float DeltaSeconds)
 	UIEffectLayer->EventQueue.Empty();
 }
 
-void ABladeIIGameMode::FinishTurn()
+void ABladeIIGameMode::EndState()
 {
 	UpdateCardState();
 
-	FString Turn = GameState->Turn == EPlayer::Player ? TEXT("Player's") : TEXT("Opponent's");
-	B2Utility::LogWarning(FString::Printf(TEXT("[%s] turn finished"), *Turn));
+	B2Utility::LogWarning(FString::Printf(TEXT("[%d] state ended"), GSM->GetCurrentState()));
 
 	// Switch to the turn switching state
 	GSM->ChangeState<GSM_State_ProcessBoardState>();
@@ -69,7 +68,8 @@ void ABladeIIGameMode::FinishTurn()
 
 void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinCondition)
 {
-
+	FString Turn = GameState->Turn == EPlayer::Player ? TEXT("Local Player") : TEXT("Opponent");
+	B2Utility::LogWarning(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
 }
 
 void ABladeIIGameMode::ChangeTurn()
@@ -373,51 +373,7 @@ void ABladeIIGameMode::OnEffectReady()
 
 void ABladeIIGameMode::OnCardPlaced()
 {
-	if (GSM->IsCurrentState(EGameState::DrawToEmptyField))
-	{
-		// Change state to the turn of the player with the highest score, or each draw another on draw
-		if (GameState->PlayerScore == GameState->OpponentScore)
-		{
-			// Edge case - what do we do if the deck(s) are empty?
-			uint32 PlayerDeckSize = Arena->PlayerDeck->Num();
-			uint32 OpponentDeckSize = Arena->OpponentDeck->Num();
-
-			if (PlayerDeckSize == 0 || OpponentDeckSize == 0)
-			{
-				B2Utility::LogWarning("Either the player deck, or the opponent deck is empty!");
-
-				// TODO looks like you just start drawing from the hand. do we get to choose? i guess so
-
-				return;
-			}
-
-			// Lets go round again.wav
-			GameState->Turn = EPlayer::Undecided;
-
-			// Switch state machine to drawing from empty field
-			GSM->ChangeState<GSM_State_DrawToEmptyField>();
-		}
-		else if (GameState->PlayerScore < GameState->OpponentScore)
-		{
-			// Switch game state to player turn
-			GameState->Turn = EPlayer::Player;
-
-			// Switch state machine to player turn
-			GSM->ChangeState<GSM_State_PlayerTurn>();
-		}
-		else
-		{
-			// Switch game state to opponent turn
-			GameState->Turn = EPlayer::Opponent;
-
-			// Switch state machine to opponent turn
-			GSM->ChangeState<GSM_State_WaitingForOpponentMove>();
-		}
-	}
-	else if (GSM->IsCurrentState(EGameState::PlayerTurn))
-	{
-		FinishTurn();
-	}
+	EndState();
 }
 
 int32 ABladeIIGameMode::AggregateScore(UCardSlot* Slot) const

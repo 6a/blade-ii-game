@@ -58,12 +58,7 @@ void GSM_State::SetCurrentCardToSelectedTransform()
 	ACard* CurrentCard = GetCurrentCard();
 
 	// Used to flip the Y offset if the cursor is on the opponent hand
-	FVector OffsetYMod = FVector::ZeroVector;
-
-	if (GI->GetGameState()->CursorPosition == ECardSlot::OpponentHand || GI->GetGameState()->CursorPosition == ECardSlot::PlayerHand)
-	{
-		OffsetYMod = FVector(1, GI->GetGameState()->CursorPosition == ECardSlot::OpponentHand ? -1 : 1, 1);
-	}
+	FVector OffsetYMod = FVector(1, GI->GetGameState()->CursorPosition == ECardSlot::OpponentHand ? -1 : 1, 1);
 
 	if (CurrentCard)
 	{

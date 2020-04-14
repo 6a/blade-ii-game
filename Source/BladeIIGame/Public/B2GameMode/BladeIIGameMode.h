@@ -32,7 +32,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	/* Informs the engine that the current turn has finished */
-	void FinishTurn();
+	void EndState();
 
 	/* Informs the engine that the local player won */
 

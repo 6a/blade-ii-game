@@ -51,7 +51,11 @@ void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 		GI->GetGameState()->CursorPosition = NewCursorSlot;
 		GI->GetGameState()->CursorSlotIndex = NewCursorSlotIndex;
 
-		SetCurrentCardToSelectedTransform();
+		
+		if (NewCursorSlot == ECardSlot::PlayerHand)
+		{
+			UpdateCursorPosition(NewCursorSlotIndex);
+		}
 	}
 }
 

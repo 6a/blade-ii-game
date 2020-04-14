@@ -52,6 +52,14 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	if (PlayerScore == OpponentScore)
 	{
 		GI->ClearAndDraw();
+		return;
+	}
+
+	// If the turn is undecided, reaching this point means that we need to set the turn to opposite player,
+	// so that the following changeturn call switches over to the correct player
+	if (GI->GetGameState()->Turn == EPlayer::Undecided)
+	{
+		GI->GetGameState()->Turn = PlayerScore > OpponentScore ? EPlayer::Player : EPlayer::Opponent;
 	}
 
 	// Otherwise, the board is still in a playable state so just switch the turn
