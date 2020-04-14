@@ -50,7 +50,6 @@ void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 		GI->GetGameState()->bAcceptPlayerInput = true;
 		GI->GetGameState()->CursorPosition = NewCursorSlot;
 		GI->GetGameState()->CursorSlotIndex = NewCursorSlotIndex;
-
 		
 		if (NewCursorSlot == ECardSlot::PlayerHand)
 		{
