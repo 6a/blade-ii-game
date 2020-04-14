@@ -66,6 +66,12 @@ public:
 	virtual ACard* GetFirst();
 
 	/**
+	 * Get an array containing pointers to all the cards in this slot
+	 * @returns An array containing pointers to all the cards in this slot
+	 */
+	virtual TArray<ACard*> GetAll() const;
+
+	/**
 	 * Remove the card at index N 
 	 * @param N - The index of the card to remove
 	 * @returns A pointer to the removed card

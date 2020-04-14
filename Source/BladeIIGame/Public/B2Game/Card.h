@@ -61,6 +61,8 @@ public:
 	/* Returns true if the card is face-down (such as when its in the opponents hand) */
 	bool IsFaceDown() const;
 
+	static uint32 TypeToValue(ECard CardType);
+
 protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;

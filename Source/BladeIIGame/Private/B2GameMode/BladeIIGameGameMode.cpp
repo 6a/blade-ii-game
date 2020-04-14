@@ -10,11 +10,12 @@
 #include "B2Engine/Transition.h"
 #include "B2Utility/Log.h"
 
-// Game phase state machines
+// Game state state machines
 #include "B2Engine/GameStateMachine/GSM_State_DrawToEmptyField.h"
 #include "B2Engine/GameStateMachine/GSM_State_WaitingForInitialDeal.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerTurn.h"
 #include "B2Engine/GameStateMachine/GSM_State_WaitingForOpponentMove.h"
+#include "B2Engine/GameStateMachine/GSM_State_ProcessBoardState.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerRod.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBolt.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerMirror.h"
@@ -58,10 +59,37 @@ void ABladeIIGameMode::Tick(float DeltaSeconds)
 void ABladeIIGameMode::FinishTurn()
 {
 	UpdateCardState();
-	
-	FString Turn = GameState->Turn == EPlayer::Player ? TEXT("Player's") : TEXT("Opponent's");
 
+	FString Turn = GameState->Turn == EPlayer::Player ? TEXT("Player's") : TEXT("Opponent's");
 	B2Utility::LogWarning(FString::Printf(TEXT("[%s] turn finished"), *Turn));
+
+	// Switch to the turn switching state
+	GSM->ChangeState<GSM_State_ProcessBoardState>();
+}
+
+void ABladeIIGameMode::LocalPlayerWon()
+{
+
+}
+
+void ABladeIIGameMode::OpponentWon()
+{
+
+}
+
+void ABladeIIGameMode::ChangeTurn()
+{
+	// If its currently the local players turn, switch to the opponents turn
+	if (GameState->Turn == EPlayer::Player)
+	{
+		GameState->Turn = EPlayer::Opponent;
+		GSM->ChangeState<GSM_State_WaitingForOpponentMove>();
+	}
+	else
+	{
+		GameState->Turn = EPlayer::Player;
+		GSM->ChangeState<GSM_State_PlayerTurn>();
+	}
 }
 
 void ABladeIIGameMode::StartPlay()
@@ -355,8 +383,7 @@ void ABladeIIGameMode::OnCardPlaced()
 			{
 				B2Utility::LogWarning("Either the player deck, or the opponent deck is empty!");
 
-				// TODO do we end the game or something? Probably send it to end state...
-				// TODO 2 looks like you just start drawing from the hand. do we get to choose? i guess so
+				// TODO looks like you just start drawing from the hand. do we get to choose? i guess so
 
 				return;
 			}
@@ -367,7 +394,7 @@ void ABladeIIGameMode::OnCardPlaced()
 			// Switch state machine to drawing from empty field
 			GSM->ChangeState<GSM_State_DrawToEmptyField>();
 		}
-		else if (GameState->PlayerScore > GameState->OpponentScore)
+		else if (GameState->PlayerScore < GameState->OpponentScore)
 		{
 			// Switch game state to player turn
 			GameState->Turn = EPlayer::Player;
@@ -377,22 +404,16 @@ void ABladeIIGameMode::OnCardPlaced()
 		}
 		else
 		{
-			//// Switch game state to opponent
-			//GameState->Turn = EPlayer::Opponent;
+			// Switch game state to opponent turn
+			GameState->Turn = EPlayer::Opponent;
 
-			//// Switch state machine to opponent turn
-			//GSM->ChangeState<GSM_State_WaitingForOpponentMove>();
-
-			//// Fire off any animations / on screen stuff...
-
-			// For testing
-			// TODO remove and revert to above code
-			// Switch game state to player turn
-			GameState->Turn = EPlayer::Player;
-
-			// Switch state machine to player turn
-			GSM->ChangeState<GSM_State_PlayerTurn>();
+			// Switch state machine to opponent turn
+			GSM->ChangeState<GSM_State_WaitingForOpponentMove>();
 		}
+	}
+	else if (GSM->IsCurrentState(EGameState::PlayerTurn))
+	{
+		FinishTurn();
 	}
 }
 
@@ -559,7 +580,19 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 		OnEffectReady();
 		break;
 	case EDealerEvent::BlastFinished:
-		FinishTurn();
+		// Edge case - when the blast event is finished, it just goes back to the same players turn
+
+		if (GameState->Turn == EPlayer::Player)
+		{
+			// Switch state machine to player turn
+			GSM->ChangeState<GSM_State_PlayerTurn>();
+		}
+		else
+		{
+			// Edge case - if the blast finished on the opponents turn, we still have to 
+			// process the next server update which should be the next card they choose
+		}
+
 		break;
 	}
 }

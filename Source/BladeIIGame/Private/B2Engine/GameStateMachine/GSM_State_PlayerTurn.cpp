@@ -110,8 +110,6 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 
 					// Update the card positions in the hand as we have just removed one
 					GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
-
-					GI->FinishTurn();
 				}
 
 				// If this was NOT a blast card, update the server - blasts are handled differently,

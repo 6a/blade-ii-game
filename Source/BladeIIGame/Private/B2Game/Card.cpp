@@ -70,6 +70,21 @@ bool ACard::IsFaceDown() const
 	return FVector::DotProduct(GetActorUpVector(), FVector::UpVector) < 0;
 }
 
+uint32 ACard::TypeToValue(ECard CardType)
+{
+	uint32 Value;
+	if (CardType > ECard::LaurasGreatsword || CardType == ECard::ElliotsOrbalStaff)
+	{
+		Value = 1;
+	}
+	else
+	{
+		Value = static_cast<uint32>(CardType) + 1;
+	}
+
+	return Value;
+}
+
 // Called every frame
 void ACard::Tick(float DeltaTime)
 {

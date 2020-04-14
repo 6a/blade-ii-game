@@ -33,6 +33,15 @@ public:
 	/* Informs the engine that the current turn has finished */
 	void FinishTurn();
 
+	/* Informs the engine that the local player won */
+	void LocalPlayerWon();
+
+	/* Informs the engine that the opponent won */
+	void OpponentWon();
+
+	/* Informs the engine that it is safe to switch turns */
+	void ChangeTurn();
+
 	/* Get a reference to the card slot of the specified type */
 	UCardSlot* GetCardSlot(ECardSlot Slot) const;
 

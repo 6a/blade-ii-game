@@ -164,6 +164,11 @@ ACard* UCardSlot::GetFirst()
 	return Card;
 }
 
+TArray<ACard*> UCardSlot::GetAll() const
+{
+	return TArray<ACard*>(Cards);
+}
+
 TArray<ACard*> UCardSlot::RemoveAll()
 {
 	TArray<ACard*> OutArray = TArray<ACard*>(Cards);
