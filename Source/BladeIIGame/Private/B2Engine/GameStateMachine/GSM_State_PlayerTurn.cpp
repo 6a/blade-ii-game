@@ -117,7 +117,7 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				if (!bUsedBlastEffect)
 				{
 					// Update the server
-					GI->GetOpponent()->SendUpdate(static_cast<EServerUpdate>(SelectedCard->Type));
+					GI->GetOpponent()->SendUpdate(CardToServerMessage(SelectedCard->Type));
 				}
 
 				GI->GetGameState()->bAcceptPlayerInput = false;

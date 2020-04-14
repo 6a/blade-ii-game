@@ -99,6 +99,18 @@ void GSM_State::UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecti
 	SetCurrentCardToSelectedTransform();
 }
 
+EServerUpdate GSM_State::CardToServerMessage(ECard Card) const
+{
+	EServerUpdate OutUpdateType = EServerUpdate::None;
+
+	if (static_cast<uint32>(Card) > SERVER_MESSAGE_CARD_MIN || static_cast<uint32>(Card) < SERVER_MESSAGE_CARD_MAX)
+	{
+		OutUpdateType = static_cast<EServerUpdate>(static_cast<uint32>(Card) + SERVER_MESSAGE_CARD_OFFSET);
+	}
+
+	return OutUpdateType;
+}
+
 ACard* GSM_State::GetCurrentCard()
 {
 	ABladeIIGameMode* GI = GameModeInstance;

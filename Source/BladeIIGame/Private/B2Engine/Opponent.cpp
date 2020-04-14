@@ -2,6 +2,8 @@
 
 void UB2Opponent::Tick(float DeltaSeconds)
 {
+	BackEnd->Tick(DeltaSeconds);
+
 	FB2ServerUpdate ServerUpdate = BackEnd->GetNextUpdate();
 
 	while (ServerUpdate.Update != EServerUpdate::None)

@@ -379,7 +379,7 @@ FB2ServerUpdate B2AIServer::ExecuteNextMove(ECard ChosenCard)
 			ECard CardToBlast = Cards.PlayerHand[FMath::RandRange(0, Cards.PlayerHand.Num() - 1)];
 			Cards.PlayerHand.RemoveSingle(CardToBlast);
 
-			UpateToSendToPlayer.Metadata = B2Utility::UInt32ToHexString(static_cast<int32>(CardToBlast));
+			UpateToSendToPlayer.Metadata = FString::FromInt(static_cast<int32>(CardToBlast));
 		}
 		else if (bUsedRodEffect)
 		{

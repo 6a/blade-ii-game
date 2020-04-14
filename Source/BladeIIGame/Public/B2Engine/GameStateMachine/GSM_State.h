@@ -2,8 +2,9 @@
 
 #include "CoreMinimal.h"
 
-#include "../../B2Enum/GameStateEnum.h"
-#include "../../B2Game/Card.h"
+#include "B2Enum/GameStateEnum.h"
+#include "B2Enum/ServerUpdateEnum.h"
+#include "B2Game/Card.h"
 
 class GSM_State
 {
@@ -47,5 +48,13 @@ protected:
 	void SetCurrentCardToPreEffectTransform();
 
 	virtual void UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecting = false);
+
+	EServerUpdate CardToServerMessage(ECard Card) const;
+
+private:
+	/* Min, max, and offset values for converting server messages to and from cards */
+	const uint32 SERVER_MESSAGE_CARD_MIN = 1;
+	const uint32 SERVER_MESSAGE_CARD_MAX = 11;
+	const uint32 SERVER_MESSAGE_CARD_OFFSET = 1;
 };
 
