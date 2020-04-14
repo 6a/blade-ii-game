@@ -27,5 +27,5 @@ void UB2Opponent::SendUpdate(EServerUpdate Update, const FString& MetaData) cons
 {
 	UE_LOG(LogTemp, Warning, TEXT("SENDING UPDATE TO SERVER"));
 
-	
+	BackEnd->SendUpdate(Update, MetaData);
 }

@@ -1,8 +1,9 @@
+#include "B2Engine/AIServer.h"
+
 #include "B2Game/Card.h"
 #include "B2Predicate/FilterFirstOfType.h"
 #include "B2Predicate/IsNotEffectCard.h"
-
-#include "B2Engine/AIServer.h"
+#include "B2Utility/String.h"
 
 const FB2ServerUpdate B2AIServer::GetNextUpdate()
 {
@@ -10,8 +11,11 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 
 	if (!bCardsSent)
 	{
-		FB2Cards OutCards = PlayerFirstTest();
-		Cards = OutCards;
+		// Generate the cards for this match
+		Cards = PlayerFirstTest();
+
+		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
+		FB2Cards OutCards = Cards;
 
 		// Set up the initial internal state based on the cards
 		ConfigureInitialState();
@@ -27,16 +31,94 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 
 void B2AIServer::Tick(float DeltaSeconds)
 {
+	if (Winner == EPlayer::Opponent) return;
+
 	// Handle messages "to" the server (rather, to us)
-	FB2ServerUpdate OutUpdate;
-	while (OutBoundQueue.Dequeue(OutUpdate))
+	FB2ServerUpdate IncomingUpdate;
+	while (OutBoundQueue.Dequeue(IncomingUpdate))
 	{
+		// Ignore "None" or message types
+		if (IncomingUpdate.Update == EServerUpdate::None || IncomingUpdate.Update == EServerUpdate::InstructionMessage) continue;
+
 		// Update the internal card state
-		UpdateState(OutUpdate);
+		UpdateState(IncomingUpdate);
 
-		// Calculate a move to make
+		// If the turn is undecided, that means we need to draw a card from our hand and send an update to the player
+		if (Turn == EPlayer::Undecided)
+		{
+			// Choose a card to play
+			ECard ChosenCard;
+			bool bValidMoveFound = GetNextMove(ChosenCard);
 
-		// Send the move back to the player
+			// Early exit if no valid move was found, though that shouldnt happen in this state
+			if (!bValidMoveFound)
+			{
+				Winner = EPlayer::Player;
+				return;
+			}
+
+			// Send the move to the player
+			FB2ServerUpdate Update
+			{
+				CardToServerMessage(ChosenCard),
+			};
+
+			OutBoundQueue.Enqueue(Update);
+
+			// Update the internal card state again, so we know what to do after drawing to the field
+			UpdateState(IncomingUpdate);
+		}
+		else if (Turn == EPlayer::Opponent)
+		{
+			// Execute the opponents turn
+			ExecuteOpponentTurn();
+		}
+
+		// Now we iterate until we have successfully moved into either the Undecided state, or the players turn
+		while (Turn == EPlayer::Opponent || Turn == EPlayer::Undecided)
+		{
+			// If the turn is still undecided, we need to draw from the hand again, but this time we have priority so we can break out of the loop
+			if (Turn == EPlayer::Undecided)
+			{
+				// Choose a card to play
+				ECard ChosenCard;
+				bool bValidMoveFound = GetNextMove(ChosenCard);
+
+				// Early exit if no valid move was found, though that shouldnt happen in this state
+				if (!bValidMoveFound)
+				{
+					Winner = EPlayer::Player;
+					return;
+				}
+
+				// Send the move to the player
+				FB2ServerUpdate Update
+				{
+					CardToServerMessage(ChosenCard),
+				};
+
+				OutBoundQueue.Enqueue(Update);
+				break;
+			}
+			else if (Turn == EPlayer::Opponent)
+			{
+				// Execute the opponents turn
+				ExecuteOpponentTurn();
+			}
+
+			if (PlayerScore == OpponentScore)
+			{
+				bool Success = HandleTie();
+
+				// If we could not break the tie, its a game over - but the player should already be aware. 
+				// Just set the state to a player win, as it doesnt matter anyway
+				if (!Success)
+				{
+					Winner = EPlayer::Player;
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -64,8 +146,49 @@ void B2AIServer::ConfigureInitialState()
 	Winner = EPlayer::Undecided;
 
 	// Draw cards from both decks to the field until a player can start
-	bool bNoValidMove = false;
+	bool bValidMoveFound = HandleTie();
 		
+	// If we couldnt find a valid move to play... We lost!
+	// Dont need to do anthing other than set the internal winner, as the player should eventually work this out by themselves
+	if (bValidMoveFound)
+	{
+		Winner = EPlayer::Player;
+	}
+	else if (Turn == EPlayer::Opponent) // Otherwise, if its our turn, choose a card to play and play it - sending the play to the player afterwards
+	{
+		// Execute the opponents turn - no need to check for success as we exit after this call anyway
+		ExecuteOpponentTurn();
+	}
+
+	// Otherwise, its the players turn, or its undecided - either way, we are not waiting for an update from the player
+}
+
+bool B2AIServer::ExecuteOpponentTurn()
+{
+	// Choose a card to play
+	ECard ChosenCard;
+	bool bValidMoveFound = GetNextMove(ChosenCard);
+
+	// If a valid move was not found, this means that we lost somehow. This is probably impossible at this stage, unless our entire deck is 
+	// full of effect cards or something, but this should be prevented by intelligently generating cards in the first place
+	if (!bValidMoveFound)
+	{
+		Winner = EPlayer::Player;
+	}
+	else
+	{
+		FB2ServerUpdate UpdateToSend = ExecuteNextMove(ChosenCard);
+
+		OutBoundQueue.Enqueue(UpdateToSend);
+	}
+
+	return bValidMoveFound;
+}
+
+bool B2AIServer::HandleTie()
+{
+	bool bNoValidMove = false;
+
 	while (true)
 	{
 		// If there are cards in the decks, we draw from the deck - else from the hand
@@ -74,7 +197,7 @@ void B2AIServer::ConfigureInitialState()
 		{
 			// Choose a card to play
 			ECard ChosenCard;
-			bool bValidMoveFound = RemoveCardToPlayFromHand(ChosenCard);
+			bool bValidMoveFound = GetNextMove(ChosenCard);
 
 			if (bValidMoveFound)
 			{
@@ -82,7 +205,17 @@ void B2AIServer::ConfigureInitialState()
 				Cards.OpponentField.Add(ChosenCard);
 
 				// Update the score
-				OpponentScore = ACard::TypeToValue(ChosenCard);
+				OpponentScore = CalculateScore(Cards.OpponentField);
+
+				// Send the move to the player
+				FB2ServerUpdate Update
+				{
+					CardToServerMessage(ChosenCard),
+				};
+
+				OutBoundQueue.Enqueue(Update);
+
+				bIsWaitingForOpponentsDrawFromHand = true;
 			}
 			else
 			{
@@ -128,29 +261,7 @@ void B2AIServer::ConfigureInitialState()
 		}
 	}
 
-	// If we couldnt find a valid move to play... We lost!
-	// Dont need to do anthing other than set the internal winner, as the player should eventually work this out by themselves
-	if (bNoValidMove)
-	{
-		Winner = EPlayer::Player;
-	}
-	else if (Turn == EPlayer::Opponent) // Otherwise, if its our turn, choose a card to play and play it - sending the play to the player afterwards
-	{
-		// Choose a card to play
-		ECard ChosenCard;
-		bool bValidMoveFound = RemoveCardToPlayFromHand(ChosenCard);
-
-		// If a valid move was not found, this means that we lost somehow. This is probably impossible at this stage, unless our entire deck is 
-		// full of effect cards or something, but this should be prevented by intelligently generating cards in the first place
-		if (!bValidMoveFound)
-		{
-			Winner = EPlayer::Player;
-		}
-		else
-		{
-			
-		}
-	}
+	return !bNoValidMove;
 }
 
 void B2AIServer::UpdateState(const FB2ServerUpdate& Update)
@@ -171,7 +282,7 @@ ECard B2AIServer::RemoveLast(TArray<ECard>& FromArray)
 	return Card;
 }
 
-bool B2AIServer::RemoveCardToPlayFromHand(ECard& OutCard)
+bool B2AIServer::GetNextMove(ECard& OutCard)
 {
 	// TODO make this smart - At the moment we just choose a random card that wont make use auto lose
 
@@ -242,6 +353,82 @@ bool B2AIServer::RemoveCardToPlayFromHand(ECard& OutCard)
 	return true;
 }
 
+FB2ServerUpdate B2AIServer::ExecuteNextMove(ECard ChosenCard)
+{
+	FB2ServerUpdate UpateToSendToPlayer
+	{
+		CardToServerMessage(ChosenCard),
+	};
+
+	// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
+	// Here we also check for effects that occurred, so we can use them to branch later
+	bool bUsedRodEffect = (ChosenCard == ECard::ElliotsOrbalStaff && IsBolted(Cards.OpponentField.Last()));
+	bool bUsedBoltEffect = (ChosenCard == ECard::Bolt);
+	bool bUsedMirrorEffect = (ChosenCard == ECard::Mirror);
+	bool bUsedBlastEffect = (ChosenCard == ECard::Blast);
+
+	// Note - we dont have to check for force, as we can just add it to the field like normal and recalculate the score
+
+	if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect)
+	{
+		if (bUsedBlastEffect)
+		{
+			// If the card is a blast card, we need to also choose a card from the players hand to remove and send it as metadata
+
+			// Randomly choose a card
+			ECard CardToBlast = Cards.PlayerHand[FMath::RandRange(0, Cards.PlayerHand.Num() - 1)];
+			Cards.PlayerHand.RemoveSingle(CardToBlast);
+
+			UpateToSendToPlayer.Metadata = B2Utility::UInt32ToHexString(static_cast<int32>(CardToBlast));
+		}
+		else if (bUsedRodEffect)
+		{
+			// If the card is a rod card (that can be used to "heal" a card) then we need to unbolt the last card on the opponents field
+			UnBolt(Cards.OpponentField);
+		}
+		else if (bUsedBoltEffect)
+		{
+			// If the card is a bolt card, bolt the last card on the players field
+			Bolt(Cards.PlayerField);
+		}
+		else if (bUsedMirrorEffect)
+		{
+			// If the card is a mirror card, flip the field
+			TArray<ECard> CachedOpponentField = Cards.OpponentField;
+			Cards.OpponentField = Cards.PlayerField;
+			Cards.PlayerField = CachedOpponentField;
+		}
+	}
+	else
+	{
+		// If its just a normal card, add it to the field
+		Cards.OpponentField.Add(ChosenCard);
+	}
+
+	// Update the scores
+	UpdateScores();
+
+	return UpateToSendToPlayer;
+}
+
+void B2AIServer::Bolt(TArray<ECard>& Field)
+{
+	ECard BoltedCard = Field[Field.Num() - 1];
+
+	ensureMsgf(BoltedCard <= ECard::Force, TEXT("Attempted to bolt a card that is already bolted"));
+
+	Field[Field.Num() - 1] = static_cast<ECard>(static_cast<uint32>(BoltedCard) + BOLTED_CARD_OFFSET);
+}
+
+void B2AIServer::UnBolt(TArray<ECard>& Field)
+{
+	ECard UnboltedCard = Field[Field.Num() - 1];
+
+	ensureMsgf(UnboltedCard > ECard::Force, TEXT("Attempted to unbolt a card that is not bolted"));
+
+	Field[Field.Num() - 1] = static_cast<ECard>(static_cast<uint32>(UnboltedCard) - BOLTED_CARD_OFFSET);
+}
+
 bool B2AIServer::IsBolted(ECard Card) const
 {
 	return Card > ECard::Force;
@@ -259,6 +446,48 @@ uint32 B2AIServer::GetBoltedCardRealValue(ECard Card) const
 	OutValue = ACard::TypeToValue(Card);
 
 	return OutValue;
+}
+
+uint32 B2AIServer::CalculateScore(TArray<ECard>& Field)
+{
+	int32 Total = 0;
+
+	for (size_t i = 0; i < Field.Num(); i++)
+	{
+		ECard Card = Field[i];
+
+		if (!IsBolted(Card))
+		{
+			if (Card == ECard::Force && i > 0)
+			{
+				Total *= 2;
+			}
+			else
+			{
+				Total += ACard::TypeToValue(Card);
+			}
+		}
+	}
+
+	return Total;
+}
+
+EServerUpdate B2AIServer::CardToServerMessage(ECard Card) const
+{
+	EServerUpdate OutUpdateType = EServerUpdate::None;
+
+	if (static_cast<uint32>(Card) > SERVER_MESSAGE_CARD_MIN || static_cast<uint32>(Card) < SERVER_MESSAGE_CARD_MAX)
+	{
+		OutUpdateType = static_cast<EServerUpdate>(static_cast<uint32>(Card) + SERVER_MESSAGE_CARD_OFFSET);
+	}
+
+	return OutUpdateType;
+}
+
+void B2AIServer::UpdateScores()
+{
+	PlayerScore = CalculateScore(Cards.PlayerField);
+	OpponentScore = CalculateScore(Cards.OpponentField);
 }
 
 FB2Cards B2AIServer::BoltTest() const
