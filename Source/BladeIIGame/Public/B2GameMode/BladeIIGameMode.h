@@ -15,6 +15,7 @@
 #include "B2Game/CardSelector.h"
 #include "B2Enum/EngineStateEnum.h"
 #include "B2Enum/UIEffectEventEnum.h"
+#include "B2Enum/WinConditionEnum.h"
 
 #include "BladeIIGameMode.generated.h"
 
@@ -34,13 +35,19 @@ public:
 	void FinishTurn();
 
 	/* Informs the engine that the local player won */
-	void LocalPlayerWon();
 
-	/* Informs the engine that the opponent won */
-	void OpponentWon();
+	/**
+	 * Informs the engine that one of the players has achieved victory
+	 * @param Player - The player that has won
+	 * @param WinCondition - The win condition that they achieved
+	 */
+	void VictoryAchieved(EPlayer Player,  EWinCondition WinCondition);
 
 	/* Informs the engine that it is safe to switch turns */
 	void ChangeTurn();
+
+	/* Inform the engine that the scores are tied and the board needs to be cleared and reset */
+	void ClearAndDraw();
 
 	/* Get a reference to the card slot of the specified type */
 	UCardSlot* GetCardSlot(ECardSlot Slot) const;
@@ -155,12 +162,11 @@ private:
 	void HandleCardsReceived(const FB2Cards& Cards);
 
 	/**
-	 * Event handler for receiving an updated from the server
-	 * @param Update - the type of update
-	 * @param Metadata - any metadata
+	 * Event handler for receiving an instruction from the server
+	 * @param Instruction - The instruction
 	 */
 	UFUNCTION()
-	void HandleServerUpdate(EServerUpdate Update, const FString& MetaData);
+	void HandleServerInstruction(const FB2ServerUpdate& Instruction);
 
 	/**
 	 * Event handler for updates from the dealer instance.

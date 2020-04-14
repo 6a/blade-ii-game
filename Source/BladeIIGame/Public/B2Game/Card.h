@@ -23,6 +23,8 @@ public:
 	/* The type of this card */
 	ECard Type;
 
+	const static uint32 MAX_CARD_SCORE = 7;
+
 	ACard();
 
 	/**

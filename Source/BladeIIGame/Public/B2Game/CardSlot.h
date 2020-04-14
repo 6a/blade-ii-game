@@ -110,6 +110,12 @@ public:
 	 */
 	const virtual FB2Transform GetNextTransform() const;
 
+	/**
+	 * Return the index of the first occurrence of the specified type
+	 * @returns The index, or -1 if not found
+	 */
+	virtual int32 GetFirstIndexOfType(ECard CardType) const;
+
 	/* Updates the internal container so that the cards are in the right order */
 	virtual void UpdateCardOrder();
 

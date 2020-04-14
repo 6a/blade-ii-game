@@ -67,12 +67,7 @@ void ABladeIIGameMode::FinishTurn()
 	GSM->ChangeState<GSM_State_ProcessBoardState>();
 }
 
-void ABladeIIGameMode::LocalPlayerWon()
-{
-
-}
-
-void ABladeIIGameMode::OpponentWon()
+void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinCondition)
 {
 
 }
@@ -90,6 +85,14 @@ void ABladeIIGameMode::ChangeTurn()
 		GameState->Turn = EPlayer::Player;
 		GSM->ChangeState<GSM_State_PlayerTurn>();
 	}
+}
+
+void ABladeIIGameMode::ClearAndDraw()
+{
+	GameState->Turn = EPlayer::Undecided;
+
+	// Switch state machine to drawing from empty field
+	GSM->ChangeState<GSM_State_DrawToEmptyField>();
 }
 
 void ABladeIIGameMode::StartPlay()
@@ -182,7 +185,7 @@ void ABladeIIGameMode::RegisterEventListeners()
 	// Register event listeners
 
 	// From Opponent
-	Opponent->OnServerUpdateReceived.AddDynamic(this, &ABladeIIGameMode::HandleServerUpdate);
+	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameMode::HandleServerInstruction);
 	Opponent->OnCardsReceived.AddDynamic(this, &ABladeIIGameMode::HandleCardsReceived);
 
 	// From Dealer
@@ -611,7 +614,7 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 	Dealer->FastDeal();
 }
 
-void ABladeIIGameMode::HandleServerUpdate(EServerUpdate Update, const FString& MetaData)
+void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instruction)
 {
 
 }

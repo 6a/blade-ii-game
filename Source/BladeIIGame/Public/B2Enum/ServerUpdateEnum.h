@@ -6,6 +6,7 @@
 UENUM(BlueprintType)
 enum class EServerUpdate : uint8
 {
+	None UMETA(DisplayName = "No update"),
 	CardElliotsOrbalStaff UMETA(DisplayName = "Played Elliot's Orbal Staff"),
 	CardFiesTwinGunswords UMETA(DisplayName = "Played Fie's Twin Gunswords"),
 	CardAlisasOrbalBow UMETA(DisplayName = "Played Alisa's Orbal Bow"),
@@ -17,7 +18,7 @@ enum class EServerUpdate : uint8
 	CardMirror UMETA(DisplayName = "Played Emma's Orbal Staff"),
 	CardBlast UMETA(DisplayName = "Played Elise's Rapier"),
 	CardForce UMETA(DisplayName = "Played Sara's Sword and Gun"),
+	InstructionCards UMETA(DisplayName = "Initial Cards"),
 	InstructionQuit UMETA(DisplayName = "Quit"),
 	InstructionMessage UMETA(DisplayName = "Message"),
-	InstructionCards UMETA(DisplayName = "Initial Cards"),
 };

@@ -2,9 +2,9 @@
 
 const uint32 MAX_ECARD_VALUE = 10;
 
-const B2ServerUpdate B2AIServer::GetNextUpdate()
+const FB2ServerUpdate B2AIServer::GetNextUpdate()
 {
-	B2ServerUpdate Payload = B2Server::GetNextUpdate();
+	FB2ServerUpdate Payload = B2Server::GetNextUpdate();
 
 	if (!bCardsSent)
 	{

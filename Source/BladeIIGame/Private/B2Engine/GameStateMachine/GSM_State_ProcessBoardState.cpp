@@ -26,22 +26,33 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 
 	uint32 PlayerScore = GameState->PlayerScore;
 	uint32 OpponentScore = GameState->OpponentScore;
+	uint32 PlayerDeckCount = GameState->Cards.PlayerDeck.Num();
+	uint32 OpponentDeckCount = GameState->Cards.OpponentDeck.Num();
 	TArray<ECard> PlayerHand = GameState->Cards.PlayerHand;
 	TArray<ECard> PlayerField = GameState->Cards.PlayerField;
 	TArray<ECard> OpponentHand = GameState->Cards.OpponentHand;
 	TArray<ECard> OpponentField = GameState->Cards.OpponentField;
 
 	// Check if either local player or the opponent won after the most recent move
-	if (CheckIfTargetWon(PlayerScore, OpponentScore, OpponentHand, OpponentField))
+	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, OpponentHand, OpponentField, PlayerDeckCount);
+	if (LocalPlayerOutcome != EWinCondition::None)
 	{
-		// The player won
+		GI->VictoryAchieved(EPlayer::Player, LocalPlayerOutcome);
+		return;
 	}
-	else if (CheckIfTargetWon(OpponentScore, PlayerScore, PlayerHand, PlayerField))
+	
+	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, PlayerHand, PlayerField, OpponentDeckCount);
+	if (OpponentOutcome != EWinCondition::None)
 	{
-		// The opponent won
+		GI->VictoryAchieved(EPlayer::Opponent, OpponentOutcome);
+		return;
 	}
 
 	// Handle tied scores
+	if (PlayerScore == OpponentScore)
+	{
+		GI->ClearAndDraw();
+	}
 
 	// Otherwise, the board is still in a playable state so just switch the turn
 	GI->ChangeTurn();
@@ -59,14 +70,23 @@ void GSM_State_ProcessBoardState::End()
 
 }
 
-bool GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, TArray<ECard> OppositePlayerHand, TArray<ECard> OppositePlayerField) const
+EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, TArray<ECard> OppositePlayerHand, TArray<ECard> OppositePlayerField, uint32 OppositePlayerDeckCount) const
 {
 	// Logically this is kind of backwards but it works in my head
 
-	// Early exit if the opponent only has effect cards left, as this is an auto loss regardless
+	// Early exit if the opponent only has effect cards left, as this is an auto win regardless
 	if (!OppositePlayerHand.ContainsByPredicate<B2Predicate_IsNotEffectCard>(B2Predicate_IsNotEffectCard()))
 	{
-		return true;
+		return EWinCondition::OpponentOnlyHasEffectCards;
+	}
+
+	// Early exit if the score is tied and the opponent has no cards left in the deck or hand
+	if (TargetScore == OppositePlayerScore)
+	{
+		if (OppositePlayerDeckCount + OppositePlayerHand.Num() == 0)
+		{
+			return EWinCondition::ScoreVictory;
+		}
 	}
 
 	if (TargetScore > OppositePlayerScore)
@@ -74,46 +94,46 @@ bool GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 Op
 		// If the opponents hand is empty
 		if (OppositePlayerHand.Num() == 0)
 		{
-			return true;
+			return EWinCondition::ScoreVictory;
 		}
 
 		// If the difference is bigger than any card could cover...
 		uint32 ScoreGap = TargetScore - OppositePlayerScore;
-		if (ScoreGap > 7)
+		if (ScoreGap > ACard::MAX_CARD_SCORE)
 		{
 			// And there is no force card that can be played
 			if (!OppositePlayerHand.FindByPredicate<B2Predicate_IsForce>(B2Predicate_IsForce()))
 			{
-				return true;
+				return EWinCondition::ScoreVictory;
 			}
 			// Else if there is a force card, but the score would still not be high enough if the force card was used
 			else if (TargetScore > OppositePlayerScore * 2)
 			{
-				return true;
+				return EWinCondition::ScoreVictory;
 			}
 		}
 
 		// If the difference is not too big to cover by a normal card, but the opponents highest value card is not high valued enough
-		// This works because rods are worth 1 as well
+		// This works because rods are worth 1, and flipped cards are worth 0
 		if (!OppositePlayerHand.FindByPredicate<B2Predicate_HasCardOfHighEnoughValue>(B2Predicate_HasCardOfHighEnoughValue(ScoreGap)))
 		{
 			// And they have no rods to play
 			if (!OppositePlayerHand.FindByPredicate<B2Predicate_IsRod>(B2Predicate_IsRod()))
 			{
-				return true;
+				return EWinCondition::ScoreVictory;
 			}
 			// else they have some rod cards, but the last card on their field is not inactive
 			else if (OppositePlayerField.Last() <= ECard::Force)
 			{
-				return true;
+				return EWinCondition::ScoreVictory;
 			}
 			// else they have rod cards, and can play them, but the opponent is not able to bump their score up past the required value by using it
 			else if (ACard::TypeToValue(OppositePlayerField.Last()) < ScoreGap)
 			{
-				return true;
+				return EWinCondition::ScoreVictory;
 			}
 		}
 	}
 
-	return false;
+	return EWinCondition::None;
 }

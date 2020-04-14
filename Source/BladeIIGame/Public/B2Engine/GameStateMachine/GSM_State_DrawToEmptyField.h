@@ -16,5 +16,10 @@ public:
 	virtual void End() override;
 
 	virtual EGameState Type() const override { return EGameState::DrawToEmptyField; }
+
+private:
+
+	/* Whether or not we are waiting for the opponents draw from their hand to be received from the server pending a draw from hand to field state */
+	bool bIsWaitingForOpponentDrawFromHand;
 };
 

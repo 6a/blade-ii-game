@@ -2,15 +2,24 @@
 
 void UB2Opponent::Tick(float DeltaSeconds)
 {
-	B2ServerUpdate ServerUpdate = BackEnd->GetNextUpdate();
+	FB2ServerUpdate ServerUpdate = BackEnd->GetNextUpdate();
 
-	if (ServerUpdate.Update == EServerUpdate::InstructionCards)
+	while (ServerUpdate.Update != EServerUpdate::None)
 	{
-		if (OnCardsReceived.IsBound()) OnCardsReceived.Broadcast(FB2Cards(ServerUpdate.Metadata));
-	}
-	else
-	{
-		if (OnServerUpdateReceived.IsBound()) OnServerUpdateReceived.Broadcast(ServerUpdate.Update, ServerUpdate.Metadata);
+		if (ServerUpdate.Update == EServerUpdate::InstructionCards)
+		{
+			if (OnCardsReceived.IsBound()) OnCardsReceived.Broadcast(FB2Cards(ServerUpdate.Metadata));
+		}
+		else if (ServerUpdate.Update >= EServerUpdate::InstructionQuit)
+		{
+			if (OnInstructionReceived.IsBound()) OnInstructionReceived.Broadcast(ServerUpdate);
+		}
+		else
+		{
+			MoveUpdateQueue.Enqueue(ServerUpdate);
+		}
+
+		ServerUpdate = BackEnd->GetNextUpdate();
 	}
 }
 

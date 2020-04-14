@@ -4,8 +4,13 @@
 
 #include "B2Enum/ServerUpdateEnum.h"
 
-struct B2ServerUpdate
+#include "ServerUpdate.generated.h"
+
+USTRUCT()
+struct FB2ServerUpdate
 {
+	GENERATED_BODY()
+
 	EServerUpdate Update;
 	FString Metadata;
 };

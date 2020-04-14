@@ -24,4 +24,8 @@ enum class ECard : uint8
 	InactiveMachiasOrbalShotgun UMETA(DisplayName = "Inactive Machias' Orbal Shotgun"),
 	InactiveGaiusSpear UMETA(DisplayName = "Inactive Gaius' Spear"),
 	InactiveLaurasGreatsword UMETA(DisplayName = "Inactive Laura's Greatsword"),
+	InactiveBolt UMETA(DisplayName = "Inactive Bolt"),
+	InactiveMirror UMETA(DisplayName = "Inactive Emma's Orbal Staff"),
+	InactiveBlast UMETA(DisplayName = "Inactive Elise's Rapier"),
+	InactiveForce UMETA(DisplayName = "Inactive Sara's Sword and Gun"),
 };

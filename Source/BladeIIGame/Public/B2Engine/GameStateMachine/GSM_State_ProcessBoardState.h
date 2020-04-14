@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 
+#include "B2Enum/WinConditionEnum.h"
+
 #include "GSM_State.h"
 
 class GSM_State_ProcessBoardState : public GSM_State
@@ -24,8 +26,9 @@ private:
 	 * @param OppositePlayerScore - The score of the opposing player
 	 * @param OppositePlayerHand - The cards currently in the hand slot of the opposing player
 	 * @param OppositePlayerField - The cards currently in the field slot of the opposing player
-	 * @returns true if won
+	 * @param OppositePlayerDeckCount - The number of cards in the deck slot of the opposing player
+	 * @returns Either the win condition achieved, or EWinCondition::None if the target did not win
 	 */
-	bool CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, TArray<ECard> OppositePlayerHand, TArray<ECard> OppositePlayerField) const;
+	EWinCondition CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, TArray<ECard> OppositePlayerHand, TArray<ECard> OppositePlayerField, uint32 OppositePlayerDeckCount) const;
 };
 

@@ -73,9 +73,16 @@ bool ACard::IsFaceDown() const
 uint32 ACard::TypeToValue(ECard CardType)
 {
 	uint32 Value;
-	if (CardType > ECard::LaurasGreatsword || CardType == ECard::ElliotsOrbalStaff)
+	if (CardType > ECard::LaurasGreatsword)
 	{
-		Value = 1;
+		if (CardType > ECard::Force)
+		{
+			Value = 0;
+		}
+		else
+		{
+			Value = 1;
+		}
 	}
 	else
 	{

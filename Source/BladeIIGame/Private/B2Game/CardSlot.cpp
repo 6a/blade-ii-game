@@ -202,6 +202,22 @@ const FB2Transform UCardSlot::GetNextTransform() const
 	return GetTransformForIndex(TransformIndex);
 }
 
+int32 UCardSlot::GetFirstIndexOfType(ECard CardType) const
+{
+	int32 Index = -1;
+
+	for (size_t i = 0; i < Cards.Num(); i++)
+	{
+		if (Cards[i]->Type == CardType)
+		{
+			Index = i;
+			break;
+		}
+	}
+
+	return Index;
+}
+
 void UCardSlot::UpdateCardOrder()
 {
 	// This actually sorts by doing a distance check from the position of the 0th card, for all the cards in the slot

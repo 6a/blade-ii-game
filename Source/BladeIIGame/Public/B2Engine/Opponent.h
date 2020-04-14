@@ -2,13 +2,15 @@
 
 #include "CoreMinimal.h"
 
+#include "Containers/Queue.h"
+
 #include "B2Engine/Server.h"
 #include "B2Engine/Cards.h"
-#include "B2Enum/ServerUpdateEnum.h"
+#include "B2Engine/ServerUpdate.h"
 
 #include "Opponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FServerUpdateReceivedDelegate, EServerUpdate, Update, const FString&, MetaData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FServerInstructionReceivedDelegate, const FB2ServerUpdate&, Instruction);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCardsReceivedDelegate, const FB2Cards&, Cards);
 
 UCLASS()
@@ -21,7 +23,10 @@ public:
 	FCardsReceivedDelegate OnCardsReceived;
 
 	/* Callback for when a non-card update is received from the server */
-	FServerUpdateReceivedDelegate OnServerUpdateReceived;
+	FServerInstructionReceivedDelegate OnInstructionReceived;
+
+	/* Queue for incoming move updates from the opponent */
+	TQueue<FB2ServerUpdate> MoveUpdateQueue;
 
 	/**
 	 * Tick this opponent instance.
