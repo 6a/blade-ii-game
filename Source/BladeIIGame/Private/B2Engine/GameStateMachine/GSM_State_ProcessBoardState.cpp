@@ -3,7 +3,6 @@
 #include "B2Utility/Log.h"
 #include "B2Predicate/IsNotEffectCard.h"
 #include "B2Predicate/HasCardOfHighEnoughValue.h"
-#include "B2Predicate/HasInactiveCard.h"
 #include "B2Predicate/IsForce.h"
 #include "B2Predicate/IsRod.h"
 
@@ -27,10 +26,10 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 
 	uint32 PlayerScore = GameState->PlayerScore;
 	uint32 OpponentScore = GameState->OpponentScore;
-	TArray<ACard*> PlayerHand = Arena->PlayerHand->GetAll();
-	TArray<ACard*> PlayerField = Arena->PlayerField->GetAll();
-	TArray<ACard*> OpponentHand = Arena->OpponentHand->GetAll();
-	TArray<ACard*> OpponentField = Arena->OpponentField->GetAll();
+	TArray<ECard> PlayerHand = GameState->Cards.PlayerHand;
+	TArray<ECard> PlayerField = GameState->Cards.PlayerField;
+	TArray<ECard> OpponentHand = GameState->Cards.OpponentHand;
+	TArray<ECard> OpponentField = GameState->Cards.OpponentField;
 
 	// Check if either local player or the opponent won after the most recent move
 	if (CheckIfTargetWon(PlayerScore, OpponentScore, OpponentHand, OpponentField))
@@ -60,7 +59,7 @@ void GSM_State_ProcessBoardState::End()
 
 }
 
-bool GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ACard*> OppositePlayerHand, const TArray<ACard*> OppositePlayerField) const
+bool GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, TArray<ECard> OppositePlayerHand, TArray<ECard> OppositePlayerField) const
 {
 	// Logically this is kind of backwards but it works in my head
 
@@ -103,13 +102,13 @@ bool GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 Op
 			{
 				return true;
 			}
-			// else they have some rod cards, but they do not have any face down cards on their field to resurrect
-			else if (!OppositePlayerField.FindByPredicate<B2Predicate_HasInactiveCard>(B2Predicate_HasInactiveCard()))
+			// else they have some rod cards, but the last card on their field is not inactive
+			else if (OppositePlayerField.Last() <= ECard::Force)
 			{
 				return true;
 			}
 			// else they have rod cards, and can play them, but the opponent is not able to bump their score up past the required value by using it
-			else if (ACard::TypeToValue(OppositePlayerField.Last()->Type) < ScoreGap)
+			else if (ACard::TypeToValue(OppositePlayerField.Last()) < ScoreGap)
 			{
 				return true;
 			}

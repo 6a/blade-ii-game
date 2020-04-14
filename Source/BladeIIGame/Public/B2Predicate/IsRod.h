@@ -1,14 +1,12 @@
 #pragma once
 
-#include "CoreMinimal.h"
-
-#include "B2Game/Card.h"
+#include "B2Enum/CardEnum.h"
 
 // Predicate object that can be used to identify rod cards
 struct B2Predicate_IsRod
 {
 	/* Find function (finds as described above) */
-	bool operator()(ACard* Card) const {
-		return Card->Type == ECard::ElliotsOrbalStaff;
+	bool operator()(ECard Card) const {
+		return Card == ECard::ElliotsOrbalStaff;
 	}
 };

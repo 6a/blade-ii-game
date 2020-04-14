@@ -26,6 +26,6 @@ private:
 	 * @param OppositePlayerField - The cards currently in the field slot of the opposing player
 	 * @returns true if won
 	 */
-	bool CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ACard*> OppositePlayerHand, const TArray<ACard*> OppositePlayerField) const;
+	bool CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, TArray<ECard> OppositePlayerHand, TArray<ECard> OppositePlayerField) const;
 };
 

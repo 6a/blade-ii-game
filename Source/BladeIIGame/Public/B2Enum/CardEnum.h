@@ -16,5 +16,12 @@ enum class ECard : uint8
 	Bolt UMETA(DisplayName = "Bolt"),
 	Mirror UMETA(DisplayName = "Emma's Orbal Staff"),
 	Blast UMETA(DisplayName = "Elise's Rapier"),
-	Force UMETA(DisplayName = "Sara's Sword and Gun")
+	Force UMETA(DisplayName = "Sara's Sword and Gun"),
+	InactiveElliotsOrbalStaff UMETA(DisplayName = "Inactive Elliot's Orbal Staff"),
+	InactiveFiesTwinGunswords UMETA(DisplayName = "Inactive Fie's Twin Gunswords"),
+	InactiveAlisasOrbalBow UMETA(DisplayName = "Inactive Alisa's Orbal Bow"),
+	InactiveJusisSword UMETA(DisplayName = "Inactive Jusis' Sword"),
+	InactiveMachiasOrbalShotgun UMETA(DisplayName = "Inactive Machias' Orbal Shotgun"),
+	InactiveGaiusSpear UMETA(DisplayName = "Inactive Gaius' Spear"),
+	InactiveLaurasGreatsword UMETA(DisplayName = "Inactive Laura's Greatsword"),
 };

@@ -431,13 +431,9 @@ int32 ABladeIIGameMode::AggregateScore(UCardSlot* Slot) const
 			{
 				Total *= 2;
 			}
-			else if (Card->Type >= ECard::Bolt)
-			{
-				Total += 1;
-			}
 			else
 			{
-				Total += (static_cast<uint32>(Card->Type) + 1);
+				Total += ACard::TypeToValue(Card->Type);
 			}
 		}
 	}
@@ -451,56 +447,112 @@ void ABladeIIGameMode::UpdateCardState()
 	GameState->Cards.PlayerDeck.Empty(Arena->PlayerDeck->Num());
 	for (size_t i = 0; i < Arena->PlayerDeck->Num(); i++)
 	{
-		GameState->Cards.PlayerDeck.Add(Arena->PlayerDeck->GetCardByIndex(i)->Type);
+		ACard* Card = Arena->PlayerDeck->GetCardByIndex(i);
+		ECard Type = Card->Type;
+		if (!Card->IsActive())
+		{
+			Type = static_cast<ECard>(static_cast<uint32>(Type) + 11);
+		}
+
+		GameState->Cards.PlayerDeck.Add(Type);
 	}
 
 	// Player Hand
 	GameState->Cards.PlayerHand.Empty(Arena->PlayerHand->Num());
 	for (size_t i = 0; i < Arena->PlayerHand->Num(); i++)
 	{
-		GameState->Cards.PlayerHand.Add(Arena->PlayerHand->GetCardByIndex(i)->Type);
+		ACard* Card = Arena->PlayerHand->GetCardByIndex(i);
+		ECard Type = Card->Type;
+		if (!Card->IsActive())
+		{
+			Type = static_cast<ECard>(static_cast<uint32>(Type) + 11);
+		}
+
+		GameState->Cards.PlayerHand.Add(Type);
 	}
 
 	// Player Field
 	GameState->Cards.PlayerField.Empty(Arena->PlayerField->Num());
 	for (size_t i = 0; i < Arena->PlayerField->Num(); i++)
 	{
-		GameState->Cards.PlayerField.Add(Arena->PlayerField->GetCardByIndex(i)->Type);
+		ACard* Card = Arena->PlayerField->GetCardByIndex(i);
+		ECard Type = Card->Type;
+		if (!Card->IsActive())
+		{
+			Type = static_cast<ECard>(static_cast<uint32>(Type) + 11);
+		}
+
+		GameState->Cards.PlayerField.Add(Type);
 	}
 
 	// Player Discard
 	GameState->Cards.PlayerDiscard.Empty(Arena->PlayerDiscard->Num());
 	for (size_t i = 0; i < Arena->PlayerDiscard->Num(); i++)
 	{
-		GameState->Cards.PlayerDiscard.Add(Arena->PlayerDiscard->GetCardByIndex(i)->Type);
+		ACard* Card = Arena->PlayerDiscard->GetCardByIndex(i);
+		ECard Type = Card->Type;
+		if (!Card->IsActive())
+		{
+			Type = static_cast<ECard>(static_cast<uint32>(Type) + 11);
+		}
+
+		GameState->Cards.PlayerDiscard.Add(Type);
 	}
 
 	// Opponent Deck
 	GameState->Cards.OpponentDeck.Empty(Arena->OpponentDeck->Num());
 	for (size_t i = 0; i < Arena->OpponentDeck->Num(); i++)
 	{
-		GameState->Cards.OpponentDeck.Add(Arena->OpponentDeck->GetCardByIndex(i)->Type);
+		ACard* Card = Arena->OpponentDeck->GetCardByIndex(i);
+		ECard Type = Card->Type;
+		if (!Card->IsActive())
+		{
+			Type = static_cast<ECard>(static_cast<uint32>(Type) + 11);
+		}
+
+		GameState->Cards.OpponentDeck.Add(Type);
 	}
 
 	// Opponent Hand
 	GameState->Cards.OpponentHand.Empty(Arena->OpponentHand->Num());
 	for (size_t i = 0; i < Arena->OpponentHand->Num(); i++)
 	{
-		GameState->Cards.OpponentHand.Add(Arena->OpponentHand->GetCardByIndex(i)->Type);
+		ACard* Card = Arena->OpponentHand->GetCardByIndex(i);
+		ECard Type = Card->Type;
+		if (!Card->IsActive())
+		{
+			Type = static_cast<ECard>(static_cast<uint32>(Type) + 11);
+		}
+
+		GameState->Cards.OpponentHand.Add(Type);
 	}
 
 	// Opponent Field
 	GameState->Cards.OpponentField.Empty(Arena->OpponentField->Num());
 	for (size_t i = 0; i < Arena->OpponentField->Num(); i++)
 	{
-		GameState->Cards.OpponentField.Add(Arena->OpponentField->GetCardByIndex(i)->Type);
+		ACard* Card = Arena->OpponentField->GetCardByIndex(i);
+		ECard Type = Card->Type;
+		if (!Card->IsActive())
+		{
+			Type = static_cast<ECard>(static_cast<uint32>(Type) + 11);
+		}
+
+		GameState->Cards.OpponentField.Add(Type);
 	}
 
 	// Opponent Discard
 	GameState->Cards.OpponentDiscard.Empty(Arena->OpponentDiscard->Num());
 	for (size_t i = 0; i < Arena->OpponentDiscard->Num(); i++)
 	{
-		GameState->Cards.OpponentDiscard.Add(Arena->OpponentDiscard->GetCardByIndex(i)->Type);
+		ACard* Card = Arena->OpponentDiscard->GetCardByIndex(i);
+		ECard Type = Card->Type;
+		if (!Card->IsActive())
+		{
+			Type = static_cast<ECard>(static_cast<uint32>(Type) + 11);
+		}
+
+		GameState->Cards.OpponentDiscard.Add(Type);
 	}
 
 	// Update scores
