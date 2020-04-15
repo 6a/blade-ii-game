@@ -4,7 +4,7 @@
 
 #include "B2Predicate/SortCardsByDistanceAscending.h"
 #include "B2Predicate/SortCardsByTypeAscending.h"
-#include "..\..\Public\B2Game\CardSlot.h"
+#include "B2Predicate/MatchCardType.h"
 
 UCardSlot::UCardSlot()
 {
@@ -160,6 +160,15 @@ ACard* UCardSlot::GetFirst()
 	{
 		Card = Cards[0];
 	}
+
+	return Card;
+}
+
+ACard* UCardSlot::GetFirstOfType(ECard CardType)
+{
+	ACard* Card = nullptr;
+
+	Card = *Cards.FindByPredicate(B2Predicate_MatchCardType(CardType));
 
 	return Card;
 }

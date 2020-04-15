@@ -68,7 +68,7 @@ void ABladeIIGameMode::EndState()
 
 void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinCondition)
 {
-	FString Turn = GameState->Turn == EPlayer::Player ? TEXT("Local Player") : TEXT("Opponent");
+	FString Turn = Player == EPlayer::Player ? TEXT("Local Player") : TEXT("Opponent");
 	B2Utility::LogWarning(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
 }
 

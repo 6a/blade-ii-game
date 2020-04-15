@@ -606,7 +606,7 @@ void UB2Dealer::FastDeal()
 		float Delay = DelayOnStart;
 
 		// Grab the card and slap it onto correlating hand slot position
-		ACard* Card = Arena->PlayerDeck->RemoveByIndex(i);
+		ACard* Card = Arena->PlayerDeck->GetCardByIndex(i);
 
 		FVector TargetPosition;
 		FRotator TargetRotation;
@@ -615,13 +615,13 @@ void UB2Dealer::FastDeal()
 		{
 			TargetPosition = Arena->PlayerHand->GetTransformForIndex(i - 5).Position;
 			TargetRotation = Arena->PlayerHand->GetTransformForIndex(i - 5).Rotation;
+			Arena->PlayerDeck->RemoveByIndex(i);
 			Arena->PlayerHand->Add(Card);
 		}
 		else
 		{
 			TargetPosition = Arena->PlayerDeck->GetTransformForIndex(i).Position;
 			TargetRotation = Arena->PlayerDeck->GetTransformForIndex(i).Rotation;
-			Arena->PlayerDeck->Add(Card);
 		}
 
 		// Transition 1
@@ -651,7 +651,7 @@ void UB2Dealer::FastDeal()
 		float Delay = DelayOnStart;
 
 		// Grab the card and slap it onto correlating hand slot position
-		ACard* Card = Arena->OpponentDeck->RemoveByIndex(i);
+		ACard* Card = Arena->OpponentDeck->GetCardByIndex(i);
 
 		FVector TargetPosition;
 		FRotator TargetRotation;
@@ -660,13 +660,13 @@ void UB2Dealer::FastDeal()
 		{
 			TargetPosition = Arena->OpponentHand->GetTransformForIndex(i - 5).Position;
 			TargetRotation = Arena->OpponentHand->GetTransformForIndex(i - 5).Rotation;
+			Arena->OpponentDeck->RemoveByIndex(i);
 			Arena->OpponentHand->Add(Card);
 		}
 		else
 		{
 			TargetPosition = Arena->OpponentDeck->GetTransformForIndex(i).Position;
 			TargetRotation = Arena->OpponentDeck->GetTransformForIndex(i).Rotation;
-			Arena->OpponentDeck->Add(Card);
 		}
 
 		// Transition 1

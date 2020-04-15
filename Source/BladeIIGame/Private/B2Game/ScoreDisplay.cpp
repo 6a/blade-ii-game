@@ -109,8 +109,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 
 		if (Digits.Num() == 1)
 		{
-			FVector Position = PlayerDigitAnchor;
-			Digits[0]->SetWorldLocation(Position);
+			Digits[0]->SetWorldLocation(PlayerDigitAnchor);
 			Digits[0]->SetVisibility(true);
 
 			PlayerDigits.Add(Digits[0]);
@@ -166,8 +165,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 
 		if (Digits.Num() == 1)
 		{
-			FVector Position = OpponentDigitAnchor;
-			Digits[0]->SetWorldLocation(Position);
+			Digits[0]->SetWorldLocation(OpponentDigitAnchor);
 			Digits[0]->SetVisibility(true);
 
 			OpponentDigits.Add(Digits[0]);
@@ -178,7 +176,7 @@ void UScoreDisplay::Update(uint32 PlayerScore, uint32 OpponentScore)
 			TotalDigitWidth += SPACING;
 
 			FVector Offset = FVector(TotalDigitWidth * 0.5f, 0, 0);
-			TArray<FVector> NewPositions = { PlayerDigitAnchor - Offset, PlayerDigitAnchor + Offset };
+			TArray<FVector> NewPositions = { OpponentDigitAnchor - Offset, OpponentDigitAnchor + Offset };
 
 			for (size_t i = 0; i < NewPositions.Num(); i++)
 			{

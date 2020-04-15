@@ -16,5 +16,10 @@ public:
 	virtual void End() override;
 
 	virtual EGameState Type() const override { return EGameState::WaitingForOpponentMove; }
+
+private:
+	
+	/* Set to true when this state has processed a move - so that we dont process the next move until the next cycle (oponent -> player -> back to opponent) */
+	bool bStale;
 };
 

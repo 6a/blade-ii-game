@@ -4,8 +4,6 @@
 
 #include "B2GameMode/BladeIIGameMode.h"
 
-const FVector ARC_ON_DRAW_FROM_DECK = FVector(0, 0, 12);
-
 GSM_State_DrawToEmptyField::GSM_State_DrawToEmptyField()
 {
 	GSM_State::GSM_State();
@@ -134,7 +132,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 	else if (bIsWaitingForOpponentDrawFromHand)
 	{
 		FB2ServerUpdate MoveUpdate;
-		while (bIsWaitingForOpponentDrawFromHand && GI->GetOpponent()->MoveUpdateQueue.Dequeue(MoveUpdate))
+		if (GI->GetOpponent()->MoveUpdateQueue.Dequeue(MoveUpdate))
 		{
 			// From player hand to player field
 			UCardSlot* CurrentSlot = GI->GetArena()->PlayerHand;
@@ -146,7 +144,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 			CurrentSlot = GI->GetArena()->OpponentHand;
 			TargetSlot = GI->GetArena()->OpponentField;
 
-			int32 SourceSlotIndex = CurrentSlot->GetFirstIndexOfType(static_cast<ECard>(static_cast<uint32>(MoveUpdate.Update) - 1));
+			int32 SourceSlotIndex = CurrentSlot->GetFirstIndexOfType(ServerUpdateToCard(MoveUpdate.Update));
 			if (SourceSlotIndex != -1)
 			{
 				GI->GetDealer()->Move(CurrentSlot, SourceSlotIndex, TargetSlot, ARC_ON_DRAW_FROM_DECK);

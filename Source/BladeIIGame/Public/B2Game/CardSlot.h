@@ -66,6 +66,12 @@ public:
 	virtual ACard* GetFirst();
 
 	/**
+	 * Get a reference to the first card of a particular type in the slot. For the field, its the first one placed, for hand its the closest from the deck, for the deck its the bottom one
+	 * @returns A pointer to the card
+	 */
+	virtual ACard* GetFirstOfType(ECard CardType);
+
+	/**
 	 * Get an array containing pointers to all the cards in this slot
 	 * @returns An array containing pointers to all the cards in this slot
 	 */

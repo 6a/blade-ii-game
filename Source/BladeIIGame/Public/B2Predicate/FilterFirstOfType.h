@@ -2,30 +2,29 @@
 
 #include "B2Enum/CardEnum.h"
 
-// Predicate object that will identify the first of the specified type
+// Predicate object that will filter the first of the specified type
 struct B2Predicate_FilterFirstOfType
 {
-	bool bFound;
+	bool bFiltered;
 	ECard Type;
 
 	B2Predicate_FilterFirstOfType(ECard Type)
 		: Type(Type)
 	{
-		bFound = false;
+		bFiltered = false;
 	}
 
 	/* Find function (finds as described above) */
 	bool operator()(ECard Card) {
-		if (bFound)
+		if (!bFiltered)
 		{
-			return false;
-		}
-		
-		if (Card == Type)
-		{
-			bFound = true;
+			if (Card == Type)
+			{
+				bFiltered = true;
+				return false;
+			}
 		}
 
-		return bFound;
+		return true;
 	}
 };

@@ -21,9 +21,6 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	AArena* Arena = GI->GetArena();
 	B2GameState* GameState = GI->GetGameState();
 
-	// Check for all the potential branches.
-	// Early exit when a condition is met
-
 	uint32 PlayerScore = GameState->PlayerScore;
 	uint32 OpponentScore = GameState->OpponentScore;
 	uint32 PlayerDeckCount = GameState->Cards.PlayerDeck.Num();
@@ -33,20 +30,8 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	TArray<ECard> OpponentHand = GameState->Cards.OpponentHand;
 	TArray<ECard> OpponentField = GameState->Cards.OpponentField;
 
-	// Check if either local player or the opponent won after the most recent move
-	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, OpponentHand, OpponentField, OpponentDeckCount);
-	if (LocalPlayerOutcome != EWinCondition::None)
-	{
-		GI->VictoryAchieved(EPlayer::Player, LocalPlayerOutcome);
-		return;
-	}
-	
-	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, PlayerHand, PlayerField, PlayerDeckCount);
-	if (OpponentOutcome != EWinCondition::None)
-	{
-		GI->VictoryAchieved(EPlayer::Opponent, OpponentOutcome);
-		return;
-	}
+	// Check for all the potential branches.
+	// Early exit when a condition is met
 
 	// Handle tied scores
 	if (PlayerScore == OpponentScore)
@@ -55,11 +40,31 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 		return;
 	}
 
-	// If the turn is undecided, reaching this point means that we need to set the turn to opposite player,
-	// so that the following changeturn call switches over to the correct player
+	// Check if either local player or the opponent won after the most recent move
+	bool bIsOtherPlayersTurn = GI->GetGameState()->Turn == EPlayer::Opponent;
+	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, OpponentHand, OpponentField, OpponentDeckCount, bIsOtherPlayersTurn);
+	if (LocalPlayerOutcome != EWinCondition::None)
+	{
+		GI->VictoryAchieved(EPlayer::Player, LocalPlayerOutcome);
+		return;
+	}
+
+	bIsOtherPlayersTurn = GI->GetGameState()->Turn == EPlayer::Player;
+	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, PlayerHand, PlayerField, PlayerDeckCount, bIsOtherPlayersTurn);
+	if (OpponentOutcome != EWinCondition::None)
+	{
+		GI->VictoryAchieved(EPlayer::Opponent, OpponentOutcome);
+		return;
+	}
+
 	if (GI->GetGameState()->Turn == EPlayer::Undecided)
 	{
-		GI->GetGameState()->Turn = PlayerScore > OpponentScore ? EPlayer::Player : EPlayer::Opponent;
+		// If the turn is undecided, reaching this point means that we need to set the turn to the opposite player,
+		// so that the following changeturn call switches over to the correct player
+		if (GI->GetGameState()->Turn == EPlayer::Undecided)
+		{
+			GI->GetGameState()->Turn = PlayerScore > OpponentScore ? EPlayer::Player : EPlayer::Opponent;
+		}
 	}
 
 	// Otherwise, the board is still in a playable state so just switch the turn
@@ -78,7 +83,7 @@ void GSM_State_ProcessBoardState::End()
 
 }
 
-EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, TArray<ECard> OppositePlayerHand, TArray<ECard> OppositePlayerField, uint32 OppositePlayerDeckCount) const
+EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, bool bIsOppositePlayersTurn) const
 {
 	// Logically this is kind of backwards but it works in my head
 
@@ -102,6 +107,12 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 
 	if (TargetScore > OppositePlayerScore)
 	{
+		// If its the other players turn and they failed to match or beat the targets score
+		if (bIsOppositePlayersTurn)
+		{
+			return EWinCondition::ScoreVictory;
+		}
+
 		// If the opponents hand is empty
 		if (OppositePlayerHand.Num() == 0)
 		{

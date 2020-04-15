@@ -2,8 +2,6 @@
 
 #include "B2GameMode/BladeIIGameMode.h"
 
-const FVector ARC_ON_MOVE = FVector(0, 0, 4);
-
 GSM_State_PlayerTurn::GSM_State_PlayerTurn()
 {
 	GSM_State::GSM_State();

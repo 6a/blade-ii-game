@@ -20,6 +20,10 @@ public:
 	virtual EGameState Type() const;
 
 protected:
+	/* Const values for moving cards around */
+	const FVector ARC_ON_MOVE = FVector(0, 0, 4);
+	const FVector ARC_ON_DRAW_FROM_DECK = FVector(0, 0, 12);
+
 	UPROPERTY()
 	class ABladeIIGameMode* GameModeInstance;
 

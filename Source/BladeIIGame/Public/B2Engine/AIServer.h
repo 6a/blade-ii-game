@@ -79,6 +79,9 @@ private:
 	/* Helper function that executes the opponents entire turn. Returns false if we couldnt find a valid move */
 	bool ExecuteTurn();
 
+	/* Update the current turn based on the state of the board - call only after the AI has played a card */
+	void UpdateTurn();
+
 	/* Handle a tied board state. Returns true if the tie was successfully solved */
 	bool HandleTie();
 
@@ -106,6 +109,12 @@ private:
 	/* Updates both players scores based on the current board state */
 	void UpdateScores();
 
+	/* Helper function for brute forcing our way to a playable state */
+	void ResolveOpponentTurn();
+
+	/* Set the AI to the loss state */
+	void SetAILoss();
+
 	/* Testing card setups */
 	FB2Cards BoltTest() const;
 	FB2Cards BlastTest() const;
@@ -116,4 +125,5 @@ private:
 	FB2Cards CardOverlapTest() const;
 	FB2Cards DupeTest() const;
 	FB2Cards PlayerFirstTest() const;
+	FB2Cards OpponentFirstTest() const;
 };

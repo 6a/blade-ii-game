@@ -6,6 +6,7 @@
 #include "B2Predicate/FilterFirstOfType.h"
 #include "B2Predicate/IsNotEffectCard.h"
 #include "B2Utility/String.h"
+#include "B2Utility/Log.h"
 
 const FB2ServerUpdate B2AIServer::GetNextUpdate()
 {
@@ -14,7 +15,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = PlayerFirstTest();
+		Cards = OpponentFirstTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -33,7 +34,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 
 void B2AIServer::Tick(float DeltaSeconds)
 {
-	if (Winner == EPlayer::Opponent)
+	if (Winner != EPlayer::Undecided)
 	{
 		return;
 	}
@@ -52,28 +53,7 @@ void B2AIServer::Tick(float DeltaSeconds)
 		UpdateState(IncomingUpdate);
 
 		// Now we iterate until we have successfully moved into either the Undecided state, or the players turn
-		while (Turn != EPlayer::Player)
-		{
-			bool bSuccess = ExecuteTurn();
-			if (!bSuccess)
-			{
-				// Game over?
-				break;
-			}
-
-			if (PlayerScore == OpponentScore)
-			{
-				bool Success = HandleTie();
-
-				// If we could not break the tie, its a game over - but the player should already be aware. 
-				// Just set the state to a player win, as it doesnt matter anyway
-				if (!Success)
-				{
-					Winner = EPlayer::Player;
-					break;
-				}
-			}
-		}
+		ResolveOpponentTurn();
 	}
 }
 
@@ -107,12 +87,15 @@ void B2AIServer::ConfigureInitialState()
 	// Dont need to do anthing other than set the internal winner, as the player should eventually work this out by themselves
 	if (!bValidMoveFound)
 	{
-		Winner = EPlayer::Player;
+		SetAILoss();
 	}
 	else if (Turn == EPlayer::Opponent) // Otherwise, if its our turn, choose a card to play and play it - sending the play to the player afterwards
 	{
+		// Update the scores
+		UpdateScores();
+
 		// Execute the opponents turn - no need to check for success as we exit after this call anyway
-		ExecuteTurn();
+		ResolveOpponentTurn();
 	}
 
 	// Otherwise, its the players turn, or its undecided - either way, we are not waiting for an update from the player
@@ -128,7 +111,7 @@ bool B2AIServer::ExecuteTurn()
 	// full of effect cards or something, but this should be prevented by intelligently generating cards in the first place
 	if (!bValidMoveFound)
 	{
-		Winner = EPlayer::Player;
+		SetAILoss();
 	}
 	else
 	{
@@ -137,7 +120,25 @@ bool B2AIServer::ExecuteTurn()
 		OutBoundQueue.Enqueue(UpdateToSend);
 	}
 
+	UpdateTurn();
+
 	return bValidMoveFound;
+}
+
+void B2AIServer::UpdateTurn()
+{
+	if (PlayerScore == OpponentScore)
+	{
+		Turn = EPlayer::Undecided;
+	}
+	else if (PlayerScore > OpponentScore)
+	{
+		Turn = EPlayer::Opponent;
+	}
+	else
+	{
+		Turn = EPlayer::Player;
+	}
 }
 
 bool B2AIServer::HandleTie()
@@ -146,6 +147,13 @@ bool B2AIServer::HandleTie()
 
 	while (true)
 	{
+		// Clear the field
+		Cards.PlayerDiscard.Append(Cards.PlayerField);
+		Cards.PlayerField.Empty();
+
+		Cards.OpponentDiscard.Append(Cards.OpponentField);
+		Cards.OpponentField.Empty();
+
 		// If there are cards in the decks, we draw from the deck - else from the hand
 		// We only need to check one of the decks as at this stage and (always ?) they should be uniform in size
 		if (Cards.PlayerDeck.Num() <= 0)
@@ -216,6 +224,8 @@ bool B2AIServer::HandleTie()
 		}
 	}
 
+	UpdateScores();
+
 	return !bNoValidMove;
 }
 
@@ -265,23 +275,13 @@ void B2AIServer::UpdateState(const FB2ServerUpdate& Update)
 	else
 	{
 		// If its just a normal card, add it to the field
+		Cards.PlayerHand.RemoveSingle(InCard);
 		Cards.PlayerField.Add(InCard);
 	}
 
 	UpdateScores();
 
-	if (PlayerScore == OpponentScore)
-	{
-		Turn = EPlayer::Undecided;
-	}
-	else if (PlayerScore > OpponentScore)
-	{
-		Turn = EPlayer::Opponent;
-	}
-	else
-	{
-		Turn = EPlayer::Player;
-	}
+	UpdateTurn();
 }
 
 ECard B2AIServer::RemoveLast(TArray<ECard>& FromArray)
@@ -310,7 +310,7 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 	{
 		TArray<ECard> HandWithoutCurrentCard = Cards.OpponentHand.FilterByPredicate(B2Predicate_FilterFirstOfType(Card));
 
-		// Check if removing this card would NOT us with only effect cards (auto lose)
+		// Check if removing this card would NOT leave us with only effect cards (auto lose)
 		if (HandWithoutCurrentCard.ContainsByPredicate(B2Predicate_IsNotEffectCard()))
 		{
 			// Check if this card has a high enough value to overcome the current score difference
@@ -357,13 +357,20 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 
 	// TODO do this intelligently - for example, preferring to NOT end up in a drawn state, prioritising lower value cards etc
 
+
 	if (ValidCards.Num() == 0)
 	{
+		if (true)
+		{
+			B2Utility::LogWarning(FString::FromInt(ValidCards.Num()));
+		}
+
+
 		return false;
 	}
 
 	ECard CardToPlay = ValidCards[FMath::RandRange(0, ValidCards.Num() - 1)];
-	Cards.PlayerHand.RemoveSingle(CardToPlay);
+	Cards.OpponentHand.RemoveSingle(CardToPlay);
 
 	OutCard = CardToPlay;
 
@@ -520,6 +527,51 @@ void B2AIServer::UpdateScores()
 	OpponentScore = CalculateScore(Cards.OpponentField);
 }
 
+void B2AIServer::ResolveOpponentTurn()
+{
+	while (Turn != EPlayer::Player)
+	{
+		if (PlayerScore == OpponentScore)
+		{
+			bool bSuccess = HandleTie();
+
+			// If we could not break the tie, its a game over - but the player should already be aware. 
+			// Just set the state to a player win, as it doesnt matter anyway
+			if (!bSuccess)
+			{
+				SetAILoss();
+				break;
+			}
+
+			if (Turn == EPlayer::Undecided)
+			{
+				break;
+			}
+		}
+		else
+		{
+			bool bSuccess = ExecuteTurn();
+			if (!bSuccess)
+			{
+				// Game over?
+				break;
+			}
+		}
+	}
+}
+
+void B2AIServer::SetAILoss()
+{
+	if (true)
+	{
+		B2Utility::LogWarning("AI entered loss state");
+
+		Winner = EPlayer::Player;
+
+		BoltTest();
+	}
+}
+
 FB2Cards B2AIServer::BoltTest() const
 {
 	FB2Cards GeneratedCards;
@@ -638,6 +690,19 @@ FB2Cards B2AIServer::PlayerFirstTest() const
 	{
 		GeneratedCards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(0, 4)));
 		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(5, 6)));
+	}
+
+	return GeneratedCards;
+}
+
+FB2Cards B2AIServer::OpponentFirstTest() const
+{
+	FB2Cards GeneratedCards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		GeneratedCards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(5, 6)));
+		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(0, 4)));
 	}
 
 	return GeneratedCards;
