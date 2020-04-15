@@ -14,7 +14,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = DupeTest();
+		Cards = PlayerFirstTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -204,7 +204,7 @@ bool B2AIServer::HandleTie()
 			Cards.PlayerField.Add(PlayerCard);
 			Cards.OpponentField.Add(OpponentCard);
 
-			if (PlayerCardValue > OpponentCardValue)
+			if (PlayerCardValue < OpponentCardValue)
 			{
 				Turn = EPlayer::Player;
 			}
