@@ -13,14 +13,14 @@ const FB2ServerUpdate B2Server::GetNextUpdate()
 		EServerUpdate::None,
 	};
 
-	InboundQueue.Dequeue(OutUpdate);
+	OutBoundQueue.Dequeue(OutUpdate);
 
 	return OutUpdate;
 }
 
 void B2Server::SendUpdate(EServerUpdate Update, const FString& MetaData)
 {
-	OutBoundQueue.Enqueue(FB2ServerUpdate{Update, MetaData});
+	InboundQueue.Enqueue(FB2ServerUpdate{Update, MetaData});
 }
 
 void B2Server::Tick(float DeltaSeconds)

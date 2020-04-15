@@ -15,6 +15,8 @@ void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 {
 	GSM_State::Init(GameMode);
 
+	bIsWaitingForOpponentDrawFromHand = false;
+
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	// If there are cards on the field, clear them
@@ -27,22 +29,16 @@ void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 		ACardSelector* Cursor = GI->GetCursor();
 
 		ECardSlot NewCursorSlot;
-		FVector NewCursorPosition;
-		FRotator NewCursorRotation;
 		uint32 NewCursorSlotIndex = 0;
 
 		if (GI->GetArena()->PlayerDeck->Num() > 0)
 		{
 			NewCursorSlot = ECardSlot::PlayerDeck;
-			NewCursorPosition = GI->GetArena()->PlayerDeck->GetLast()->GetActorLocation();
-			NewCursorRotation = GI->GetArena()->PlayerDeck->GetLast()->GetActorRotation();
 			NewCursorSlotIndex = GI->GetArena()->PlayerDeck->Num() - 1;
 		}
 		else
 		{
 			NewCursorSlot = ECardSlot::PlayerHand;
-			NewCursorPosition = GI->GetArena()->PlayerHand->GetFirst()->GetActorLocation() + Cursor->OFFSET_WHEN_SELECTED;
-			NewCursorRotation = GI->GetArena()->PlayerHand->GetFirst()->GetActorRotation();
 			NewCursorSlotIndex = 0;
 		}
 
@@ -54,6 +50,10 @@ void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 		if (NewCursorSlot == ECardSlot::PlayerHand)
 		{
 			UpdateCursorPosition(NewCursorSlotIndex);
+		}
+		else
+		{
+			Cursor->SetActorLocationAndRotation(GI->GetArena()->PlayerDeck->GetTransformForIndex(GI->GetArena()->PlayerDeck->Num() - 1).Position, FRotator::ZeroRotator);
 		}
 	}
 }
@@ -75,7 +75,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 			{
 				if (GI->GetGameState()->CursorPosition == ECardSlot::PlayerDeck)
 				{
-					continue;
+					break;
 				}
 
 				uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex > 0 ? GI->GetGameState()->CursorSlotIndex - 1 : GI->GetArena()->PlayerHand->Num() - 1;
@@ -87,7 +87,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 			{
 				if (GI->GetGameState()->CursorPosition == ECardSlot::PlayerDeck)
 				{
-					continue;
+					break;
 				}
 
 				uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex < GI->GetArena()->PlayerHand->Num() - 1 ? GI->GetGameState()->CursorSlotIndex + 1 : 0;
@@ -122,7 +122,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 					// Dont perform the move yet as we have to wait for the opponents selection as well
 
 					ACard* SelectedCard = GetCurrentCard();
-					GI->GetOpponent()->SendUpdate(CardToServerMessage(SelectedCard->Type));
+					GI->GetOpponent()->SendUpdate(CardToServerUpdate(SelectedCard->Type));
 
 					bIsWaitingForOpponentDrawFromHand = true;
 				}
@@ -134,7 +134,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 	else if (bIsWaitingForOpponentDrawFromHand)
 	{
 		FB2ServerUpdate MoveUpdate;
-		while (GI->GetOpponent()->MoveUpdateQueue.Dequeue(MoveUpdate))
+		while (bIsWaitingForOpponentDrawFromHand && GI->GetOpponent()->MoveUpdateQueue.Dequeue(MoveUpdate))
 		{
 			// From player hand to player field
 			UCardSlot* CurrentSlot = GI->GetArena()->PlayerHand;
@@ -143,7 +143,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 			GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
 
 			// From opponent hand to opponent field
-			CurrentSlot = GI->GetArena()->OpponentDeck;
+			CurrentSlot = GI->GetArena()->OpponentHand;
 			TargetSlot = GI->GetArena()->OpponentField;
 
 			int32 SourceSlotIndex = CurrentSlot->GetFirstIndexOfType(static_cast<ECard>(static_cast<uint32>(MoveUpdate.Update) - 1));
@@ -157,6 +157,10 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 
 				// Error recovery? Check the next one? End the game?
 			}
+
+			// Update the card positions in the hand as we have just removed cards from each hand
+			GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
+			GI->GetDealer()->UpdateHandPositions(EPlayer::Opponent);
 
 			bIsWaitingForOpponentDrawFromHand = false;
 		}

@@ -1,5 +1,7 @@
 #include "B2Engine/Opponent.h"
 
+#include "B2Utility/Log.h"
+
 void UB2Opponent::Tick(float DeltaSeconds)
 {
 	BackEnd->Tick(DeltaSeconds);
@@ -18,6 +20,8 @@ void UB2Opponent::Tick(float DeltaSeconds)
 		}
 		else
 		{
+			B2Utility::LogInfo(FString::Printf(TEXT("Opponent received card instruction from server; [ %d ]"), ServerUpdate.Update));
+
 			MoveUpdateQueue.Enqueue(ServerUpdate);
 		}
 

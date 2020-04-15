@@ -572,7 +572,7 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 
 void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instruction)
 {
-
+	B2Utility::LogWarning(FString::Printf(TEXT("Server Instruction: [%d] Metadata: [ %s ]"), Instruction.Update, *Instruction.Metadata));
 }
 
 void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)

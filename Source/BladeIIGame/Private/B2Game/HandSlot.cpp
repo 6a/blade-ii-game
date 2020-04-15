@@ -22,7 +22,7 @@ const FB2Transform UHandSlot::GetTransformForIndex(uint32 Index) const
 	FB2Transform Transform = GetBaseTransform();
 
 	TArray<FB2Transform> TransformsSource = Num() % 2 == 0 ? CardTransforms : CardTransformsOffset;
-	uint32 Offset = Num() < 9 ? (TransformsSource.Num()) / 2 - Num() : 0;
+	uint32 Offset = Num() < 9 ? (TransformsSource.Num() - Num()) / 2 : 0;
 	uint32 NewIndex = Index + Offset;
 
 	if (TransformsSource.IsValidIndex(NewIndex))

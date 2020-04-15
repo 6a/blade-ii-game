@@ -99,16 +99,28 @@ void GSM_State::UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecti
 	SetCurrentCardToSelectedTransform();
 }
 
-EServerUpdate GSM_State::CardToServerMessage(ECard Card) const
+EServerUpdate GSM_State::CardToServerUpdate(ECard Card) const
 {
 	EServerUpdate OutUpdateType = EServerUpdate::None;
 
-	if (static_cast<uint32>(Card) > SERVER_MESSAGE_CARD_MIN || static_cast<uint32>(Card) < SERVER_MESSAGE_CARD_MAX)
+	if (static_cast<uint32>(Card) >= SERVER_MESSAGE_CARD_MIN || static_cast<uint32>(Card) <= SERVER_MESSAGE_CARD_MAX)
 	{
 		OutUpdateType = static_cast<EServerUpdate>(static_cast<uint32>(Card) + SERVER_MESSAGE_CARD_OFFSET);
 	}
 
 	return OutUpdateType;
+}
+
+ECard GSM_State::ServerUpdateToCard(EServerUpdate Update) const
+{
+	ECard OutCard = ECard::ElliotsOrbalStaff;
+
+	if (static_cast<uint32>(Update) >= SERVER_MESSAGE_CARD_UPDATE_MIN || static_cast<uint32>(Update) <= SERVER_MESSAGE_CARD_UPDATE_MAX)
+	{
+		OutCard = static_cast<ECard>(static_cast<uint32>(Update) - SERVER_MESSAGE_CARD_OFFSET);
+	}
+
+	return OutCard;
 }
 
 ACard* GSM_State::GetCurrentCard()

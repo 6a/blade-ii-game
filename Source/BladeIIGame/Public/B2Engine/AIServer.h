@@ -29,8 +29,10 @@ private:
 	const uint32 BOLTED_CARD_OFFSET = 11;
 
 	/* Min, max, and offset values for converting server messages to and from cards */
-	const uint32 SERVER_MESSAGE_CARD_MIN = 1;
-	const uint32 SERVER_MESSAGE_CARD_MAX = 11;
+	const uint32 SERVER_MESSAGE_CARD_MIN = 0;
+	const uint32 SERVER_MESSAGE_CARD_MAX = 10;
+	const uint32 SERVER_MESSAGE_CARD_UPDATE_MIN = 1;
+	const uint32 SERVER_MESSAGE_CARD_UPDATE_MAX = 11;
 	const uint32 SERVER_MESSAGE_CARD_OFFSET = 1;
 
 	/* Prevents the initial deck from being generated and sent more than once */
@@ -75,7 +77,7 @@ private:
 	FB2ServerUpdate ExecuteNextMove(ECard ChosenCard);
 
 	/* Helper function that executes the opponents entire turn. Returns false if we couldnt find a valid move */
-	bool ExecuteOpponentTurn();
+	bool ExecuteTurn();
 
 	/* Handle a tied board state. Returns true if the tie was successfully solved */
 	bool HandleTie();
@@ -96,7 +98,10 @@ private:
 	uint32 CalculateScore(TArray<ECard>& Field);
 
 	/* Returns the corresponding server update enum for the specified card */
-	EServerUpdate CardToServerMessage(ECard Card) const;
+	EServerUpdate CardToServerUpdate(ECard Card) const;
+
+	/* Returns the corresponding card for the specified server update */
+	ECard ServerUpdateToCard(EServerUpdate Update) const;
 
 	/* Updates both players scores based on the current board state */
 	void UpdateScores();

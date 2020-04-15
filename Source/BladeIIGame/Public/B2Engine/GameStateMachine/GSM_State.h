@@ -49,12 +49,18 @@ protected:
 
 	virtual void UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecting = false);
 
-	EServerUpdate CardToServerMessage(ECard Card) const;
+	/* Returns the corresponding server update enum for the specified card */
+	EServerUpdate CardToServerUpdate(ECard Card) const;
+
+	/* Returns the corresponding card for the specified server update */
+	ECard ServerUpdateToCard(EServerUpdate Update) const;
 
 private:
 	/* Min, max, and offset values for converting server messages to and from cards */
-	const uint32 SERVER_MESSAGE_CARD_MIN = 1;
-	const uint32 SERVER_MESSAGE_CARD_MAX = 11;
+	const uint32 SERVER_MESSAGE_CARD_MIN = 0;
+	const uint32 SERVER_MESSAGE_CARD_MAX = 10;
+	const uint32 SERVER_MESSAGE_CARD_UPDATE_MIN = 1;
+	const uint32 SERVER_MESSAGE_CARD_UPDATE_MAX = 11;
 	const uint32 SERVER_MESSAGE_CARD_OFFSET = 1;
 };
 

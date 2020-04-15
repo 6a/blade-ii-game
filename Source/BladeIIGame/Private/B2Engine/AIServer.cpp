@@ -1,5 +1,7 @@
 #include "B2Engine/AIServer.h"
 
+#include "Misc/DefaultValueHelper.h"
+
 #include "B2Game/Card.h"
 #include "B2Predicate/FilterFirstOfType.h"
 #include "B2Predicate/IsNotEffectCard.h"
@@ -12,7 +14,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = PlayerFirstTest();
+		Cards = DupeTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -31,79 +33,32 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 
 void B2AIServer::Tick(float DeltaSeconds)
 {
-	if (Winner == EPlayer::Opponent) return;
+	if (Winner == EPlayer::Opponent)
+	{
+		return;
+	}
 
 	// Handle messages "to" the server (rather, to us)
 	FB2ServerUpdate IncomingUpdate;
-	while (OutBoundQueue.Dequeue(IncomingUpdate))
+	while (InboundQueue.Dequeue(IncomingUpdate))
 	{
-		// Ignore "None" or message types
-		if (IncomingUpdate.Update == EServerUpdate::None || IncomingUpdate.Update == EServerUpdate::InstructionMessage) continue;
+		// Ignore "None" or message types for now
+		if (IncomingUpdate.Update == EServerUpdate::None || IncomingUpdate.Update == EServerUpdate::InstructionMessage)
+		{
+			continue;
+		}
 
 		// Update the internal card state
 		UpdateState(IncomingUpdate);
 
-		// If the turn is undecided, that means we need to draw a card from our hand and send an update to the player
-		if (Turn == EPlayer::Undecided)
-		{
-			// Choose a card to play
-			ECard ChosenCard;
-			bool bValidMoveFound = GetNextMove(ChosenCard);
-
-			// Early exit if no valid move was found, though that shouldnt happen in this state
-			if (!bValidMoveFound)
-			{
-				Winner = EPlayer::Player;
-				return;
-			}
-
-			// Send the move to the player
-			FB2ServerUpdate Update
-			{
-				CardToServerMessage(ChosenCard),
-			};
-
-			OutBoundQueue.Enqueue(Update);
-
-			// Update the internal card state again, so we know what to do after drawing to the field
-			UpdateState(IncomingUpdate);
-		}
-		else if (Turn == EPlayer::Opponent)
-		{
-			// Execute the opponents turn
-			ExecuteOpponentTurn();
-		}
-
 		// Now we iterate until we have successfully moved into either the Undecided state, or the players turn
-		while (Turn == EPlayer::Opponent || Turn == EPlayer::Undecided)
+		while (Turn != EPlayer::Player)
 		{
-			// If the turn is still undecided, we need to draw from the hand again, but this time we have priority so we can break out of the loop
-			if (Turn == EPlayer::Undecided)
+			bool bSuccess = ExecuteTurn();
+			if (!bSuccess)
 			{
-				// Choose a card to play
-				ECard ChosenCard;
-				bool bValidMoveFound = GetNextMove(ChosenCard);
-
-				// Early exit if no valid move was found, though that shouldnt happen in this state
-				if (!bValidMoveFound)
-				{
-					Winner = EPlayer::Player;
-					return;
-				}
-
-				// Send the move to the player
-				FB2ServerUpdate Update
-				{
-					CardToServerMessage(ChosenCard),
-				};
-
-				OutBoundQueue.Enqueue(Update);
+				// Game over?
 				break;
-			}
-			else if (Turn == EPlayer::Opponent)
-			{
-				// Execute the opponents turn
-				ExecuteOpponentTurn();
 			}
 
 			if (PlayerScore == OpponentScore)
@@ -150,20 +105,20 @@ void B2AIServer::ConfigureInitialState()
 		
 	// If we couldnt find a valid move to play... We lost!
 	// Dont need to do anthing other than set the internal winner, as the player should eventually work this out by themselves
-	if (bValidMoveFound)
+	if (!bValidMoveFound)
 	{
 		Winner = EPlayer::Player;
 	}
 	else if (Turn == EPlayer::Opponent) // Otherwise, if its our turn, choose a card to play and play it - sending the play to the player afterwards
 	{
 		// Execute the opponents turn - no need to check for success as we exit after this call anyway
-		ExecuteOpponentTurn();
+		ExecuteTurn();
 	}
 
 	// Otherwise, its the players turn, or its undecided - either way, we are not waiting for an update from the player
 }
 
-bool B2AIServer::ExecuteOpponentTurn()
+bool B2AIServer::ExecuteTurn()
 {
 	// Choose a card to play
 	ECard ChosenCard;
@@ -210,7 +165,7 @@ bool B2AIServer::HandleTie()
 				// Send the move to the player
 				FB2ServerUpdate Update
 				{
-					CardToServerMessage(ChosenCard),
+					CardToServerUpdate(ChosenCard),
 				};
 
 				OutBoundQueue.Enqueue(Update);
@@ -266,7 +221,67 @@ bool B2AIServer::HandleTie()
 
 void B2AIServer::UpdateState(const FB2ServerUpdate& Update)
 {
+	ECard InCard = ServerUpdateToCard(Update.Update);
 
+	// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
+	// Here we also check for effects that occurred, so we can use them to branch later
+	bool bUsedRodEffect = (InCard == ECard::ElliotsOrbalStaff && Cards.PlayerField.Num() > 0 && IsBolted(Cards.PlayerField.Last()));
+	bool bUsedBoltEffect = (InCard == ECard::Bolt);
+	bool bUsedMirrorEffect = (InCard == ECard::Mirror);
+	bool bUsedBlastEffect = (InCard == ECard::Blast);
+
+	// Note - we dont have to check for force, as we can just add it to the field like normal and recalculate the score
+
+	if (Cards.PlayerField.Num() > 0 && (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect))
+	{
+		if (bUsedBlastEffect)
+		{
+			// If the card is a blast card, we need to also remove the selected card (specified in metadata) from the opponents hand
+			int32 OutInt;
+			FDefaultValueHelper::ParseInt(Update.Metadata, OutInt);
+			ECard BlastedCard = static_cast<ECard>(OutInt);
+
+			Cards.OpponentHand.RemoveSingle(BlastedCard);
+			Cards.OpponentDiscard.Add(BlastedCard);
+		}
+		else if (bUsedRodEffect)
+		{
+			// If the card is a rod card (that can be used to "heal" a card) then we need to unbolt the last card on the opponents field
+			UnBolt(Cards.PlayerField);
+		}
+		else if (bUsedBoltEffect)
+		{
+			// If the card is a bolt card, bolt the last card on the players field
+			Bolt(Cards.OpponentField);
+		}
+		else if (bUsedMirrorEffect)
+		{
+			// If the card is a mirror card, flip the field
+			TArray<ECard> CachedOpponentField = Cards.OpponentField;
+			Cards.OpponentField = Cards.PlayerField;
+			Cards.PlayerField = CachedOpponentField;
+		}
+	}
+	else
+	{
+		// If its just a normal card, add it to the field
+		Cards.PlayerField.Add(InCard);
+	}
+
+	UpdateScores();
+
+	if (PlayerScore == OpponentScore)
+	{
+		Turn = EPlayer::Undecided;
+	}
+	else if (PlayerScore > OpponentScore)
+	{
+		Turn = EPlayer::Opponent;
+	}
+	else
+	{
+		Turn = EPlayer::Player;
+	}
 }
 
 ECard B2AIServer::RemoveLast(TArray<ECard>& FromArray)
@@ -285,6 +300,8 @@ ECard B2AIServer::RemoveLast(TArray<ECard>& FromArray)
 bool B2AIServer::GetNextMove(ECard& OutCard)
 {
 	// TODO make this smart - At the moment we just choose a random card that wont make use auto lose
+
+	// TODO mirror, bolt, blast cards valid?
 
 	TArray<ECard> ValidCards;
 	uint32 ScoreDifference = PlayerScore - OpponentScore;
@@ -357,19 +374,19 @@ FB2ServerUpdate B2AIServer::ExecuteNextMove(ECard ChosenCard)
 {
 	FB2ServerUpdate UpateToSendToPlayer
 	{
-		CardToServerMessage(ChosenCard),
+		CardToServerUpdate(ChosenCard),
 	};
 
 	// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 	// Here we also check for effects that occurred, so we can use them to branch later
-	bool bUsedRodEffect = (ChosenCard == ECard::ElliotsOrbalStaff && IsBolted(Cards.OpponentField.Last()));
+	bool bUsedRodEffect = (ChosenCard == ECard::ElliotsOrbalStaff && Cards.PlayerField.Num() > 0 && IsBolted(Cards.PlayerField.Last()));
 	bool bUsedBoltEffect = (ChosenCard == ECard::Bolt);
 	bool bUsedMirrorEffect = (ChosenCard == ECard::Mirror);
 	bool bUsedBlastEffect = (ChosenCard == ECard::Blast);
 
 	// Note - we dont have to check for force, as we can just add it to the field like normal and recalculate the score
 
-	if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect)
+	if (Turn == EPlayer::Opponent && (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect))
 	{
 		if (bUsedBlastEffect)
 		{
@@ -378,6 +395,7 @@ FB2ServerUpdate B2AIServer::ExecuteNextMove(ECard ChosenCard)
 			// Randomly choose a card
 			ECard CardToBlast = Cards.PlayerHand[FMath::RandRange(0, Cards.PlayerHand.Num() - 1)];
 			Cards.PlayerHand.RemoveSingle(CardToBlast);
+			Cards.PlayerDiscard.Add(CardToBlast);
 
 			UpateToSendToPlayer.Metadata = FString::FromInt(static_cast<int32>(CardToBlast));
 		}
@@ -472,16 +490,28 @@ uint32 B2AIServer::CalculateScore(TArray<ECard>& Field)
 	return Total;
 }
 
-EServerUpdate B2AIServer::CardToServerMessage(ECard Card) const
+EServerUpdate B2AIServer::CardToServerUpdate(ECard Card) const
 {
 	EServerUpdate OutUpdateType = EServerUpdate::None;
 
-	if (static_cast<uint32>(Card) > SERVER_MESSAGE_CARD_MIN || static_cast<uint32>(Card) < SERVER_MESSAGE_CARD_MAX)
+	if (static_cast<uint32>(Card) >= SERVER_MESSAGE_CARD_MIN || static_cast<uint32>(Card) <= SERVER_MESSAGE_CARD_MAX)
 	{
 		OutUpdateType = static_cast<EServerUpdate>(static_cast<uint32>(Card) + SERVER_MESSAGE_CARD_OFFSET);
 	}
 
 	return OutUpdateType;
+}
+
+ECard B2AIServer::ServerUpdateToCard(EServerUpdate Update) const
+{
+	ECard OutCard = ECard::ElliotsOrbalStaff;
+
+	if (static_cast<uint32>(Update) >= SERVER_MESSAGE_CARD_UPDATE_MIN || static_cast<uint32>(Update) <= SERVER_MESSAGE_CARD_UPDATE_MAX)
+	{
+		OutCard = static_cast<ECard>(static_cast<uint32>(Update) - SERVER_MESSAGE_CARD_OFFSET);
+	}
+
+	return OutCard;
 }
 
 void B2AIServer::UpdateScores()
