@@ -169,7 +169,7 @@ ACard* UCardSlot::GetFirstOfType(ECard CardType) const
 {
 	ACard* Card = nullptr;
 
-	Card = *Cards.FindByPredicate(B2Predicate_MatchCardActorType(CardType));
+	Card = *(Cards.FindByPredicate(B2Predicate_MatchCardActorType(CardType)));
 
 	return Card;
 }
@@ -177,6 +177,19 @@ ACard* UCardSlot::GetFirstOfType(ECard CardType) const
 TArray<ACard*> UCardSlot::GetAll() const
 {
 	return TArray<ACard*>(Cards);
+}
+
+ACard* UCardSlot::RemoveFirstOfType(const ECard& CardType)
+{
+	ACard* Card = nullptr;
+
+	int32 Index = Cards.IndexOfByPredicate(B2Predicate_MatchCardActorType(CardType));
+	if (Index != INDEX_NONE)
+	{
+		Card = RemoveByIndex(Index);
+	}
+
+	return Card;
 }
 
 TArray<ACard*> UCardSlot::RemoveAll()
