@@ -11,7 +11,8 @@ class BLADEIIGAME_API ACardSelector : public AActor
 	GENERATED_BODY()
 
 public:
-	const FVector OFFSET_WHEN_SELECTED = FVector(0, 0.8f, 6.f);
+	/* Helper const for working out the offset of a card that is currently selected */
+	static const FVector OFFSET_WHEN_SELECTED;
 
 	/* The mesh for this actor, with read access for blueprints */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

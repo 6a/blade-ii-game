@@ -76,27 +76,27 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 			case EInput::Select:
 				GI->GetCursor()->ToggleActorVisibility(false);
 
-				ACard* SelectedCard = GetCurrentPlayerCard();
+				ACard* Card = GetCurrentPlayerCard();
 
 				// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 				// Here we also check for effects that occurred, so we can use them to branch later
-				bool bUsedRodEffect = (SelectedCard->Type == ECard::ElliotsOrbalStaff && !GI->GetArena()->PlayerField->GetLast()->IsActive());
-				bool bUsedBoltEffect = (SelectedCard->Type == ECard::Bolt);
-				bool bUsedMirrorEffect = (SelectedCard->Type == ECard::Mirror);
-				bool bUsedBlastEffect = (SelectedCard->Type == ECard::Blast);
-				bool bUsedForceEffect = (SelectedCard->Type == ECard::Force);
+				bool bUsedRodEffect = (Card->Type == ECard::ElliotsOrbalStaff && GI->GetArena()->PlayerField->Num() > 0 && !GI->GetArena()->PlayerField->GetLast()->IsActive());
+				bool bUsedBoltEffect = (Card->Type == ECard::Bolt && GI->GetArena()->OpponentField->Num() > 0 && GI->GetArena()->OpponentField->GetLast()->IsActive());
+				bool bUsedMirrorEffect = (Card->Type == ECard::Mirror && GI->GetArena()->PlayerField->Num() > 0 && GI->GetArena()->OpponentField->Num() > 0);
+				bool bUsedBlastEffect = (Card->Type == ECard::Blast && GI->GetArena()->OpponentHand->Num() > 0);
+				bool bUsedForceEffect = (Card->Type == ECard::Force);
 				bool bUsedNormalCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect && !bUsedForceEffect;
 
 				// If the selected card was a normal card or a force card, and the players lastest field card is flipped, remove it
 				ACard* LatestFieldCard = GI->GetArena()->PlayerField->GetLast();
-				if (!LatestFieldCard->IsActive() && (bUsedForceEffect || bUsedNormalCard))
+				if (LatestFieldCard && !LatestFieldCard->IsActive() && (bUsedForceEffect || bUsedNormalCard))
 				{
 					GI->GetDealer()->ClearSingleFromField(LatestFieldCard);
 				}
 
 				if (!bUsedNormalCard)
 				{
-					GI->GetDealer()->PlayerEffectCard(SelectedCard);
+					GI->GetDealer()->PlayerEffectCard(Card);
 					GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Undecided);
 				}
 				else
@@ -116,7 +116,7 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				if (!bUsedBlastEffect)
 				{
 					// Update the server
-					GI->GetOpponent()->SendUpdate(CardToServerUpdate(SelectedCard->Type));
+					GI->GetOpponent()->SendUpdate(CardToServerUpdate(Card->Type));
 				}
 
 				GI->GetGameState()->bAcceptPlayerInput = false;

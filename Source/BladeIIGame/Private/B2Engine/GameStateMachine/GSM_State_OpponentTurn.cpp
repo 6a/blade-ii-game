@@ -32,43 +32,43 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 		// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 		// Here we also check for effects that occurred, so we can use them to branch later
 		bool bUsedRodEffect = (Card == ECard::ElliotsOrbalStaff && GI->GetArena()->OpponentField->Num() > 0 && !GI->GetArena()->OpponentField->GetLast()->IsActive());
-		bool bUsedBoltEffect = (Card == ECard::Bolt);
-		bool bUsedMirrorEffect = (Card == ECard::Mirror);
-		bool bUsedBlastEffect = (Card == ECard::Blast);
+		bool bUsedBoltEffect = (Card == ECard::Bolt && GI->GetArena()->PlayerField->Num() > 0 && GI->GetArena()->PlayerField->GetLast()->IsActive());
+		bool bUsedMirrorEffect = (Card == ECard::Mirror && GI->GetArena()->PlayerField->Num() > 0 && GI->GetArena()->OpponentField->Num() > 0);
+		bool bUsedBlastEffect = (Card == ECard::Blast && GI->GetArena()->PlayerHand->Num() > 0);
 		bool bUsedForceEffect = (Card == ECard::Force);
 		bool bUsedNormalCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect && !bUsedForceEffect;
 
 		// If the selected card was a normal card or a force card, and the opponents lastest field card is flipped, remove it
 		ACard* LatestFieldCard = GI->GetArena()->OpponentField->GetLast();
-		if (!LatestFieldCard->IsActive() && (bUsedForceEffect || bUsedNormalCard))
+		if (LatestFieldCard && !LatestFieldCard->IsActive() && (bUsedForceEffect || bUsedNormalCard))
 		{
 			GI->GetDealer()->ClearSingleFromField(LatestFieldCard);
 		}
 
-		if (!bUsedNormalCard)
+		int32 SourceSlotIndex = GI->GetArena()->OpponentHand->GetFirstIndexOfType(Card);
+		if (SourceSlotIndex != -1)
 		{
-			GI->GetDealer()->OpponentEffectCard(GI->GetArena()->OpponentHand->GetFirstOfType(Card));
-		}
-		else
-		{
-			// From opponent hand to opponent field
-			UCardSlot* CurrentSlot = GI->GetArena()->OpponentHand;
-			UCardSlot* TargetSlot = GI->GetArena()->OpponentField;
+			GI->GetGameState()->CursorPosition = ECardSlot::OpponentHand;
+			GI->GetGameState()->CursorSlotIndex = SourceSlotIndex;
 
-			int32 SourceSlotIndex = CurrentSlot->GetFirstIndexOfType(Card);
-			if (SourceSlotIndex != -1)
+			if (!bUsedNormalCard)
 			{
-				GI->GetDealer()->Move(CurrentSlot, SourceSlotIndex, TargetSlot, ARC_ON_MOVE);
+				GI->GetDealer()->OpponentEffectCard(GI->GetArena()->OpponentHand->GetFirstOfType(Card));
 			}
 			else
 			{
-				B2Utility::LogWarning(FString::Printf(TEXT("Received an invalid card from the opponent: [ %d ]"), Card));
+				// From opponent hand to opponent field
+				GI->GetDealer()->Move(GI->GetArena()->OpponentHand, SourceSlotIndex, GI->GetArena()->OpponentField, ARC_ON_MOVE);
 
-				// Error recovery? Check the next one? End the game?
+				// Update the card positions in the hand as we have just removed one
+				GI->GetDealer()->UpdateHandPositions(EPlayer::Opponent);
 			}
+		}
+		else
+		{
+			B2Utility::LogWarning(FString::Printf(TEXT("Received an invalid card from the opponent: [ %d ]"), Card));
 
-			// Update the card positions in the hand as we have just removed one
-			GI->GetDealer()->UpdateHandPositions(EPlayer::Opponent);
+			// Error recovery? Check the next one? End the game?
 		}
 
 		bStale = true;

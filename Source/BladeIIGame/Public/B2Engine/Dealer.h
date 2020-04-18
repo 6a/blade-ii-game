@@ -98,7 +98,7 @@ public:
 	 * Moves all the cards in the specified player's hand to their correct location - use after removing a card from the hand
 	 * @param Target - The player whos hand will updated
 	 */
-	void UpdateHandPositions(EPlayer Target) const;
+	void UpdateHandPositions(EPlayer Target);
 
 	/**
 	 * Clears the specified card off of the field
@@ -122,6 +122,7 @@ private:
 	B2WaitGroup WaitGroupClearFinished;
 	B2WaitGroup WaitGroupEffectReady;
 	B2WaitGroup WaitGroupBlastFinished;
+	B2WaitGroup WaitGroupHandPositionUpdateFinished;
 
 	/**
 	 * Helper function for effect card transition

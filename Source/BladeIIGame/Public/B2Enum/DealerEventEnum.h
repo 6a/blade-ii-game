@@ -11,4 +11,5 @@ enum class EDealerEvent : uint8
 	CardPlaced UMETA(DisplayName = "Card Placed"),
 	EffectReady UMETA(DisplayName = "Card pre-effect transition finished"),
 	BlastFinished UMETA(DisplayName = "Blast sequence finished"),
+	CardPositionUpdateFinished UMETA(DisplayName = "Blast sequence finished"),
 };

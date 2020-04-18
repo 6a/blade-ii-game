@@ -87,7 +87,8 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 	// If this happens, we should probably just redraw instead.
 
 	// Early exit if the opponent only has effect cards left, as this is an auto win regardless
-	if (!OppositePlayerHand.ContainsByPredicate<B2Predicate_IsNotEffectCard>(B2Predicate_IsNotEffectCard()))
+	// Skips check if the opposite players hand is empty (as it means that the target probably has 1 more card to play
+	if (OppositePlayerHand.Num() > 0 && !OppositePlayerHand.ContainsByPredicate<B2Predicate_IsNotEffectCard>(B2Predicate_IsNotEffectCard()))
 	{
 		return EWinCondition::OpponentOnlyHasEffectCards;
 	}
@@ -137,7 +138,7 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 						return EWinCondition::None;
 					}
 				}
-				else if (ACard::TypeToValue(OppositePlayerField.Last()) >= ScoreGap)
+				else if (GetBoltedCardRealValue(OppositePlayerField.Last()) >= ScoreGap)
 				{
 					return EWinCondition::None;
 				}

@@ -1,5 +1,6 @@
 #include "B2Engine/Dealer.h"
 
+#include "B2Game/CardSelector.h"
 #include "B2Utility/Log.h"
 
 // Class scope values
@@ -27,6 +28,7 @@ UB2Dealer::UB2Dealer()
 	WaitGroupClearFinished = B2WaitGroupNone;
 	WaitGroupEffectReady = B2WaitGroupNone;
 	WaitGroupBlastFinished = B2WaitGroupNone;
+	WaitGroupHandPositionUpdateFinished = B2WaitGroupNone;
 
 	B2Transition::ResetStatic();
 }
@@ -740,7 +742,9 @@ void UB2Dealer::PlayerEffectCard(ACard* Card)
 
 void UB2Dealer::OpponentEffectCard(ACard* Card)
 {
-	FVector Offset = GetDirectionNormalized(Card, EPlayer::Opponent) * CARD_POP_OUT_DISTANCE;
+	FVector SelectorOffset = ACardSelector::OFFSET_WHEN_SELECTED * FVector(1, -1, 1);
+
+	FVector Offset = GetDirectionNormalized(Card, EPlayer::Opponent) * CARD_POP_OUT_DISTANCE + SelectorOffset;
 	EffectCard(Card, Offset);
 }
 
@@ -1119,10 +1123,13 @@ void UB2Dealer::ForceIn(ACard* Card)
 	Card->QueueTransition(Transition);
 }
 
-void UB2Dealer::UpdateHandPositions(EPlayer Target) const
+void UB2Dealer::UpdateHandPositions(EPlayer Target)
 {
 	const float DelayOnStart = 0.1f;
 	const float TransitionDuration = 0.35f;
+
+	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
+	WaitGroupHandPositionUpdateFinished = WaitGroup + 1;
 
 	UCardSlot* TargetSlot = Target == EPlayer::Player ? Arena->PlayerHand : Arena->OpponentHand;
 
@@ -1148,7 +1155,7 @@ void UB2Dealer::UpdateHandPositions(EPlayer Target) const
 		};
 
 		// Add the transition to the transition queue
-		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, TransitionDuration, DelayOnStart);
+		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
 		TargetCard->QueueTransition(Transition);
 	}
 }
@@ -1323,6 +1330,12 @@ void UB2Dealer::Tick(float DeltaSeconds)
 			// Fire the event and reset this wait group so we dont keep entering this part
 			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::BlastFinished);
 			WaitGroupBlastFinished = B2WaitGroupNone;
+		}
+		else if (CurrentWaitGroup == WaitGroupHandPositionUpdateFinished)
+		{
+			// Fire the event and reset this wait group so we dont keep entering this part
+			if (OnDealerEvent.IsBound()) OnDealerEvent.Broadcast(EDealerEvent::CardPositionUpdateFinished);
+			WaitGroupHandPositionUpdateFinished = B2WaitGroupNone;
 		}
 	}
 }

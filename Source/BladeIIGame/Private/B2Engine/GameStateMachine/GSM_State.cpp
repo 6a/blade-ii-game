@@ -90,7 +90,7 @@ void GSM_State::UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecti
 	FRotator OffsetRotationMod = GI->GetGameState()->CursorPosition == ECardSlot::OpponentHand ? FRotator(180, 0, 0) : FRotator::ZeroRotator;
 
 	FB2Transform TargetTransform;
-	TargetTransform.Position = CurrentCard->GetActorLocation() + GI->GetCursor()->OFFSET_WHEN_SELECTED * OffsetYMod;
+	TargetTransform.Position = CurrentCard->GetActorLocation() + ACardSelector::OFFSET_WHEN_SELECTED * OffsetYMod;
 	TargetTransform.Rotation = CurrentCard->GetActorRotation() + OffsetRotationMod;
 	
 	GI->GetCursor()->SetActorLocationAndRotation(TargetTransform.Position, TargetTransform.Rotation);
@@ -121,6 +121,20 @@ ECard GSM_State::ServerUpdateToCard(EServerUpdate Update) const
 	}
 
 	return OutCard;
+}
+
+uint32 GSM_State::GetBoltedCardRealValue(ECard Card) const
+{
+	int32 OutValue = 0;
+
+	if (Card > ECard::Force)
+	{
+		Card = static_cast<ECard>(static_cast<uint32>(Card) - BOLTED_CARD_OFFSET);
+	}
+
+	OutValue = ACard::TypeToValue(Card);
+
+	return OutValue;
 }
 
 ACard* GSM_State::GetCurrentPlayerCard()

@@ -59,7 +59,13 @@ protected:
 	/* Returns the corresponding card for the specified server update */
 	ECard ServerUpdateToCard(EServerUpdate Update) const;
 
+	/* Returns the value of the specified if it wasnt bolted */
+	uint32 GetBoltedCardRealValue(ECard Card) const;
+
 private:
+	/* The value to remove from a bolted card (non effect) to determine its non flipped type */
+	const uint32 BOLTED_CARD_OFFSET = 11;
+
 	/* Min, max, and offset values for converting server messages to and from cards */
 	const uint32 SERVER_MESSAGE_CARD_MIN = 0;
 	const uint32 SERVER_MESSAGE_CARD_MAX = 10;

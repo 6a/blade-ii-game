@@ -15,7 +15,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = StandardCardsOnlyTest();
+		Cards = OpponentRodTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -228,23 +228,24 @@ bool B2AIServer::HandleTie()
 void B2AIServer::UpdateState(const FB2ServerUpdate& Update)
 {
 	ECard InCard = ServerUpdateToCard(Update.Update);
+	Cards.PlayerHand.RemoveSingle(InCard);
 
 	// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 	// Here we also check for effects that occurred, so we can use them to branch later
 	// Note - we dont have to check for force, as we can just add it to the field like normal and recalculate the score
 	bool bUsedRodEffect = (InCard == ECard::ElliotsOrbalStaff && Cards.PlayerField.Num() > 0 && IsBolted(Cards.PlayerField.Last()));
-	bool bUsedBoltEffect = (InCard == ECard::Bolt);
-	bool bUsedMirrorEffect = (InCard == ECard::Mirror);
-	bool bUsedBlastEffect = (InCard == ECard::Blast);
+	bool bUsedBoltEffect = (InCard == ECard::Bolt) && Cards.OpponentField.Num() > 0 && !IsBolted(Cards.OpponentField.Last());
+	bool bUsedMirrorEffect = (InCard == ECard::Mirror) && Cards.PlayerField.Num() > 0 && Cards.OpponentField.Num() > 0;
+	bool bUsedBlastEffect = (InCard == ECard::Blast) && Cards.OpponentHand.Num() > 0;
 	bool bUsedNormalOrForceCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect;
 
-	// If the selected card was a normal card or a force card, and the opponents lastest field card is flipped, remove it
-	if (IsBolted(Cards.PlayerField.Last()) && bUsedNormalOrForceCard)
+	// If the selected card was a normal card or a force card, and the players lastest field card is flipped, remove it
+	if (Cards.PlayerField.Num() > 0 && IsBolted(Cards.PlayerField.Last()) && bUsedNormalOrForceCard)
 	{
 		Cards.PlayerDiscard.Add(RemoveLast(Cards.PlayerField));
 	}
 
-	if (Cards.PlayerField.Num() > 0 && (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect))
+	if (Cards.PlayerField.Num() > 0 && !bUsedNormalOrForceCard)
 	{
 		if (bUsedBlastEffect)
 		{
@@ -273,11 +274,13 @@ void B2AIServer::UpdateState(const FB2ServerUpdate& Update)
 			Cards.OpponentField = Cards.PlayerField;
 			Cards.PlayerField = CachedOpponentField;
 		}
+
+		// Discard the card
+		Cards.PlayerDiscard.Add(InCard);
 	}
 	else
 	{
-		// If its just a normal card, add it to the field
-		Cards.PlayerHand.RemoveSingle(InCard);
+		// Add the card to the field
 		Cards.PlayerField.Add(InCard);
 	}
 
@@ -433,10 +436,17 @@ FB2ServerUpdate B2AIServer::ExecuteMove(ECard ChosenCard)
 
 	// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 	// Here we also check for effects that occurred, so we can use them to branch later
-	bool bUsedRodEffect = (ChosenCard == ECard::ElliotsOrbalStaff && Cards.PlayerField.Num() > 0 && IsBolted(Cards.PlayerField.Last()));
-	bool bUsedBoltEffect = (ChosenCard == ECard::Bolt);
-	bool bUsedMirrorEffect = (ChosenCard == ECard::Mirror);
-	bool bUsedBlastEffect = (ChosenCard == ECard::Blast);
+	bool bUsedRodEffect = (ChosenCard == ECard::ElliotsOrbalStaff && Cards.OpponentField.Num() > 0 && IsBolted(Cards.OpponentField.Last()));
+	bool bUsedBoltEffect = (ChosenCard == ECard::Bolt) && Cards.PlayerField.Num() > 0 && !IsBolted(Cards.PlayerField.Last());
+	bool bUsedMirrorEffect = (ChosenCard == ECard::Mirror) && Cards.PlayerField.Num() > 0 && Cards.OpponentField.Num() > 0;
+	bool bUsedBlastEffect = (ChosenCard == ECard::Blast) && Cards.PlayerHand.Num() > 0;
+	bool bUsedNormalOrForceCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect;
+
+	// If the selected card was a normal card or a force card, and the opponents lastest field card is flipped, remove it
+	if (Cards.OpponentField.Num() > 0 && IsBolted(Cards.OpponentField.Last()) && bUsedNormalOrForceCard)
+	{
+		Cards.OpponentDiscard.Add(RemoveLast(Cards.OpponentField));
+	}
 
 	// Note - we dont have to check for force, as we can just add it to the field like normal and recalculate the score
 
@@ -622,8 +632,21 @@ FB2Cards B2AIServer::BoltTest() const
 
 	for (int i = 14; i >= 0; i--)
 	{
-		GeneratedCards.PlayerDeck.Add(ECard::Bolt);
+		GeneratedCards.PlayerDeck.Add(FMath::RandBool() ? ECard::Bolt : static_cast<ECard>(FMath::RandRange(1, 6)));
 		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+	}
+
+	return GeneratedCards;
+}
+
+FB2Cards B2AIServer::OpponentBoltTest() const
+{
+	FB2Cards GeneratedCards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		GeneratedCards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+		GeneratedCards.OpponentDeck.Add(FMath::RandBool() ? ECard::Bolt : static_cast<ECard>(FMath::RandRange(1, 6)));
 	}
 
 	return GeneratedCards;
@@ -648,7 +671,7 @@ FB2Cards B2AIServer::ForceTest() const
 
 	for (int i = 14; i >= 0; i--)
 	{
-		ECard Type = static_cast<bool>(FMath::RandRange(0, 1)) ? ECard::Force : ECard::GaiusSpear;
+		ECard Type = FMath::RandBool() ? ECard::Force : ECard::GaiusSpear;
 
 		GeneratedCards.PlayerDeck.Add(Type);
 		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
@@ -663,10 +686,23 @@ FB2Cards B2AIServer::RodTest() const
 
 	for (int i = 14; i >= 0; i--)
 	{
-		ECard Type = static_cast<bool>(FMath::RandRange(0, 1)) ? ECard::ElliotsOrbalStaff : ECard::GaiusSpear;
+		ECard Type = FMath::RandBool() ? ECard::ElliotsOrbalStaff : ECard::GaiusSpear;
 
 		GeneratedCards.PlayerDeck.Add(Type);
 		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+	}
+
+	return GeneratedCards;
+}
+
+FB2Cards B2AIServer::OpponentRodTest() const
+{
+	FB2Cards GeneratedCards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		GeneratedCards.PlayerDeck.Add(FMath::RandBool() ? ECard::Bolt : static_cast<ECard>(FMath::RandRange(1, 6)));
+		GeneratedCards.OpponentDeck.Add(FMath::RandBool() ? ECard::ElliotsOrbalStaff : static_cast<ECard>(FMath::RandRange(1, 6)));
 	}
 
 	return GeneratedCards;
@@ -678,7 +714,7 @@ FB2Cards B2AIServer::MirrorTest() const
 
 	for (int i = 14; i >= 0; i--)
 	{
-		ECard Type = static_cast<bool>(FMath::RandRange(0, 1)) ? ECard::Mirror : static_cast<ECard>(FMath::RandRange(0, 6));
+		ECard Type = FMath::RandBool() ? ECard::Mirror : static_cast<ECard>(FMath::RandRange(0, 6));
 
 		GeneratedCards.PlayerDeck.Add(Type);
 		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));

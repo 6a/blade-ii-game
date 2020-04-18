@@ -24,6 +24,8 @@
 #include "B2Engine/GameStateMachine/GSM_State_PlayerForce.h"
 
 #include "B2Engine/GameStateMachine/GSM_State_OpponentTurn.h"
+#include "B2Engine/GameStateMachine/GSM_State_OpponentRod.h"
+#include "B2Engine/GameStateMachine/GSM_State_OpponentBolt.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
@@ -321,7 +323,8 @@ void ABladeIIGameMode::OnEffectReady()
 		}
 		else
 		{
-
+			// Switch state machine to opponent rod
+			GSM->ChangeState<GSM_State_OpponentRod>();
 		}
 		break;
 	case ECard::Bolt:
@@ -332,7 +335,8 @@ void ABladeIIGameMode::OnEffectReady()
 		}
 		else
 		{
-
+			// Switch state machine to opponent bolt
+			GSM->ChangeState<GSM_State_OpponentBolt>();
 		}
 		break;
 	case ECard::Mirror:
