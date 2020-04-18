@@ -15,7 +15,7 @@ public:
 
 	virtual void End() override;
 
-	virtual EGameState Type() const override { return EGameState::WaitingForOpponentMove; }
+	virtual EGameState Type() const override { return EGameState::OpponentTurn; }
 
 private:
 	

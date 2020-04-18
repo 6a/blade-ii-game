@@ -9,7 +9,7 @@ enum class EGameState : uint8
 	WaitingForInitialDeal UMETA(DisplayName = "Waiting for initial deal"),
 	DrawToEmptyField UMETA(DisplayName = "Drawing from the deck to an empty field"),
 	PlayerTurn UMETA(DisplayName = "The players turn"),
-	WaitingForOpponentMove UMETA(DisplayName = "Waiting for the opponents move to be received"),
+	OpponentTurn UMETA(DisplayName = "Waiting for the opponents move to be received"),
 	ProcessingBoardState UMETA(DisplayName = "Processing the board state"),
 	SelectingFromPlayerHand UMETA(DisplayName = "Selecting a card from the local players hand"),
 	SelectingFromOpponentHand UMETA(DisplayName = "Selecting a card from the opponents hand"),
