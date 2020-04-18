@@ -41,18 +41,15 @@ private:
 	/* The cards in the game */
 	FB2Cards Cards;
 
-	/* Player and Opponent (AI) Score */
+	/* Player and AI Score */
 	uint32 PlayerScore;
-	uint32 OpponentScore;
+	uint32 AIScore;
 
 	/* Current turn */
 	EPlayer Turn;
 
 	/* The winner of the match (if one has been found, else undecided) */
 	EPlayer Winner;
-
-	/* Flag for whether or not we are waiting for the opponents move (drawing from the hand after a tie on the field and no cards in the deck) */
-	bool bIsWaitingForOpponentsDrawFromHand;
 
 	/* Helper function that sets up the internal state of the game after the cards have first been generated */
 	void ConfigureInitialState();
@@ -64,7 +61,7 @@ private:
 	ECard RemoveLast(TArray<ECard>& FromArray);
 
 	/**
-	 * Removes and returns the card (as an out ref) from the opponent hand, that the AI has decided to play
+	 * Removes and returns the card (as an out ref) from the AI's hand, that the AI has decided to play
 	 * @return true if a card was found
 	 */
 	bool GetNextMove(ECard& OutCard);
@@ -76,7 +73,7 @@ private:
 	 */
 	FB2ServerUpdate ExecuteMove(ECard ChosenCard);
 
-	/* Helper function that executes the opponents entire turn. Returns false if we couldnt find a valid move */
+	/* Helper function that executes the AI's entire turn. Returns false if a valid move was not found */
 	bool ExecuteTurn();
 
 	/* Update the current turn based on the state of the board - call only after the AI has played a card */
@@ -109,8 +106,8 @@ private:
 	/* Updates both players scores based on the current board state */
 	void UpdateScores();
 
-	/* Helper function for brute forcing our way to a playable state */
-	void ResolveOpponentTurn();
+	/* Do whatever is required to get the gamestate back to being either the player turn, or an undecided state */
+	void ResolveAITurn();
 
 	/* Set the AI to the loss state */
 	void SetAILoss();
@@ -125,5 +122,5 @@ private:
 	FB2Cards CardOverlapTest() const;
 	FB2Cards DupeTest() const;
 	FB2Cards PlayerFirstTest() const;
-	FB2Cards OpponentFirstTest() const;
+	FB2Cards AIFirstTest() const;
 };

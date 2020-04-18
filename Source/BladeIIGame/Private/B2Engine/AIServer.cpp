@@ -15,7 +15,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = OpponentFirstTest();
+		Cards = AIFirstTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -53,13 +53,13 @@ void B2AIServer::Tick(float DeltaSeconds)
 		UpdateState(IncomingUpdate);
 
 		// Now we iterate until we have successfully moved into either the Undecided state, or the players turn
-		ResolveOpponentTurn();
+		ResolveAITurn();
 	}
 }
 
 void B2AIServer::ConfigureInitialState()
 {
-	// Note - The AI player is always player, or in this case, the "opponent"
+	// Note - The AI player is always player 1, or in this case, the "opponent"
 
 	// Place the cards from the decks onto the hands
 	for (int32 i = static_cast<int32>(DECK_SLOT_MAX) - 1; i >= static_cast<int32>(DECK_SLOT_MAX) - static_cast<int32>(HAND_SLOT_MAX); i--)
@@ -72,7 +72,7 @@ void B2AIServer::ConfigureInitialState()
 	}
 
 	// Set the initial scores
-	PlayerScore = OpponentScore = 0;
+	PlayerScore = AIScore = 0;
 
 	// Set initial turn
 	Turn = EPlayer::Undecided;
@@ -95,7 +95,7 @@ void B2AIServer::ConfigureInitialState()
 		UpdateScores();
 
 		// Execute the opponents turn - no need to check for success as we exit after this call anyway
-		ResolveOpponentTurn();
+		ResolveAITurn();
 	}
 
 	// Otherwise, its the players turn, or its undecided - either way, we are not waiting for an update from the player
@@ -127,11 +127,11 @@ bool B2AIServer::ExecuteTurn()
 
 void B2AIServer::UpdateTurn()
 {
-	if (PlayerScore == OpponentScore)
+	if (PlayerScore == AIScore)
 	{
 		Turn = EPlayer::Undecided;
 	}
-	else if (PlayerScore > OpponentScore)
+	else if (PlayerScore > AIScore)
 	{
 		Turn = EPlayer::Opponent;
 	}
@@ -168,7 +168,7 @@ bool B2AIServer::HandleTie()
 				Cards.OpponentField.Add(ChosenCard);
 
 				// Update the score
-				OpponentScore = CalculateScore(Cards.OpponentField);
+				AIScore = CalculateScore(Cards.OpponentField);
 
 				// Send the move to the player
 				FB2ServerUpdate Update
@@ -302,7 +302,7 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 	// TODO make this smart - At the moment we just choose a random card that wont make use auto lose
 
 	TArray<ECard> ValidCards;
-	uint32 ScoreDifference = PlayerScore - OpponentScore;
+	uint32 ScoreDifference = PlayerScore - AIScore;
 	
 	for (ECard Card : Cards.OpponentHand)
 	{
@@ -348,7 +348,7 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 						TArray<ECard> PlayerFieldBolted = Cards.PlayerField;
 						Bolt(PlayerFieldBolted);
 						uint32 PostBoltPlayerScore = CalculateScore(PlayerFieldBolted);
-						if (OpponentScore >= PostBoltPlayerScore)
+						if (AIScore >= PostBoltPlayerScore)
 						{
 							// If so, its valid to play this card
 							ValidCards.Add(Card);
@@ -361,7 +361,7 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 				if (Card == ECard::Mirror)
 				{
 					// If fliping the field will either improve or match the opponents current score
-					if (PlayerScore >= OpponentScore)
+					if (PlayerScore >= AIScore)
 					{
 						// If so, its valid to play this card
 						ValidCards.Add(Card);
@@ -385,7 +385,7 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 				if (Card == ECard::Force)
 				{
 					// If we played this force card, the resulting score would be high enough to match or beat the other score
-					if (OpponentScore * 2 >= ScoreDifference)
+					if (AIScore * 2 >= ScoreDifference)
 					{
 						// If so, its valid to play this card
 						ValidCards.Add(Card);
@@ -565,14 +565,14 @@ ECard B2AIServer::ServerUpdateToCard(EServerUpdate Update) const
 void B2AIServer::UpdateScores()
 {
 	PlayerScore = CalculateScore(Cards.PlayerField);
-	OpponentScore = CalculateScore(Cards.OpponentField);
+	AIScore = CalculateScore(Cards.OpponentField);
 }
 
-void B2AIServer::ResolveOpponentTurn()
+void B2AIServer::ResolveAITurn()
 {
 	while (Turn != EPlayer::Player)
 	{
-		if (PlayerScore == OpponentScore)
+		if (PlayerScore == AIScore)
 		{
 			bool bSuccess = HandleTie();
 
@@ -736,7 +736,7 @@ FB2Cards B2AIServer::PlayerFirstTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::OpponentFirstTest() const
+FB2Cards B2AIServer::AIFirstTest() const
 {
 	FB2Cards GeneratedCards;
 
