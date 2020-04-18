@@ -15,7 +15,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = OpponentMirrorTest();
+		Cards = OpponentForceTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -398,7 +398,7 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 					if (Card == ECard::Force)
 					{
 						// If we played this force card, the resulting score would be high enough to match or beat the other score
-						if (AIScore * 2 >= ScoreDifference)
+						if (AIScore * 2 >= PlayerScore)
 						{
 							// If so, its valid to play this card
 							ValidCards.Add(Card);
@@ -658,8 +658,21 @@ FB2Cards B2AIServer::BlastTest() const
 
 	for (int i = 14; i >= 0; i--)
 	{
-		GeneratedCards.PlayerDeck.Add(ECard::Blast);
+		GeneratedCards.PlayerDeck.Add(FMath::RandBool() ? ECard::Blast : static_cast<ECard>(FMath::RandRange(1, 6)));
 		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+	}
+
+	return GeneratedCards;
+}
+
+FB2Cards B2AIServer::OpponentBlastTest() const
+{
+	FB2Cards GeneratedCards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		GeneratedCards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+		GeneratedCards.OpponentDeck.Add(FMath::RandBool() ? ECard::Blast : static_cast<ECard>(FMath::RandRange(1, 6)));
 	}
 
 	return GeneratedCards;
@@ -671,10 +684,21 @@ FB2Cards B2AIServer::ForceTest() const
 
 	for (int i = 14; i >= 0; i--)
 	{
-		ECard Type = FMath::RandBool() ? ECard::Force : ECard::GaiusSpear;
-
-		GeneratedCards.PlayerDeck.Add(Type);
+		GeneratedCards.PlayerDeck.Add(FMath::RandBool() ? ECard::Force : static_cast<ECard>(FMath::RandRange(1, 6)));
 		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+	}
+
+	return GeneratedCards;
+}
+
+FB2Cards B2AIServer::OpponentForceTest() const
+{
+	FB2Cards GeneratedCards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		GeneratedCards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+		GeneratedCards.OpponentDeck.Add(FMath::RandBool() ? ECard::Force : static_cast<ECard>(FMath::RandRange(1, 6)));
 	}
 
 	return GeneratedCards;

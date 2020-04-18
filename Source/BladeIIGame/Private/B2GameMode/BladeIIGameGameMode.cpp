@@ -28,6 +28,9 @@
 #include "B2Engine/GameStateMachine/GSM_State_OpponentBolt.h"
 #include "B2Engine/GameStateMachine/GSM_State_OpponentMirror.h"
 
+
+#include "B2Engine/GameStateMachine/GSM_State_OpponentForce.h"
+
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
@@ -373,7 +376,8 @@ void ABladeIIGameMode::OnEffectReady()
 		}
 		else
 		{
-
+			// Switch state machine to player force
+			GSM->ChangeState<GSM_State_OpponentForce>();
 		}
 		break;
 	}

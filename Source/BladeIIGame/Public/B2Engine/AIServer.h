@@ -117,8 +117,10 @@ private:
 	FB2Cards OpponentBoltTest() const;
 
 	FB2Cards BlastTest() const;
+	FB2Cards OpponentBlastTest() const;
 
 	FB2Cards ForceTest() const;
+	FB2Cards OpponentForceTest() const;
 
 	FB2Cards RodTest() const;
 	FB2Cards OpponentRodTest() const;

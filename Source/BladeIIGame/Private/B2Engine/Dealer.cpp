@@ -1072,7 +1072,7 @@ void UB2Dealer::ForceOut(ACard* Card)
 	const float DelayOnStart = 0.4f;
 	const float TransitionDuration = 0.2f;
 
-	FVector Target = CardIsFromPlayerField(Card) ? FORCE_MAX_OFFSET_PLAYER : FORCE_MAX_OFFSET_OPPONENT;
+	FVector Target = Card->GetActorLocation() + (CardIsFromPlayerField(Card) ? FORCE_MAX_OFFSET_PLAYER : FORCE_MAX_OFFSET_OPPONENT);
 
 	// Transition 1
 	B2TPosition Position
