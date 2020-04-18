@@ -54,31 +54,6 @@ void B2Transition::Tick(float DeltaTime)
 			// Early exit if this transitions waitgroup is not yet in action
 			return;
 		}
-
-		// If done, early exit and remove this transition from its waitgroup
-		if (CurrentAlpha == LERP_MAX)
-		{
-			if (!bTransitionFinished)
-			{
-				bTransitionFinished = true;	
-				WaitGroups[WaitGroup]--;
-
-				if (WaitGroups[WaitGroup] <= 0)
-				{
-					WaitGroups.Remove(WaitGroup);
-					CurrentWaitGroup++;
-				}
-			}
-
-			return;
-		}
-	}
-	else
-	{
-		if (CurrentAlpha == LERP_MAX && !bTransitionFinished)
-		{
-			bTransitionFinished = true;
-		}
 	}
 
 	/* Calculate the step for this frame and increment the current alpha */
@@ -109,6 +84,35 @@ void B2Transition::Tick(float DeltaTime)
 
 	/* Calculate and update the current rotation */
 	CurrentRotation = EaseRotator(Rotation.StartRotation, Rotation.EndRotation, CurrentAlpha, Rotation.Ease);
+
+	//Waitgroup check to see if this waitgroup is finished
+	if (WaitGroup >= 0)
+	{
+		// If done, early exit and remove this transition from its waitgroup
+		if (CurrentAlpha == LERP_MAX)
+		{
+			if (!bTransitionFinished)
+			{
+				bTransitionFinished = true;
+				WaitGroups[WaitGroup]--;
+
+				if (WaitGroups[WaitGroup] <= 0)
+				{
+					WaitGroups.Remove(WaitGroup);
+					CurrentWaitGroup++;
+				}
+			}
+
+			return;
+		}
+	}
+	else
+	{
+		if (CurrentAlpha == LERP_MAX && !bTransitionFinished)
+		{
+			bTransitionFinished = true;
+		}
+	}
 }
 
 bool B2Transition::Done() const

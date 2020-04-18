@@ -1,7 +1,6 @@
 #include "B2Game/Card.h"
 
 #include "Materials/MaterialInstanceDynamic.h"
-
 #include "Misc/Guid.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -109,8 +108,6 @@ void ACard::Tick(float DeltaTime)
 		/* If the transition has now finished, remove it and exit early */
 		if (Transitions.Peek()->Done())
 		{
-			//B2Utility::LogInfo(FString::Printf(TEXT("Card with WG [ %d ] Finished"), Transitions.Peek()->WaitGroup));
-
 			Transitions.Pop();
 			return;
 		}
