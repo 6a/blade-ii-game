@@ -1,22 +1,22 @@
-#include "B2Engine/GameStateMachine/GSM_State_WaitingForOpponentMove.h"
+#include "B2Engine/GameStateMachine/GSM_State_OpponentTurn.h"
 
 #include "B2Utility/Log.h"
 
 #include "B2GameMode/BladeIIGameMode.h"
 
-GSM_State_WaitingForOpponentMove::GSM_State_WaitingForOpponentMove()
+GSM_State_OpponentTurn::GSM_State_OpponentTurn()
 {
 	GSM_State::GSM_State();
 }
 
-void GSM_State_WaitingForOpponentMove::Init(ABladeIIGameMode* GameMode)
+void GSM_State_OpponentTurn::Init(ABladeIIGameMode* GameMode)
 {
 	GSM_State::Init(GameMode);
 
 	bStale = false;
 }
 
-void GSM_State_WaitingForOpponentMove::Tick(float DeltaSeconds)
+void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 {
 	GSM_State::Tick(DeltaSeconds);
 
@@ -75,7 +75,7 @@ void GSM_State_WaitingForOpponentMove::Tick(float DeltaSeconds)
 	}
 }
 
-void GSM_State_WaitingForOpponentMove::End()
+void GSM_State_OpponentTurn::End()
 {
 	GSM_State::End();
 

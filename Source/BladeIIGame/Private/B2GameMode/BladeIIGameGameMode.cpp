@@ -13,15 +13,17 @@
 // Game state state machines
 #include "B2Engine/GameStateMachine/GSM_State_DrawToEmptyField.h"
 #include "B2Engine/GameStateMachine/GSM_State_WaitingForInitialDeal.h"
-#include "B2Engine/GameStateMachine/GSM_State_PlayerTurn.h"
-#include "B2Engine/GameStateMachine/GSM_State_WaitingForOpponentMove.h"
 #include "B2Engine/GameStateMachine/GSM_State_ProcessBoardState.h"
+
+#include "B2Engine/GameStateMachine/GSM_State_PlayerTurn.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerRod.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBolt.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerMirror.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBlast.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerBlastTarget.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerForce.h"
+
+#include "B2Engine/GameStateMachine/GSM_State_OpponentTurn.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
@@ -78,7 +80,7 @@ void ABladeIIGameMode::ChangeTurn()
 	if (GameState->Turn == EPlayer::Player)
 	{
 		GameState->Turn = EPlayer::Opponent;
-		GSM->ChangeState<GSM_State_WaitingForOpponentMove>();
+		GSM->ChangeState<GSM_State_OpponentTurn>();
 	}
 	else
 	{
@@ -537,8 +539,7 @@ UCardSlot* ABladeIIGameMode::GetCardSlot(ECardSlot Slot) const
 		CardSlot = Arena->PlayerField;
 		break;
 	case ECardSlot::PlayerDiscard:
-		// TODO impl?
-		B2Utility::LogWarning("PlayerDiscard does not exist!!!");
+		CardSlot = Arena->PlayerDiscard;
 		break;
 	case ECardSlot::OpponentDeck:
 		CardSlot = Arena->OpponentDeck;
@@ -550,8 +551,7 @@ UCardSlot* ABladeIIGameMode::GetCardSlot(ECardSlot Slot) const
 		CardSlot = Arena->OpponentField;
 		break;
 	case ECardSlot::OpponentDiscard:
-		// TODO impl?
-		B2Utility::LogWarning("OpponentDiscard does not exist!!!");
+		CardSlot = Arena->OpponentDiscard;
 		break;
 	}
 

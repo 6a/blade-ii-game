@@ -4,10 +4,10 @@
 
 #include "GSM_State.h"
 
-class GSM_State_WaitingForOpponentMove : public GSM_State
+class GSM_State_OpponentTurn : public GSM_State
 {
 public:
-	GSM_State_WaitingForOpponentMove();
+	GSM_State_OpponentTurn();
 
 	virtual void Init(class ABladeIIGameMode* GameMode) override;
 
