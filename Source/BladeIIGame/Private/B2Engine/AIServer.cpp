@@ -231,12 +231,18 @@ void B2AIServer::UpdateState(const FB2ServerUpdate& Update)
 
 	// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 	// Here we also check for effects that occurred, so we can use them to branch later
+	// Note - we dont have to check for force, as we can just add it to the field like normal and recalculate the score
 	bool bUsedRodEffect = (InCard == ECard::ElliotsOrbalStaff && Cards.PlayerField.Num() > 0 && IsBolted(Cards.PlayerField.Last()));
 	bool bUsedBoltEffect = (InCard == ECard::Bolt);
 	bool bUsedMirrorEffect = (InCard == ECard::Mirror);
 	bool bUsedBlastEffect = (InCard == ECard::Blast);
+	bool bUsedNormalOrForceCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect;
 
-	// Note - we dont have to check for force, as we can just add it to the field like normal and recalculate the score
+	// If the selected card was a normal card or a force card, and the opponents lastest field card is flipped, remove it
+	if (IsBolted(Cards.PlayerField.Last()) && bUsedNormalOrForceCard)
+	{
+		Cards.PlayerDiscard.Add(RemoveLast(Cards.PlayerField));
+	}
 
 	if (Cards.PlayerField.Num() > 0 && (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect))
 	{

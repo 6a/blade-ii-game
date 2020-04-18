@@ -31,13 +31,21 @@ void GSM_State_WaitingForOpponentMove::Tick(float DeltaSeconds)
 
 		// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 		// Here we also check for effects that occurred, so we can use them to branch later
-		bool bUsedRodEffect = (Card == ECard::ElliotsOrbalStaff && !GI->GetArena()->OpponentField->GetLast()->IsActive());
+		bool bUsedRodEffect = (Card == ECard::ElliotsOrbalStaff && GI->GetArena()->OpponentField->Num() > 0 && !GI->GetArena()->OpponentField->GetLast()->IsActive());
 		bool bUsedBoltEffect = (Card == ECard::Bolt);
 		bool bUsedMirrorEffect = (Card == ECard::Mirror);
 		bool bUsedBlastEffect = (Card == ECard::Blast);
 		bool bUsedForceEffect = (Card == ECard::Force);
+		bool bUsedNormalCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect && !bUsedForceEffect;
 
-		if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect || bUsedForceEffect)
+		// If the selected card was a normal card or a force card, and the opponents lastest field card is flipped, remove it
+		ACard* LatestFieldCard = GI->GetArena()->OpponentField->GetLast();
+		if (!LatestFieldCard->IsActive() && (bUsedForceEffect || bUsedNormalCard))
+		{
+			GI->GetDealer()->ClearSingleFromField(LatestFieldCard);
+		}
+
+		if (!bUsedNormalCard)
 		{
 			GI->GetDealer()->OpponentEffectCard(GI->GetArena()->OpponentHand->GetFirstOfType(Card));
 		}
@@ -46,13 +54,6 @@ void GSM_State_WaitingForOpponentMove::Tick(float DeltaSeconds)
 			// From opponent hand to opponent field
 			UCardSlot* CurrentSlot = GI->GetArena()->OpponentHand;
 			UCardSlot* TargetSlot = GI->GetArena()->OpponentField;
-
-			// If the fields most recent card is face down, remove it (if we didnt use an effect card the card is now void)
-			ACard* LatestFieldCard = GI->GetArena()->OpponentField->GetLast();
-			if (!LatestFieldCard->IsActive())
-			{
-				GI->GetDealer()->ClearSingleFromField(LatestFieldCard);
-			}
 
 			int32 SourceSlotIndex = CurrentSlot->GetFirstIndexOfType(Card);
 			if (SourceSlotIndex != -1)

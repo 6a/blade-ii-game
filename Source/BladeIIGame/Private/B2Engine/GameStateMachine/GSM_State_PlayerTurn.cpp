@@ -85,8 +85,16 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				bool bUsedMirrorEffect = (SelectedCard->Type == ECard::Mirror);
 				bool bUsedBlastEffect = (SelectedCard->Type == ECard::Blast);
 				bool bUsedForceEffect = (SelectedCard->Type == ECard::Force);
+				bool bUsedNormalCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect && !bUsedForceEffect;
 
-				if (bUsedRodEffect || bUsedBoltEffect || bUsedMirrorEffect || bUsedBlastEffect || bUsedForceEffect)
+				// If the selected card was a normal card or a force card, and the players lastest field card is flipped, remove it
+				ACard* LatestFieldCard = GI->GetArena()->PlayerField->GetLast();
+				if (!LatestFieldCard->IsActive() && (bUsedForceEffect || bUsedNormalCard))
+				{
+					GI->GetDealer()->ClearSingleFromField(LatestFieldCard);
+				}
+
+				if (!bUsedNormalCard)
 				{
 					GI->GetDealer()->PlayerEffectCard(SelectedCard);
 					GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Undecided);
@@ -96,13 +104,6 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 					// From player hand to player field
 					UCardSlot* CurrentSlot = GI->GetArena()->PlayerHand;
 					UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
-
-					// If the fields most recent card is face down, remove it (if we didnt use an effect card the card is now void)
-					ACard* LatestFieldCard = GI->GetArena()->PlayerField->GetLast();
-					if (!LatestFieldCard->IsActive())
-					{
-						GI->GetDealer()->ClearSingleFromField(LatestFieldCard);
-					}
 
 					GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_MOVE);
 
