@@ -115,11 +115,17 @@ private:
 	/* Testing card setups */
 	FB2Cards BoltTest() const;
 	FB2Cards OpponentBoltTest() const;
+
 	FB2Cards BlastTest() const;
+
 	FB2Cards ForceTest() const;
+
 	FB2Cards RodTest() const;
 	FB2Cards OpponentRodTest() const;
+
 	FB2Cards MirrorTest() const;
+	FB2Cards OpponentMirrorTest() const;
+
 	FB2Cards StandardCardsOnlyTest() const;
 	FB2Cards CardOverlapTest() const;
 	FB2Cards DupeTest() const;

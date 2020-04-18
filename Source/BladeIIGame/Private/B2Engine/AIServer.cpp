@@ -15,7 +15,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = OpponentRodTest();
+		Cards = OpponentMirrorTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -714,10 +714,21 @@ FB2Cards B2AIServer::MirrorTest() const
 
 	for (int i = 14; i >= 0; i--)
 	{
-		ECard Type = FMath::RandBool() ? ECard::Mirror : static_cast<ECard>(FMath::RandRange(0, 6));
-
-		GeneratedCards.PlayerDeck.Add(Type);
+		GeneratedCards.PlayerDeck.Add(FMath::RandBool() ? ECard::Mirror : static_cast<ECard>(FMath::RandRange(1, 6)));
 		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+	}
+
+	return GeneratedCards;
+}
+
+FB2Cards B2AIServer::OpponentMirrorTest() const
+{
+	FB2Cards GeneratedCards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		GeneratedCards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+		GeneratedCards.OpponentDeck.Add(FMath::RandBool() ? ECard::Mirror : static_cast<ECard>(FMath::RandRange(1, 6)));
 	}
 
 	return GeneratedCards;

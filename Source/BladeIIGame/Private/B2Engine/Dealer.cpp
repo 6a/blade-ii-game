@@ -1128,10 +1128,13 @@ void UB2Dealer::UpdateHandPositions(EPlayer Target)
 	const float DelayOnStart = 0.1f;
 	const float TransitionDuration = 0.35f;
 
+	UCardSlot* TargetSlot = Target == EPlayer::Player ? Arena->PlayerHand : Arena->OpponentHand;
+
+	// Early exit if the slot is empty
+	if (TargetSlot->Num() <= 0) return;
+
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
 	WaitGroupHandPositionUpdateFinished = WaitGroup + 1;
-
-	UCardSlot* TargetSlot = Target == EPlayer::Player ? Arena->PlayerHand : Arena->OpponentHand;
 
 	for (size_t i = 0; i < TargetSlot->Num(); i++)
 	{

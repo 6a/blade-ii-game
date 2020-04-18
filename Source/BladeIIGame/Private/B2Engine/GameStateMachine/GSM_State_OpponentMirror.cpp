@@ -1,4 +1,4 @@
-#include "B2Engine/GameStateMachine/GSM_State_PlayerMirror.h"
+#include "B2Engine/GameStateMachine/GSM_State_OpponentMirror.h"
 
 #include "TimerManager.h"
 
@@ -6,12 +6,12 @@
 
 #include "B2GameMode/BladeIIGameMode.h"
 
-GSM_State_PlayerMirror::GSM_State_PlayerMirror()
+GSM_State_OpponentMirror::GSM_State_OpponentMirror()
 {
 	GSM_State::GSM_State();
 }
 
-void GSM_State_PlayerMirror::Init(ABladeIIGameMode* GameMode)
+void GSM_State_OpponentMirror::Init(ABladeIIGameMode* GameMode)
 {
 	GSM_State::Init(GameMode);
 
@@ -24,7 +24,7 @@ void GSM_State_PlayerMirror::Init(ABladeIIGameMode* GameMode)
 	GI->GetEffectLayer()->Play(Effect, nullptr, 0.25f, 0.0f);
 }
 
-void GSM_State_PlayerMirror::Tick(float DeltaSeconds)
+void GSM_State_OpponentMirror::Tick(float DeltaSeconds)
 {
 	GSM_State::Tick(DeltaSeconds);
 
@@ -41,15 +41,15 @@ void GSM_State_PlayerMirror::Tick(float DeltaSeconds)
 		else if (Event == EUIEffectEvent::Finished)
 		{
 			// Remove the mirror card from the players hand
-			ACard* SelectedCard = RemoveCurrentPlayerCard();
+			ACard* SelectedCard = GI->GetArena()->OpponentHand->RemoveFirstOfType(ECard::Mirror);
 			SelectedCard->SetActorHiddenInGame(true);
-			SelectedCard->SetActorLocation(GI->GetArena()->PlayerDiscard->GetNextTransform().Position);
+			SelectedCard->SetActorLocation(GI->GetArena()->OpponentDiscard->GetNextTransform().Position);
 
 			// Update card slots 
-			GI->GetArena()->PlayerDiscard->Add(SelectedCard);
+			GI->GetArena()->OpponentDiscard->Add(SelectedCard);
 
 			// Update the card positions in the hand as we have just removed one
-			GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
+			GI->GetDealer()->UpdateHandPositions(EPlayer::Opponent);
 
 			// Signal to the game mode that the turn has finished
 			GI->EndState();
@@ -57,7 +57,7 @@ void GSM_State_PlayerMirror::Tick(float DeltaSeconds)
 	}
 }
 
-void GSM_State_PlayerMirror::End()
+void GSM_State_OpponentMirror::End()
 {
 	GSM_State::End();
 

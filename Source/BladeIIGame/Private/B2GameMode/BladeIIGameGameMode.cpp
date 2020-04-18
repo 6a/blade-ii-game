@@ -26,6 +26,7 @@
 #include "B2Engine/GameStateMachine/GSM_State_OpponentTurn.h"
 #include "B2Engine/GameStateMachine/GSM_State_OpponentRod.h"
 #include "B2Engine/GameStateMachine/GSM_State_OpponentBolt.h"
+#include "B2Engine/GameStateMachine/GSM_State_OpponentMirror.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
 
@@ -342,12 +343,13 @@ void ABladeIIGameMode::OnEffectReady()
 	case ECard::Mirror:
 		if (GameState->Turn == EPlayer::Player)
 		{
-			// Switch state machine to player force
+			// Switch state machine to player mirror
 			GSM->ChangeState<GSM_State_PlayerMirror>();
 		}
 		else
 		{
-
+			// Switch state machine to opponent mirror
+			GSM->ChangeState<GSM_State_OpponentMirror>();
 		}
 		break;
 	case ECard::Blast:
