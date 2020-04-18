@@ -65,7 +65,7 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 				GI->GetCursor()->ToggleActorVisibility(false);
 				GI->GetGameState()->bAcceptPlayerInput = false;
 
-				ACard* OpponentCard = GetCurrentCard();
+				ACard* OpponentCard = GetCurrentPlayerCard();
 				GI->GetDealer()->OpponentEffectCard(OpponentCard);
 
 				// Update the server
@@ -78,7 +78,7 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 	{
 		GI->GetGameState()->bBlastAnimationPending = false;
 
-		FVector TargetLocation = GetCurrentCard()->GetActorLocation();
+		FVector TargetLocation = GetCurrentPlayerCard()->GetActorLocation();
 		GI->GetEffectLayer()->Play(EUIEffect::BlastTarget, &TargetLocation, 1, 0);
 	}
 	else
@@ -89,7 +89,7 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 			if (Event == EUIEffectEvent::Ready)
 			{
 				// Get a reference to the target card (should be the one that is currently selected
-				ACard* TargetCard = RemoveCurrentCard();
+				ACard* TargetCard = RemoveCurrentPlayerCard();
 				TargetCard->SetActorHiddenInGame(true);
 
 				// Update card slots 

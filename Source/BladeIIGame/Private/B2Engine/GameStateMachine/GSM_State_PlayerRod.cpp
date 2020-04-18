@@ -41,7 +41,7 @@ void GSM_State_PlayerRod::Tick(float DeltaSeconds)
 		if (Event == EUIEffectEvent::Ready)
 		{
 			// Remove the rod card from the players hand
-			ACard* SelectedCard = RemoveCurrentCard();
+			ACard* SelectedCard = RemoveCurrentPlayerCard();
 			SelectedCard->SetActorHiddenInGame(true);
 			SelectedCard->SetActorLocation(GI->GetArena()->PlayerDiscard->GetNextTransform().Position);
 

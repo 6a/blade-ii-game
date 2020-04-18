@@ -76,7 +76,7 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 			case EInput::Select:
 				GI->GetCursor()->ToggleActorVisibility(false);
 
-				ACard* SelectedCard = GetCurrentCard();
+				ACard* SelectedCard = GetCurrentPlayerCard();
 
 				// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 				// Here we also check for effects that occurred, so we can use them to branch later
@@ -139,7 +139,7 @@ void GSM_State_PlayerTurn::UpdateCursorPosition(uint32 NewCursorIndex, bool bIsB
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	// Force card edge case
-	ACard* CurrentCard = GetCurrentCard();
+	ACard* CurrentCard = GetCurrentPlayerCard();
 	if (CurrentCard->Type == ECard::Force)
 	{
 		// Set the force indicator

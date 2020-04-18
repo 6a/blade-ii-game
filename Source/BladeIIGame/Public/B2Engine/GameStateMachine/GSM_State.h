@@ -31,13 +31,13 @@ protected:
 	 * Get a pointer to the currently selected card
 	 * @return A pointer to the card
 	 */
-	ACard* GetCurrentCard();
+	ACard* GetCurrentPlayerCard();
 
 	/**
 	 * Remove the current card from its slot
 	 * @return A pointer to the card
 	 */
-	ACard* RemoveCurrentCard();
+	ACard* RemoveCurrentPlayerCard();
 
 	/**
 	 * Returns the card currently under the cursor to its original transform

@@ -35,7 +35,7 @@ void GSM_State_PlayerBolt::Tick(float DeltaSeconds)
 		if (Event == EUIEffectEvent::Ready)
 		{
 			// Get a reference to the cards we will be working on
-			ACard* SelectedCard = GetCurrentCard();
+			ACard* SelectedCard = GetCurrentPlayerCard();
 			ACard* TargetCard = GameModeInstance->GetArena()->OpponentField->RemoveLast();
 
 			// Set target card state to inactive
@@ -52,7 +52,7 @@ void GSM_State_PlayerBolt::Tick(float DeltaSeconds)
 		else if (Event == EUIEffectEvent::Finished)
 		{
 			// Remove the bolt card from the players hand
-			ACard* SelectedCard = RemoveCurrentCard();
+			ACard* SelectedCard = RemoveCurrentPlayerCard();
 			SelectedCard->SetActorHiddenInGame(true);
 			SelectedCard->SetActorLocation(GI->GetArena()->PlayerDiscard->GetNextTransform().Position);
 

@@ -98,6 +98,13 @@ public:
 	virtual ACard* RemoveLast();
 
 	/**
+	 * Remove the first card of the specified type
+	 * @param CardType - The type of card to remove
+	 * @returns A pointer to the removed card
+	 */
+	virtual ACard* RemoveFirstOfType(const ECard& CardType);
+
+	/**
 	 * Remove all the cards from this slot
 	 * @returns An array of pointers to all the removed cards
 	 */

@@ -41,7 +41,7 @@ void GSM_State_PlayerMirror::Tick(float DeltaSeconds)
 		else if (Event == EUIEffectEvent::Finished)
 		{
 			// Remove the mirror card from the players hand
-			ACard* SelectedCard = RemoveCurrentCard();
+			ACard* SelectedCard = RemoveCurrentPlayerCard();
 			SelectedCard->SetActorHiddenInGame(true);
 			SelectedCard->SetActorLocation(GI->GetArena()->PlayerDiscard->GetNextTransform().Position);
 
