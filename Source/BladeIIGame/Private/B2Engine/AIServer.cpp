@@ -115,7 +115,7 @@ bool B2AIServer::ExecuteTurn()
 	}
 	else
 	{
-		FB2ServerUpdate UpdateToSend = ExecuteNextMove(ChosenCard);
+		FB2ServerUpdate UpdateToSend = ExecuteMove(ChosenCard);
 
 		OutBoundQueue.Enqueue(UpdateToSend);
 	}
@@ -301,8 +301,6 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 {
 	// TODO make this smart - At the moment we just choose a random card that wont make use auto lose
 
-	// TODO mirror, bolt, blast cards valid?
-
 	TArray<ECard> ValidCards;
 	uint32 ScoreDifference = PlayerScore - OpponentScore;
 	
@@ -337,6 +335,49 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 							ValidCards.Add(Card);
 							continue;
 						}
+					}
+				}
+
+				// This is a bolt card
+				if (Card == ECard::Bolt)
+				{
+					// The player has at least one card on their field, which is not already bolted/disabled
+					if (Cards.PlayerField.Num() > 0 && !IsBolted(Cards.PlayerField.Last()))
+					{
+						// If the players score will be lower or equal to our score after bolting
+						TArray<ECard> PlayerFieldBolted = Cards.PlayerField;
+						Bolt(PlayerFieldBolted);
+						uint32 PostBoltPlayerScore = CalculateScore(PlayerFieldBolted);
+						if (OpponentScore >= PostBoltPlayerScore)
+						{
+							// If so, its valid to play this card
+							ValidCards.Add(Card);
+							continue;
+						}
+					}
+				}
+
+				// This is a mirror card
+				if (Card == ECard::Mirror)
+				{
+					// If fliping the field will either improve or match the opponents current score
+					if (PlayerScore >= OpponentScore)
+					{
+						// If so, its valid to play this card
+						ValidCards.Add(Card);
+						continue;
+					}
+				}
+
+				// This is a blast card
+				if (Card == ECard::Blast)
+				{
+					// If the player has at least one card in their hand
+					if (Cards.PlayerHand.Num() > 0)
+					{
+						// If so, its valid to play this card
+						ValidCards.Add(Card);
+						continue;
 					}
 				}
 
@@ -377,7 +418,7 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 	return true;
 }
 
-FB2ServerUpdate B2AIServer::ExecuteNextMove(ECard ChosenCard)
+FB2ServerUpdate B2AIServer::ExecuteMove(ECard ChosenCard)
 {
 	FB2ServerUpdate UpateToSendToPlayer
 	{
@@ -473,7 +514,7 @@ uint32 B2AIServer::GetBoltedCardRealValue(ECard Card) const
 	return OutValue;
 }
 
-uint32 B2AIServer::CalculateScore(TArray<ECard>& Field)
+uint32 B2AIServer::CalculateScore(TArray<ECard>& Field) const
 {
 	int32 Total = 0;
 

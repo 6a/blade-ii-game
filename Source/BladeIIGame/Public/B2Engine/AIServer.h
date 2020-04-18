@@ -74,7 +74,7 @@ private:
 	 * @param ChosenCard - The card for which the move will be executed
 	 * @return The update to send to the player
 	 */
-	FB2ServerUpdate ExecuteNextMove(ECard ChosenCard);
+	FB2ServerUpdate ExecuteMove(ECard ChosenCard);
 
 	/* Helper function that executes the opponents entire turn. Returns false if we couldnt find a valid move */
 	bool ExecuteTurn();
@@ -98,7 +98,7 @@ private:
 	uint32 GetBoltedCardRealValue(ECard Card) const;
 
 	/* Calculates the score for the specified field */
-	uint32 CalculateScore(TArray<ECard>& Field);
+	uint32 CalculateScore(TArray<ECard>& Field) const;
 
 	/* Returns the corresponding server update enum for the specified card */
 	EServerUpdate CardToServerUpdate(ECard Card) const;
