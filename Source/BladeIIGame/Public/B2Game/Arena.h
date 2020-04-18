@@ -72,6 +72,9 @@ public:
 	 */
 	void AttachCard(ACard* Card);
 
+	/* Prints the current cards on the board out to the console */
+	void PrintOpponentCards();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -79,4 +82,5 @@ private:
 	/* Score display component */
 	UPROPERTY()
 	USceneComponent* CardRoot;
+
 };

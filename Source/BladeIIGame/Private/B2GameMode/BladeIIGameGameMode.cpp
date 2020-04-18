@@ -85,6 +85,8 @@ void ABladeIIGameMode::ChangeTurn()
 		GameState->Turn = EPlayer::Player;
 		GSM->ChangeState<GSM_State_PlayerTurn>();
 	}
+
+	Arena->PrintOpponentCards();
 }
 
 void ABladeIIGameMode::ClearAndDraw()

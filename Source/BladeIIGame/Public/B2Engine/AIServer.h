@@ -110,7 +110,7 @@ private:
 	void ResolveAITurn();
 
 	/* Set the AI to the loss state */
-	void SetAILoss();
+	void SetAILoss(const FString& Reason);
 
 	/* Testing card setups */
 	FB2Cards BoltTest() const;

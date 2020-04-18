@@ -6,6 +6,7 @@
 #include "B2Game/DeckSlot.h"
 #include "B2Game/FieldSlot.h"
 #include "B2Game/HandSlot.h"
+#include "B2Utility/Log.h"
 
 AArena::AArena()
 {
@@ -77,4 +78,27 @@ void AArena::Tick(float DeltaTime)
 void AArena::AttachCard(ACard* Card)
 {
 	Card->AttachToComponent(CardRoot, FAttachmentTransformRules::KeepWorldTransform);
+}
+
+void AArena::PrintOpponentCards()
+{
+	FString Deck = OpponentDeck->Stringify();
+
+	FString Hand = OpponentHand->Stringify();
+
+	FString Field = OpponentField->Stringify();
+
+	FString Discard = OpponentDiscard->Stringify();
+
+	B2Utility::LogInfo("################## Opponent Cards ##################");
+	B2Utility::LogInfo("");
+	B2Utility::LogInfo(FString("Hand:    ").Append(Hand));
+	B2Utility::LogInfo("");
+	B2Utility::LogInfo(FString("Deck:    ").Append(Deck));
+	B2Utility::LogInfo("");
+	B2Utility::LogInfo(FString("Field:   ").Append(Field));
+	B2Utility::LogInfo("");
+	B2Utility::LogInfo(FString("Discard: ").Append(Discard));
+	B2Utility::LogInfo("");
+	B2Utility::LogInfo("####################################################");
 }

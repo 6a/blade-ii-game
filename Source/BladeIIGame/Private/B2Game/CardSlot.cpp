@@ -5,6 +5,7 @@
 #include "B2Predicate/SortCardsByDistanceAscending.h"
 #include "B2Predicate/SortCardsByTypeAscending.h"
 #include "B2Predicate/MatchCardType.h"
+#include "B2Utility/String.h"
 
 UCardSlot::UCardSlot()
 {
@@ -17,7 +18,7 @@ uint32 UCardSlot::Num() const
 	return Cards.Num();
 }
 
-TArray<FString> UCardSlot::GetSortedIDsAscending()
+TArray<FString> UCardSlot::GetSortedIDsAscending() const
 {
 	TArray<ACard*> CardsCopy(Cards);
 	CardsCopy.Sort(B2Predicate_SortCardsByTypeAscending());
@@ -34,7 +35,7 @@ TArray<FString> UCardSlot::GetSortedIDsAscending()
 	return Strings;
 }
 
-TArray<FString> UCardSlot::GetSortedIDsDescending()
+TArray<FString> UCardSlot::GetSortedIDsDescending() const
 {
 	TArray<FString> OutArray = GetSortedIDsAscending();
 
@@ -53,7 +54,7 @@ void UCardSlot::Add(TArray<ACard*> InCards)
 	Cards.Append(InCards);
 }
 
-ACard* UCardSlot::GetCardByIndex(uint32 N)
+ACard* UCardSlot::GetCardByIndex(uint32 N) const
 {
 	ACard* Card = nullptr;
 
@@ -65,7 +66,7 @@ ACard* UCardSlot::GetCardByIndex(uint32 N)
 	return Card;
 }
 
-ACard* UCardSlot::GetCardByID(FString ID)
+ACard* UCardSlot::GetCardByID(FString ID) const
 {
 	ACard* Card = nullptr;
 
@@ -81,7 +82,7 @@ ACard* UCardSlot::GetCardByID(FString ID)
 	return Card;
 }
 
-int UCardSlot::GetIndexByID(FString ID)
+int UCardSlot::GetIndexByID(FString ID) const
 {
 	int OutIndex = -1;
 
@@ -140,7 +141,7 @@ ACard* UCardSlot::RemoveLast()
 
 }
 
-ACard* UCardSlot::GetLast()
+ACard* UCardSlot::GetLast() const
 {
 	ACard* Card = nullptr;
 
@@ -152,7 +153,7 @@ ACard* UCardSlot::GetLast()
 	return Card;
 }
 
-ACard* UCardSlot::GetFirst()
+ACard* UCardSlot::GetFirst() const
 {
 	ACard* Card = nullptr;
 
@@ -164,7 +165,7 @@ ACard* UCardSlot::GetFirst()
 	return Card;
 }
 
-ACard* UCardSlot::GetFirstOfType(ECard CardType)
+ACard* UCardSlot::GetFirstOfType(ECard CardType) const
 {
 	ACard* Card = nullptr;
 
@@ -234,6 +235,22 @@ void UCardSlot::UpdateCardOrder()
 
 	FVector RootLocation = CardTransforms[0].Position;
 	Cards.Sort(B2Predicate_SortCardsByDistanceAscending(RootLocation));
+}
+
+FString UCardSlot::Stringify() const
+{
+	FString SlotString;
+
+	for (size_t i = 0; i < Num(); i++)
+	{
+		SlotString.Append(B2Utility::CardEnumToString(Cards[i]->Type));
+		if (i < Num() - 1)
+		{
+			SlotString.Append(" | ");
+		}
+	}
+
+	return SlotString;
 }
 
 void UCardSlot::SetType(ECardSlot SlotType)

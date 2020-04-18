@@ -21,10 +21,10 @@ public:
 	uint32 Num() const;
 
 	/* Returns an array of the card ID's, in ascending order */
-	TArray<FString> GetSortedIDsAscending();
+	TArray<FString> GetSortedIDsAscending() const;
 
 	/* Returns an array of the card ID's, in descending order */
-	TArray<FString> GetSortedIDsDescending();
+	TArray<FString> GetSortedIDsDescending() const;
 
 	/* Add the specified card */
 	virtual void Add(ACard* Card);
@@ -37,39 +37,39 @@ public:
 	 * @param N - The index of the card to get
 	 * @returns A pointer to the card
 	 */
-	virtual ACard* GetCardByIndex(uint32 N);
+	virtual ACard* GetCardByIndex(uint32 N) const;
 
 	/**
 	 * Get the card with the specified ID
 	 * @param ID - The ID of the card to get
 	 * @returns A pointer to the card
 	 */
-	virtual ACard* GetCardByID(FString ID);
+	virtual ACard* GetCardByID(FString ID) const;
 
 	/**
 	 * Get the index of the card with the specified ID
 	 * @param ID - The ID of the card for which the index will be returned
 	 * @returns the index as an int - returns -1 if the card with the specified ID was not found
 	 */
-	virtual int GetIndexByID(FString ID);
+	virtual int GetIndexByID(FString ID) const;
 
 	/**
 	 * Get a reference to the last card in the slot. For the field, its the latest one placed, for hand its the furthest from the deck, for the deck its the top one
 	 * @returns A pointer to the card
 	 */
-	virtual ACard* GetLast();
+	virtual ACard* GetLast() const;
 
 	/**
 	 * Get a reference to the first card in the slot. For the field, its the first one placed, for hand its the closest from the deck, for the deck its the bottom one
 	 * @returns A pointer to the card
 	 */
-	virtual ACard* GetFirst();
+	virtual ACard* GetFirst() const;
 
 	/**
 	 * Get a reference to the first card of a particular type in the slot. For the field, its the first one placed, for hand its the closest from the deck, for the deck its the bottom one
 	 * @returns A pointer to the card
 	 */
-	virtual ACard* GetFirstOfType(ECard CardType);
+	virtual ACard* GetFirstOfType(ECard CardType) const;
 
 	/**
 	 * Get an array containing pointers to all the cards in this slot
@@ -124,6 +124,9 @@ public:
 
 	/* Updates the internal container so that the cards are in the right order */
 	virtual void UpdateCardOrder();
+
+	/* Returns a string representation of this slot (namely the cards it contains */
+	virtual FString Stringify() const;
 
 	/* Set this instance's slot type */
 	void SetType(ECardSlot SlotType);

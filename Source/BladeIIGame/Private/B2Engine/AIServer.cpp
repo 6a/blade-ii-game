@@ -15,7 +15,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = AIFirstTest();
+		Cards = StandardCardsOnlyTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -87,7 +87,7 @@ void B2AIServer::ConfigureInitialState()
 	// Dont need to do anthing other than set the internal winner, as the player should eventually work this out by themselves
 	if (!bValidMoveFound)
 	{
-		SetAILoss();
+		SetAILoss("Could not find an initial move to play");
 	}
 	else if (Turn == EPlayer::Opponent) // Otherwise, if its our turn, choose a card to play and play it - sending the play to the player afterwards
 	{
@@ -97,8 +97,6 @@ void B2AIServer::ConfigureInitialState()
 		// Execute the opponents turn - no need to check for success as we exit after this call anyway
 		ResolveAITurn();
 	}
-
-	// Otherwise, its the players turn, or its undecided - either way, we are not waiting for an update from the player
 }
 
 bool B2AIServer::ExecuteTurn()
@@ -111,7 +109,7 @@ bool B2AIServer::ExecuteTurn()
 	// full of effect cards or something, but this should be prevented by intelligently generating cards in the first place
 	if (!bValidMoveFound)
 	{
-		SetAILoss();
+		SetAILoss("Could not get next move");
 	}
 	else
 	{
@@ -177,8 +175,6 @@ bool B2AIServer::HandleTie()
 				};
 
 				OutBoundQueue.Enqueue(Update);
-
-				bIsWaitingForOpponentsDrawFromHand = true;
 			}
 			else
 			{
@@ -303,109 +299,113 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 
 	TArray<ECard> ValidCards;
 	uint32 ScoreDifference = PlayerScore - AIScore;
-	
-	for (ECard Card : Cards.OpponentHand)
+
+	// Edge case - if there is only 1 card left in the hand, treat it as valid
+	// Due to being filtered out in the previous turn, it should be impossible for this to be an effect card
+	if (Cards.OpponentHand.Num() == 1)
 	{
-		TArray<ECard> HandWithoutCurrentCard = Cards.OpponentHand.FilterByPredicate(B2Predicate_FilterFirstOfType(Card));
-
-		// Check if removing this card would NOT leave us with only effect cards (auto lose)
-		if (HandWithoutCurrentCard.ContainsByPredicate(B2Predicate_IsNotEffectCard()))
+		ValidCards.Add(Cards.OpponentHand.Last());
+	}
+	else
+	{
+		for (ECard Card : Cards.OpponentHand)
 		{
-			// Check if this card has a high enough value to overcome the current score difference
-			if (ACard::TypeToValue(Card) >= ScoreDifference)
-			{
-				// If so, its valid to play this card
-				ValidCards.Add(Card);
-				continue;
-			}
+			TArray<ECard> HandWithoutCurrentCard = Cards.OpponentHand.FilterByPredicate(B2Predicate_FilterFirstOfType(Card));
 
-			// Check if this card can not overcome the score difference, but...
-			if (ACard::TypeToValue(Card) < ScoreDifference)
+			// Check if removing this card would NOT leave us with only effect cards (auto lose)
+			if (HandWithoutCurrentCard.ContainsByPredicate(B2Predicate_IsNotEffectCard()))
 			{
-				// Its a rod card
-				if (Card == ECard::ElliotsOrbalStaff)
+				// Check if this card has a high enough value to overcome the current score difference
+				if (ACard::TypeToValue(Card) >= ScoreDifference)
 				{
-					// We have a card on the field that can be resurrected
-					if (IsBolted(Cards.OpponentField.Last()))
+					// If so, its valid to play this card
+					ValidCards.Add(Card);
+					continue;
+				}
+
+				// Check if this card can not overcome the score difference, but...
+				if (ACard::TypeToValue(Card) < ScoreDifference)
+				{
+					// Its a rod card
+					if (Card == ECard::ElliotsOrbalStaff)
 					{
-						// The card to resurrect has a high enough score to match or beat the other score
-						if (GetBoltedCardRealValue(Cards.OpponentField.Last()) >= ScoreDifference)
+						// We have a card on the field that can be resurrected
+						if (IsBolted(Cards.OpponentField.Last()))
+						{
+							// The card to resurrect has a high enough score to match or beat the other score
+							if (GetBoltedCardRealValue(Cards.OpponentField.Last()) >= ScoreDifference)
+							{
+								// If so, its valid to play this card
+								ValidCards.Add(Card);
+								continue;
+							}
+						}
+					}
+
+					// This is a bolt card
+					if (Card == ECard::Bolt)
+					{
+						// The player has at least one card on their field, which is not already bolted/disabled
+						if (Cards.PlayerField.Num() > 0 && !IsBolted(Cards.PlayerField.Last()))
+						{
+							// If the players score will be lower or equal to our score after bolting
+							TArray<ECard> PlayerFieldBolted = Cards.PlayerField;
+							Bolt(PlayerFieldBolted);
+							uint32 PostBoltPlayerScore = CalculateScore(PlayerFieldBolted);
+							if (AIScore >= PostBoltPlayerScore)
+							{
+								// If so, its valid to play this card
+								ValidCards.Add(Card);
+								continue;
+							}
+						}
+					}
+
+					// This is a mirror card
+					if (Card == ECard::Mirror)
+					{
+						// If fliping the field will either improve or match the opponents current score
+						if (PlayerScore >= AIScore)
 						{
 							// If so, its valid to play this card
 							ValidCards.Add(Card);
 							continue;
 						}
 					}
-				}
 
-				// This is a bolt card
-				if (Card == ECard::Bolt)
-				{
-					// The player has at least one card on their field, which is not already bolted/disabled
-					if (Cards.PlayerField.Num() > 0 && !IsBolted(Cards.PlayerField.Last()))
+					// This is a blast card
+					if (Card == ECard::Blast)
 					{
-						// If the players score will be lower or equal to our score after bolting
-						TArray<ECard> PlayerFieldBolted = Cards.PlayerField;
-						Bolt(PlayerFieldBolted);
-						uint32 PostBoltPlayerScore = CalculateScore(PlayerFieldBolted);
-						if (AIScore >= PostBoltPlayerScore)
+						// If the player has at least one card in their hand
+						if (Cards.PlayerHand.Num() > 0)
 						{
 							// If so, its valid to play this card
 							ValidCards.Add(Card);
 							continue;
 						}
 					}
-				}
 
-				// This is a mirror card
-				if (Card == ECard::Mirror)
-				{
-					// If fliping the field will either improve or match the opponents current score
-					if (PlayerScore >= AIScore)
+					// This is a force card
+					if (Card == ECard::Force)
 					{
-						// If so, its valid to play this card
-						ValidCards.Add(Card);
-						continue;
-					}
-				}
-
-				// This is a blast card
-				if (Card == ECard::Blast)
-				{
-					// If the player has at least one card in their hand
-					if (Cards.PlayerHand.Num() > 0)
-					{
-						// If so, its valid to play this card
-						ValidCards.Add(Card);
-						continue;
-					}
-				}
-
-				// This is a force card
-				if (Card == ECard::Force)
-				{
-					// If we played this force card, the resulting score would be high enough to match or beat the other score
-					if (AIScore * 2 >= ScoreDifference)
-					{
-						// If so, its valid to play this card
-						ValidCards.Add(Card);
-						continue;
+						// If we played this force card, the resulting score would be high enough to match or beat the other score
+						if (AIScore * 2 >= ScoreDifference)
+						{
+							// If so, its valid to play this card
+							ValidCards.Add(Card);
+							continue;
+						}
 					}
 				}
 			}
 		}
 	}
-
+	
 	// TODO do this intelligently - for example, preferring to NOT end up in a drawn state, prioritising lower value cards etc
-
 
 	if (ValidCards.Num() == 0)
 	{
-		if (true)
-		{
-			B2Utility::LogWarning(FString::FromInt(ValidCards.Num()));
-		}
-
+		B2Utility::LogWarning(FString("Could not find any valid cards!"));
 
 		return false;
 	}
@@ -580,7 +580,7 @@ void B2AIServer::ResolveAITurn()
 			// Just set the state to a player win, as it doesnt matter anyway
 			if (!bSuccess)
 			{
-				SetAILoss();
+				SetAILoss("Could not break tie");
 				break;
 			}
 
@@ -601,16 +601,13 @@ void B2AIServer::ResolveAITurn()
 	}
 }
 
-void B2AIServer::SetAILoss()
+void B2AIServer::SetAILoss(const FString& Reason)
 {
-	if (true)
-	{
-		B2Utility::LogWarning("AI entered loss state");
+	B2Utility::LogWarning(FString("AI entered loss state: ").Append(Reason));
 
-		Winner = EPlayer::Player;
+	Winner = EPlayer::Player;
 
-		BoltTest();
-	}
+	BoltTest();
 }
 
 FB2Cards B2AIServer::BoltTest() const
