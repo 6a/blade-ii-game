@@ -90,6 +90,7 @@ void AArena::PrintOpponentCards()
 
 	FString Discard = OpponentDiscard->Stringify();
 
+	B2Utility::LogInfo("");
 	B2Utility::LogInfo("################## Opponent Cards ##################");
 	B2Utility::LogInfo("");
 	B2Utility::LogInfo(FString("Hand:    ").Append(Hand));
@@ -101,4 +102,5 @@ void AArena::PrintOpponentCards()
 	B2Utility::LogInfo(FString("Discard: ").Append(Discard));
 	B2Utility::LogInfo("");
 	B2Utility::LogInfo("####################################################");
+	B2Utility::LogInfo("");
 }
