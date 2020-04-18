@@ -6,7 +6,8 @@
 struct B2Predicate_IsNotEffectCard
 {
 	/* Find function (finds as described above) */
-	bool operator()(ECard Card) const {
+	bool operator()(const ECard& Card) const 
+	{
 		return Card > ECard::ElliotsOrbalStaff && Card < ECard::Bolt;
 	}
 };

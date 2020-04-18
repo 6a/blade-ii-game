@@ -14,7 +14,8 @@ struct B2Predicate_SortCardsByDistanceAscending
 		:RootLocation(RootLocation) {}
 
 	/* Sort function (sorts as described above) */
-	bool operator()(const ACard& CardLHS, const ACard& CardRHS) const {
+	bool operator()(const ACard& CardLHS, const ACard& CardRHS) const 
+	{
 
 		// Distance square check so that sqrt isnt needed - we dont need the actual value, just have to compare relative to eachother
 		float SquareDistanceLHS = FVector::DistSquared(RootLocation, CardLHS.GetActorLocation());

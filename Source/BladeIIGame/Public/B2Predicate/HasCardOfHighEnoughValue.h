@@ -10,7 +10,8 @@ struct B2Predicate_HasCardOfHighEnoughValue
 	B2Predicate_HasCardOfHighEnoughValue(uint32 Min) : Min(Min) {}
 
 	/* Find function (finds as described above) */
-	bool operator()(ECard Card) const {
+	bool operator()(const ECard& Card) const
+	{
 		return ACard::TypeToValue(Card) >= Min;
 	}
 };

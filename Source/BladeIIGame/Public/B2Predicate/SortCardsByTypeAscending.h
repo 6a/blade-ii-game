@@ -8,7 +8,8 @@
 struct B2Predicate_SortCardsByTypeAscending
 {
 	/* Sort function (sorts as described above) */
-	bool operator()(const ACard& CardLHS, const ACard& CardRHS) const {
+	bool operator()(const ACard& CardLHS, const ACard& CardRHS) const 
+	{
 		return CardLHS.Type > CardRHS.Type;
 	}
 };

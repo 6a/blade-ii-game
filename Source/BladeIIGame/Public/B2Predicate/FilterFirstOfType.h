@@ -15,7 +15,8 @@ struct B2Predicate_FilterFirstOfType
 	}
 
 	/* Find function (finds as described above) */
-	bool operator()(ECard Card) {
+	bool operator()(const ECard& Card) 
+	{
 		if (!bFiltered)
 		{
 			if (Card == Type)

@@ -3,8 +3,7 @@
 #include "B2Utility/Log.h"
 #include "B2Predicate/IsNotEffectCard.h"
 #include "B2Predicate/HasCardOfHighEnoughValue.h"
-#include "B2Predicate/IsForce.h"
-#include "B2Predicate/IsRod.h"
+#include "B2Predicate/MatchCardType.h"
 
 #include "B2GameMode/BladeIIGameMode.h"
 
@@ -33,16 +32,9 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	// Check for all the potential branches.
 	// Early exit when a condition is met
 
-	// Handle tied scores
-	if (PlayerScore == OpponentScore)
-	{
-		GI->ClearAndDraw();
-		return;
-	}
-
 	// Check if either local player or the opponent won after the most recent move
 	bool bIsOtherPlayersTurn = GI->GetGameState()->Turn == EPlayer::Opponent;
-	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, OpponentHand, OpponentField, OpponentDeckCount, bIsOtherPlayersTurn);
+	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, PlayerHand, PlayerField, OpponentHand, OpponentField, OpponentDeckCount, bIsOtherPlayersTurn);
 	if (LocalPlayerOutcome != EWinCondition::None)
 	{
 		GI->VictoryAchieved(EPlayer::Player, LocalPlayerOutcome);
@@ -50,21 +42,25 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	}
 
 	bIsOtherPlayersTurn = GI->GetGameState()->Turn == EPlayer::Player;
-	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, PlayerHand, PlayerField, PlayerDeckCount, bIsOtherPlayersTurn);
+	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, OpponentHand, OpponentField, PlayerHand, PlayerField, PlayerDeckCount, bIsOtherPlayersTurn);
 	if (OpponentOutcome != EWinCondition::None)
 	{
 		GI->VictoryAchieved(EPlayer::Opponent, OpponentOutcome);
 		return;
 	}
 
+	// Handle tied scores
+	if (PlayerScore == OpponentScore)
+	{
+		GI->ClearAndDraw();
+		return;
+	}
+
+	// If the turn is undecided, reaching this point means that we need to set the turn to the opposite player,
+	// so that the following changeturn call switches over to the correct player
 	if (GI->GetGameState()->Turn == EPlayer::Undecided)
 	{
-		// If the turn is undecided, reaching this point means that we need to set the turn to the opposite player,
-		// so that the following changeturn call switches over to the correct player
-		if (GI->GetGameState()->Turn == EPlayer::Undecided)
-		{
-			GI->GetGameState()->Turn = PlayerScore > OpponentScore ? EPlayer::Player : EPlayer::Opponent;
-		}
+		GI->GetGameState()->Turn = PlayerScore > OpponentScore ? EPlayer::Player : EPlayer::Opponent;
 	}
 
 	// Otherwise, the board is still in a playable state so just switch the turn
@@ -83,7 +79,7 @@ void GSM_State_ProcessBoardState::End()
 
 }
 
-EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, bool bIsOppositePlayersTurn) const
+EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& TargetHand, const TArray<ECard>& TargetField, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, bool bIsOppositePlayersTurn) const
 {
 	// Logically this is kind of backwards but it works in my head
 
@@ -107,54 +103,82 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 
 	if (TargetScore > OppositePlayerScore)
 	{
+		uint32 ScoreGap = TargetScore - OppositePlayerScore;
+
 		// If its the other players turn and they failed to match or beat the targets score
 		if (bIsOppositePlayersTurn)
 		{
 			return EWinCondition::ScoreVictory;
 		}
 
-		// If the opponents hand is empty
+		// If the other players hand is empty
 		if (OppositePlayerHand.Num() == 0)
 		{
 			return EWinCondition::ScoreVictory;
 		}
 
-		// If the difference is bigger than any card could cover...
-		uint32 ScoreGap = TargetScore - OppositePlayerScore;
-		if (ScoreGap > ACard::MAX_CARD_SCORE)
+		// If there is no way for the other player to overcome the score difference, they lose
+
+		// Do they have a regular card that would cause their score to match or beat the other score
+		if (OppositePlayerHand.ContainsByPredicate<B2Predicate_HasCardOfHighEnoughValue>(B2Predicate_HasCardOfHighEnoughValue(ScoreGap)))
 		{
-			// And there is no force card that can be played
-			if (!OppositePlayerHand.FindByPredicate<B2Predicate_IsForce>(B2Predicate_IsForce()))
+			return EWinCondition::None;
+		}
+
+		// Does the other player have a rod card, which can be played, and would playing it save them?
+		if (OppositePlayerHand.ContainsByPredicate<B2Predicate_MatchCardEnumType>(B2Predicate_MatchCardEnumType(ECard::ElliotsOrbalStaff)))
+		{
+			if (OppositePlayerField.Last() > ECard::Force)
 			{
-				return EWinCondition::ScoreVictory;
-			}
-			// Else if there is a force card, but the score would still not be high enough if the force card was used
-			else if (TargetScore > OppositePlayerScore * 2)
-			{
-				return EWinCondition::ScoreVictory;
+				if (OppositePlayerField.Last() == ECard::InactiveForce)
+				{
+					if (OppositePlayerScore * 2 >= TargetScore)
+					{
+						return EWinCondition::None;
+					}
+				}
+				else if (ACard::TypeToValue(OppositePlayerField.Last()) >= ScoreGap)
+				{
+					return EWinCondition::None;
+				}
 			}
 		}
 
-		// If the difference is not too big to cover by a normal card, but the opponents highest value card is not high valued enough
-		// This works because rods are worth 1, and flipped cards are worth 0
-		if (!OppositePlayerHand.FindByPredicate<B2Predicate_HasCardOfHighEnoughValue>(B2Predicate_HasCardOfHighEnoughValue(ScoreGap)))
+		// Does the other player have a bolt card, which can be played, and would playing it save them?
+		if (OppositePlayerHand.ContainsByPredicate<B2Predicate_MatchCardEnumType>(B2Predicate_MatchCardEnumType(ECard::Bolt)))
 		{
-			// And they have no rods to play
-			if (!OppositePlayerHand.FindByPredicate<B2Predicate_IsRod>(B2Predicate_IsRod()))
+			if (TargetField.Last() <= ECard::Force)
 			{
-				return EWinCondition::ScoreVictory;
-			}
-			// else they have some rod cards, but the last card on their field is not inactive
-			else if (OppositePlayerField.Last() <= ECard::Force)
-			{
-				return EWinCondition::ScoreVictory;
-			}
-			// else they have rod cards, and can play them, but the opponent is not able to bump their score up past the required value by using it
-			else if (ACard::TypeToValue(OppositePlayerField.Last()) < ScoreGap)
-			{
-				return EWinCondition::ScoreVictory;
+				// Note - bolts are always valid to play as long as there is a card that can be bolted on the opposite field
+				return EWinCondition::None;
 			}
 		}
+
+		// Does the other player have a mirror card, which can be played, and would playing it save them?
+		if (OppositePlayerHand.ContainsByPredicate<B2Predicate_MatchCardEnumType>(B2Predicate_MatchCardEnumType(ECard::Mirror)))
+		{
+			// Note - mirrors are always valid to play from a lower score position
+			return EWinCondition::None;
+		}
+
+		// Does the other player have a blast card, which can be played, and would playing it save them?
+		if (OppositePlayerHand.ContainsByPredicate<B2Predicate_MatchCardEnumType>(B2Predicate_MatchCardEnumType(ECard::Blast)))
+		{
+			// Note - blast cards are always valid to play from any position as the turn does not change, as long as the opposite
+			// player has cards in their hand, which should always be the case if the game has not been ended on the previous turn
+			return EWinCondition::None;
+		}
+
+		// Does the other player have a force card, and would playing it save them?
+		if (OppositePlayerHand.ContainsByPredicate<B2Predicate_MatchCardEnumType>(B2Predicate_MatchCardEnumType(ECard::Force)))
+		{
+			if (OppositePlayerScore * 2 >= TargetScore)
+			{
+				return EWinCondition::None;
+			}
+		}
+
+		return EWinCondition::ScoreVictory;
 	}
 
 	return EWinCondition::None;

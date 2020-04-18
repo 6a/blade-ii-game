@@ -169,7 +169,7 @@ ACard* UCardSlot::GetFirstOfType(ECard CardType) const
 {
 	ACard* Card = nullptr;
 
-	Card = *Cards.FindByPredicate(B2Predicate_MatchCardType(CardType));
+	Card = *Cards.FindByPredicate(B2Predicate_MatchCardActorType(CardType));
 
 	return Card;
 }
