@@ -20,7 +20,7 @@ void UB2Opponent::Tick(float DeltaSeconds)
 		}
 		else
 		{
-			B2Utility::LogInfo(FString::Printf(TEXT("Opponent received card instruction from server: [ %d ]"), ServerUpdate.Update));
+			B2Utility::LogInfo(FString::Printf(TEXT("Opponent received card instruction from server: [ %d ][ %s ]"), ServerUpdate.Update, *ServerUpdate.Metadata));
 
 			MoveUpdateQueue.Enqueue(ServerUpdate);
 		}

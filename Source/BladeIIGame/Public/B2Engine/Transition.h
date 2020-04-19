@@ -48,8 +48,11 @@ public:
 	 */
 	void Tick(float DeltaTime);
 
-	/* Returns true when this transition has completed */
+	/* Returns true when this transition AND its waitgroup has completed */
 	bool Done() const;
+
+	/* Returns true when this particular transition has finished - though it may still be waiting for its waitgroup */
+	bool TransitionInactive() const;
 
 	/* Returns the next wait group */
 	static B2WaitGroup GetNextWaitGroup();

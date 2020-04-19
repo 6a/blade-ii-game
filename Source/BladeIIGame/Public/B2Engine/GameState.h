@@ -30,5 +30,8 @@ struct B2GameState
 
 	// The ID of the most recently played blast card (so that it can be removed from the hand it is in)
 	FString MostRecentBlastCardID;
+
+	// The type of card that has most recently been blased (so that it can be removed from the hand that it is in)
+	ECard MostRecentBlastedCard;
 };
 

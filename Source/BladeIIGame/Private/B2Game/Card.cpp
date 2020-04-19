@@ -1,8 +1,11 @@
 #include "B2Game/Card.h"
 
 #include "Materials/MaterialInstanceDynamic.h"
+
 #include "Misc/Guid.h"
 #include "UObject/ConstructorHelpers.h"
+
+#include "B2Utility/Log.h"
 
 ACard::ACard()
 {
@@ -99,15 +102,20 @@ void ACard::Tick(float DeltaTime)
 	/* If there is an active transition */
 	if (IsTransitioning())
 	{
-		/* Tick the transition */
-		Transitions.Peek()->Tick(DeltaTime);
+		if (!Transitions.Peek()->TransitionInactive())
+		{
+			/* Tick the transition */
+			Transitions.Peek()->Tick(DeltaTime);
 
-		/* Apply the new values to the card */
-		SetActorLocationAndRotation(Transitions.Peek()->CurrentPosition, Transitions.Peek()->CurrentRotation);
+			/* Apply the new values to the card */
+			SetActorLocationAndRotation(Transitions.Peek()->CurrentPosition, Transitions.Peek()->CurrentRotation);
+		}
 
 		/* If the transition has now finished, remove it and exit early */
 		if (Transitions.Peek()->Done())
 		{
+			//B2Utility::LogInfo(FString::Printf(TEXT("Card with WG [ %d ] Finished"), Transitions.Peek()->WaitGroup));
+
 			Transitions.Pop();
 			return;
 		}

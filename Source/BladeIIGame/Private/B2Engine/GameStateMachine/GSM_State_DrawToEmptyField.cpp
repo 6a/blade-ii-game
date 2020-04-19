@@ -119,7 +119,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 					// From player hand to player field
 					// Dont perform the move yet as we have to wait for the opponents selection as well
 
-					ACard* SelectedCard = GetCurrentPlayerCard();
+					ACard* SelectedCard = GetCurrentCard();
 					GI->GetOpponent()->SendUpdate(CardToServerUpdate(SelectedCard->Type));
 
 					bIsWaitingForOpponentDrawFromHand = true;

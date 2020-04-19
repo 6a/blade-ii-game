@@ -6,6 +6,7 @@
 #include "B2Predicate/SortCardsByTypeAscending.h"
 #include "B2Predicate/MatchCardType.h"
 #include "B2Utility/String.h"
+#include "..\..\Public\B2Game\CardSlot.h"
 
 UCardSlot::UCardSlot()
 {
@@ -170,6 +171,19 @@ ACard* UCardSlot::GetFirstOfType(ECard CardType) const
 	ACard* Card = nullptr;
 
 	Card = *(Cards.FindByPredicate(B2Predicate_MatchCardActorType(CardType)));
+
+	return Card;
+}
+
+ACard* UCardSlot::GetRandomOfType(ECard CardType) const
+{
+	ACard* Card = nullptr;
+
+	TArray<ACard*> CardsOfType = Cards.FilterByPredicate(B2Predicate_MatchCardActorType(CardType));
+	if (CardsOfType.Num() > 0)
+	{
+		Card = CardsOfType[FMath::RandRange(0, CardsOfType.Num() -1)];
+	}
 
 	return Card;
 }

@@ -132,11 +132,10 @@ private:
 	void EffectCard(ACard* Card, FVector Offset);
 
 	/**
-	 * Helper function that returns the forawrd direction of the specified card, taking into account the owning player
+	 * Helper function that returns the forward direction of the specified card
 	 * @param Card - The card
-	 * @param Target - The player to which the card belongs
 	 */
-	FVector GetDirectionNormalized(const ACard* Card, const EPlayer Target) const;
+	FVector GetDirectionNormalized(const ACard* Card) const;
 
 	/**
 	 * Helper function that returns true if the specified card is on the players side of the field

@@ -736,7 +736,7 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 
 void UB2Dealer::PlayerEffectCard(ACard* Card)
 {
-	FVector Offset = GetDirectionNormalized(Card, EPlayer::Player) * CARD_POP_OUT_DISTANCE;
+	FVector Offset = GetDirectionNormalized(Card) * CARD_POP_OUT_DISTANCE;
 	EffectCard(Card, Offset);
 }
 
@@ -744,7 +744,7 @@ void UB2Dealer::OpponentEffectCard(ACard* Card)
 {
 	FVector SelectorOffset = ACardSelector::OFFSET_WHEN_SELECTED * FVector(1, -1, 1);
 
-	FVector Offset = GetDirectionNormalized(Card, EPlayer::Opponent) * CARD_POP_OUT_DISTANCE + SelectorOffset;
+	FVector Offset = GetDirectionNormalized(Card) * CARD_POP_OUT_DISTANCE + SelectorOffset;
 	EffectCard(Card, Offset);
 }
 
@@ -855,7 +855,7 @@ void UB2Dealer::PreBlastSelect(EPlayer Target)
 
 	// Gather to center
 	const float DelayOnStart = 0.45f;
-	const float DelayPrePlayerHandFlip = 0.3f;
+	const float DelayPrePlayerHandFlip = 0.5f;
 	const float TransitionGatherDuration = 0.45f;
 	const float DurationPlayerHandFlip = 0.3f;
 
@@ -888,7 +888,7 @@ void UB2Dealer::PreBlastSelect(EPlayer Target)
 
 		if (Target == EPlayer::Player)
 		{
-			TargetRotation = FMath::Lerp(Arena->PlayerHandReversed->GetTransformForIndex(4).Rotation, Arena->PlayerHandReversed->GetTransformForIndex(5).Rotation, 0.5f);
+			FRotator NewTargetRotation = FMath::Lerp(Arena->PlayerHandReversed->GetTransformForIndex(4).Rotation, Arena->PlayerHandReversed->GetTransformForIndex(5).Rotation, 0.5f);
 
 			FVector VerticalOffset = (TargetSlot->Num() - 1 - i) * CARD_STACKING_OFFSET;
 
@@ -902,8 +902,8 @@ void UB2Dealer::PreBlastSelect(EPlayer Target)
 
 			Rotation = B2TRotation
 			{
-				Rotation.StartRotation,
 				TargetRotation,
+				NewTargetRotation,
 				EEase::EaseInOut,
 			};
 
@@ -967,7 +967,7 @@ void UB2Dealer::BlastSelect(EPlayer Target)
 			Card->QueueTransition(Transition);
 		}
 
-		FVector Offset = GetDirectionNormalized(Card, Target) * CARD_POP_OUT_DISTANCE;
+		FVector Offset = GetDirectionNormalized(Card) * CARD_POP_OUT_DISTANCE;
 
 		FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(i);
 		TargetTransform.Position += RAISED_CARD_OFFSET + Offset;
@@ -1375,14 +1375,9 @@ void UB2Dealer::EffectCard(ACard* Card, FVector Offset)
 	Card->QueueTransition(Transition);
 }
 
-FVector UB2Dealer::GetDirectionNormalized(const ACard* Card, const EPlayer Target) const
+FVector UB2Dealer::GetDirectionNormalized(const ACard* Card) const
 {
-	// Early exit with a zero vector if the player is not specified
-	if (Target == EPlayer::Undecided) return FVector::ZeroVector;
-
-	float Rotation = Target == EPlayer::Player ? 90 : -90;
-
-	return Card->GetActorRotation().Vector().RotateAngleAxis(Rotation, FVector::UpVector).GetSafeNormal();
+	return Card->GetActorRotation().Vector().RotateAngleAxis(90, Card->GetActorUpVector()).GetSafeNormal();
 }
 
 bool UB2Dealer::CardIsFromPlayerField(const ACard* Card) const

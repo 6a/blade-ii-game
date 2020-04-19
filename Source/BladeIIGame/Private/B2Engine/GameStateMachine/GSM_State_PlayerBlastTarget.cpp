@@ -24,7 +24,6 @@ void GSM_State_PlayerBlastTarget::Init(ABladeIIGameMode* GameMode)
 	ACardSelector* Cursor = GI->GetCursor();
 
 	SetCurrentCardToSelectedTransform();
-
 	UpdateCursorPosition(0, true);
 	Cursor->ToggleActorVisibility(true);
 }
@@ -65,7 +64,7 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 				GI->GetCursor()->ToggleActorVisibility(false);
 				GI->GetGameState()->bAcceptPlayerInput = false;
 
-				ACard* OpponentCard = GetCurrentPlayerCard();
+				ACard* OpponentCard = GetCurrentCard();
 				GI->GetDealer()->OpponentEffectCard(OpponentCard);
 
 				// Update the server
@@ -78,7 +77,7 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 	{
 		GI->GetGameState()->bBlastAnimationPending = false;
 
-		FVector TargetLocation = GetCurrentPlayerCard()->GetActorLocation();
+		FVector TargetLocation = GetCurrentCard()->GetActorLocation();
 		GI->GetEffectLayer()->Play(EUIEffect::BlastTarget, &TargetLocation, 1, 0);
 	}
 	else

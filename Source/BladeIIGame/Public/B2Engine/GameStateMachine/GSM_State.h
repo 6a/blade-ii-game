@@ -31,7 +31,7 @@ protected:
 	 * Get a pointer to the currently selected card
 	 * @return A pointer to the card
 	 */
-	ACard* GetCurrentPlayerCard();
+	ACard* GetCurrentCard();
 
 	/**
 	 * Remove the current card from its slot

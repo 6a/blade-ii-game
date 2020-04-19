@@ -1,5 +1,7 @@
 #include "B2Engine/GameStateMachine/GSM_State_OpponentTurn.h"
 
+#include "Misc/DefaultValueHelper.h"
+
 #include "B2Utility/Log.h"
 
 #include "B2GameMode/BladeIIGameMode.h"
@@ -53,6 +55,15 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 
 			if (!bUsedNormalCard)
 			{
+				// Edge case to capture the blasted card from the opponent
+				if (bUsedBlastEffect)
+				{
+					int32 OutInt;
+					FDefaultValueHelper::ParseInt(MoveUpdate.Metadata, OutInt);
+
+					GI->GetGameState()->MostRecentBlastedCard = static_cast<ECard>(OutInt);
+				}
+
 				GI->GetDealer()->OpponentEffectCard(GI->GetArena()->OpponentHand->GetFirstOfType(Card));
 			}
 			else
@@ -70,6 +81,9 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 
 			// Error recovery? Check the next one? End the game?
 		}
+
+		// Edge case - if the card was a blast card, the metadata should also contain the card that the opponent selected to
+		// remove from the players hand. In this case, we have to be a bit sneaky and store a flag in the gamestate object
 
 		bStale = true;
 	}

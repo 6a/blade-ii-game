@@ -27,8 +27,8 @@
 #include "B2Engine/GameStateMachine/GSM_State_OpponentRod.h"
 #include "B2Engine/GameStateMachine/GSM_State_OpponentBolt.h"
 #include "B2Engine/GameStateMachine/GSM_State_OpponentMirror.h"
-
-
+#include "B2Engine/GameStateMachine/GSM_State_OpponentBlast.h"
+#include "B2Engine/GameStateMachine/GSM_State_OpponentBlastTarget.h"
 #include "B2Engine/GameStateMachine/GSM_State_OpponentForce.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
@@ -293,6 +293,9 @@ void ABladeIIGameMode::OnCardsDealt()
 
 void ABladeIIGameMode::OnEffectReady()
 {
+	ACard* Card = GetCardSlot(GameState->CursorPosition)->GetCardByIndex(GameState->CursorSlotIndex);
+	ECard Type = Card->Type;
+
 	// Blast edge cases -  we should switch to the blast select state from the blast state, or set the bBlastAnimationPending flag from
 	// the blast select state
 	if (GSM->IsCurrentState(EGameState::PlayerBlast))
@@ -305,6 +308,7 @@ void ABladeIIGameMode::OnEffectReady()
 	else if (GSM->IsCurrentState(EGameState::OpponentBlast))
 	{
 		// Switch to opponent blast target state
+		GSM->ChangeState<GSM_State_OpponentBlastTarget>();
 
 		return;
 	}
@@ -313,9 +317,6 @@ void ABladeIIGameMode::OnEffectReady()
 		GameState->bBlastAnimationPending = true;
 		return;
 	}
-
-	ACard* Card = GetCardSlot(GameState->CursorPosition)->GetCardByIndex(GameState->CursorSlotIndex);
-	ECard Type = Card->Type;
 
 	switch (Type)
 	{
@@ -365,7 +366,8 @@ void ABladeIIGameMode::OnEffectReady()
 		}
 		else
 		{
-
+			// Switch state machine to opponent blast
+			GSM->ChangeState<GSM_State_OpponentBlast>();
 		}
 		break;
 	case ECard::Force:
@@ -600,20 +602,19 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 	case EDealerEvent::EffectReady:
 		OnEffectReady();
 		break;
-	case EDealerEvent::BlastFinished:
-		// Edge case - when the blast event is finished, it just goes back to the same players turn
+	case EDealerEvent::CardPositionUpdateFinished:
+		// Handling card position updates for blast only
 
-		if (GameState->Turn == EPlayer::Player)
+		if (GSM->IsCurrentState(EGameState::PlayerBlastTarget))
 		{
 			// Switch state machine to player turn
 			GSM->ChangeState<GSM_State_PlayerTurn>();
 		}
-		else
+		else if(GSM->IsCurrentState(EGameState::OpponentBlastTarget))
 		{
-			// Edge case - if the blast finished on the opponents turn, we still have to 
-			// process the next server update which should be the next card they choose
+			// Switch state machine to player turn
+			GSM->ChangeState<GSM_State_OpponentTurn>();
 		}
-
 		break;
 	}
 }

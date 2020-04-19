@@ -22,7 +22,7 @@ void GSM_State_PlayerForce::Init(ABladeIIGameMode* GameMode)
 	FVector TargetWorldPosition = GI->GetArena()->PlayerField->GetNextTransform().Position;
 	GI->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 1.0f, 0.4f);
 	
-	ACard* CurrentForceCard = GetCurrentPlayerCard();
+	ACard* CurrentForceCard = GetCurrentCard();
 	GI->GetDealer()->ForceOut(CurrentForceCard);
 
 	CurrentForceCard->FadeOut(0.4f);

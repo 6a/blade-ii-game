@@ -72,6 +72,12 @@ public:
 	virtual ACard* GetFirstOfType(ECard CardType) const;
 
 	/**
+	 * Get a reference to a random card of a particular type in the slot.
+	 * @returns A pointer to the card
+	 */
+	virtual ACard* GetRandomOfType(ECard CardType) const;
+
+	/**
 	 * Get an array containing pointers to all the cards in this slot
 	 * @returns An array containing pointers to all the cards in this slot
 	 */

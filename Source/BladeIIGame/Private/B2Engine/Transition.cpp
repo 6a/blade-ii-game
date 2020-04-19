@@ -123,6 +123,11 @@ bool B2Transition::Done() const
 	return Done;
 }
 
+bool B2Transition::TransitionInactive() const
+{
+	return bTransitionFinished;
+}
+
 B2WaitGroup B2Transition::GetNextWaitGroup()
 {
 	return NextWaitGroup++;
