@@ -11,25 +11,50 @@ GSM_State_OpponentTurn::GSM_State_OpponentTurn()
 	GSM_State::GSM_State();
 }
 
+GSM_State_OpponentTurn::~GSM_State_OpponentTurn()
+{
+}
+
 void GSM_State_OpponentTurn::Init(ABladeIIGameMode* GameMode)
 {
 	GSM_State::Init(GameMode);
 
-	bStale = false;
+	bMovedReceived = false;
+
+	CachedMove = FB2ServerUpdate{ EServerUpdate::None };
+
+	MoveExecutionTime = TNumericLimits<float>::Max();
 }
 
 void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 {
 	GSM_State::Tick(DeltaSeconds);
 
-	if (bStale) return;
-
 	ABladeIIGameMode* GI = GameModeInstance;
 
-	FB2ServerUpdate MoveUpdate;
-	if (GI->GetOpponent()->MoveUpdateQueue.Dequeue(MoveUpdate))
+	if (!bMovedReceived)
 	{
-		ECard Card = ServerUpdateToCard(MoveUpdate.Update);
+		FB2ServerUpdate MoveUpdate;
+		if (GI->GetOpponent()->MoveUpdateQueue.Dequeue(MoveUpdate))
+		{
+			CachedMove = MoveUpdate;
+
+			bMovedReceived = true;
+
+			// If the opponent is an AI opponent, we add an artificial delay
+			if (GI->GetGameState()->bOpponentIsAI)
+			{
+				MoveExecutionTime = GI->GetWorld()->GetTimeSeconds() + FMath::FRandRange(AI_DELAY_MIN, AI_DELAY_MAX);
+			}
+			else
+			{
+				MoveExecutionTime = 0;
+			}
+		}
+	}
+	else if (!bMoveHandled && GI->GetWorld()->GetTimeSeconds() > MoveExecutionTime)
+	{
+		ECard Card = ServerUpdateToCard(CachedMove.Update);
 
 		// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 		// Here we also check for effects that occurred, so we can use them to branch later
@@ -59,9 +84,16 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 				if (bUsedBlastEffect)
 				{
 					int32 OutInt;
-					FDefaultValueHelper::ParseInt(MoveUpdate.Metadata, OutInt);
+					FDefaultValueHelper::ParseInt(CachedMove.Metadata, OutInt);
 
-					GI->GetGameState()->MostRecentBlastedCard = static_cast<ECard>(OutInt);
+					if (OutInt != -1)
+					{
+						GI->GetGameState()->MostRecentBlastedCard = static_cast<ECard>(OutInt);
+					}
+					else
+					{
+						B2Utility::LogWarning(FString::Printf(TEXT("Unable to parse the blast metadata from the opponent: [ %s ]"), *CachedMove.Metadata));
+					}
 				}
 
 				GI->GetDealer()->OpponentEffectCard(GI->GetArena()->OpponentHand->GetFirstOfType(Card));
@@ -82,10 +114,7 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 			// Error recovery? Check the next one? End the game?
 		}
 
-		// Edge case - if the card was a blast card, the metadata should also contain the card that the opponent selected to
-		// remove from the players hand. In this case, we have to be a bit sneaky and store a flag in the gamestate object
-
-		bStale = true;
+		bMoveHandled = true;
 	}
 }
 

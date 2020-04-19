@@ -25,6 +25,8 @@ struct B2GameState
 	// Turn
 	EPlayer Turn;
 
+	// Blast stuff
+
 	// Blast effect animation (card destruction) pending bool (should be set to false once checked)
 	bool bBlastAnimationPending;
 
@@ -33,5 +35,8 @@ struct B2GameState
 
 	// The type of card that has most recently been blased (so that it can be removed from the hand that it is in)
 	ECard MostRecentBlastedCard;
+
+	// True if the opponent is the AI opponent
+	bool bOpponentIsAI;
 };
 

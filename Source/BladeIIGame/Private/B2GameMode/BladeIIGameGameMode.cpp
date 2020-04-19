@@ -574,6 +574,9 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
 	GameState = new B2GameState(Cards);
 
+	UB2AIOpponent* CastedOpponent = Cast<UB2AIOpponent>(Opponent);
+	GameState->bOpponentIsAI = (CastedOpponent != nullptr);
+
 	InitialiseBoard();
 
 	EngineState = EEngineState::Dealing;

@@ -2,12 +2,15 @@
 
 #include "CoreMinimal.h"
 
+#include "B2Engine/ServerUpdate.h"
+
 #include "GSM_State.h"
 
 class GSM_State_OpponentTurn : public GSM_State
 {
 public:
 	GSM_State_OpponentTurn();
+	virtual ~GSM_State_OpponentTurn();
 
 	virtual void Init(class ABladeIIGameMode* GameMode) override;
 
@@ -18,8 +21,21 @@ public:
 	virtual EGameState Type() const override { return EGameState::OpponentTurn; }
 
 private:
+
+	/* Minimum and maximum articifial delays */
+	const float AI_DELAY_MIN = 1.f;
+	const float AI_DELAY_MAX = 6.f;
 	
-	/* Set to true when this state has processed a move - so that we dont process the next move until the next cycle (oponent -> player -> back to opponent) */
-	bool bStale;
+	/* Set to true when this state has received a move update - so that we dont consume the next move */
+	bool bMovedReceived;
+
+	/* Set to true when this state has handled the move update - so that we dont handle it again */
+	bool bMoveHandled;
+
+	/* The move update that has been received, and will be processed once the execution time has been reached */
+	FB2ServerUpdate CachedMove;
+
+	/* The time at which the stored move will be executed */
+	float MoveExecutionTime;
 };
 
