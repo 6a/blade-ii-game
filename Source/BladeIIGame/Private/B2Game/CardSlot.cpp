@@ -239,6 +239,14 @@ const FB2Transform UCardSlot::GetNextTransform() const
 	return GetTransformForIndex(TransformIndex);
 }
 
+const FB2Transform UCardSlot::GetCurrentCenterTransform() const
+{
+	FVector CenterPosition = FMath::Lerp(GetTransformForIndex(3).Position, GetTransformForIndex(4).Position, 0.5f);
+	FRotator CenterRotation = FMath::Lerp(GetTransformForIndex(4).Rotation, GetTransformForIndex(5).Rotation, 0.5f);
+
+	return FB2Transform(CenterPosition, CenterRotation);
+}
+
 int32 UCardSlot::GetFirstIndexOfType(ECard CardType) const
 {
 	int32 Index = -1;

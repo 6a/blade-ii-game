@@ -130,6 +130,12 @@ public:
 	const virtual FB2Transform GetNextTransform() const;
 
 	/**
+	 * Return the position + rotation for the center of the slot.
+	 * @returns FB2Transform for the center slot
+	 */
+	const virtual FB2Transform GetCurrentCenterTransform() const;
+
+	/**
 	 * Return the index of the first occurrence of the specified type
 	 * @returns The index, or -1 if not found
 	 */
