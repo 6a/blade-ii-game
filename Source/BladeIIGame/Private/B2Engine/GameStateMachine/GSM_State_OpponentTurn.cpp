@@ -56,6 +56,9 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 	{
 		ECard Card = ServerUpdateToCard(CachedMove.Update);
 
+		// Reset eyes
+		GI->GetOpponentAvatar()->RevertEyes();
+
 		// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
 		// Here we also check for effects that occurred, so we can use them to branch later
 		bool bUsedRodEffect = (Card == ECard::ElliotsOrbalStaff && GI->GetArena()->OpponentField->Num() > 0 && !GI->GetArena()->OpponentField->GetLast()->IsActive());

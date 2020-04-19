@@ -24,7 +24,7 @@ private:
 
 	/* Minimum and maximum articifial delays */
 	const float AI_DELAY_MIN = 1.f;
-	const float AI_DELAY_MAX = 6.f;
+	const float AI_DELAY_MAX = 2.f;
 	
 	/* Set to true when this state has received a move update - so that we dont consume the next move */
 	bool bMovedReceived;

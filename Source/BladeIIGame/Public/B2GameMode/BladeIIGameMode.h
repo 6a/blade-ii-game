@@ -13,9 +13,11 @@
 #include "B2Engine/GameStateMachine/GSM.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
+#include "B2Game/AvatarCaptureRig.h"
 #include "B2Enum/EngineStateEnum.h"
 #include "B2Enum/UIEffectEventEnum.h"
 #include "B2Enum/WinConditionEnum.h"
+#include "B2UI/Avatar.h"
 
 #include "BladeIIGameMode.generated.h"
 
@@ -66,6 +68,7 @@ public:
 	AArena* GetArena() const { return Arena; }
 	ACardSelector* GetCursor() const { return Cursor; }
 	ALocalPlayerInput* GetLocalPlayerInput() const { return LocalPlayerInput; }
+	AAvatarCaptureRig* GetOpponentAvatar() const { return AvatarCaptureRig;  }
 	UB2Dealer* GetDealer() const { return Dealer; }
 	UB2Opponent* GetOpponent() const { return Opponent; }
 	UB2UIEffectLayer* GetEffectLayer() const { return UIEffectLayer; }
@@ -98,6 +101,14 @@ private:
 	UPROPERTY()
 	UB2UIEffectLayer* UIEffectLayer;
 
+	/* Pointer to the avatar capture rig */
+	UPROPERTY()
+	AAvatarCaptureRig* AvatarCaptureRig;
+
+	/* Pointer to UI avatar layer */
+	UPROPERTY()
+	UAvatar* UIAvatarLayer;
+
 	/* Pointer to the cardfactory that will be used throughout this match */
 	B2CardFactory* CardFactory;
 
@@ -110,6 +121,9 @@ private:
 	/* The current state of the engine */
 	EEngineState EngineState;
 
+	/* Class type for avatar widget */
+	TSubclassOf<UAvatar> UIAvatarWidgetClass;
+
 	/**
 	 * Reads the launch config and sets up the engine accordingly.
 	 * @param ObjectInitializer - ObjectInitializer helper from constructor
@@ -121,6 +135,9 @@ private:
 
 	/* Set up the gameplay state machine */
 	void CreateGSM();
+
+	/* Gets and stores a reference to the UI Avatar layer class */
+	void GetUIAvatarWidgetClass();
 
 	/* Set up any event listeners */
 	void RegisterEventListeners();
@@ -139,6 +156,12 @@ private:
 
 	/* Set up the UI Effect layer */
 	void SetupUIEffectLayer();
+
+	/* Set up the UI avatar layer */
+	void SetupUIAvatarLayer();
+
+	/* Set up the avatar capture rig */
+	void SetupAvatarCaptureRig();
 
 	/* Set the board state based on the current state */
 	void InitialiseBoard();

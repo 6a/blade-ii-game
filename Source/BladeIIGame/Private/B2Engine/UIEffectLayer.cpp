@@ -26,7 +26,7 @@ void UB2UIEffectLayer::Initialise()
 		EffectsLayerWidget = CreateWidget<UEffectsLayerWidget>(GetWorld()->GetGameInstance(), EffectsLayerWidgetClass, TEXT("UI Effects Layer"));
 		if (EffectsLayerWidget)
 		{
-			EffectsLayerWidget->AddToViewport();
+			EffectsLayerWidget->AddToPlayerScreen();
 			EffectsLayerWidget->Initialise();
 		}
 	}

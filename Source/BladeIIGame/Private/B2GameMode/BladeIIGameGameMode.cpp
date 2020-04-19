@@ -32,6 +32,9 @@
 #include "B2Engine/GameStateMachine/GSM_State_OpponentForce.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
+const FString AVATAR_CAPTURE_RIG_BLUEPRINT_PATH = "Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_AvatarCaptureRig.BP_AvatarCaptureRig'";
+const FString AVATAR_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Avatar'";
+const FVector AVATAR_CAPTURE_RIG_SPAWN_LOCATION = FVector(500, 0, 0);
 
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 {
@@ -42,6 +45,8 @@ ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 	SetupLaunchConfig(ObjectInitializer);
 
 	CreateGSM();
+
+	GetUIAvatarWidgetClass();
 
 	B2Utility::LogInfo("GameMode initialized");
 }
@@ -119,6 +124,10 @@ void ABladeIIGameMode::StartPlay()
 
 	SetupUIEffectLayer();
 
+	SetupUIAvatarLayer();
+
+	SetupAvatarCaptureRig();
+
 	FindLocalPlayerInput();
 
 	RegisterEventListeners();
@@ -153,19 +162,19 @@ void ABladeIIGameMode::SetupCardFactory()
 
 	B2CardFactoryConfig.CardFrontPaths = TArray<FString>({
 		/* Basic cards */
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Staff.T_Card_Staff"),
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Gunswords.T_Card_Gunswords"),
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Bow.T_Card_Bow"),
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Sword.T_Card_Sword"),
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Shotgun.T_Card_Shotgun"),
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Spear.T_Card_Spear"),
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Broadsword.T_Card_Broadsword"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Staff.T_Card_Staff"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Gunswords.T_Card_Gunswords"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Bow.T_Card_Bow"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Sword.T_Card_Sword"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Shotgun.T_Card_Shotgun"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Spear.T_Card_Spear"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Broadsword.T_Card_Broadsword"),
 
 		/* Special cards */
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Bolt.T_Card_Bolt"),
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Mirror.T_Card_Mirror"),
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Blast.T_Card_Blast"),
-		TEXT("/Game/BladeIIGame/Textures/T_Card_Force.T_Card_Force"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Bolt.T_Card_Bolt"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Mirror.T_Card_Mirror"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Blast.T_Card_Blast"),
+		TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Force.T_Card_Force"),
 	});
 
 	/* Back and MRS (metallic, roughness, specular) paths */
@@ -186,6 +195,15 @@ void ABladeIIGameMode::CreateGSM()
 {
 	GSM = new B2GameStateMachine(this);
 	GSM->ChangeState<GSM_State_WaitingForInitialDeal>();
+}
+
+void ABladeIIGameMode::GetUIAvatarWidgetClass()
+{
+	ConstructorHelpers::FClassFinder<UAvatar> ClassFinder(*AVATAR_WIDGET_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the avatar widget")))
+	{
+		UIAvatarWidgetClass = ClassFinder.Class;
+	}
 }
 
 void ABladeIIGameMode::RegisterEventListeners()
@@ -257,6 +275,30 @@ void ABladeIIGameMode::SetupUIEffectLayer()
 	UIEffectLayer->Initialise();
 }
 
+void ABladeIIGameMode::SetupUIAvatarLayer()
+{
+	if (UIAvatarWidgetClass)
+	{
+		UIAvatarLayer = CreateWidget<UAvatar>(GetWorld()->GetGameInstance(), UIAvatarWidgetClass, TEXT("UI Avatar Layer"));
+		if (UIAvatarLayer)
+		{
+			UIAvatarLayer->AddToPlayerScreen();
+		}
+	}
+}
+
+void ABladeIIGameMode::SetupAvatarCaptureRig()
+{
+	UObject* AvatarCaptureRigClass = StaticLoadObject(UObject::StaticClass(), NULL, *AVATAR_CAPTURE_RIG_BLUEPRINT_PATH);
+	ensureMsgf(AvatarCaptureRigClass, TEXT("Could not load avatar capture rig actor - static load failed"));
+
+	UBlueprint* AvatarCaptureRigBlueprint = Cast<UBlueprint>(AvatarCaptureRigClass);
+	ensureMsgf(AvatarCaptureRigBlueprint, TEXT("Could not cast avatar capture rig to blueprint"));
+
+	AvatarCaptureRig = GetWorld()->SpawnActor<AAvatarCaptureRig>(AvatarCaptureRigBlueprint->GeneratedClass, AVATAR_CAPTURE_RIG_SPAWN_LOCATION, FRotator::ZeroRotator);
+	ensureMsgf(AvatarCaptureRig, TEXT("Could not spawn avatar capture rig blueprint"));
+}
+
 void ABladeIIGameMode::InitialiseBoard()
 {
 	// Player Deck
@@ -295,6 +337,13 @@ void ABladeIIGameMode::OnEffectReady()
 {
 	ACard* Card = GetCardSlot(GameState->CursorPosition)->GetCardByIndex(GameState->CursorSlotIndex);
 	ECard Type = Card->Type;
+
+	// "React" to the effect card if its the players turn
+	if (GameState->Turn == EPlayer::Player)
+	{
+		// Changes the eyes to a random one
+		AvatarCaptureRig->ChangeEyes();
+	}
 
 	// Blast edge cases -  we should switch to the blast select state from the blast state, or set the bBlastAnimationPending flag from
 	// the blast select state
