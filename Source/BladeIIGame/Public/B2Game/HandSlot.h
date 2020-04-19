@@ -22,6 +22,12 @@ public:
 	 */
 	const virtual FB2Transform GetTransformForIndex(uint32 Index) const override;
 
+	/**
+	 * Return the position + rotation for the center of the slot.
+	 * @returns FB2Transform for the center slot
+	 */
+	const virtual FB2Transform GetCurrentCenterTransform() const override;
+
 protected:
 
 	/* The positions for each possible card location, when there is an odd number of cards in the slot */

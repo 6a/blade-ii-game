@@ -32,3 +32,12 @@ const FB2Transform UHandSlot::GetTransformForIndex(uint32 Index) const
 
 	return Transform;
 }
+
+const FB2Transform UHandSlot::GetCurrentCenterTransform() const
+{
+	// Grab the original position and rotation without the offset that is applied by the overriden version above
+	FVector CenterPosition = FMath::Lerp(UCardSlot::GetTransformForIndex(3).Position, UCardSlot::GetTransformForIndex(4).Position, 0.5f);
+	FRotator CenterRotation = FMath::Lerp(UCardSlot::GetTransformForIndex(4).Rotation, UCardSlot::GetTransformForIndex(5).Rotation, 0.5f);
+
+	return FB2Transform(CenterPosition, CenterRotation);
+}
