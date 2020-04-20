@@ -16,7 +16,7 @@ void GSM_State_PlayerBlast::Init(ABladeIIGameMode* GameMode)
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	// Play blast animation in the center of the screen
-	GI->GetEffectLayer()->Play(EUIEffect::Blast, nullptr, 0.2f, 0.0f);
+	GI->GetUIEffectLayer()->Play(EUIEffect::Blast, nullptr, 0.2f, 0.0f);
 
 	GI->GetDealer()->PreBlastSelect(EPlayer::Opponent);
 }
@@ -28,7 +28,7 @@ void GSM_State_PlayerBlast::Tick(float DeltaSeconds)
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	EUIEffectEvent Event;
-	while (GI->GetEffectLayer()->EventQueue.Dequeue(Event))
+	while (GI->GetUIEffectLayer()->EventQueue.Dequeue(Event))
 	{
 		if (Event == EUIEffectEvent::Finished)
 		{

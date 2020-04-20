@@ -12,7 +12,7 @@ struct FB2Transform
 
 public:
 	FB2Transform()
-		: Position(FVector()), Rotation(FRotator()){}
+		: Position(FVector::ZeroVector), Rotation(FRotator::ZeroRotator){ }
 
 	FB2Transform(FVector Position, FRotator Rotation)
 		: Position(Position), Rotation(Rotation) { }

@@ -3,7 +3,9 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
+#include "B2UI/Avatar.h"
 #include "B2Utility/Log.h"
+#include "B2GameMode/BladeIIGameMode.h"
 
 /* The root path for all mouth and eye variations */
 const FString VARIATON_PATH = "/Game/BladeIIGame/Textures/Characters/";
@@ -57,16 +59,15 @@ AAvatarCaptureRig::AAvatarCaptureRig()
 	LoadTextures();
 }
 
+void AAvatarCaptureRig::SetGameModeInstance(ABladeIIGameMode* InGameModeInstance)
+{
+	GameModeInstance = InGameModeInstance;
+}
+
 void AAvatarCaptureRig::ChangeEyes()
 {
 	uint32 TextureIndex = FMath::RandRange(1, EyeTextures.Num() - 1);
-
-	if (EyeTextures.IsValidIndex(TextureIndex))
-	{
-		UTexture* Texture = EyeTextures[TextureIndex];
-
-		EyeMaterialInstance->SetTextureParameterValue(TEXTURE_PARAM_NAME, Texture);
-	}
+	SetTexture(Folder::Eyes, TextureIndex);
 }
 
 void AAvatarCaptureRig::RevertEyes()
@@ -86,6 +87,24 @@ void AAvatarCaptureRig::BeginPlay()
 	
 	ensureMsgf(EyeMaterialInstance, TEXT("Couldnt get a reference to and/or cast the eye material for the avatar"));
 	ensureMsgf(MouthMaterialInstance, TEXT("Couldnt get a reference to and/or cast the mouth material for the avatar"));
+}
+
+void AAvatarCaptureRig::RandomMouthTexture()
+{
+	uint32 TextureIndex = FMath::RandRange(1, MouthTextures.Num() - 1);
+	SetTexture(Folder::Mouth, TextureIndex);
+
+	if (!GameModeInstance->GetUIAvatarLayer()->IsAnimatingCalloutText())
+	{
+		if (GetWorldTimerManager().TimerExists(MouthAnimationHandle))
+		{
+			GetWorldTimerManager().ClearTimer(MouthAnimationHandle);
+
+			SetTexture(Folder::Mouth, 0);
+
+			return;
+		}
+	}
 }
 
 const FString AAvatarCaptureRig::GetPathForIndex(Folder Folder, uint32 Index) const
@@ -148,9 +167,32 @@ void AAvatarCaptureRig::LoadTextures()
 	}
 }
 
-void AAvatarCaptureRig::AnimateMouth(float Duration)
+void AAvatarCaptureRig::SetTexture(Folder Target, uint32 Index)
 {
+	TArray<UTexture*> Textures = Target == Folder::Eyes ? EyeTextures : MouthTextures;
+	UMaterialInstanceDynamic* MaterialInstance = Target == Folder::Eyes ? EyeMaterialInstance : MouthMaterialInstance;
 
+	if (Textures.IsValidIndex(Index))
+	{
+		UTexture* Texture = Textures[Index];
+
+		MaterialInstance->SetTextureParameterValue(TEXTURE_PARAM_NAME, Texture);
+	}
+}
+
+void AAvatarCaptureRig::AnimateMouth()
+{
+	if (GetWorldTimerManager().TimerExists(MouthAnimationHandle))
+	{
+		GetWorldTimerManager().ClearTimer(MouthAnimationHandle);
+	}
+
+	GetWorldTimerManager().SetTimer(MouthAnimationHandle, this, &AAvatarCaptureRig::RandomMouthTexture, ANIMATION_TICK, true, 0);
+}
+
+const FString& AAvatarCaptureRig::GetCurrentCharacterName() const
+{
+	return AvatarCharacterName;
 }
 
 void AAvatarCaptureRig::Tick(float DeltaTime)

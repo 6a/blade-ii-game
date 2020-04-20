@@ -71,7 +71,8 @@ public:
 	AAvatarCaptureRig* GetOpponentAvatar() const { return AvatarCaptureRig;  }
 	UB2Dealer* GetDealer() const { return Dealer; }
 	UB2Opponent* GetOpponent() const { return Opponent; }
-	UB2UIEffectLayer* GetEffectLayer() const { return UIEffectLayer; }
+	UB2UIEffectLayer* GetUIEffectLayer() const { return UIEffectLayer; }
+	UAvatar* GetUIAvatarLayer() const { return UIAvatarLayer; }
 	
 	B2CardFactory* GetCardFactory() const { return CardFactory; }
 	B2GameState* GetGameState() const { return GameState; }

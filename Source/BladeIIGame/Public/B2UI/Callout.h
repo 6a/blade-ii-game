@@ -18,9 +18,14 @@ public:
 	/**
 	 * Sets the text for, and shows this callout
 	 * @param NewText - The text to display
-	 * @return how long the animation will take
 	 */
-	float SetText(const FString& NewText);
+	void SetText(const FString& NewText);
+
+	/* Returns true if the callout is currently animating text */
+	bool IsAnimatingText() const;
+
+	/* Returns true if the callout is currently active (animating text, waiting, or fading out) */
+	bool IsActive() const;
 
 private:
 

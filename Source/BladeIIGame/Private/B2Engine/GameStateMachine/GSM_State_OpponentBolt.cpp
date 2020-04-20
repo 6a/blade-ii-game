@@ -20,7 +20,7 @@ void GSM_State_OpponentBolt::Init(ABladeIIGameMode* GameMode)
 	// Play bolt animation at players last card position
 	EUIEffect Effect = EUIEffect::Bolt;
 	FVector TargetWorldPosition = GI->GetArena()->PlayerField->GetLast()->GetActorLocation();
-	GI->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 0.25f, 0.4f);
+	GI->GetUIEffectLayer()->Play(Effect, &TargetWorldPosition, 0.25f, 0.4f);
 }
 
 void GSM_State_OpponentBolt::Tick(float DeltaSeconds)
@@ -30,7 +30,7 @@ void GSM_State_OpponentBolt::Tick(float DeltaSeconds)
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	EUIEffectEvent Event;
-	while (GI->GetEffectLayer()->EventQueue.Dequeue(Event))
+	while (GI->GetUIEffectLayer()->EventQueue.Dequeue(Event))
 	{
 		if (Event == EUIEffectEvent::Ready)
 		{

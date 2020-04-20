@@ -11,12 +11,11 @@ enum class EOpponentMessage : uint8
 	PlayerGoesFirst UMETA(DisplayName = "Player Goes First"),
 	OpponentGoesFirst UMETA(DisplayName = "Opponent Goes First"),
 	MatchedScores UMETA(DisplayName = "Matched Scores"),
-	Rod UMETA(DisplayName = "Rod"),
 	Bolt UMETA(DisplayName = "Bolt"),
 	Mirror UMETA(DisplayName = "Mirror"),
 	Blast UMETA(DisplayName = "Blast"),
 	Force UMETA(DisplayName = "Force"),
-	Ouch UMETA(DisplayName = "Ouch"),
+	Reaction UMETA(DisplayName = "Reaction"),
 	Victory UMETA(DisplayName = "Victory"),
 	Defeat UMETA(DisplayName = "Defeat"),
 };

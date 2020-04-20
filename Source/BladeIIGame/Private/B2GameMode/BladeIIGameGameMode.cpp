@@ -297,6 +297,8 @@ void ABladeIIGameMode::SetupAvatarCaptureRig()
 
 	AvatarCaptureRig = GetWorld()->SpawnActor<AAvatarCaptureRig>(AvatarCaptureRigBlueprint->GeneratedClass, AVATAR_CAPTURE_RIG_SPAWN_LOCATION, FRotator::ZeroRotator);
 	ensureMsgf(AvatarCaptureRig, TEXT("Could not spawn avatar capture rig blueprint"));
+
+	AvatarCaptureRig->SetGameModeInstance(this);
 }
 
 void ABladeIIGameMode::InitialiseBoard()
@@ -333,7 +335,8 @@ void ABladeIIGameMode::OnCardsDealt()
 	EngineState = EEngineState::InPlay;
 
 	// TODO remove test
-	UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Draw);
+	UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Draw, AvatarCaptureRig->GetCurrentCharacterName());
+	AvatarCaptureRig->AnimateMouth();
 }
 
 void ABladeIIGameMode::OnEffectReady()

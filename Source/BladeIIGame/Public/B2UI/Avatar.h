@@ -21,10 +21,16 @@ public:
 	/**
 	 * Sets the opponent callout to the specifed text
 	 * @param Message - The message to play
-	 * @return how long the animation will take (including the time it will stay visible once the animation has finished
+	 * @param Character - String representation of the character for which the corresponding message should be fetched
 	 */
-	float SetOpponentMessage(EOpponentMessage Message);
+	void SetOpponentMessage(EOpponentMessage Message, const FString& Character);
 	
+	/* Returns true if the callout is currently animating text */
+	bool IsAnimatingCalloutText() const;
+
+	/* Returns true if the callout is currently active (animating text, waiting, or fading out) */
+	bool IsCalloutActive() const;
+
 private:
 
 	/* Render image widget */
@@ -38,4 +44,19 @@ private:
 	/* Callout widget */
 	UPROPERTY(meta = (BindWidget))
 	UCallout* Callout;
+
+	/**
+	 * Gets the corresponding message for the specified parameters as a text object, catering for localisation
+	 * @param Message - The message to play
+	 * @param Character - String representation of the character for which the corresponding message should be fetched
+	 * @return the corresponding text object
+	 */
+	const FText GetTextForMessage(EOpponentMessage Message, const FString& Character) const;
+
+	/**
+	 * Returns the specified message as a string
+	 * @param Message - The message type to convert
+	 * @return The message type as a string
+	 */
+	FString MessageTypeToString(EOpponentMessage Message) const;
 };

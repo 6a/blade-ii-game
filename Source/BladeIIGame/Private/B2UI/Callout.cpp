@@ -19,7 +19,7 @@ const float LERP_MAX = 1;
 /* Ease exponent for fading the callout out */
 const float EASE_EXP = 2.f;
 
-float UCallout::SetText(const FString& NewText)
+void UCallout::SetText(const FString& NewText)
 {
 	if (GetWorld()->GetTimerManager().TimerExists(TextAnimationHandle))
 	{
@@ -38,8 +38,18 @@ float UCallout::SetText(const FString& NewText)
 	SizeText->SetText(FText::FromString(TargetText));
 
 	GetWorld()->GetTimerManager().SetTimer(TextAnimationHandle, this, &UCallout::ProgressTextAnimation, TEXT_ANIMATION_TICK, true, 0);
+}
 
-	return TargetText.Len() * TEXT_ANIMATION_TICK + TEXT_ANIMATION_POST_WAIT + TEXT_FADE_DURATION;
+bool UCallout::IsAnimatingText() const
+{
+	return GetWorld()->GetTimerManager().TimerExists(TextAnimationHandle);
+}
+
+bool UCallout::IsActive() const
+{
+	bool bIsWaitingForFadeOut = GetWorld()->GetTimeSeconds() < FadeStartTime;
+
+	return (IsAnimatingText() || bIsWaitingForFadeOut || bIsFadingOut);
 }
 
 void UCallout::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

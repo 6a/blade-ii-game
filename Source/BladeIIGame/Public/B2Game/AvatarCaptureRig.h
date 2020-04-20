@@ -28,17 +28,20 @@ public:
 
 	AAvatarCaptureRig();
 
+	/* Set the current game mode instance */
+	void SetGameModeInstance(class ABladeIIGameMode* InGameModeInstance);
+
 	/* Switch to a random set of eyes - will automatically revert after the timeout period */
 	void ChangeEyes();
 
 	/* Revert the avatars eyes to the default ones */
 	void RevertEyes();
 
-	/**
-	 * Initiates a mouth animation that lasts for the specified amount of time
-	 * @param Duration - how long the animation should last
-	 */
-	void AnimateMouth(float Duration);
+	/* Initiates a mouth animation that lasts for the specified amount of time */
+	void AnimateMouth();
+
+	/* Returns the name of the current character */
+	const FString& GetCurrentCharacterName() const;
 
 protected:
 
@@ -72,6 +75,17 @@ private:
 	UPROPERTY()
 	TArray<UTexture*> MouthTextures;
 
+	/* Timer handle for mouth animations */
+	FTimerHandle MouthAnimationHandle;
+
+	/* Forward declaration for game mode instance so we can check the avatar UI layer for stuff */
+	UPROPERTY()
+	class ABladeIIGameMode* GameModeInstance;
+
+	/* Swaps the mouth texture for a random texture */
+	UFUNCTION()
+	void RandomMouthTexture();
+
 	/**
 	 * Returns the reference path for the specific asset of the specific index
 	 * @param Folder - The folder to search
@@ -82,4 +96,11 @@ private:
 
 	/* Load the mouth and eye textures for this avatar */
 	void LoadTextures();
+
+	/**
+	 * Sets the texture with the specified index for the specified target
+	 * @param Target - The target for which the texture will be changed
+	 * @param Index - The index for the texture
+	 */
+	void SetTexture(Folder Target, uint32 Index);
 };

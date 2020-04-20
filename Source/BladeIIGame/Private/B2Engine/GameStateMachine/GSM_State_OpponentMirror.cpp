@@ -21,7 +21,7 @@ void GSM_State_OpponentMirror::Init(ABladeIIGameMode* GameMode)
 
 	// Play Mirror animation at the center of the screen
 	EUIEffect Effect = EUIEffect::Mirror;
-	GI->GetEffectLayer()->Play(Effect, nullptr, 0.25f, 0.0f);
+	GI->GetUIEffectLayer()->Play(Effect, nullptr, 0.25f, 0.0f);
 }
 
 void GSM_State_OpponentMirror::Tick(float DeltaSeconds)
@@ -31,7 +31,7 @@ void GSM_State_OpponentMirror::Tick(float DeltaSeconds)
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	EUIEffectEvent Event;
-	while (GI->GetEffectLayer()->EventQueue.Dequeue(Event))
+	while (GI->GetUIEffectLayer()->EventQueue.Dequeue(Event))
 	{
 		if (Event == EUIEffectEvent::Ready)
 		{

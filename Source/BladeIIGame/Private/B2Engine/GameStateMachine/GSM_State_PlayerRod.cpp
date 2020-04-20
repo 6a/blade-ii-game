@@ -22,7 +22,7 @@ void GSM_State_PlayerRod::Init(ABladeIIGameMode* GameMode)
 	// Play bolt animation at players last field card
 	EUIEffect Effect = EUIEffect::Rod;
 	FVector TargetWorldPosition = TargetCard->GetActorLocation();
-	GI->GetEffectLayer()->Play(Effect, &TargetWorldPosition, 0.25f, 0.0f);
+	GI->GetUIEffectLayer()->Play(Effect, &TargetWorldPosition, 0.25f, 0.0f);
 	
 	// Flip the card back to upright 
 	GI->GetDealer()->FlipFieldCard(TargetCard, true, 0.25f);
@@ -36,7 +36,7 @@ void GSM_State_PlayerRod::Tick(float DeltaSeconds)
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	EUIEffectEvent Event;
-	while (GI->GetEffectLayer()->EventQueue.Dequeue(Event))
+	while (GI->GetUIEffectLayer()->EventQueue.Dequeue(Event))
 	{
 		if (Event == EUIEffectEvent::Ready)
 		{

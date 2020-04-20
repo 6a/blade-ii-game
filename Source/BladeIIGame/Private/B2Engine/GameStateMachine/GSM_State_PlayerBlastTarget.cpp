@@ -78,12 +78,12 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 		GI->GetGameState()->bBlastAnimationPending = false;
 
 		FVector TargetLocation = GetCurrentCard()->GetActorLocation();
-		GI->GetEffectLayer()->Play(EUIEffect::BlastTarget, &TargetLocation, 1, 0);
+		GI->GetUIEffectLayer()->Play(EUIEffect::BlastTarget, &TargetLocation, 1, 0);
 	}
 	else
 	{
 		EUIEffectEvent Event;
-		while (GI->GetEffectLayer()->EventQueue.Dequeue(Event))
+		while (GI->GetUIEffectLayer()->EventQueue.Dequeue(Event))
 		{
 			if (Event == EUIEffectEvent::Ready)
 			{
