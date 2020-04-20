@@ -6,7 +6,6 @@
 #include "B2Predicate/SortCardsByTypeAscending.h"
 #include "B2Predicate/MatchCardType.h"
 #include "B2Utility/String.h"
-#include "..\..\Public\B2Game\CardSlot.h"
 
 UCardSlot::UCardSlot()
 {
