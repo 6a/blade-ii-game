@@ -52,7 +52,18 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	// Handle tied scores
 	if (PlayerScore == OpponentScore)
 	{
-		GI->ClearAndDraw();
+		float Delay = 0;
+
+		// Set the opponent message to matched if the field has cards on it (if it doesnt, it means we have already set it)
+		if (GI->GetArena()->PlayerField->Num() + GI->GetArena()->OpponentField->Num() > 0)
+		{
+			GI->GetUIAvatarLayer()->SetOpponentMessage(EOpponentMessage::MatchedScores, GI->GetOpponentAvatar()->GetCurrentCharacterName());
+			GI->GetOpponentAvatar()->AnimateMouth();
+
+			Delay = DELAY_ON_REPORT_TIED_SCORE;
+		}
+
+		GI->ClearAndDraw(Delay);
 		return;
 	}
 
@@ -61,6 +72,17 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	if (GI->GetGameState()->Turn == EPlayer::Undecided)
 	{
 		GI->GetGameState()->Turn = PlayerScore > OpponentScore ? EPlayer::Player : EPlayer::Opponent;
+
+		if (GI->GetGameState()->Turn == EPlayer::Player)
+		{
+			GI->GetUIAvatarLayer()->SetOpponentMessage(EOpponentMessage::OpponentGoesFirst, GI->GetOpponentAvatar()->GetCurrentCharacterName());
+		}
+		else
+		{
+			GI->GetUIAvatarLayer()->SetOpponentMessage(EOpponentMessage::PlayerGoesFirst, GI->GetOpponentAvatar()->GetCurrentCharacterName());
+		}
+
+		GI->GetOpponentAvatar()->AnimateMouth();
 	}
 
 	// Otherwise, the board is still in a playable state so just switch the turn

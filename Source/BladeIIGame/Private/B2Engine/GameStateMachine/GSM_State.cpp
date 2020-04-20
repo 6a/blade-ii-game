@@ -148,6 +148,14 @@ uint32 GSM_State::GetBoltedCardRealValue(ECard Card) const
 	return OutValue;
 }
 
+void GSM_State::OpponentMessage(EOpponentMessage MessageType) const
+{
+	ABladeIIGameMode* GI = GameModeInstance;
+
+	GI->GetUIAvatarLayer()->SetOpponentMessage(MessageType, GI->GetOpponentAvatar()->GetCurrentCharacterName());
+	GI->GetOpponentAvatar()->AnimateMouth();
+}
+
 ACard* GSM_State::GetCurrentCard()
 {
 	ABladeIIGameMode* GI = GameModeInstance;

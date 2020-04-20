@@ -26,6 +26,8 @@ void GSM_State_OpponentForce::Init(ABladeIIGameMode* GameMode)
 	GI->GetDealer()->ForceOut(CurrentForceCard);
 
 	CurrentForceCard->FadeOut(0.4f);
+
+	OpponentMessage(EOpponentMessage::Force);
 }
 
 void GSM_State_OpponentForce::Tick(float DeltaSeconds)

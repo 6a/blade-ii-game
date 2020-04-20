@@ -4,21 +4,6 @@
 
 #include "TimerManager.h"
 
-/* How long to wait between each character being added */
-const float TEXT_ANIMATION_TICK = 0.05f;
-
-/* How long to wait after the text has finished animating */
-const float TEXT_ANIMATION_POST_WAIT = 1.0f;
-
-/* How long the fade out takes */
-const float TEXT_FADE_DURATION = 0.5f;
-
-/* The maximum value that we can have when lerping between 0 and 1 */
-const float LERP_MAX = 1;
-
-/* Ease exponent for fading the callout out */
-const float EASE_EXP = 2.f;
-
 void UCallout::SetText(const FString& NewText)
 {
 	if (GetWorld()->GetTimerManager().TimerExists(TextAnimationHandle))
@@ -30,6 +15,7 @@ void UCallout::SetText(const FString& NewText)
 	TargetTextIndex = 0;
 	SetRenderOpacity(1);
 	CurrentFadeAlpha = 1;
+	bIsFadingOut = false;
 
 	// Empty the text field, replacing it with a string of spaces the same length 
 	CalloutText->SetText(FText::FromString(""));

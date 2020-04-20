@@ -33,6 +33,8 @@ void GSM_State_OpponentBlast::Tick(float DeltaSeconds)
 		if (Event == EUIEffectEvent::Finished)
 		{
 			GI->GetDealer()->BlastSelect(EPlayer::Player);
+
+			OpponentMessage(EOpponentMessage::Blast);
 		}
 	}
 }

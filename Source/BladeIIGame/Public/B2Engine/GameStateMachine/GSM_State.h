@@ -4,6 +4,7 @@
 
 #include "B2Enum/GameStateEnum.h"
 #include "B2Enum/ServerUpdateEnum.h"
+#include "B2Enum/OpponentMessageEnum.h"
 #include "B2Game/Card.h"
 
 class GSM_State
@@ -61,6 +62,9 @@ protected:
 
 	/* Returns the value of the specified if it wasnt bolted */
 	uint32 GetBoltedCardRealValue(ECard Card) const;
+
+	/* Requests a message callout with a message of the specified type + mouth animation for the opponent avatar */
+	void OpponentMessage(EOpponentMessage MessageType) const;
 
 private:
 	/* The value to remove from a bolted card (non effect) to determine its non flipped type */

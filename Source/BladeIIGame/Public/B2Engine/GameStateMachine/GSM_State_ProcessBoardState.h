@@ -20,6 +20,10 @@ public:
 	virtual EGameState Type() const override { return EGameState::ProcessingBoardState; }
 
 private:
+
+	/* The amount of time to wait, when the score is tied, before reporting back to the game mode - gives time for the opponent callout + animation */
+	const float DELAY_ON_REPORT_TIED_SCORE = 3.f;
+
 	/**
 	 * Check if the specified score grants a win under the current board state
 	 * @param TargetScore - The score of the player for which we are checking whether they have won

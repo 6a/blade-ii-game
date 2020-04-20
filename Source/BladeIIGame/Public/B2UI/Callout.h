@@ -12,7 +12,6 @@ class BLADEIIGAME_API UCallout : public UUserWidget
 {
 	GENERATED_BODY()
 
-
 public:
 
 	/**
@@ -28,8 +27,21 @@ public:
 	bool IsActive() const;
 
 private:
+	/* Class consts */
+	/* How long to wait between each character being added */
+	const float TEXT_ANIMATION_TICK = 0.05f;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	/* How long to wait after the text has finished animating */
+	const float TEXT_ANIMATION_POST_WAIT = 1.0f;
+
+	/* How long the fade out takes */
+	const float TEXT_FADE_DURATION = 0.5f;
+
+	/* The maximum value that we can have when lerping between 0 and 1 */
+	const float LERP_MAX = 1;
+
+	/* Ease exponent for fading the callout out */
+	const float EASE_EXP = 2.f;
 
 	/* Text widget */
 	UPROPERTY(meta = (BindWidgetOptional))
@@ -56,6 +68,8 @@ private:
 
 	/* Alpha (lerp) value for the current fade out */
 	float CurrentFadeAlpha;
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 	/* Function that adds one character to the text field each call, until completion */
 	UFUNCTION()

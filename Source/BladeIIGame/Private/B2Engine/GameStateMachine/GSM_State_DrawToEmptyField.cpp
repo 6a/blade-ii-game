@@ -53,6 +53,9 @@ void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 		{
 			Cursor->SetActorLocationAndRotation(GI->GetArena()->PlayerDeck->GetTransformForIndex(GI->GetArena()->PlayerDeck->Num() - 1).Position, FRotator::ZeroRotator);
 		}
+
+		GI->GetUIAvatarLayer()->SetOpponentMessage(EOpponentMessage::Draw, GI->GetOpponentAvatar()->GetCurrentCharacterName());
+		GI->GetOpponentAvatar()->AnimateMouth();
 	}
 }
 

@@ -48,8 +48,12 @@ public:
 	/* Informs the engine that it is safe to switch turns */
 	void ChangeTurn();
 
-	/* Inform the engine that the scores are tied and the board needs to be cleared and reset */
-	void ClearAndDraw();
+	/**
+	 * Inform the engine that the scores are tied and the board needs to be cleared and reset, with an optional delay
+	 * @param Delay - Optional delay in seconds, defaults to zero
+	 */
+	UFUNCTION()
+	void ClearAndDraw(float Delay = 0.f);
 
 	/* Get a reference to the card slot of the specified type */
 	UCardSlot* GetCardSlot(ECardSlot Slot) const;
@@ -124,6 +128,9 @@ private:
 
 	/* Class type for avatar widget */
 	TSubclassOf<UAvatar> UIAvatarWidgetClass;
+
+	/* Timer handle for any delayed clear and draw calls */
+	FTimerHandle ClearAndDrawHandle;
 
 	/**
 	 * Reads the launch config and sets up the engine accordingly.

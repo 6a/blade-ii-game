@@ -22,6 +22,8 @@ void GSM_State_OpponentMirror::Init(ABladeIIGameMode* GameMode)
 	// Play Mirror animation at the center of the screen
 	EUIEffect Effect = EUIEffect::Mirror;
 	GI->GetUIEffectLayer()->Play(Effect, nullptr, 0.25f, 0.0f);
+
+	OpponentMessage(EOpponentMessage::Mirror);
 }
 
 void GSM_State_OpponentMirror::Tick(float DeltaSeconds)

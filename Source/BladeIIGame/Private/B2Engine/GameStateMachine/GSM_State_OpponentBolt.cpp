@@ -43,6 +43,8 @@ void GSM_State_OpponentBolt::Tick(float DeltaSeconds)
 			// Update score
 			GI->GetGameState()->PlayerScore = GI->AggregateScore(GI->GetArena()->PlayerField);
 			GI->GetArena()->ScoreDisplay->Update(GI->GetGameState()->PlayerScore, GI->GetGameState()->OpponentScore);
+
+			OpponentMessage(EOpponentMessage::Bolt);
 		}
 		else if (Event == EUIEffectEvent::Finished)
 		{

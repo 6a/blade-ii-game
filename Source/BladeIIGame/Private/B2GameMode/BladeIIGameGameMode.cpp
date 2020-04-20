@@ -2,6 +2,7 @@
 
 #include "EngineUtils.h"
 #include "UObject/UObjectGlobals.h"
+#include "TimerManager.h"
 
 #include "B2GameMode/BladeIIGameInstance.h"
 #include "B2Engine/AIOpponent.h"
@@ -81,7 +82,20 @@ void ABladeIIGameMode::EndState()
 
 void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinCondition)
 {
-	FString Turn = Player == EPlayer::Player ? TEXT("Local Player") : TEXT("Opponent");
+	FString Turn;
+	if (Player == EPlayer::Player)
+	{
+		Turn = TEXT("Local Player");
+		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Defeat, AvatarCaptureRig->GetCurrentCharacterName());
+	}
+	else
+	{
+		Turn = TEXT("Opponent");
+		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Victory, AvatarCaptureRig->GetCurrentCharacterName());
+	}
+
+	AvatarCaptureRig->AnimateMouth();
+
 	B2Utility::LogWarning(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
 }
 
@@ -102,8 +116,23 @@ void ABladeIIGameMode::ChangeTurn()
 	Arena->PrintOpponentCards();
 }
 
-void ABladeIIGameMode::ClearAndDraw()
+void ABladeIIGameMode::ClearAndDraw(float Delay)
 {
+	if (Delay > 0)
+	{
+		if (GetWorldTimerManager().TimerExists(ClearAndDrawHandle))
+		{
+			GetWorldTimerManager().ClearTimer(ClearAndDrawHandle);
+		}
+
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindLambda([this]() { this->ClearAndDraw(0); });
+
+		GetWorldTimerManager().SetTimer(ClearAndDrawHandle, TimerDelegate, Delay, false);
+
+		return;
+	}
+
 	GameState->Turn = EPlayer::Undecided;
 
 	// Switch state machine to drawing from empty field
@@ -334,7 +363,6 @@ void ABladeIIGameMode::OnCardsDealt()
 
 	EngineState = EEngineState::InPlay;
 
-	// TODO remove test
 	UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Draw, AvatarCaptureRig->GetCurrentCharacterName());
 	AvatarCaptureRig->AnimateMouth();
 }
@@ -349,6 +377,13 @@ void ABladeIIGameMode::OnEffectReady()
 	{
 		// Changes the eyes to a random one
 		AvatarCaptureRig->ChangeEyes();
+
+		// Add reaction text to the opponent avatar and animate the mouth if the effect is not a rod
+		if (Type != ECard::ElliotsOrbalStaff)
+		{
+			UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Reaction, AvatarCaptureRig->GetCurrentCharacterName());
+			AvatarCaptureRig->AnimateMouth();
+		}
 	}
 
 	// Blast edge cases -  we should switch to the blast select state from the blast state, or set the bBlastAnimationPending flag from
@@ -638,6 +673,9 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 
 	 //Dealer->Deal();
 	Dealer->FastDeal();
+
+	UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Greeting, AvatarCaptureRig->GetCurrentCharacterName());
+	AvatarCaptureRig->AnimateMouth();
 }
 
 void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instruction)

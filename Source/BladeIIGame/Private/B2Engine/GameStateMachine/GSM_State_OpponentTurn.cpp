@@ -11,10 +11,6 @@ GSM_State_OpponentTurn::GSM_State_OpponentTurn()
 	GSM_State::GSM_State();
 }
 
-GSM_State_OpponentTurn::~GSM_State_OpponentTurn()
-{
-}
-
 void GSM_State_OpponentTurn::Init(ABladeIIGameMode* GameMode)
 {
 	GSM_State::Init(GameMode);

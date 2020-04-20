@@ -10,7 +10,7 @@ class GSM_State_OpponentTurn : public GSM_State
 {
 public:
 	GSM_State_OpponentTurn();
-	virtual ~GSM_State_OpponentTurn();
+	virtual ~GSM_State_OpponentTurn() {}
 
 	virtual void Init(class ABladeIIGameMode* GameMode) override;
 
@@ -23,8 +23,8 @@ public:
 private:
 
 	/* Minimum and maximum articifial delays */
-	const float AI_DELAY_MIN = 1.f;
-	const float AI_DELAY_MAX = 2.f;
+	const float AI_DELAY_MIN = 0.4f;
+	const float AI_DELAY_MAX = 1.f;
 	
 	/* Set to true when this state has received a move update - so that we dont consume the next move */
 	bool bMovedReceived;
