@@ -96,6 +96,11 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 
 	AvatarCaptureRig->AnimateMouth();
 
+	if (Arena->OpponentHand->Num() > 0)
+	{
+		Dealer->RevealOpponentsHand();
+	}
+
 	B2Utility::LogWarning(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
 }
 

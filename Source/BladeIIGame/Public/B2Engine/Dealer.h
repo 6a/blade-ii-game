@@ -109,6 +109,8 @@ public:
 	/* Clears the field of any cards */
 	void ClearField();
 
+	void RevealOpponentsHand() const;
+
 	/* Tick the dealer so that it can perform tasks such as calling-back after transitions are finished etc. */
 	void Tick(float DeltaSeconds);
 private:

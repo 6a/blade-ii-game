@@ -17,6 +17,7 @@ const FVector MIRROR_ARC = FVector(0, 0, 4);
 const FVector RAISED_CARD_OFFSET = FVector(0, 0, 6.f);
 const FVector FORCE_MAX_OFFSET_PLAYER = FVector(-2, -0.4f, 122);
 const FVector FORCE_MAX_OFFSET_OPPONENT = FVector(2, 0.4f, 122);
+const FVector CARD_REVEAL_ARC = FVector(6.5f, 2.f, 5.f);
 
 UB2Dealer::UB2Dealer()
 {
@@ -250,7 +251,7 @@ void UB2Dealer::Deal()
 		{
 			Arena->PlayerHandReversed->GetTransformForIndex(i).Position,
 			Arena->PlayerHandReversed->GetTransformForIndex(i).Position,
-			FVector(6.5f, 2.f, 5.f),
+			CARD_REVEAL_ARC,
 			EEase::EaseIn,
 		};
 
@@ -1267,6 +1268,41 @@ void UB2Dealer::ClearField()
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(PostDelayWaitGroup, Position, Rotation, AddedDelay, 0);
 	DelayCard->QueueTransition(Transition);
+}
+
+void UB2Dealer::RevealOpponentsHand() const
+{
+	const float DelayOnStart = 0.0f;
+	const float TransitionDuration = 0.4f;
+	const float DelayPerCard = 0.1f;
+
+	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
+
+	for (uint32 i = 0; i < Arena->OpponentHand->Num(); i++)
+	{
+		ACard* Card = Arena->OpponentHand->GetCardByIndex(i);
+		float CardDelay = DelayOnStart + (DelayPerCard * i);
+
+		// Transition 1
+		B2TPosition Position
+		{
+			Card->GetActorLocation(),
+			Card->GetActorLocation(),
+			CARD_REVEAL_ARC * FVector(-1, -0.5f, 1),
+			EEase::EaseIn,
+		};
+
+		B2TRotation Rotation
+		{
+			Card->GetActorRotation(),
+			Card->GetActorRotation() + FRotator(180, 0, 0),
+			EEase::EaseInOut,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, TransitionDuration, CardDelay);
+		Card->QueueTransition(Transition);
+	}
 }
 
 void UB2Dealer::Tick(float DeltaSeconds)
