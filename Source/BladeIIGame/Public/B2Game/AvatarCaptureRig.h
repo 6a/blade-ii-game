@@ -6,7 +6,6 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "GameFramework/SpringArmComponent.h"
 
-
 #include "AvatarCaptureRig.generated.h"
 
 UCLASS()

@@ -178,9 +178,9 @@ void ABladeIIGameMode::SetupCardFactory()
 	});
 
 	/* Back and MRS (metallic, roughness, specular) paths */
-	B2CardFactoryConfig.CardBackPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Back.T_Card_Back");
-	B2CardFactoryConfig.CardFrontMRSPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Front_MRS.T_Card_Front_MRS");
-	B2CardFactoryConfig.CardBackMRSPath = TEXT("/Game/BladeIIGame/Textures/T_Card_Back_MRS.T_Card_Back_MRS");
+	B2CardFactoryConfig.CardBackPath = TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Back.T_Card_Back");
+	B2CardFactoryConfig.CardFrontMRSPath = TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Front_MRS.T_Card_Front_MRS");
+	B2CardFactoryConfig.CardBackMRSPath = TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Back_MRS.T_Card_Back_MRS");
 
 	/* Card actor path */
 	B2CardFactoryConfig.CardActorPath = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card.BP_Card'");
@@ -331,6 +331,9 @@ void ABladeIIGameMode::OnCardsDealt()
 	GSM->ChangeState<GSM_State_DrawToEmptyField>();
 
 	EngineState = EEngineState::InPlay;
+
+	// TODO remove test
+	UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Draw);
 }
 
 void ABladeIIGameMode::OnEffectReady()
