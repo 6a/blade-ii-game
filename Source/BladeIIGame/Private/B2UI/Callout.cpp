@@ -1,8 +1,14 @@
 #include "B2UI/Callout.h"
 
 #include "B2Utility/Log.h"
+#include "B2GameMode/BladeIIGameMode.h"
 
 #include "TimerManager.h"
+
+void UCallout::SetGameModeInstance(ABladeIIGameMode* GameMode)
+{
+	GameModeInstance = GameMode;
+}
 
 void UCallout::SetText(const FString& NewText)
 {
@@ -16,6 +22,7 @@ void UCallout::SetText(const FString& NewText)
 	SetRenderOpacity(1);
 	CurrentFadeAlpha = 1;
 	bIsFadingOut = false;
+	CurrentCalloutTextSoundIndex = 0;
 
 	// Empty the text field, replacing it with a string of spaces the same length 
 	CalloutText->SetText(FText::FromString(""));
@@ -80,4 +87,11 @@ void UCallout::ProgressTextAnimation()
 	FString CurrentString = FString(TargetTextIndex, *TargetText);
 
 	CalloutText->SetText(FText::FromString(CurrentString));
+
+	if (CurrentCalloutTextSoundIndex % 1 == 0)
+	{
+		GameModeInstance->GetGameSound()->PlaySFX(ESFX::TextPulse);
+	}
+
+	CurrentCalloutTextSoundIndex++;
 }

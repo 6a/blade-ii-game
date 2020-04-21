@@ -5,6 +5,8 @@
 #include "Sound/SoundWave.h"
 #include "GameFramework/Actor.h"
 
+#include "B2Enum/SFXEnum.h"
+
 #include "GameSound.generated.h"
 
 UCLASS()
@@ -22,9 +24,27 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UAudioComponent* SFXAudioComponent;
 
+	AGameSound();
+
 	virtual void Tick(float DeltaTime) override;
 
-	AGameSound();
+	/**
+	 * Set the internal reference to the game mode instance
+	 * @param GameModeInstance - A pointer to the game mode instance
+	 */
+	void SetGameModeInstance(class ABladeIIGameMode* GameMode);
+
+	/**
+	 * Start playing the BGM track - fades in over the specified duration, or instant if <= 0
+	 * @param FadeInDuration - Duration of the fade in
+	 */
+	void PlayBGM(float FadeInDuration);
+
+	/**
+	 * Play an SFX oneshot of the specified type
+	 * @param SFX - The effect to play
+	 */
+	void PlaySFX(ESFX SFX);
 
 protected:
 
@@ -72,6 +92,46 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundBank|Effects")
 	USoundWave* EffectForceSound;
 
-	virtual void BeginPlay() override;	
+	/* Master sound class */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundBank|Config")
+	USoundClass* SoundClassMaster;
 
+	/* SFX sound class */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundBank|Config")
+	USoundClass* SoundClassSFX;
+
+	/* BGM sound class */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundBank|Config")
+	USoundClass* SoundClassBGM;
+
+	/* BGM fade sound class */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundBank|Config")
+	USoundClass* SoundClassBGMFade;
+
+	/* BGM sound class */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundBank|Config")
+	USoundMix* SoundMixMaster;
+
+	virtual void BeginPlay() override;
+
+private:
+
+	/* Pointer to the game mode instance */
+	class ABladeIIGameMode* GameModeInstance;
+
+	/* Various const values */
+	float ALPHA_MAX = 1.f;
+	float EASE_EXP = 2.f;
+
+	/* Whether or not the BGM is currently fading in or out */
+	bool bIsFadingBGM;
+
+	/* The current alpha for the BGM fade */
+	float BGMFadeAlpha;
+
+	/* The target alpha for the current BGM fade */
+	float BGMTargetAlpha;
+
+	/* The duration over which the BGM will fade */
+	float BGMFadeDuration;
 };

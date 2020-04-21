@@ -10,10 +10,12 @@
 #include "B2Engine/Cards.h"
 #include "B2Engine/LocalPlayerInput.h"
 #include "B2Engine/UIEffectLayer.h"
+#include "B2Engine/Settings.h"
 #include "B2Engine/GameStateMachine/GSM.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
 #include "B2Game/AvatarCaptureRig.h"
+#include "B2Game/GameSound.h"
 #include "B2Enum/EngineStateEnum.h"
 #include "B2Enum/UIEffectEventEnum.h"
 #include "B2Enum/WinConditionEnum.h"
@@ -72,11 +74,13 @@ public:
 	AArena* GetArena() const { return Arena; }
 	ACardSelector* GetCursor() const { return Cursor; }
 	ALocalPlayerInput* GetLocalPlayerInput() const { return LocalPlayerInput; }
-	AAvatarCaptureRig* GetOpponentAvatar() const { return AvatarCaptureRig;  }
+	AAvatarCaptureRig* GetOpponentAvatar() const { return AvatarCaptureRig; }
+	AGameSound* GetGameSound() const { return GameSound;  }
 	UB2Dealer* GetDealer() const { return Dealer; }
 	UB2Opponent* GetOpponent() const { return Opponent; }
 	UB2UIEffectLayer* GetUIEffectLayer() const { return UIEffectLayer; }
 	UAvatar* GetUIAvatarLayer() const { return UIAvatarLayer; }
+	USettings* GetSettings() const { return Settings; }
 	
 	B2CardFactory* GetCardFactory() const { return CardFactory; }
 	B2GameState* GetGameState() const { return GameState; }
@@ -94,6 +98,14 @@ private:
 	UPROPERTY()
 	ALocalPlayerInput* LocalPlayerInput;
 
+	/* Pointer to the avatar capture rig */
+	UPROPERTY()
+	AAvatarCaptureRig* AvatarCaptureRig;
+
+	/* Pointer to the game sound actor*/
+	UPROPERTY()
+	AGameSound* GameSound;
+
 	/* Pointer the dealer that will be used throughout this match */
 	UPROPERTY()
 	UB2Dealer* Dealer;
@@ -106,13 +118,13 @@ private:
 	UPROPERTY()
 	UB2UIEffectLayer* UIEffectLayer;
 
-	/* Pointer to the avatar capture rig */
-	UPROPERTY()
-	AAvatarCaptureRig* AvatarCaptureRig;
-
 	/* Pointer to UI avatar layer */
 	UPROPERTY()
 	UAvatar* UIAvatarLayer;
+
+	/* Pointer to the settings object */
+	UPROPERTY()
+	USettings* Settings;
 
 	/* Pointer to the cardfactory that will be used throughout this match */
 	B2CardFactory* CardFactory;
@@ -155,6 +167,9 @@ private:
 
 	/* Find and store a reference to the local player input actors */
 	void FindLocalPlayerInput();
+
+	/* Find and store a reference to the game sound actor */
+	void FindGameSoundActor();
 
 	/* Set up the internal dealer instance */
 	void SetupDealer();

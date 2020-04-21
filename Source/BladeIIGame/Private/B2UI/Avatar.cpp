@@ -22,6 +22,13 @@ const FString LOC_KEY_SUFFIX_001 = "001";
 
 const FTextKey LOC_KEY_CHAR_NAMESPACE = "LOC_CHAR";
 
+void UAvatar::SetGameModeInstance(ABladeIIGameMode* GameMode)
+{
+	GameModeInstance = GameMode;
+
+	Callout->SetGameModeInstance(GameMode);
+}
+
 void UAvatar::SetOpponentMessage(EOpponentMessage Message, const FString& Character)
 {
 	Callout->SetText(GetTextForMessage(Message, Character).ToString());

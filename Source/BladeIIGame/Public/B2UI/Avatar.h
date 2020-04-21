@@ -19,6 +19,12 @@ class BLADEIIGAME_API UAvatar : public UUserWidget
 public:
 
 	/**
+	 * Set the internal reference to the game mode instance
+	 * @param GameModeInstance - A pointer to the game mode instance
+	 */
+	void SetGameModeInstance(class ABladeIIGameMode* GameMode);
+
+	/**
 	 * Sets the opponent callout to the specifed text
 	 * @param Message - The message to play
 	 * @param Character - String representation of the character for which the corresponding message should be fetched
@@ -32,6 +38,9 @@ public:
 	bool IsCalloutActive() const;
 
 private:
+
+	/* Pointer to the game mode instance */
+	class ABladeIIGameMode* GameModeInstance;
 
 	/* Render image widget */
 	UPROPERTY(meta = (BindWidget))

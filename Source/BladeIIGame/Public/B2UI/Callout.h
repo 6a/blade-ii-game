@@ -15,6 +15,12 @@ class BLADEIIGAME_API UCallout : public UUserWidget
 public:
 
 	/**
+	 * Set the internal reference to the game mode instance
+	 * @param GameModeInstance - A pointer to the game mode instance
+	 */
+	void SetGameModeInstance(class ABladeIIGameMode* GameMode);
+
+	/**
 	 * Sets the text for, and shows this callout
 	 * @param NewText - The text to display
 	 */
@@ -51,6 +57,9 @@ private:
 	UPROPERTY(meta = (BindWidgetOptional))
 	UTextBlock* SizeText;
 
+	/* Pointer to the game mode instance */
+	class ABladeIIGameMode* GameModeInstance;
+
 	/* Text animation handle */
 	FTimerHandle TextAnimationHandle;
 
@@ -63,11 +72,14 @@ private:
 	/* Set to true when fading the callout out */
 	bool bIsFadingOut;
 
-	float FadeStartTime;
 	/* The time at which the fade out can be started */
+	float FadeStartTime;
 
 	/* Alpha (lerp) value for the current fade out */
 	float CurrentFadeAlpha;
+
+	/* Used to restrict how often the callout text sound is played */
+	uint32 CurrentCalloutTextSoundIndex;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 

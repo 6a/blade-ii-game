@@ -74,7 +74,7 @@ void ABladeIIGameMode::EndState()
 {
 	UpdateCardState();
 
-	B2Utility::LogWarning(FString::Printf(TEXT("[%d] state ended"), GSM->GetCurrentState()));
+	B2Utility::LogInfo(FString::Printf(TEXT("[%d] state ended"), GSM->GetCurrentState()));
 
 	// Switch to the turn switching state
 	GSM->ChangeState<GSM_State_ProcessBoardState>();
@@ -101,7 +101,7 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 		Dealer->RevealOpponentsHand();
 	}
 
-	B2Utility::LogWarning(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
+	B2Utility::LogInfo(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
 }
 
 void ABladeIIGameMode::ChangeTurn()
@@ -164,6 +164,8 @@ void ABladeIIGameMode::StartPlay()
 
 	FindLocalPlayerInput();
 
+	FindGameSoundActor();
+
 	RegisterEventListeners();
 }
 
@@ -187,6 +189,10 @@ void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitial
 
 		Opponent = static_cast<UB2Opponent*>(NetOpponent);
 	}
+
+	// Set up the settings object
+	Settings = ObjectInitializer.CreateDefaultSubobject<USettings>(this, TEXT("Settings"));
+	Settings->Initialise(LaunchConfig);
 }
 
 void ABladeIIGameMode::SetupCardFactory()
@@ -282,6 +288,24 @@ void ABladeIIGameMode::FindLocalPlayerInput()
 	check(LocalPlayerInput);
 }
 
+void ABladeIIGameMode::FindGameSoundActor()
+{
+	// Try to get a reference to the local player input actor
+	for (TActorIterator<AGameSound> InputIter(GetWorld()); InputIter; ++InputIter)
+	{
+		if (InputIter)
+		{
+			GameSound = *InputIter;
+		}
+	}
+
+	// Throw if the game sound actor was not found
+	check(GameSound);
+
+	// Set the game mode instance for the gamesound actor
+	GameSound->SetGameModeInstance(this);
+}
+
 void ABladeIIGameMode::SetupDealer()
 {
 	Dealer = NewObject<UB2Dealer>(this, TEXT("Dealer"));
@@ -317,6 +341,7 @@ void ABladeIIGameMode::SetupUIAvatarLayer()
 		if (UIAvatarLayer)
 		{
 			UIAvatarLayer->AddToPlayerScreen();
+			UIAvatarLayer->SetGameModeInstance(this);
 		}
 	}
 }
@@ -679,13 +704,17 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 	 //Dealer->Deal();
 	Dealer->FastDeal();
 
+	// Animate the opponent avatar
 	UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Greeting, AvatarCaptureRig->GetCurrentCharacterName());
 	AvatarCaptureRig->AnimateMouth();
+
+	// Start the BGM track
+	GameSound->PlayBGM(2);
 }
 
 void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instruction)
 {
-	B2Utility::LogWarning(FString::Printf(TEXT("Server Instruction: [%d] Metadata: [ %s ]"), Instruction.Update, *Instruction.Metadata));
+	B2Utility::LogInfo(FString::Printf(TEXT("Server Instruction: [%d] Metadata: [ %s ]"), Instruction.Update, *Instruction.Metadata));
 }
 
 void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
