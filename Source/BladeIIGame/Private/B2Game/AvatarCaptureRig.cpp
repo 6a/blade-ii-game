@@ -41,9 +41,9 @@ void AAvatarCaptureRig::ChangeEyes()
 	if (GetWorldTimerManager().TimerExists(EyeResetHandle))
 	{
 		GetWorldTimerManager().ClearTimer(EyeResetHandle);
-
-		GetWorldTimerManager().SetTimer(EyeResetHandle, this, &AAvatarCaptureRig::RevertEyes, MAX_EYE_CHANGE_DURATION, false);
 	}
+
+	GetWorldTimerManager().SetTimer(EyeResetHandle, this, &AAvatarCaptureRig::RevertEyes, MAX_EYE_CHANGE_DURATION, false);
 }
 
 void AAvatarCaptureRig::RevertEyes()
@@ -82,8 +82,6 @@ void AAvatarCaptureRig::RandomMouthTexture()
 			GetWorldTimerManager().ClearTimer(MouthAnimationHandle);
 
 			SetTexture(Folder::Mouth, 0);
-
-			return;
 		}
 	}
 }

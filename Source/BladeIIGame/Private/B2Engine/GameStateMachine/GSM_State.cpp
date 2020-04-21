@@ -156,6 +156,7 @@ void GSM_State::OpponentMessage(EOpponentMessage MessageType) const
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	GI->GetUIAvatarLayer()->SetOpponentMessage(MessageType, GI->GetOpponentAvatar()->GetCurrentCharacterName());
+	GI->GetOpponentAvatar()->ChangeEyes();
 	GI->GetOpponentAvatar()->AnimateMouth();
 }
 

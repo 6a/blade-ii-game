@@ -38,6 +38,9 @@ const FString AVATAR_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints
 const FVector AVATAR_CAPTURE_RIG_SPAWN_LOCATION = FVector(500, 0, 0);
 const FString LOADING_SCREEN_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_LoadingScreen'";
 
+// TODO set to zero for build
+#define FAST_DRAW 1
+
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 {
 	EngineState = EEngineState::Initialisation;
@@ -425,9 +428,15 @@ void ABladeIIGameMode::DelayedStart()
 		InitialiseBoard();
 
 		EngineState = EEngineState::Dealing;
-
-		Dealer->Deal();
-		//Dealer->FastDeal();
+			
+		if (FAST_DRAW)
+		{
+			Dealer->FastDeal();
+		}
+		else
+		{
+			Dealer->Deal();
+		}
 
 		// Animate the opponent avatar
 		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Greeting, AvatarCaptureRig->GetCurrentCharacterName());

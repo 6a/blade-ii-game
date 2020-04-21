@@ -23,6 +23,8 @@ void GSM_State_OpponentBlast::Init(ABladeIIGameMode* GameMode)
 	// Play blast sound effect
 	GI->GetGameSound()->PlaySFX(ESFX::EffectBlastStart, 0.2f);
 	GI->GetGameSound()->PlaySFX(ESFX::EffectBase, 0.2f);
+
+	OpponentMessage(EOpponentMessage::Blast);
 }
 
 void GSM_State_OpponentBlast::Tick(float DeltaSeconds)
@@ -37,8 +39,6 @@ void GSM_State_OpponentBlast::Tick(float DeltaSeconds)
 		if (Event == EUIEffectEvent::Finished)
 		{
 			GI->GetDealer()->BlastSelect(EPlayer::Player);
-
-			OpponentMessage(EOpponentMessage::Blast);
 		}
 	}
 }
