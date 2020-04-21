@@ -20,6 +20,7 @@
 #include "B2Enum/UIEffectEventEnum.h"
 #include "B2Enum/WinConditionEnum.h"
 #include "B2UI/Avatar.h"
+#include "B2UI/LoadingScreen.h"
 
 #include "BladeIIGameMode.generated.h"
 
@@ -70,6 +71,9 @@ public:
 	/* Update the cards in the game state */
 	void UpdateCardState();
 
+	/* Helper function to inform the game mode that the automatic load has finished (when vs AI) */
+	void AutoLoadFinished();
+
 	/* Getters for various references */
 	AArena* GetArena() const { return Arena; }
 	ACardSelector* GetCursor() const { return Cursor; }
@@ -80,6 +84,7 @@ public:
 	UB2Opponent* GetOpponent() const { return Opponent; }
 	UB2UIEffectLayer* GetUIEffectLayer() const { return UIEffectLayer; }
 	UAvatar* GetUIAvatarLayer() const { return UIAvatarLayer; }
+	ULoadingScreen* GetUILoadingScreenLayer() const { return UILoadingScreenLayer; }
 	USettings* GetSettings() const { return Settings; }
 	
 	B2CardFactory* GetCardFactory() const { return CardFactory; }
@@ -122,6 +127,10 @@ private:
 	UPROPERTY()
 	UAvatar* UIAvatarLayer;
 
+	/* Loading screen UI layer*/
+	UPROPERTY()
+	ULoadingScreen* UILoadingScreenLayer;
+
 	/* Pointer to the settings object */
 	UPROPERTY()
 	USettings* Settings;
@@ -141,8 +150,13 @@ private:
 	/* Class type for avatar widget */
 	TSubclassOf<UAvatar> UIAvatarWidgetClass;
 
+	/* Class type for avatar widget */
+	TSubclassOf<ULoadingScreen> UILoadingScreenWidgetClass;
+
 	/* Timer handle for any delayed clear and draw calls */
 	FTimerHandle ClearAndDrawHandle;
+
+	bool bOtherDelayedStartComponentReady;
 
 	/**
 	 * Reads the launch config and sets up the engine accordingly.
@@ -158,6 +172,9 @@ private:
 
 	/* Gets and stores a reference to the UI Avatar layer class */
 	void GetUIAvatarWidgetClass();
+
+	/* Gets and stores a reference to the UI loading screen layer class */
+	void GetUILoadingScreenWidgetClass();
 
 	/* Set up any event listeners */
 	void RegisterEventListeners();
@@ -183,11 +200,17 @@ private:
 	/* Set up the UI avatar layer */
 	void SetupUIAvatarLayer();
 
+	/* Set up the UI loading screen layer */
+	void SetupUILoadingScreenLayer();
+
 	/* Set up the avatar capture rig */
 	void SetupAvatarCaptureRig();
 
 	/* Set the board state based on the current state */
 	void InitialiseBoard();
+
+	/* Start the game if both the opponent and the loading screen are ready - else increment the internal counter */
+	void DelayedStart();
 
 	/* Performs whatever is required for when the game enters play (post deal) */
 	void OnCardsDealt();

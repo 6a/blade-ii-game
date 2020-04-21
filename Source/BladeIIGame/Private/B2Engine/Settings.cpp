@@ -5,6 +5,9 @@ void USettings::Initialise(const B2LaunchConfig& LaunchConfig)
 	// Copy and store the settings
 
 	SettingsCache = LaunchConfig;
+
+	// TODO do this properly
+	VersionString = "V0.0.1.202004212113";
 }
 
 float USettings::GetFloatSetting(EFloatSetting Setting) const
@@ -25,4 +28,23 @@ float USettings::GetFloatSetting(EFloatSetting Setting) const
 	}
 
 	return OutFloat;
+}
+
+FString USettings::GetStringSetting(EStringSetting Setting) const
+{
+	FString OutString = "";
+
+	switch (Setting)
+	{
+	case EStringSetting::Version:
+		OutString = VersionString;
+		break;
+	}
+
+	return OutString;
+}
+
+bool USettings::IsVersusAI() const
+{
+	return SettingsCache.bIsBotGame;
 }

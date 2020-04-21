@@ -36,6 +36,7 @@ const float OUT_OF_BOUNDS_OFFSET_X = 28;
 const FString AVATAR_CAPTURE_RIG_BLUEPRINT_PATH = "Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_AvatarCaptureRig.BP_AvatarCaptureRig'";
 const FString AVATAR_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Avatar'";
 const FVector AVATAR_CAPTURE_RIG_SPAWN_LOCATION = FVector(500, 0, 0);
+const FString LOADING_SCREEN_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_LoadingScreen'";
 
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 {
@@ -48,6 +49,8 @@ ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 	CreateGSM();
 
 	GetUIAvatarWidgetClass();
+
+	GetUILoadingScreenWidgetClass();
 
 	B2Utility::LogInfo("GameMode initialized");
 }
@@ -154,6 +157,8 @@ void ABladeIIGameMode::StartPlay()
 {
 	Super::StartPlay();
 
+	bOtherDelayedStartComponentReady = false;
+
 	FindArena();
 
 	SetupCardFactory();
@@ -165,6 +170,8 @@ void ABladeIIGameMode::StartPlay()
 	SetupUIEffectLayer();
 
 	SetupUIAvatarLayer();
+
+	SetupUILoadingScreenLayer();
 
 	SetupAvatarCaptureRig();
 
@@ -249,6 +256,15 @@ void ABladeIIGameMode::GetUIAvatarWidgetClass()
 	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the avatar widget")))
 	{
 		UIAvatarWidgetClass = ClassFinder.Class;
+	}
+}
+
+void ABladeIIGameMode::GetUILoadingScreenWidgetClass()
+{
+	ConstructorHelpers::FClassFinder<ULoadingScreen> ClassFinder(*LOADING_SCREEN_WIDGET_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the loading screen widget")))
+	{
+		UILoadingScreenWidgetClass = ClassFinder.Class;
 	}
 }
 
@@ -352,6 +368,19 @@ void ABladeIIGameMode::SetupUIAvatarLayer()
 	}
 }
 
+void ABladeIIGameMode::SetupUILoadingScreenLayer()
+{
+	if (UILoadingScreenWidgetClass)
+	{
+		UILoadingScreenLayer = CreateWidget<ULoadingScreen>(GetWorld()->GetGameInstance(), UILoadingScreenWidgetClass, TEXT("UI Loading Screen Layer"));
+		if (UILoadingScreenLayer)
+		{
+			UILoadingScreenLayer->AddToPlayerScreen();
+			UILoadingScreenLayer->Initialise(this, Settings->IsVersusAI());
+		}
+	}
+}
+
 void ABladeIIGameMode::SetupAvatarCaptureRig()
 {
 	UObject* AvatarCaptureRigClass = StaticLoadObject(UObject::StaticClass(), NULL, *AVATAR_CAPTURE_RIG_BLUEPRINT_PATH);
@@ -382,6 +411,30 @@ void ABladeIIGameMode::InitialiseBoard()
 		FB2Transform CardTransform = Arena->OpponentDeck->GetTransformForIndex(i);
 		ACard* Card = CardFactory->Make(GameState->Cards.OpponentDeck[i], CardTransform.Position + FVector(-OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
 		Arena->OpponentDeck->Add(Card); 
+	}
+}
+
+void ABladeIIGameMode::DelayedStart()
+{
+	if (!bOtherDelayedStartComponentReady)
+	{
+		bOtherDelayedStartComponentReady = true;
+	}
+	else
+	{
+		InitialiseBoard();
+
+		EngineState = EEngineState::Dealing;
+
+		Dealer->Deal();
+		//Dealer->FastDeal();
+
+		// Animate the opponent avatar
+		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Greeting, AvatarCaptureRig->GetCurrentCharacterName());
+		AvatarCaptureRig->AnimateMouth();
+
+		// Start the BGM track
+		GameSound->PlayBGM(2);
 	}
 }
 
@@ -661,6 +714,11 @@ void ABladeIIGameMode::UpdateCardState()
 	Arena->ScoreDisplay->Update(GameState->PlayerScore, GameState->OpponentScore);
 }
 
+void ABladeIIGameMode::AutoLoadFinished()
+{
+	DelayedStart();
+}
+
 UCardSlot* ABladeIIGameMode::GetCardSlot(ECardSlot Slot) const
 {
 	UCardSlot* CardSlot = nullptr;
@@ -700,22 +758,9 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
 	GameState = new B2GameState(Cards);
 
-	UB2AIOpponent* CastedOpponent = Cast<UB2AIOpponent>(Opponent);
-	GameState->bOpponentIsAI = (CastedOpponent != nullptr);
+	GameState->bOpponentIsAI = Settings->IsVersusAI();
 
-	InitialiseBoard();
-
-	EngineState = EEngineState::Dealing;
-
-	 Dealer->Deal();
-	//Dealer->FastDeal();
-
-	// Animate the opponent avatar
-	UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Greeting, AvatarCaptureRig->GetCurrentCharacterName());
-	AvatarCaptureRig->AnimateMouth();
-
-	// Start the BGM track
-	GameSound->PlayBGM(2);
+	DelayedStart();
 }
 
 void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instruction)

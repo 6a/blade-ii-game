@@ -28,8 +28,21 @@ public:
 	 */
 	float GetFloatSetting(EFloatSetting Setting) const;
 
+	/**
+	 * Get the specified string setting
+	 * @param Setting - The setting to get
+	 * @return The string setting
+	 */
+	FString GetStringSetting(EStringSetting Setting) const;
+
+	/* Returns true if the game is vs the AI */
+	bool IsVersusAI() const;
+
 private:
 
 	/* Current settings data cache - changes only in memory, not on disc */
 	B2LaunchConfig SettingsCache;
+
+	/* The version string */
+	FString VersionString;
 };

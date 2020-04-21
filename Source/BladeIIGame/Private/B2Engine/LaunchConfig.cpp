@@ -38,6 +38,8 @@ B2LaunchConfig::B2LaunchConfig(const FString& GameInfoFileName)
 	// Exit if the values could not be parsed properly, with the returned error message
 	ensureMsgf(Error.IsEmpty(), TEXT("Launch config file could not be parsed: %s"), *Error);
 
+	bIsBotGame = MatchID <= MATCH_ID_AI_GAME_THRESHOLD;
+
 	B2Utility::LogInfo("Launch config loaded and parsed successfully");
 }
 
