@@ -28,6 +28,12 @@ void GSM_State_OpponentForce::Init(ABladeIIGameMode* GameMode)
 	CurrentForceCard->FadeOut(0.4f);
 
 	OpponentMessage(EOpponentMessage::Force);
+
+	// Play base sound effect
+	GI->GetGameSound()->PlaySFX(ESFX::EffectBase, 0.1f);
+
+	// Play force sound effect 
+	GI->GetGameSound()->PlaySFX(ESFX::EffectForce, 1.1f);
 }
 
 void GSM_State_OpponentForce::Tick(float DeltaSeconds)

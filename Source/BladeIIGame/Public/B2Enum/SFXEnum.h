@@ -11,6 +11,7 @@ enum class ESFX : uint8
 	CursorNavigate UMETA(DisplayName = "Cursor Navigate"),
 	CursorSelect UMETA(DisplayName = "Cursor Select"),
 	EffectBase UMETA(DisplayName = "Base Effect SFX"),
+	EffectRod UMETA(DisplayName = "Rod Effect SFX"),
 	EffectBolt UMETA(DisplayName = "Bolt SFX"),
 	EffectBlastStart UMETA(DisplayName = "Blast Start SFX"),
 	EffectBlastSelect UMETA(DisplayName = "Blast Select SFX"),

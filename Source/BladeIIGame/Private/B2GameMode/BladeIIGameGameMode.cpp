@@ -403,7 +403,7 @@ void ABladeIIGameMode::OnEffectReady()
 	ECard Type = Card->Type;
 
 	// "React" to the effect card if its the players turn
-	if (GameState->Turn == EPlayer::Player)
+	if (GameState->Turn == EPlayer::Player && !GSM->IsCurrentState(EGameState::PlayerBlast))
 	{
 		// Changes the eyes to a random one
 		AvatarCaptureRig->ChangeEyes();

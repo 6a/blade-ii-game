@@ -20,10 +20,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UAudioComponent* BGMAudioComponent;
 
-	/* The Effects audio component for this actor, used for playing sound effects */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UAudioComponent* SFXAudioComponent;
-
 	AGameSound();
 
 	virtual void Tick(float DeltaTime) override;
@@ -43,8 +39,9 @@ public:
 	/**
 	 * Play an SFX oneshot of the specified type
 	 * @param SFX - The effect to play
+	 * @param Delay - Optional delay before playing
 	 */
-	void PlaySFX(ESFX SFX);
+	void PlaySFX(ESFX SFX, float Delay = 0);
 
 protected:
 
@@ -134,4 +131,10 @@ private:
 
 	/* The duration over which the BGM will fade */
 	float BGMFadeDuration;
+
+	/**
+	 * Play oneshot of the specifed sound
+	 * @param Sound - The sound to play
+	 */
+	void PlayOneshot(USoundWave* Sound);
 };

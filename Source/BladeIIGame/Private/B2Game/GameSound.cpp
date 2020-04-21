@@ -19,9 +19,6 @@ AGameSound::AGameSound()
 
 	BGMAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("BGM Audio Component"));
 	BGMAudioComponent->SetupAttachment(RootComponent);
-
-	SFXAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("SFX Audio Component"));
-	SFXAudioComponent->SetupAttachment(RootComponent);
 }
 
 void AGameSound::PlayBGM(float FadeInDuration)
@@ -37,7 +34,7 @@ void AGameSound::PlayBGM(float FadeInDuration)
 	}
 }
 
-void AGameSound::PlaySFX(ESFX SFX)
+void AGameSound::PlaySFX(ESFX SFX, float Delay)
 {
 	USoundWave* SFXSoundToPlay = nullptr;
 
@@ -58,6 +55,9 @@ void AGameSound::PlaySFX(ESFX SFX)
 	case ESFX::EffectBase:
 		SFXSoundToPlay = EffectBaseSound;
 		break;
+	case ESFX::EffectRod:
+		SFXSoundToPlay = EffectRodSound;
+		break;
 	case ESFX::EffectBolt:
 		SFXSoundToPlay = EffectBoltSound;
 		break;
@@ -74,11 +74,20 @@ void AGameSound::PlaySFX(ESFX SFX)
 
 	if (SFXSoundToPlay)
 	{
-		FAudioDevice* CurrentAudioDevice = GetWorld()->GetAudioDevice()->GetAudioDeviceManager()->GetActiveAudioDevice();
-
-		if (CurrentAudioDevice)
+		if (Delay > 0)
 		{
-			UGameplayStatics::PlaySound2D(this, SFXSoundToPlay);
+			FTimerHandle SFXPlayHandle;
+
+			// We fire off the timer with an anonymous lamda and a handle that we dont track - this is a oneshot so it doesnt need to be handled
+			// after firing
+			FTimerDelegate TimerDelegate; 
+			TimerDelegate.BindLambda([this, SFXSoundToPlay]() { this->PlayOneshot(SFXSoundToPlay); });
+
+			GetWorldTimerManager().SetTimer(SFXPlayHandle, TimerDelegate, Delay, false);
+		}
+		else
+		{
+			PlayOneshot(SFXSoundToPlay);
 		}
 	}
 }
@@ -87,6 +96,16 @@ void AGameSound::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void AGameSound::PlayOneshot(USoundWave* Sound)
+{
+	FAudioDevice* CurrentAudioDevice = GetWorld()->GetAudioDevice()->GetAudioDeviceManager()->GetActiveAudioDevice();
+
+	if (CurrentAudioDevice)
+	{
+		UGameplayStatics::PlaySound2D(this, Sound);
+	}
 }
 
 void AGameSound::Tick(float DeltaTime)

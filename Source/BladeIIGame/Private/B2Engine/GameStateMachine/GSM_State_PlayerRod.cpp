@@ -27,6 +27,9 @@ void GSM_State_PlayerRod::Init(ABladeIIGameMode* GameMode)
 	// Flip the card back to upright 
 	GI->GetDealer()->FlipFieldCard(TargetCard, true, 0.25f);
 	GI->UpdateCardState();
+
+	// Play base sound effect
+	GI->GetGameSound()->PlaySFX(ESFX::EffectRod, 0.2f);
 }
 
 void GSM_State_PlayerRod::Tick(float DeltaSeconds)

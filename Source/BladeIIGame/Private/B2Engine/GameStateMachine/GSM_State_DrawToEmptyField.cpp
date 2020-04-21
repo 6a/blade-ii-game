@@ -116,6 +116,9 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 					TargetSlot = GI->GetArena()->OpponentField;
 
 					GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
+
+					// Play base sound effect
+					GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);
 				}
 				else
 				{
@@ -142,6 +145,9 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 			UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
 
 			GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
+
+			// Play base sound effect
+			GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);
 
 			// From opponent hand to opponent field
 			CurrentSlot = GI->GetArena()->OpponentHand;

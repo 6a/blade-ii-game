@@ -7,37 +7,6 @@
 #include "B2Utility/Log.h"
 #include "B2GameMode/BladeIIGameMode.h"
 
-/* The root path for all mouth and eye variations */
-const FString VARIATON_PATH = "/Game/BladeIIGame/Textures/Characters/";
-
-/* The folder name for mouth variations */
-const FString VARIATION_FOLDER_MOUTH = "Mouths";
-
-/* The folder name for eye variations */
-const FString VARIATION_FOLDER_EYE = "Eyes";
-
-/* Names of the eye and mouth material slots */
-const FName MATERIAL_SLOT_EYE = FName(TEXT("Eye"));
-const FName MATERIAL_SLOT_MOUTH = FName(TEXT("Mouth"));
-
-/* Name of the eye and mouth texture parameter */
-const FName TEXTURE_PARAM_NAME = FName(TEXT("Dynamic"));
-
-/* The folder delimiter */
-const FString F_DLIM = "/";
-
-/* The total number of eye textures to load */
-const uint32 NUM_EYE_TEX = 6;
-
-/* The total number of mouth textures to load */
-const uint32 NUM_MOUTH_TEX = 12;
-
-/* Number of characters for each file's index suffix */
-const uint32 INDEX_SIZE = 3;
-
-/* Time between mouth animation updates */
-const float ANIMATION_TICK = 0.1f;
-
 AAvatarCaptureRig::AAvatarCaptureRig()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -68,11 +37,23 @@ void AAvatarCaptureRig::ChangeEyes()
 {
 	uint32 TextureIndex = FMath::RandRange(1, EyeTextures.Num() - 1);
 	SetTexture(Folder::Eyes, TextureIndex);
+
+	if (GetWorldTimerManager().TimerExists(EyeResetHandle))
+	{
+		GetWorldTimerManager().ClearTimer(EyeResetHandle);
+
+		GetWorldTimerManager().SetTimer(EyeResetHandle, this, &AAvatarCaptureRig::RevertEyes, MAX_EYE_CHANGE_DURATION, false);
+	}
 }
 
 void AAvatarCaptureRig::RevertEyes()
 {
-	EyeMaterialInstance->SetTextureParameterValue(TEXTURE_PARAM_NAME, EyeTextures[0]);
+	SetTexture(Folder::Eyes, 0);
+
+	if (GetWorldTimerManager().TimerExists(EyeResetHandle))
+	{
+		GetWorldTimerManager().ClearTimer(EyeResetHandle);
+	}
 }
 
 void AAvatarCaptureRig::BeginPlay()

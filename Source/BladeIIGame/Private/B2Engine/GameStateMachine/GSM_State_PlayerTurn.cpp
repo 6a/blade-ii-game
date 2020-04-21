@@ -119,6 +119,9 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 					GI->GetOpponent()->SendUpdate(CardToServerUpdate(Card->Type));
 				}
 
+				// Play card selection sound effect
+				GI->GetGameSound()->PlaySFX(ESFX::CursorSelect);
+
 				GI->GetGameState()->bAcceptPlayerInput = false;
 				break;
 			}
@@ -150,4 +153,7 @@ void GSM_State_PlayerTurn::UpdateCursorPosition(uint32 NewCursorIndex, bool bIsB
 		// Set the force indicator
 		GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Undecided);
 	}
+
+	// Play navigation sound effect
+	GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);
 }

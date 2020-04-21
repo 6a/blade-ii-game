@@ -22,6 +22,9 @@ void GSM_State_PlayerMirror::Init(ABladeIIGameMode* GameMode)
 	// Play Mirror animation at the center of the screen
 	EUIEffect Effect = EUIEffect::Mirror;
 	GI->GetUIEffectLayer()->Play(Effect, nullptr, 0.25f, 0.0f);
+
+	// Play base sound effect
+	GI->GetGameSound()->PlaySFX(ESFX::EffectBase, 0.25f);
 }
 
 void GSM_State_PlayerMirror::Tick(float DeltaSeconds)

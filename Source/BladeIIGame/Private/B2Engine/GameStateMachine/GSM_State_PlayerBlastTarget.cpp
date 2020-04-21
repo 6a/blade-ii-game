@@ -79,6 +79,9 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 
 		FVector TargetLocation = GetCurrentCard()->GetActorLocation();
 		GI->GetUIEffectLayer()->Play(EUIEffect::BlastTarget, &TargetLocation, 1, 0);
+
+		// Play blast sound effect
+		GI->GetGameSound()->PlaySFX(ESFX::EffectBlastSelect, 1.05f);
 	}
 	else
 	{

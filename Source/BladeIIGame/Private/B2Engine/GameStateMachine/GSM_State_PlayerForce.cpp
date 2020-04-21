@@ -25,6 +25,12 @@ void GSM_State_PlayerForce::Init(ABladeIIGameMode* GameMode)
 	ACard* CurrentForceCard = GetCurrentCard();
 	GI->GetDealer()->ForceOut(CurrentForceCard);
 
+	// Play base sound effect
+	GI->GetGameSound()->PlaySFX(ESFX::EffectBase, 0.1f);
+
+	// Play force sound effect 
+	GI->GetGameSound()->PlaySFX(ESFX::EffectForce, 1.1f);
+
 	CurrentForceCard->FadeOut(0.4f);
 }
 

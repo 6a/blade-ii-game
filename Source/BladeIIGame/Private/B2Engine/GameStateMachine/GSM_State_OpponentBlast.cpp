@@ -19,6 +19,10 @@ void GSM_State_OpponentBlast::Init(ABladeIIGameMode* GameMode)
 	GI->GetUIEffectLayer()->Play(EUIEffect::Blast, nullptr, 0.2f, 0.0f);
 
 	GI->GetDealer()->PreBlastSelect(EPlayer::Player);
+
+	// Play blast sound effect
+	GI->GetGameSound()->PlaySFX(ESFX::EffectBlastStart, 0.2f);
+	GI->GetGameSound()->PlaySFX(ESFX::EffectBase, 0.2f);
 }
 
 void GSM_State_OpponentBlast::Tick(float DeltaSeconds)

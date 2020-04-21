@@ -1,7 +1,5 @@
 #include "B2Engine/GameStateMachine/GSM_State_OpponentMirror.h"
 
-#include "TimerManager.h"
-
 #include "B2Utility/Log.h"
 
 #include "B2GameMode/BladeIIGameMode.h"
@@ -24,6 +22,9 @@ void GSM_State_OpponentMirror::Init(ABladeIIGameMode* GameMode)
 	GI->GetUIEffectLayer()->Play(Effect, nullptr, 0.25f, 0.0f);
 
 	OpponentMessage(EOpponentMessage::Mirror);
+
+	// Play base sound effect
+	GI->GetGameSound()->PlaySFX(ESFX::EffectBase, 0.25f);
 }
 
 void GSM_State_OpponentMirror::Tick(float DeltaSeconds)

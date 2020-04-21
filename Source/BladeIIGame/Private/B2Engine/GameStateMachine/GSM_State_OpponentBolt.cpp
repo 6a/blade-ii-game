@@ -45,6 +45,9 @@ void GSM_State_OpponentBolt::Tick(float DeltaSeconds)
 			GI->GetArena()->ScoreDisplay->Update(GI->GetGameState()->PlayerScore, GI->GetGameState()->OpponentScore);
 
 			OpponentMessage(EOpponentMessage::Bolt);
+
+			// Play bolt sound effect
+			GI->GetGameSound()->PlaySFX(ESFX::EffectBolt);
 		}
 		else if (Event == EUIEffectEvent::Finished)
 		{

@@ -15,7 +15,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = BoltTest();
+		Cards = RodTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -710,10 +710,8 @@ FB2Cards B2AIServer::RodTest() const
 
 	for (int i = 14; i >= 0; i--)
 	{
-		ECard Type = FMath::RandBool() ? ECard::ElliotsOrbalStaff : ECard::GaiusSpear;
-
-		GeneratedCards.PlayerDeck.Add(Type);
-		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+		GeneratedCards.PlayerDeck.Add(FMath::RandBool() ? ECard::ElliotsOrbalStaff : static_cast<ECard>(FMath::RandRange(1, 6)));
+		GeneratedCards.OpponentDeck.Add(FMath::RandBool() ? ECard::Bolt : static_cast<ECard>(FMath::RandRange(1, 6)));
 	}
 
 	return GeneratedCards;
