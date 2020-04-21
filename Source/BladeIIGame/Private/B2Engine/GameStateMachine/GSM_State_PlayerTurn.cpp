@@ -140,7 +140,7 @@ void GSM_State_PlayerTurn::UpdateCursorPosition(uint32 NewCursorIndex, bool bIsB
 
 	// Force card edge case
 	ACard* CurrentCard = GetCurrentCard();
-	if (CurrentCard->Type == ECard::Force)
+	if (CurrentCard->Type == ECard::Force && GI->GetGameState()->Turn == EPlayer::Player)
 	{
 		// Set the force indicator
 		GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Player);

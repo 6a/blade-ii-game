@@ -78,9 +78,6 @@ private:
 	/* Alpha (lerp) value for the current fade out */
 	float CurrentFadeAlpha;
 
-	/* Used to restrict how often the callout text sound is played */
-	uint32 CurrentCalloutTextSoundIndex;
-
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 	/* Function that adds one character to the text field each call, until completion */
