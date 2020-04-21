@@ -15,7 +15,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = RodTest();
+		Cards = AllRandomTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -816,6 +816,19 @@ FB2Cards B2AIServer::AIFirstTest() const
 	{
 		GeneratedCards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(5, 6)));
 		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(0, 4)));
+	}
+
+	return GeneratedCards;
+}
+
+FB2Cards B2AIServer::AllRandomTest() const
+{
+	FB2Cards GeneratedCards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		GeneratedCards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(0, 10)));
+		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(0, 10)));
 	}
 
 	return GeneratedCards;

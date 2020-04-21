@@ -89,6 +89,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundBank|Effects")
 	USoundWave* EffectForceSound;
 
+	/* Victory sound */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundBank|Game")
+	USoundWave* VictorySound;
+
+	/* Defeat sound */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundBank|Game")
+	USoundWave* DefeatSound;
+
 	/* Master sound class */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SoundBank|Config")
 	USoundClass* SoundClassMaster;

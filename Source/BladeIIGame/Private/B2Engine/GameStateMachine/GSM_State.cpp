@@ -108,6 +108,9 @@ void GSM_State::UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecti
 
 	// Raise the newly selected card by the offset
 	SetCurrentCardToSelectedTransform();
+
+	// Play navigation sound effect
+	GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);
 }
 
 EServerUpdate GSM_State::CardToServerUpdate(ECard Card) const

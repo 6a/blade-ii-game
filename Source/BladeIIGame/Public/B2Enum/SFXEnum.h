@@ -16,4 +16,6 @@ enum class ESFX : uint8
 	EffectBlastStart UMETA(DisplayName = "Blast Start SFX"),
 	EffectBlastSelect UMETA(DisplayName = "Blast Select SFX"),
 	EffectForce UMETA(DisplayName = "Force SFX"),
+	Victory UMETA(DisplayName = "Victory SFX"),
+	Defeat UMETA(DisplayName = "Defeat SFX"),
 };

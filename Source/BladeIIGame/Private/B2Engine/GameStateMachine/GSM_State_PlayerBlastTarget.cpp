@@ -69,6 +69,9 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 
 				// Update the server
 				GI->GetOpponent()->SendUpdate(EServerUpdate::CardBlast, FString::FromInt(static_cast<uint32>(OpponentCard->Type)));
+
+				// Play card select sound effect
+				GI->GetGameSound()->PlaySFX(ESFX::CursorSelect);
 				break;
 			}
 		}

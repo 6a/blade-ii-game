@@ -87,11 +87,17 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 	{
 		Turn = TEXT("Local Player");
 		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Defeat, AvatarCaptureRig->GetCurrentCharacterName());
+
+		// Play victory sound effect
+		GameSound->PlaySFX(ESFX::Victory);
 	}
 	else
 	{
 		Turn = TEXT("Opponent");
 		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Victory, AvatarCaptureRig->GetCurrentCharacterName());
+
+		// Play defeat sound effect
+		GameSound->PlaySFX(ESFX::Defeat);
 	}
 
 	AvatarCaptureRig->AnimateMouth();
@@ -701,8 +707,8 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 
 	EngineState = EEngineState::Dealing;
 
-	 //Dealer->Deal();
-	Dealer->FastDeal();
+	 Dealer->Deal();
+	//Dealer->FastDeal();
 
 	// Animate the opponent avatar
 	UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Greeting, AvatarCaptureRig->GetCurrentCharacterName());

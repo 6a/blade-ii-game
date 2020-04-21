@@ -153,7 +153,4 @@ void GSM_State_PlayerTurn::UpdateCursorPosition(uint32 NewCursorIndex, bool bIsB
 		// Set the force indicator
 		GI->GetArena()->ScoreDisplay->Highlight(EPlayer::Undecided);
 	}
-
-	// Play navigation sound effect
-	GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);
 }

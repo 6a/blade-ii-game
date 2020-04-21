@@ -70,6 +70,12 @@ void AGameSound::PlaySFX(ESFX SFX, float Delay)
 	case ESFX::EffectForce:
 		SFXSoundToPlay = EffectForceSound;
 		break;
+	case ESFX::Victory:
+		SFXSoundToPlay = VictorySound;
+		break;
+	case ESFX::Defeat:
+		SFXSoundToPlay = DefeatSound;
+		break;
 	}
 
 	if (SFXSoundToPlay)
