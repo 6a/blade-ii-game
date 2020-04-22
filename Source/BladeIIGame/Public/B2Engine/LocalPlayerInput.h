@@ -9,6 +9,8 @@
 
 #include "LocalPlayerInput.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMenuButtonPressedDelegate);
+
 UCLASS()
 class BLADEIIGAME_API ALocalPlayerInput : public APawn
 {
@@ -16,6 +18,8 @@ class BLADEIIGAME_API ALocalPlayerInput : public APawn
 
 public:
 	TQueue<EInput> ButtonInputQueue;
+
+	FMenuButtonPressedDelegate OnMenuButtonPressed;
 
 	ALocalPlayerInput();
 

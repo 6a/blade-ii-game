@@ -257,4 +257,8 @@ private:
 	 */
 	UFUNCTION()
 	void HandleDealerEvent(EDealerEvent Event);
+
+	/* Event handler for when a menu button is received by the input actor */
+	UFUNCTION()
+	void HandleMenuButtonPressed();
 };

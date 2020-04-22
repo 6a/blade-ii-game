@@ -291,11 +291,23 @@ void ABladeIIGameMode::RegisterEventListeners()
 	// Register event listeners
 
 	// From Opponent
-	Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameMode::HandleServerInstruction);
-	Opponent->OnCardsReceived.AddDynamic(this, &ABladeIIGameMode::HandleCardsReceived);
+	if (Opponent)
+	{
+		Opponent->OnInstructionReceived.AddDynamic(this, &ABladeIIGameMode::HandleServerInstruction);
+		Opponent->OnCardsReceived.AddDynamic(this, &ABladeIIGameMode::HandleCardsReceived);
+	}
 
 	// From Dealer
-	Dealer->OnDealerEvent.AddDynamic(this, &ABladeIIGameMode::HandleDealerEvent);
+	if (Dealer)
+	{
+		Dealer->OnDealerEvent.AddDynamic(this, &ABladeIIGameMode::HandleDealerEvent);
+	}
+
+	// From input actor
+	if (LocalPlayerInput)
+	{
+		LocalPlayerInput->OnMenuButtonPressed.AddDynamic(this, &ABladeIIGameMode::HandleMenuButtonPressed);
+	}
 }
 
 void ABladeIIGameMode::FindArena()
@@ -833,4 +845,9 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 		}
 		break;
 	}
+}
+
+void ABladeIIGameMode::HandleMenuButtonPressed()
+{
+	UIOptionsMenuLayer->ToggleMenu();
 }

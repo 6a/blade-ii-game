@@ -24,7 +24,7 @@ void ALocalPlayerInput::BeginPlay()
 
 void ALocalPlayerInput::OnMenuPressed()
 {
-	ButtonInputQueue.Enqueue(EInput::Menu);
+	if (OnMenuButtonPressed.IsBound()) OnMenuButtonPressed.Broadcast();
 
 	B2Utility::LogInfo(TEXT("Menu Pressed"));
 }

@@ -70,9 +70,6 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 
 				break;
 			}
-			case EInput::Menu:
-				// Handle menu open / close etc
-				break;
 			case EInput::Select:
 				GI->GetCursor()->ToggleActorVisibility(false);
 

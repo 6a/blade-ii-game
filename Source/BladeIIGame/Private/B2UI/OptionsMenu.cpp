@@ -15,6 +15,8 @@ void UOptionsMenu::NativeOnInitialized()
 	RegisterEventListeners();
 
 	LoadStoredValues();
+
+	bIsOpen = true;
 }
 
 UOptionsMenu::UOptionsMenu(const FObjectInitializer& ObjectInitializer)
@@ -24,6 +26,23 @@ UOptionsMenu::UOptionsMenu(const FObjectInitializer& ObjectInitializer)
 	if (ComboBoxItem.Succeeded())
 	{
 		ComboBoxItemClass = ComboBoxItem.Class;
+	}
+}
+
+void UOptionsMenu::ToggleMenu()
+{
+	if (!IsAnyAnimationPlaying())
+	{
+		if (bIsOpen)
+		{
+			PlayAnimation(CloseAnimation);
+		}
+		else
+		{
+			PlayAnimation(OpenAnimation);
+		}
+
+		bIsOpen = !bIsOpen;
 	}
 }
 

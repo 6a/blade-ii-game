@@ -23,6 +23,9 @@ public:
 
 	UOptionsMenu(const FObjectInitializer& ObjectInitializer);
 
+	/* Toggle the options menu between open and closed - does not interrupt animations, so will result in a noop if one is playing */
+	void ToggleMenu();
+
 private:
 	enum class Slider : uint8
 	{
@@ -71,6 +74,15 @@ private:
 	UPROPERTY (meta = (BindWidgetAnim))
 	UWidgetAnimation* CloseAnimation;
 
+	/* Combo box item class */
+	TSubclassOf<UComboBoxItem> ComboBoxItemClass;
+
+	/* Reference to the game mode instance */
+	class ABladeIIGameMode* GameModeInstance;
+
+	/* Whether or not the menu is in the open (visible) state or not */
+	bool bIsOpen;
+
 	/* Callback handler for when the master volume slider's value changes */
 	UFUNCTION()
 	void OnMasterVolumeValueChanged(float NewValue);
@@ -86,12 +98,6 @@ private:
 	/* Callback handler for when the language combobox is constructed */
 	UFUNCTION()
 	UWidget* OnLanguageComboBoxConstructed(FString Item);
-
-	/* Combo box item class */
-	TSubclassOf<UComboBoxItem> ComboBoxItemClass;
-
-	/* Reference to the game mode instance */
-	class ABladeIIGameMode* GameModeInstance;
 
 	/* Register the event listeners for this widget */
 	void RegisterEventListeners();
