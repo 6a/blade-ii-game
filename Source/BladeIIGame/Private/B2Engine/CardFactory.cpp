@@ -1,29 +1,46 @@
 #include "B2Engine/CardFactory.h"
 
+#include "UObject/ConstructorHelpers.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 #include "B2Utility/Log.h"
 #include "B2Utility/String.h"
 
-B2CardFactory::B2CardFactory(const B2CardFactoryConfig& CardFactoryConfig, AArena* Arena)
-	: Arena(Arena)
+const FString CARD_ACTOR_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card'");
+
+void UB2CardFactory::Initialise(const B2CardFactoryConfig& CardFactoryConfig, AArena* InArena)
 {
+	Arena = InArena;
+
 	LoadConfig(CardFactoryConfig);
 
 	B2Utility::LogInfo("Card Factory initialized");
 }
 
-B2CardFactory::~B2CardFactory()
+UB2CardFactory::~UB2CardFactory()
 {
 
 }
 
-ACard* B2CardFactory::Make(const ECard& Card, const FVector& StartingPosition, const FRotator& StartingRotation)
+UB2CardFactory::UB2CardFactory(const FObjectInitializer& ObjectInitialiser)
+{
+	/* Card actor has to be in constructor as it uses constructor helper */
+	ConstructorHelpers::FClassFinder<ACard> ClassFinder(*CARD_ACTOR_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the blueprint for the card actor")))
+	{
+		CardActorClass = ClassFinder.Class;
+	}
+}
+
+ACard* UB2CardFactory::Make(const ECard& Card, const FVector& StartingPosition, const FRotator& StartingRotation)
 {
 	ACard* SpawnedCard = World->SpawnActor<ACard>(CardActorClass, StartingPosition, StartingRotation);
+	SpawnedCard->Type = Card;
+
+#if WITH_EDITOR
 	SpawnedCard->Rename(*B2Utility::CardEnumToString(Card));
 	SpawnedCard->SetActorLabel(*B2Utility::CardEnumToString(Card));
-	SpawnedCard->Type = Card;
+#endif
 
 	UMaterialInstanceDynamic* MaterialFront = UMaterialInstanceDynamic::Create(SpawnedCard->Mesh->GetMaterial(0), NULL);
 	UMaterialInstanceDynamic* MaterialBack = UMaterialInstanceDynamic::Create(SpawnedCard->Mesh->GetMaterial(1), NULL);
@@ -42,7 +59,7 @@ ACard* B2CardFactory::Make(const ECard& Card, const FVector& StartingPosition, c
 	return SpawnedCard;
 }
 
-void B2CardFactory::LoadConfig(const B2CardFactoryConfig& CardFactoryConfig)
+void UB2CardFactory::LoadConfig(const B2CardFactoryConfig& CardFactoryConfig)
 {
 	/* Card front textures */
 	for (auto It = CardFactoryConfig.CardFrontPaths.CreateConstIterator(); It; ++It)
@@ -55,21 +72,11 @@ void B2CardFactory::LoadConfig(const B2CardFactoryConfig& CardFactoryConfig)
 	CardFrontMRSTexture = LoadObject<UTexture>(NULL, *CardFactoryConfig.CardFrontMRSPath, NULL, LOAD_None, NULL);
 	CardBackMRSTexture = LoadObject<UTexture>(NULL, *CardFactoryConfig.CardBackMRSPath, NULL, LOAD_None, NULL);
 
-	/* Card actor */
-	UObject* CardActor = StaticLoadObject(UObject::StaticClass(), NULL, *CardFactoryConfig.CardActorPath);
-	ensureMsgf(CardActor, TEXT("Could not load card actor - static load failed"));
-
-	UBlueprint* CardBlueprint = Cast<UBlueprint>(CardActor);
-	ensureMsgf(CardBlueprint, TEXT("Could not cast UObject to UBlueprint"));
-	
-	CardActorClass = CardBlueprint->GeneratedClass;
-	ensureMsgf(CardActorClass, TEXT("Could not get classs from card blueprint"));
-
 	/* World */
 	World = CardFactoryConfig.World;
 }
 
-UTexture* B2CardFactory::GetTexture(const ECard& Card) const
+UTexture* UB2CardFactory::GetTexture(const ECard& Card) const
 {
 	return CardFrontTextures[static_cast<uint8>(Card)];
 }

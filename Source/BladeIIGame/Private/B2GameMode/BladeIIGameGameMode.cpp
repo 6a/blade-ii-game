@@ -33,11 +33,12 @@
 #include "B2Engine/GameStateMachine/GSM_State_OpponentForce.h"
 
 const float OUT_OF_BOUNDS_OFFSET_X = 28;
-const FString AVATAR_CAPTURE_RIG_BLUEPRINT_PATH = "Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_AvatarCaptureRig.BP_AvatarCaptureRig'";
-const FString AVATAR_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Avatar'";
+const FString AVATAR_CAPTURE_RIG_BLUEPRINT_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_AvatarCaptureRig'");
+const FString AVATAR_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Avatar'");
 const FVector AVATAR_CAPTURE_RIG_SPAWN_LOCATION = FVector(500, 0, 0);
-const FString LOADING_SCREEN_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_LoadingScreen'";
-const FString OPTIONS_MENU_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_OptionsMenu'";
+const FString LOADING_SCREEN_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_LoadingScreen'");
+const FString OPTIONS_MENU_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_OptionsMenu'");
+const FString CARD_CURSOR_BLUEPRINT_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card_Cursor'");
 
 // TODO set to zero for build
 #define FAST_DRAW 1
@@ -50,6 +51,8 @@ ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 
 	SetupLaunchConfig(ObjectInitializer);
 
+	SetupCardFactory(ObjectInitializer);
+
 	CreateGSM();
 
 	GetUIAvatarWidgetClass();
@@ -57,6 +60,10 @@ ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 	GetUILoadingScreenWidgetClass();
 
 	GetUIOptionsMenuWidgetClass();
+
+	GetCursorClass();
+
+	GetAvatarCaptureRigClass();
 
 	B2Utility::LogInfo("GameMode initialized");
 }
@@ -169,7 +176,7 @@ void ABladeIIGameMode::StartPlay()
 
 	FindArena();
 
-	SetupCardFactory();
+	InitialiseCardFactory();
 
 	SetupDealer();
 
@@ -218,7 +225,12 @@ void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitial
 	Settings->Initialise(this, LaunchConfig);
 }
 
-void ABladeIIGameMode::SetupCardFactory()
+void ABladeIIGameMode::SetupCardFactory(const FObjectInitializer& ObjectInitializer)
+{
+	CardFactory = ObjectInitializer.CreateDefaultSubobject<UB2CardFactory>(this, TEXT("Card Factory"));
+}
+
+void ABladeIIGameMode::InitialiseCardFactory()
 {
 	// Load card config (textures to use, etc)
 	B2CardFactoryConfig B2CardFactoryConfig;
@@ -245,13 +257,10 @@ void ABladeIIGameMode::SetupCardFactory()
 	B2CardFactoryConfig.CardFrontMRSPath = TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Front_MRS.T_Card_Front_MRS");
 	B2CardFactoryConfig.CardBackMRSPath = TEXT("/Game/BladeIIGame/Textures/Cards/T_Card_Back_MRS.T_Card_Back_MRS");
 
-	/* Card actor path */
-	B2CardFactoryConfig.CardActorPath = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card.BP_Card'");
-
 	/* Pointer to current world */
 	B2CardFactoryConfig.World = GetWorld();
 
-	CardFactory = new B2CardFactory(B2CardFactoryConfig, Arena);
+	CardFactory->Initialise(B2CardFactoryConfig, Arena);
 }
 
 void ABladeIIGameMode::CreateGSM()
@@ -284,6 +293,24 @@ void ABladeIIGameMode::GetUIOptionsMenuWidgetClass()
 	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the options menu widget")))
 	{
 		UIOptionsMenuWidgetClass = ClassFinder.Class;
+	}
+}
+
+void ABladeIIGameMode::GetCursorClass()
+{
+	ConstructorHelpers::FClassFinder<ACardSelector> ClassFinder(*CARD_CURSOR_BLUEPRINT_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the card cursor actor")))
+	{
+		CursorClass = ClassFinder.Class;
+	}
+}
+
+void ABladeIIGameMode::GetAvatarCaptureRigClass()
+{
+	ConstructorHelpers::FClassFinder<AAvatarCaptureRig> ClassFinder(*AVATAR_CAPTURE_RIG_BLUEPRINT_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the avatar capture rig actor")))
+	{
+		AvatarCaptureRigClass = ClassFinder.Class;
 	}
 }
 
@@ -365,16 +392,7 @@ void ABladeIIGameMode::SetupDealer()
 
 void ABladeIIGameMode::SetupSelector()
 {
-	UObject* CardSelectorActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card_Cursor.BP_Card_Cursor'"));
-	ensureMsgf(CardSelectorActor, TEXT("Could not load card selector actor - static load failed"));
-
-	UBlueprint* CardSelectorBlueprint = Cast<UBlueprint>(CardSelectorActor);
-	ensureMsgf(CardSelectorBlueprint, TEXT("Could not cast UObject to UBlueprint"));
-
-	UClass* CardSelectorClass = CardSelectorBlueprint->GeneratedClass;
-	ensureMsgf(CardSelectorClass, TEXT("Could not get class from card selector blueprint"));
-
-	Cursor = GetWorld()->SpawnActor<ACardSelector>(CardSelectorClass, FVector::ZeroVector, FRotator::ZeroRotator);
+	Cursor = GetWorld()->SpawnActor<ACardSelector>(CursorClass, FVector::ZeroVector, FRotator::ZeroRotator);
 }
 
 void ABladeIIGameMode::SetupUIEffectLayer()
@@ -423,16 +441,14 @@ void ABladeIIGameMode::SetupUIOptionsMenuLayer()
 
 void ABladeIIGameMode::SetupAvatarCaptureRig()
 {
-	UObject* AvatarCaptureRigClass = StaticLoadObject(UObject::StaticClass(), NULL, *AVATAR_CAPTURE_RIG_BLUEPRINT_PATH);
-	ensureMsgf(AvatarCaptureRigClass, TEXT("Could not load avatar capture rig actor - static load failed"));
-
-	UBlueprint* AvatarCaptureRigBlueprint = Cast<UBlueprint>(AvatarCaptureRigClass);
-	ensureMsgf(AvatarCaptureRigBlueprint, TEXT("Could not cast avatar capture rig to blueprint"));
-
-	AvatarCaptureRig = GetWorld()->SpawnActor<AAvatarCaptureRig>(AvatarCaptureRigBlueprint->GeneratedClass, AVATAR_CAPTURE_RIG_SPAWN_LOCATION, FRotator::ZeroRotator);
-	ensureMsgf(AvatarCaptureRig, TEXT("Could not spawn avatar capture rig blueprint"));
-
-	AvatarCaptureRig->SetGameModeInstance(this);
+	if (AvatarCaptureRigClass)
+	{
+		AvatarCaptureRig = GetWorld()->SpawnActor<AAvatarCaptureRig>(AvatarCaptureRigClass, AVATAR_CAPTURE_RIG_SPAWN_LOCATION, FRotator::ZeroRotator);
+		if (AvatarCaptureRig)
+		{
+			AvatarCaptureRig->SetGameModeInstance(this);
+		}
+	}
 }
 
 void ABladeIIGameMode::InitialiseBoard()

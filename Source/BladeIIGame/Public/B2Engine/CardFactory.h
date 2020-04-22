@@ -6,6 +6,8 @@
 #include "B2Game/Arena.h"
 #include "B2Enum/CardEnum.h"
 
+#include "CardFactory.generated.h"
+
 /* A wrapper for a card factory's initialization parameters */
 struct B2CardFactoryConfig
 {
@@ -18,18 +20,22 @@ struct B2CardFactoryConfig
 };
 
 /* Spawns and places cards */
-class B2CardFactory
+UCLASS()
+class BLADEIIGAME_API UB2CardFactory : public UObject
 {
+	GENERATED_BODY()
+
 public:
+
+	~UB2CardFactory();
+	UB2CardFactory(const FObjectInitializer& ObjectInitialiser);
 
 	/**
 	 * Initialize this card factory with the specified configuration.
 	 * @param CardFactoryConfig - The configuration for this card factory
 	 * @param Arena - A pointer to the arena
 	 */
-	B2CardFactory(const B2CardFactoryConfig& CardFactoryConfig, AArena* Arena);
-
-	~B2CardFactory();
+	void Initialise(const B2CardFactoryConfig& CardFactoryConfig, AArena* InArena);
 
 	/**
 	 * Spawn and return a pointer to a card actor.
@@ -48,7 +54,7 @@ private:
 	UTexture* CardBackMRSTexture;
 
 	/* Card actor */
-	UClass* CardActorClass;
+	TSubclassOf<ACard> CardActorClass;
 
 	/* Pointer to current world object */
 	UWorld* World;

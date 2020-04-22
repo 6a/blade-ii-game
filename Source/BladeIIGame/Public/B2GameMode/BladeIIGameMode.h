@@ -88,7 +88,7 @@ public:
 	ULoadingScreen* GetUILoadingScreenLayer() const { return UILoadingScreenLayer; }
 	USettings* GetSettings() const { return Settings; }
 	
-	B2CardFactory* GetCardFactory() const { return CardFactory; }
+	UB2CardFactory* GetCardFactory() const { return CardFactory; }
 	B2GameState* GetGameState() const { return GameState; }
 
 private:
@@ -141,7 +141,7 @@ private:
 	USettings* Settings;
 
 	/* Pointer to the cardfactory that will be used throughout this match */
-	B2CardFactory* CardFactory;
+	UB2CardFactory* CardFactory;
 
 	/* The gamestate state machine instance */
 	B2GameStateMachine* GSM;
@@ -161,6 +161,12 @@ private:
 	/* Class type for avatar widget */
 	TSubclassOf<UOptionsMenu> UIOptionsMenuWidgetClass;
 
+	/* Class type for the cursor actor */
+	TSubclassOf<ACardSelector> CursorClass;
+
+	/* Class type for the cursor actor */
+	TSubclassOf<AAvatarCaptureRig> AvatarCaptureRigClass;
+
 	/* Timer handle for any delayed clear and draw calls */
 	FTimerHandle ClearAndDrawHandle;
 
@@ -172,8 +178,14 @@ private:
 	 */
 	void SetupLaunchConfig(const FObjectInitializer& ObjectInitializer);
 
+	/**
+	 * Creates the card factory (initialisation is done later in begin play)
+	 * @param ObjectInitializer - ObjectInitializer helper from constructor
+	 */
+	void SetupCardFactory(const FObjectInitializer& ObjectInitializer);
+
 	/* Set up the internal card factory */
-	void SetupCardFactory();
+	void InitialiseCardFactory();
 
 	/* Set up the gameplay state machine */
 	void CreateGSM();
@@ -186,6 +198,12 @@ private:
 
 	/* Gets and stores a reference to the UI options menu layer class */
 	void GetUIOptionsMenuWidgetClass();
+
+	/* Gets and stores a reference to the cursor actor class */
+	void GetCursorClass();
+
+	/* Gets and stores a reference to the avatar capture rig actor class */
+	void GetAvatarCaptureRigClass();
 
 	/* Set up any event listeners */
 	void RegisterEventListeners();
