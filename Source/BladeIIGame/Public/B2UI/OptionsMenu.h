@@ -63,6 +63,14 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UButton* ForfeitButton;
 
+	/* Open Animation */
+	UPROPERTY(meta = (BindWidgetAnim))
+	UWidgetAnimation* OpenAnimation;
+
+	/* Close Animation */
+	UPROPERTY (meta = (BindWidgetAnim))
+	UWidgetAnimation* CloseAnimation;
+
 	/* Callback handler for when the master volume slider's value changes */
 	UFUNCTION()
 	void OnMasterVolumeValueChanged(float NewValue);
@@ -82,6 +90,9 @@ private:
 	/* Combo box item class */
 	TSubclassOf<UComboBoxItem> ComboBoxItemClass;
 
+	/* Reference to the game mode instance */
+	class ABladeIIGameMode* GameModeInstance;
+
 	/* Register the event listeners for this widget */
 	void RegisterEventListeners();
 
@@ -91,4 +102,7 @@ private:
 	 * @param Value - The new slider value (0-1)
 	 */
 	void SetSliderValue(Slider Slider, float Value);
+
+	/* Reads the stored settings from the settings class and applies them to their respective controls */
+	void LoadStoredValues();
 };

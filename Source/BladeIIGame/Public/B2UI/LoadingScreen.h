@@ -16,10 +16,9 @@ public:
 
 	/**
 	 * Initialise the loading screen
-	 * @param GameModeInstance - A pointer to the game mode instance
 	 * @param bIsVersusAI - Whether or not this game is vs the AI (if true, we do a fake load)
 	 */
-	void Initialise(class ABladeIIGameMode* GameMode, bool bIsVersusAI);
+	void Initialise(bool bIsVersusAI);
 
 protected:
 

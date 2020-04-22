@@ -37,6 +37,7 @@ const FString AVATAR_CAPTURE_RIG_BLUEPRINT_PATH = "Blueprint'/Game/BladeIIGame/B
 const FString AVATAR_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Avatar'";
 const FVector AVATAR_CAPTURE_RIG_SPAWN_LOCATION = FVector(500, 0, 0);
 const FString LOADING_SCREEN_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_LoadingScreen'";
+const FString OPTIONS_MENU_WIDGET_PATH = "WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_OptionsMenu'";
 
 // TODO set to zero for build
 #define FAST_DRAW 1
@@ -54,6 +55,8 @@ ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 	GetUIAvatarWidgetClass();
 
 	GetUILoadingScreenWidgetClass();
+
+	GetUIOptionsMenuWidgetClass();
 
 	B2Utility::LogInfo("GameMode initialized");
 }
@@ -176,6 +179,8 @@ void ABladeIIGameMode::StartPlay()
 
 	SetupUILoadingScreenLayer();
 
+	SetupUIOptionsMenuLayer();
+
 	SetupAvatarCaptureRig();
 
 	FindLocalPlayerInput();
@@ -270,6 +275,16 @@ void ABladeIIGameMode::GetUILoadingScreenWidgetClass()
 		UILoadingScreenWidgetClass = ClassFinder.Class;
 	}
 }
+
+void ABladeIIGameMode::GetUIOptionsMenuWidgetClass()
+{
+	ConstructorHelpers::FClassFinder<UOptionsMenu> ClassFinder(*OPTIONS_MENU_WIDGET_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the options menu widget")))
+	{
+		UIOptionsMenuWidgetClass = ClassFinder.Class;
+	}
+}
+
 
 void ABladeIIGameMode::RegisterEventListeners()
 {
@@ -366,7 +381,6 @@ void ABladeIIGameMode::SetupUIAvatarLayer()
 		if (UIAvatarLayer)
 		{
 			UIAvatarLayer->AddToPlayerScreen();
-			UIAvatarLayer->SetGameModeInstance(this);
 		}
 	}
 }
@@ -379,7 +393,19 @@ void ABladeIIGameMode::SetupUILoadingScreenLayer()
 		if (UILoadingScreenLayer)
 		{
 			UILoadingScreenLayer->AddToPlayerScreen();
-			UILoadingScreenLayer->Initialise(this, Settings->IsVersusAI());
+			UILoadingScreenLayer->Initialise(Settings->IsVersusAI());
+		}
+	}
+}
+
+void ABladeIIGameMode::SetupUIOptionsMenuLayer()
+{
+	if (UIOptionsMenuWidgetClass)
+	{
+		UIOptionsMenuLayer = CreateWidget<UOptionsMenu>(GetWorld()->GetGameInstance(), UIOptionsMenuWidgetClass, TEXT("UI Options Menu Layer"));
+		if (UIOptionsMenuLayer)
+		{
+			UIOptionsMenuLayer->AddToPlayerScreen();
 		}
 	}
 }

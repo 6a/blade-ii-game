@@ -21,6 +21,7 @@
 #include "B2Enum/WinConditionEnum.h"
 #include "B2UI/Avatar.h"
 #include "B2UI/LoadingScreen.h"
+#include "B2UI/OptionsMenu.h"
 
 #include "BladeIIGameMode.generated.h"
 
@@ -131,6 +132,10 @@ private:
 	UPROPERTY()
 	ULoadingScreen* UILoadingScreenLayer;
 
+	/* Loading screen UI layer*/
+	UPROPERTY()
+	UOptionsMenu* UIOptionsMenuLayer;
+
 	/* Pointer to the settings object */
 	UPROPERTY()
 	USettings* Settings;
@@ -152,6 +157,9 @@ private:
 
 	/* Class type for avatar widget */
 	TSubclassOf<ULoadingScreen> UILoadingScreenWidgetClass;
+
+	/* Class type for avatar widget */
+	TSubclassOf<UOptionsMenu> UIOptionsMenuWidgetClass;
 
 	/* Timer handle for any delayed clear and draw calls */
 	FTimerHandle ClearAndDrawHandle;
@@ -175,6 +183,9 @@ private:
 
 	/* Gets and stores a reference to the UI loading screen layer class */
 	void GetUILoadingScreenWidgetClass();
+
+	/* Gets and stores a reference to the UI options menu layer class */
+	void GetUIOptionsMenuWidgetClass();
 
 	/* Set up any event listeners */
 	void RegisterEventListeners();
@@ -202,6 +213,9 @@ private:
 
 	/* Set up the UI loading screen layer */
 	void SetupUILoadingScreenLayer();
+
+	/* Set up the UI loading screen layer */
+	void SetupUIOptionsMenuLayer();
 
 	/* Set up the avatar capture rig */
 	void SetupAvatarCaptureRig();

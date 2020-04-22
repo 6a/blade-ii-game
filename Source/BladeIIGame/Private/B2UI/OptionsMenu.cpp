@@ -2,13 +2,19 @@
 
 #include "UObject/ConstructorHelpers.h"
 
+#include "B2GameMode/BladeIIGameMode.h"
+
 #include "B2Utility/Log.h"
 
 void UOptionsMenu::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
+	GameModeInstance = Cast<ABladeIIGameMode>(GetWorld()->GetAuthGameMode());
+
 	RegisterEventListeners();
+
+	LoadStoredValues();
 }
 
 UOptionsMenu::UOptionsMenu(const FObjectInitializer& ObjectInitializer)
@@ -19,8 +25,6 @@ UOptionsMenu::UOptionsMenu(const FObjectInitializer& ObjectInitializer)
 	{
 		ComboBoxItemClass = ComboBoxItem.Class;
 	}
-
-	B2Utility::LogInfo("Opions NativeOnInitialized");
 }
 
 void UOptionsMenu::OnMasterVolumeValueChanged(float NewValue)
@@ -96,5 +100,23 @@ void UOptionsMenu::SetSliderValue(Slider Slider, float Value)
 		SFXVolumeSlider->SetValue(Value);
 		OnSFXVolumeValueChanged(Value);
 		break;
+	}
+}
+
+void UOptionsMenu::LoadStoredValues()
+{
+	if (MasterVolumeSlider)
+	{
+		SetSliderValue(Slider::MasterVolume, GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::MasterVolume));
+	}
+
+	if (BGMVolumeSlider)
+	{
+		SetSliderValue(Slider::BGMVolume, GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::BGMVolume));
+	}
+
+	if (SFXVolumeSlider)
+	{
+		SetSliderValue(Slider::SFXVolume, GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::SFXVolume));
 	}
 }

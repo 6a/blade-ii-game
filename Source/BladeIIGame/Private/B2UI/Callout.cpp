@@ -5,9 +5,11 @@
 
 #include "TimerManager.h"
 
-void UCallout::SetGameModeInstance(ABladeIIGameMode* GameMode)
+void UCallout::NativeOnInitialized()
 {
-	GameModeInstance = GameMode;
+	Super::NativeOnInitialized();
+
+	GameModeInstance = Cast<ABladeIIGameMode>(GetWorld()->GetAuthGameMode());
 }
 
 void UCallout::SetText(const FString& NewText)

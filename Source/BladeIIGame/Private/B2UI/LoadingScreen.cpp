@@ -5,11 +5,11 @@
 // TODO set to zero for build
 #define FAST_LOAD 1
 
-void ULoadingScreen::Initialise(class ABladeIIGameMode* GameMode, bool bIsVersusAI)
+void ULoadingScreen::Initialise(bool bIsVersusAI)
 {
-	GameModeInstance = GameMode;
+	GameModeInstance = Cast<ABladeIIGameMode>(GetWorld()->GetAuthGameMode());
 
-	VersionText->SetText(FText::FromString(FString(TEXT_VERSION_PREFIX).Append(GameMode->GetSettings()->GetStringSetting(EStringSetting::Version))));
+	VersionText->SetText(FText::FromString(FString(TEXT_VERSION_PREFIX).Append(GameModeInstance->GetSettings()->GetStringSetting(EStringSetting::Version))));
 
 	TextInitialising->SetText(FText::FromString(AddLoadingBar(TEXT_INITIALIZING, 0)));
 	TextConnecting->SetText(FText());
@@ -20,7 +20,7 @@ void ULoadingScreen::Initialise(class ABladeIIGameMode* GameMode, bool bIsVersus
 	{
 		SetRenderOpacity(0);
 		SetVisibility(ESlateVisibility::Hidden);
-		GameMode->AutoLoadFinished();
+		GameModeInstance->AutoLoadFinished();
 	}
 	else
 	{

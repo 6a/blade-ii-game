@@ -14,11 +14,7 @@ class BLADEIIGAME_API UCallout : public UUserWidget
 
 public:
 
-	/**
-	 * Set the internal reference to the game mode instance
-	 * @param GameModeInstance - A pointer to the game mode instance
-	 */
-	void SetGameModeInstance(class ABladeIIGameMode* GameMode);
+	virtual void NativeOnInitialized() override;
 
 	/**
 	 * Sets the text for, and shows this callout
