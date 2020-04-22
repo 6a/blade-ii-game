@@ -154,6 +154,11 @@ void ALocalPlayerInput::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerController->bEnableClickEvents = true;
 	PlayerController->bEnableMouseOverEvents = true;
 
+	FInputModeGameAndUI InputMode;
+	InputMode.SetHideCursorDuringCapture(false);
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	PlayerController->SetInputMode(InputMode);
+
 	/* Bind the left mouse click button */
 	InputComponent->BindAction("LeftMouseButton", IE_Pressed, this, &ALocalPlayerInput::OnMouseButtonLeft);
 

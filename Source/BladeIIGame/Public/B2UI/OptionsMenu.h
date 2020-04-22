@@ -16,7 +16,15 @@ class BLADEIIGAME_API UOptionsMenu : public UUserWidget
 	
 public:
 
+	virtual void NativeOnInitialized() override;
+
 private:
+	enum class Slider : uint8
+	{
+		MasterVolume,
+		BGMVolume,
+		SFXVolume,
+	};
 	
 	/* Master volume slider widget */
 	UPROPERTY(meta = (BindWidget))
@@ -45,4 +53,26 @@ private:
 	/* Forfeit button widget */
 	UPROPERTY(meta = (BindWidget))
 	UButton* ForfeitButton;
+
+	/* Callback handler for when the master volume slider's value changes */
+	UFUNCTION()
+	void OnMasterVolumeValueChanged(float NewValue);
+
+	/* Callback handler for when the BGM volume slider's value changes */
+	UFUNCTION()
+	void OnBGMVolumeValueChanged(float NewValue);
+
+	/* Callback handler for when the SFX volume slider's value changes */
+	UFUNCTION()
+	void OnSFXVolumeValueChanged(float NewValue);
+
+	/* Register the event listeners for this widget */
+	void RegisterEventListeners();
+
+	/**
+	 * Set the value for a particular slider
+	 * @param Slider - The slider for which the value will be changed
+	 * @param Value - The new slider value (0-1)
+	 */
+	void SetSliderValue(Slider Slider, float Value);
 };
