@@ -76,6 +76,11 @@ void UOptionsMenu::OnSFXVolumeValueChanged(float NewValue)
 	GameModeInstance->GetSettings()->SetFloatSetting(EFloatSetting::SFXVolume, NewValue);
 }
 
+void UOptionsMenu::OnLanguageComboBoxValueChanged(FString SelectedItem, ESelectInfo::Type SelectionType)
+{
+	GameModeInstance->GetSettings()->SetStringSetting(EStringSetting::Language, SelectedItem);
+}
+
 UWidget* UOptionsMenu::OnLanguageComboBoxConstructed(FString Item)
 {
 	UComboBoxItem* ComboBoxItem = CreateWidget<UComboBoxItem>(this, ComboBoxItemClass);
@@ -104,6 +109,7 @@ void UOptionsMenu::RegisterEventListeners()
 	if (LanguageComboBox)
 	{
 		LanguageComboBox->OnGenerateWidgetEvent.BindDynamic(this, &UOptionsMenu::OnLanguageComboBoxConstructed);
+		LanguageComboBox->OnSelectionChanged.AddDynamic(this, &UOptionsMenu::OnLanguageComboBoxValueChanged);
 	}
 }
 
@@ -151,5 +157,10 @@ void UOptionsMenu::LoadStoredValues()
 		float Volume = GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::SFXVolume);
 		SFXVolumeSlider->SetValue(Volume);
 		SFXVolumeSliderFill->SetRenderScale(FVector2D(Volume, 1));
+	}
+
+	if (LanguageComboBox)
+	{
+		LanguageComboBox->SetSelectedOption(GameModeInstance->GetSettings()->GetStringSetting(EStringSetting::Language));
 	}
 }

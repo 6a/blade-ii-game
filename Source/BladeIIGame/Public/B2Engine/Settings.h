@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 
@@ -54,7 +54,19 @@ public:
 	/* Returns true if the game is vs the AI */
 	bool IsVersusAI() const;
 
+
+	/* Applies all the stored settings */
+	void ApplyAll();
+
 private:
+
+	/* Utility consts */
+	const FString SHORT_LOCALE_EN = "en";
+	const FString SHORT_LOCALE_JP = "ja";
+	const FString SHORT_LOCALE_DEFAULT = "en";
+	const FString LOCALE_EN = "English";
+	const FString LOCALE_JP = TEXT("日本語");
+	const FString LOCALE_DEFAULT = "English";
 
 	/* Current settings data cache - changes only in memory, not on disc */
 	B2LaunchConfig SettingsCache;
@@ -64,4 +76,18 @@ private:
 
 	/* Reference to the game mode instance */
 	class ABladeIIGameMode* GameModeInstance;
+
+	/**
+	 * Returns the specified short locale string as a full string (the full word, i.e. en -> English)
+	 * @param LocaleString - The locale string to convert
+	 * @return The full locale string
+	 */
+	FString ShortLocaleStringToFull(const FString& ShortLocaleString) const;
+
+	/**
+	 * Returns the specified full locale string as a short string (the full word, i.e. English -> en)
+	 * @param LocaleString - The locale string to convert
+	 * @return The full locale string
+	 */
+	FString FullLocaleStringToShort(const FString& FullLocaleString) const;
 };

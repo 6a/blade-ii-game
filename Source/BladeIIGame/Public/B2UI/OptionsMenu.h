@@ -83,6 +83,9 @@ private:
 	/* Whether or not the menu is in the open (visible) state or not */
 	bool bIsOpen;
 
+	/* Register the event listeners for this widget */
+	void RegisterEventListeners();
+
 	/* Callback handler for when the master volume slider's value changes */
 	UFUNCTION()
 	void OnMasterVolumeValueChanged(float NewValue);
@@ -95,12 +98,13 @@ private:
 	UFUNCTION()
 	void OnSFXVolumeValueChanged(float NewValue);
 
+	/* Callback handler for when the language combo box's value changes */
+	UFUNCTION()
+	void OnLanguageComboBoxValueChanged(FString SelectedItem, ESelectInfo::Type SelectionType);
+
 	/* Callback handler for when the language combobox is constructed */
 	UFUNCTION()
 	UWidget* OnLanguageComboBoxConstructed(FString Item);
-
-	/* Register the event listeners for this widget */
-	void RegisterEventListeners();
 
 	/**
 	 * Set the value for a particular slider

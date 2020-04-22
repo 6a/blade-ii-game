@@ -165,6 +165,8 @@ void ABladeIIGameMode::StartPlay()
 
 	bOtherDelayedStartComponentReady = false;
 
+	Settings->ApplyAll();
+
 	FindArena();
 
 	SetupCardFactory();
@@ -478,7 +480,7 @@ void ABladeIIGameMode::DelayedStart()
 		AvatarCaptureRig->AnimateMouth();
 
 		// Start the BGM track
-		GameSound->PlayBGM(2);
+		GameSound->PlayBGM(0.2f);
 	}
 }
 

@@ -16,4 +16,5 @@ UENUM(BlueprintType)
 enum class EStringSetting : uint8
 {
 	Version UMETA(DisplayName = "Version"),
+	Language UMETA(DisplayName = "Version"),
 };

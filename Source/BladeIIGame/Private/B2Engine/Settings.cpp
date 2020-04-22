@@ -1,4 +1,6 @@
-#include "B2Engine/Settings.h"
+﻿#include "B2Engine/Settings.h"
+
+#include "Internationalization/Internationalization.h"
 
 #include "B2Utility/Log.h"
 
@@ -64,6 +66,9 @@ FString USettings::GetStringSetting(EStringSetting Setting) const
 	case EStringSetting::Version:
 		OutString = VersionString;
 		break;
+	case EStringSetting::Language:
+		OutString = ShortLocaleStringToFull(SettingsCache.Language);
+		break;
 	}
 
 	return OutString;
@@ -76,10 +81,51 @@ void USettings::SetStringSetting(EStringSetting Setting, const FString& Value)
 	case EStringSetting::Version:
 		VersionString = Value;
 		break;
+	case EStringSetting::Language:
+		SettingsCache.Language = FullLocaleStringToShort(Value);
+		FInternationalization::Get().SetCurrentCulture(SettingsCache.Language);
+		break;
 	}
 }
 
 bool USettings::IsVersusAI() const
 {
 	return SettingsCache.bIsBotGame;
+}
+
+void USettings::ApplyAll()
+{
+	FInternationalization::Get().SetCurrentLanguageAndLocale(SettingsCache.Language);
+}
+
+FString USettings::ShortLocaleStringToFull(const FString& ShortLocaleString) const
+{
+	FString OutString = LOCALE_DEFAULT;
+
+	if (ShortLocaleString.Compare(SHORT_LOCALE_EN) == 0)
+	{
+		OutString =  LOCALE_EN;
+	}
+	else if (ShortLocaleString.Compare(SHORT_LOCALE_JP) == 0)
+	{
+		OutString = LOCALE_JP;
+	}
+
+	return OutString;
+}
+
+FString USettings::FullLocaleStringToShort(const FString& FullLocaleString) const
+{
+	FString OutString = SHORT_LOCALE_DEFAULT;
+
+	if (FullLocaleString.Compare(LOCALE_EN) == 0)
+	{
+		OutString = SHORT_LOCALE_EN;
+	}
+	else if (FullLocaleString.Compare(LOCALE_JP) == 0)
+	{
+		OutString = SHORT_LOCALE_JP;
+	}
+
+	return OutString;
 }
