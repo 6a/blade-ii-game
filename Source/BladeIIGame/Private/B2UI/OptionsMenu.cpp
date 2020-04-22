@@ -1,5 +1,7 @@
 #include "B2UI/OptionsMenu.h"
 
+#include "UObject/ConstructorHelpers.h"
+
 #include "B2Utility/Log.h"
 
 void UOptionsMenu::NativeOnInitialized()
@@ -7,8 +9,16 @@ void UOptionsMenu::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	RegisterEventListeners();
+}
 
-
+UOptionsMenu::UOptionsMenu(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	static ConstructorHelpers::FClassFinder<UComboBoxItem> ComboBoxItem(TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_ComboBoxItemItem'"));
+	if (ComboBoxItem.Succeeded())
+	{
+		ComboBoxItemClass = ComboBoxItem.Class;
+	}
 
 	B2Utility::LogInfo("Opions NativeOnInitialized");
 }
@@ -37,6 +47,14 @@ void UOptionsMenu::OnSFXVolumeValueChanged(float NewValue)
 	}
 }
 
+UWidget* UOptionsMenu::OnLanguageComboBoxConstructed(FString Item)
+{
+	UComboBoxItem* ComboBoxItem = CreateWidget<UComboBoxItem>(this, ComboBoxItemClass);
+	ComboBoxItem->SetText(FText::FromString(Item));
+
+	return ComboBoxItem;
+}
+
 void UOptionsMenu::RegisterEventListeners()
 {
 	if (MasterVolumeSlider)
@@ -52,6 +70,11 @@ void UOptionsMenu::RegisterEventListeners()
 	if (SFXVolumeSlider)
 	{
 		SFXVolumeSlider->OnValueChanged.AddDynamic(this, &UOptionsMenu::OnSFXVolumeValueChanged);
+	}
+
+	if (LanguageComboBox)
+	{
+		LanguageComboBox->OnGenerateWidgetEvent.BindDynamic(this, &UOptionsMenu::OnLanguageComboBoxConstructed);
 	}
 }
 

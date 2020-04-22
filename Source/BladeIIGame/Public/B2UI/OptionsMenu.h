@@ -6,6 +6,9 @@
 #include "Components/Slider.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Components/ComboBoxString.h"
+
+#include "B2UI/ComboBoxItem.h"
 
 #include "OptionsMenu.generated.h"
 
@@ -17,6 +20,8 @@ class BLADEIIGAME_API UOptionsMenu : public UUserWidget
 public:
 
 	virtual void NativeOnInitialized() override;
+
+	UOptionsMenu(const FObjectInitializer& ObjectInitializer);
 
 private:
 	enum class Slider : uint8
@@ -52,6 +57,10 @@ private:
 
 	/* Forfeit button widget */
 	UPROPERTY(meta = (BindWidget))
+	UComboBoxString* LanguageComboBox;
+
+	/* Forfeit button widget */
+	UPROPERTY(meta = (BindWidget))
 	UButton* ForfeitButton;
 
 	/* Callback handler for when the master volume slider's value changes */
@@ -65,6 +74,13 @@ private:
 	/* Callback handler for when the SFX volume slider's value changes */
 	UFUNCTION()
 	void OnSFXVolumeValueChanged(float NewValue);
+
+	/* Callback handler for when the language combobox is constructed */
+	UFUNCTION()
+	UWidget* OnLanguageComboBoxConstructed(FString Item);
+
+	/* Combo box item class */
+	TSubclassOf<UComboBoxItem> ComboBoxItemClass;
 
 	/* Register the event listeners for this widget */
 	void RegisterEventListeners();
