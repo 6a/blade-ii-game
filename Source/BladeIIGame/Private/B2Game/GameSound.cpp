@@ -98,9 +98,49 @@ void AGameSound::PlaySFX(ESFX SFX, float Delay)
 	}
 }
 
+void AGameSound::SetVolume(EAudioChannel Channel, float Value)
+{
+	FAudioDevice* CurrentAudioDevice = GetWorld()->GetAudioDevice()->GetAudioDeviceManager()->GetActiveAudioDevice();
+	if (CurrentAudioDevice)
+	{
+		float NewVolume = FMath::Clamp(Value, 0.f, 1.f);
+
+		USoundClass* TargetSoundClass = nullptr;
+
+		switch (Channel)
+		{
+		case EAudioChannel::Master:
+			TargetSoundClass = SoundClassMaster;
+			break;
+		case EAudioChannel::BGM:
+			TargetSoundClass = SoundClassBGM;
+			break;
+		case EAudioChannel::SFX:
+			TargetSoundClass = SoundClassSFX;
+			break;
+		}
+
+		TargetSoundClass->Properties.Volume = NewVolume;
+		CurrentAudioDevice->SetSoundMixClassOverride(SoundMixMaster, TargetSoundClass, 1.f, 1.f, 0, false);
+	}
+}
+
 void AGameSound::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GameModeInstance = Cast<ABladeIIGameMode>(GetWorld()->GetAuthGameMode());
+
+	FAudioDevice* CurrentAudioDevice = GetWorld()->GetAudioDevice()->GetAudioDeviceManager()->GetActiveAudioDevice();
+
+	SoundClassMaster->Properties.Volume = GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::MasterVolume);
+	CurrentAudioDevice->SetSoundMixClassOverride(SoundMixMaster, SoundClassMaster, 1.f, 1.f, 0, false);
+
+	SoundClassBGM->Properties.Volume = GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::BGMVolume);
+	CurrentAudioDevice->SetSoundMixClassOverride(SoundMixMaster, SoundClassBGM, 1.f, 1.f, 0, false);
+
+	SoundClassSFX->Properties.Volume = GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::SFXVolume);
+	CurrentAudioDevice->SetSoundMixClassOverride(SoundMixMaster, SoundClassSFX, 1.f, 1.f, 0, false);
 
 }
 
@@ -134,7 +174,8 @@ void AGameSound::Tick(float DeltaTime)
 		FAudioDevice* CurrentAudioDevice = GetWorld()->GetAudioDevice()->GetAudioDeviceManager()->GetActiveAudioDevice();
 		if (CurrentAudioDevice)
 		{
-			CurrentAudioDevice->SetSoundMixClassOverride(SoundMixMaster, SoundClassBGMFade, NewVolume, 1.f, 0, false);
+			SoundClassBGMFade->Properties.Volume = NewVolume;
+			CurrentAudioDevice->SetSoundMixClassOverride(SoundMixMaster, SoundClassBGMFade, 1.f, 1.f, 0, false);
 		}
 
 		if (BGMFadeAlpha <= 0 || BGMFadeAlpha >= 1)
@@ -143,9 +184,3 @@ void AGameSound::Tick(float DeltaTime)
 		}
 	}
 }
-
-void AGameSound::SetGameModeInstance(ABladeIIGameMode* GameMode)
-{
-	GameModeInstance = GameMode;
-}
-

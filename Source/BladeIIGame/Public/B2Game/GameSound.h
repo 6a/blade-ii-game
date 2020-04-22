@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 
 #include "B2Enum/SFXEnum.h"
+#include "B2Enum/AudioChannelEnum.h"
 
 #include "GameSound.generated.h"
 
@@ -25,12 +26,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	/**
-	 * Set the internal reference to the game mode instance
-	 * @param GameModeInstance - A pointer to the game mode instance
-	 */
-	void SetGameModeInstance(class ABladeIIGameMode* GameMode);
-
-	/**
 	 * Start playing the BGM track - fades in over the specified duration, or instant if <= 0
 	 * @param FadeInDuration - Duration of the fade in
 	 */
@@ -42,6 +37,13 @@ public:
 	 * @param Delay - Optional delay before playing
 	 */
 	void PlaySFX(ESFX SFX, float Delay = 0);
+
+	/**
+	 * Change the volume for the specified audio channel
+	 * @param Channel - The channel to modify
+	 * @param Value - The new volume (0-1)
+	 */
+	void SetVolume(EAudioChannel Channel, float Value);
 
 protected:
 

@@ -213,7 +213,7 @@ void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitial
 
 	// Set up the settings object
 	Settings = ObjectInitializer.CreateDefaultSubobject<USettings>(this, TEXT("Settings"));
-	Settings->Initialise(LaunchConfig);
+	Settings->Initialise(this, LaunchConfig);
 }
 
 void ABladeIIGameMode::SetupCardFactory()
@@ -353,9 +353,6 @@ void ABladeIIGameMode::FindGameSoundActor()
 
 	// Throw if the game sound actor was not found
 	check(GameSound);
-
-	// Set the game mode instance for the gamesound actor
-	GameSound->SetGameModeInstance(this);
 }
 
 void ABladeIIGameMode::SetupDealer()

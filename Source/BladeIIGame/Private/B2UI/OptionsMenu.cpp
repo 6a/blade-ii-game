@@ -52,6 +52,8 @@ void UOptionsMenu::OnMasterVolumeValueChanged(float NewValue)
 	{
 		MasterVolumeSliderFill->SetRenderScale(FVector2D(NewValue, 1));
 	}
+
+	GameModeInstance->GetSettings()->SetFloatSetting(EFloatSetting::MasterVolume, NewValue);
 }
 
 void UOptionsMenu::OnBGMVolumeValueChanged(float NewValue)
@@ -60,6 +62,8 @@ void UOptionsMenu::OnBGMVolumeValueChanged(float NewValue)
 	{
 		BGMVolumeSliderFill->SetRenderScale(FVector2D(NewValue, 1));
 	}
+
+	GameModeInstance->GetSettings()->SetFloatSetting(EFloatSetting::BGMVolume, NewValue);
 }
 
 void UOptionsMenu::OnSFXVolumeValueChanged(float NewValue)
@@ -68,6 +72,8 @@ void UOptionsMenu::OnSFXVolumeValueChanged(float NewValue)
 	{
 		SFXVolumeSliderFill->SetRenderScale(FVector2D(NewValue, 1));
 	}
+
+	GameModeInstance->GetSettings()->SetFloatSetting(EFloatSetting::SFXVolume, NewValue);
 }
 
 UWidget* UOptionsMenu::OnLanguageComboBoxConstructed(FString Item)
@@ -124,18 +130,26 @@ void UOptionsMenu::SetSliderValue(Slider Slider, float Value)
 
 void UOptionsMenu::LoadStoredValues()
 {
-	if (MasterVolumeSlider)
+	// During init, we manually set the values so that we dont try to re-apply the settings that were just read
+
+	if (MasterVolumeSlider && MasterVolumeSliderFill)
 	{
-		SetSliderValue(Slider::MasterVolume, GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::MasterVolume));
+		float Volume = GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::MasterVolume);
+		MasterVolumeSlider->SetValue(Volume);
+		MasterVolumeSliderFill->SetRenderScale(FVector2D(Volume, 1));
 	}
 
-	if (BGMVolumeSlider)
+	if (BGMVolumeSlider && BGMVolumeSliderFill)
 	{
-		SetSliderValue(Slider::BGMVolume, GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::BGMVolume));
+		float Volume = GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::BGMVolume);
+		BGMVolumeSlider->SetValue(Volume);
+		BGMVolumeSliderFill->SetRenderScale(FVector2D(Volume, 1));
 	}
 
-	if (SFXVolumeSlider)
+	if (SFXVolumeSlider && SFXVolumeSliderFill)
 	{
-		SetSliderValue(Slider::SFXVolume, GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::SFXVolume));
+		float Volume = GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::SFXVolume);
+		SFXVolumeSlider->SetValue(Volume);
+		SFXVolumeSliderFill->SetRenderScale(FVector2D(Volume, 1));
 	}
 }
