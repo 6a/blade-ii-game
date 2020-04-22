@@ -20,7 +20,7 @@ public:
 	 * Sets the text for, and shows this callout
 	 * @param NewText - The text to display
 	 */
-	void SetText(const FString& NewText);
+	void SetText(const FText& NewText);
 
 	/* Returns true if the callout is currently animating text */
 	bool IsAnimatingText() const;
@@ -59,8 +59,8 @@ private:
 	/* Text animation handle */
 	FTimerHandle TextAnimationHandle;
 
-	/* The string that we are currently setting for the text block */
-	FString TargetText;
+	/* The text object that we are currently setting for the text block */
+	FText TargetText;
 
 	/* The current Index for the text animation - as in, how many characters of the full message we are now displaying */
 	uint32 TargetTextIndex;

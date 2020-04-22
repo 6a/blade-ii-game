@@ -12,7 +12,7 @@ void UCallout::NativeOnInitialized()
 	GameModeInstance = Cast<ABladeIIGameMode>(GetWorld()->GetAuthGameMode());
 }
 
-void UCallout::SetText(const FString& NewText)
+void UCallout::SetText(const FText& NewText)
 {
 	if (GetWorld()->GetTimerManager().TimerExists(TextAnimationHandle))
 	{
@@ -29,7 +29,7 @@ void UCallout::SetText(const FString& NewText)
 	CalloutText->SetText(FText::FromString(""));
 
 	// Fill the sizing text with the incoming text to set the size of the callout
-	SizeText->SetText(FText::FromString(TargetText));
+	SizeText->SetText(TargetText);
 
 	GetWorld()->GetTimerManager().SetTimer(TextAnimationHandle, this, &UCallout::ProgressTextAnimation, TEXT_ANIMATION_TICK, true, 0);
 }
@@ -69,11 +69,13 @@ void UCallout::ProgressTextAnimation()
 {
 	bool bFirstCharacterAdded = false;
 
-	while (!bFirstCharacterAdded || TargetText.Mid(TargetTextIndex, 1).Compare(TEXT(" ")) == 0)
+	FString TargetTextString = TargetText.ToString();
+
+	while (!bFirstCharacterAdded || TargetTextString.Mid(TargetTextIndex, 1).Compare(TEXT(" ")) == 0)
 	{
 		bFirstCharacterAdded = true;
 
-		if (++TargetTextIndex > static_cast<uint32>(TargetText.Len()))
+		if (++TargetTextIndex > static_cast<uint32>(TargetTextString.Len()))
 		{
 			if (GetWorld()->GetTimerManager().TimerExists(TextAnimationHandle))
 			{
@@ -85,7 +87,7 @@ void UCallout::ProgressTextAnimation()
 		}
 	}
 
-	FString CurrentString = FString(TargetTextIndex, *TargetText);
+	FString CurrentString = FString(TargetTextIndex, *TargetTextString);
 
 	CalloutText->SetText(FText::FromString(CurrentString));
 

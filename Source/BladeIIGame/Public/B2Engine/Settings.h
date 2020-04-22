@@ -62,7 +62,7 @@ private:
 
 	/* Utility consts */
 	const FString SHORT_LOCALE_EN = "en";
-	const FString SHORT_LOCALE_JP = "ja";
+	const FString SHORT_LOCALE_JP = "ja-JP";
 	const FString SHORT_LOCALE_DEFAULT = "en";
 	const FString LOCALE_EN = "English";
 	const FString LOCALE_JP = TEXT("日本語");

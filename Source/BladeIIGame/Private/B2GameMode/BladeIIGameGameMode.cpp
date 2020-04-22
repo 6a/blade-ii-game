@@ -128,6 +128,8 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 
 void ABladeIIGameMode::ChangeTurn()
 {
+	B2Utility::LogInfo(FString::FromInt(static_cast<uint32>(GameState->Turn)));
+
 	// If its currently the local players turn, switch to the opponents turn
 	if (GameState->Turn == EPlayer::Player)
 	{

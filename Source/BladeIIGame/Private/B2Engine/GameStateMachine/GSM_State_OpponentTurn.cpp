@@ -15,6 +15,7 @@ void GSM_State_OpponentTurn::Init(ABladeIIGameMode* GameMode)
 {
 	GSM_State::Init(GameMode);
 
+	bMoveHandled = false;
 	bMovedReceived = false;
 
 	CachedMove = FB2ServerUpdate{ EServerUpdate::None };
