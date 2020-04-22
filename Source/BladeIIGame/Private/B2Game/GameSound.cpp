@@ -110,7 +110,7 @@ void AGameSound::PlayOneshot(USoundWave* Sound)
 
 	if (CurrentAudioDevice)
 	{
-		UGameplayStatics::PlaySound2D(this, Sound);
+		UGameplayStatics::PlaySound2D(this, Sound, GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::SFXVolume));
 	}
 }
 
