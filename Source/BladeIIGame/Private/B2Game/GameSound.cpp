@@ -169,7 +169,7 @@ void AGameSound::Tick(float DeltaTime)
 
 		BGMFadeAlpha = FMath::Clamp(BGMFadeAlpha + Step, 0.f, ALPHA_MAX);
 
-		float NewVolume = FMath::InterpEaseIn(0.f, GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::BGMVolume), BGMFadeAlpha, EASE_EXP);
+		float NewVolume = FMath::InterpEaseIn(0.f, 1.f, BGMFadeAlpha, EASE_EXP);
 
 		FAudioDevice* CurrentAudioDevice = GetWorld()->GetAudioDevice()->GetAudioDeviceManager()->GetActiveAudioDevice();
 		if (CurrentAudioDevice)

@@ -16,7 +16,7 @@ void UOptionsMenu::NativeOnInitialized()
 
 	LoadStoredValues();
 
-	bIsOpen = false;
+	State = State::MenuClosed;
 }
 
 UOptionsMenu::UOptionsMenu(const FObjectInitializer& ObjectInitializer)
@@ -35,16 +35,21 @@ void UOptionsMenu::ToggleMenu()
 
 	if (!IsAnyAnimationPlaying())
 	{
-		if (bIsOpen)
+		if (State == State::MenuOpen)
 		{
 			PlayAnimation(CloseAnimation);
+			State = State::MenuClosed;
 		}
-		else
+		else if (State == State::MenuClosed)
 		{
 			PlayAnimation(OpenAnimation);
+			State = State::MenuOpen;
 		}
-
-		bIsOpen = !bIsOpen;
+		else if (State == State::ModalOpen)
+		{
+			PlayAnimation(ModalCloseAnimation);
+			State = State::MenuOpen;
+		}
 	}
 }
 
@@ -92,7 +97,8 @@ FEventReply UOptionsMenu::OnBackgroundClicked(FGeometry MyGeometry, const FPoint
 
 void UOptionsMenu::OnForfeitButtonPressed()
 {
-
+	PlayAnimation(ModalOpenAnimation);
+	State = State::ModalOpen;
 }
 
 UWidget* UOptionsMenu::OnLanguageComboBoxConstructed(FString Item)
@@ -101,6 +107,17 @@ UWidget* UOptionsMenu::OnLanguageComboBoxConstructed(FString Item)
 	ComboBoxItem->SetText(FText::FromString(Item));
 
 	return ComboBoxItem;
+}
+
+void UOptionsMenu::OnForfeitConfirmButtonPressed()
+{
+	GameModeInstance->LocalQuit();
+}
+
+void UOptionsMenu::OnForfeitCancelButtonPressed()
+{
+	PlayAnimation(ModalCloseAnimation);
+	State = State::MenuOpen;
 }
 
 void UOptionsMenu::RegisterEventListeners()
@@ -134,6 +151,16 @@ void UOptionsMenu::RegisterEventListeners()
 	if (ForfeitButton)
 	{
 		ForfeitButton->OnClicked.AddDynamic(this, &UOptionsMenu::OnForfeitButtonPressed);
+	}
+
+	if (ModalConfirmForfeitButton)
+	{
+		ModalConfirmForfeitButton->OnClicked.AddDynamic(this, &UOptionsMenu::OnForfeitConfirmButtonPressed);
+	}
+
+	if (ModalCancelForfeitButton)
+	{
+		ModalCancelForfeitButton->OnClicked.AddDynamic(this, &UOptionsMenu::OnForfeitCancelButtonPressed);
 	}
 }
 

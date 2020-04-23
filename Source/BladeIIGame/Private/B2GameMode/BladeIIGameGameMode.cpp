@@ -39,6 +39,7 @@ const FVector AVATAR_CAPTURE_RIG_SPAWN_LOCATION = FVector(500, 0, 0);
 const FString LOADING_SCREEN_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_LoadingScreen'");
 const FString OPTIONS_MENU_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_OptionsMenu'");
 const FString CARD_CURSOR_BLUEPRINT_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card_Cursor'");
+const FString LOCAL_QUIT_METADATA = TEXT("LOCAL_QUIT");
 
 // TODO set to zero for build
 #define FAST_DRAW 1
@@ -781,6 +782,14 @@ void ABladeIIGameMode::UpdateCardState()
 void ABladeIIGameMode::AutoLoadFinished()
 {
 	DelayedStart();
+}
+
+void ABladeIIGameMode::LocalQuit()
+{
+	Opponent->SendUpdate(EServerUpdate::InstructionQuit, LOCAL_QUIT_METADATA);
+
+	// TODO add this to a callback instead, that quits after a timeout OR when receiving an OK from the server or something.
+	FGenericPlatformMisc::RequestExit(false);
 }
 
 UCardSlot* ABladeIIGameMode::GetCardSlot(ECardSlot Slot) const

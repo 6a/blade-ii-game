@@ -75,6 +75,9 @@ public:
 	/* Helper function to inform the game mode that the automatic load has finished (when vs AI) */
 	void AutoLoadFinished();
 
+	/* Helper function to initialise a match quit + shutdown by the local player */
+	void LocalQuit();
+
 	/* Getters for various references */
 	AArena* GetArena() const { return Arena; }
 	ACardSelector* GetCursor() const { return Cursor; }

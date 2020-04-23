@@ -98,7 +98,11 @@ bool USettings::IsVersusAI() const
 
 void USettings::ApplyAll()
 {
+	// Language
 	FInternationalization::Get().SetCurrentLanguageAndLocale(SettingsCache.Language);
+
+	// Volume is handled by the game sound actor at game start
+	
 }
 
 FString USettings::ShortLocaleStringToFull(const FString& ShortLocaleString) const

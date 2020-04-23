@@ -27,12 +27,24 @@ public:
 	void ToggleMenu();
 
 private:
+
+	/* Slider represents different slider controls, so that we can generalise value setters and getters */
 	enum class Slider : uint8
 	{
 		MasterVolume,
 		BGMVolume,
 		SFXVolume,
 	};
+
+	/* State represents the state of the options menu, so we can track what we need to do in response to escape pressed etc */
+	enum class State : uint8
+	{
+		MenuOpen,
+		MenuClosed,
+		ModalOpen,
+	};
+
+	/* Widgets */
 	
 	/* Master volume slider widget */
 	UPROPERTY(meta = (BindWidget))
@@ -58,7 +70,7 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UImage* SFXVolumeSliderFill;
 
-	/* Forfeit button widget */
+	/* Language combo box widget */
 	UPROPERTY(meta = (BindWidget))
 	UComboBoxString* LanguageComboBox;
 
@@ -66,9 +78,19 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UButton* ForfeitButton;
 
-	/* Forfeit button widget */
+	/* Darkener image widget */
 	UPROPERTY(meta = (BindWidget))
 	UImage* Darkener;
+
+	/* Confirm forfeit button widget */
+	UPROPERTY(meta = (BindWidget))
+	UButton* ModalConfirmForfeitButton;
+
+	/* Cancel forfeit button widget */
+	UPROPERTY(meta = (BindWidget))
+	UButton* ModalCancelForfeitButton;
+
+	/* Animations */
 
 	/* Open Animation */
 	UPROPERTY(meta = (BindWidgetAnim))
@@ -78,6 +100,14 @@ private:
 	UPROPERTY (meta = (BindWidgetAnim))
 	UWidgetAnimation* CloseAnimation;
 
+	/* Open Modal Animation */
+	UPROPERTY(meta = (BindWidgetAnim))
+	UWidgetAnimation* ModalOpenAnimation;
+
+	/* Close Modal Animation */
+	UPROPERTY(meta = (BindWidgetAnim))
+	UWidgetAnimation* ModalCloseAnimation;
+
 	/* Combo box item class */
 	TSubclassOf<UComboBoxItem> ComboBoxItemClass;
 
@@ -85,7 +115,7 @@ private:
 	class ABladeIIGameMode* GameModeInstance;
 
 	/* Whether or not the menu is in the open (visible) state or not */
-	bool bIsOpen;
+	State State;
 
 	/* Register the event listeners for this widget */
 	void RegisterEventListeners();
@@ -117,6 +147,14 @@ private:
 	/* Callback handler for when the language combobox is constructed */
 	UFUNCTION()
 	UWidget* OnLanguageComboBoxConstructed(FString Item);
+
+	/* Callback handler for when the forfeit confirm button is pressed */
+	UFUNCTION()
+	void OnForfeitConfirmButtonPressed();
+
+	/* Callback handler for when the forfeit cancel button is pressed */
+	UFUNCTION()
+	void OnForfeitCancelButtonPressed();
 
 	/**
 	 * Set the value for a particular slider
