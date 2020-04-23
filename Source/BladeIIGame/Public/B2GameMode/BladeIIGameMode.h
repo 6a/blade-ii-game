@@ -52,6 +52,9 @@ public:
 	/* Informs the engine that it is safe to switch turns */
 	void ChangeTurn();
 
+	/* Informs the engine to continue with the same player again, after a blast card was used */
+	void ContinueTurn();
+
 	/**
 	 * Inform the engine that the scores are tied and the board needs to be cleared and reset, with an optional delay
 	 * @param Delay - Optional delay in seconds, defaults to zero

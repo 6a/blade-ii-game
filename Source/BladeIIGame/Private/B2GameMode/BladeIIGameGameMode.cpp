@@ -129,8 +129,6 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 
 void ABladeIIGameMode::ChangeTurn()
 {
-	B2Utility::LogInfo(FString::FromInt(static_cast<uint32>(GameState->Turn)));
-
 	// If its currently the local players turn, switch to the opponents turn
 	if (GameState->Turn == EPlayer::Player)
 	{
@@ -142,8 +140,19 @@ void ABladeIIGameMode::ChangeTurn()
 		GameState->Turn = EPlayer::Player;
 		GSM->ChangeState<GSM_State_PlayerTurn>();
 	}
+}
 
-	Arena->PrintOpponentCards();
+void ABladeIIGameMode::ContinueTurn()
+{
+	// Determine whos turn it currently is, then switch to that state again
+	if (GameState->Turn == EPlayer::Player)
+	{
+		GSM->ChangeState<GSM_State_PlayerTurn>();
+	}
+	else
+	{
+		GSM->ChangeState<GSM_State_OpponentTurn>();
+	}
 }
 
 void ABladeIIGameMode::ClearAndDraw(float Delay)
@@ -777,6 +786,8 @@ void ABladeIIGameMode::UpdateCardState()
 	GameState->OpponentScore = AggregateScore(Arena->OpponentField);
 
 	Arena->ScoreDisplay->Update(GameState->PlayerScore, GameState->OpponentScore);
+
+	//Arena->PrintOpponentCards();
 }
 
 void ABladeIIGameMode::AutoLoadFinished()
@@ -859,16 +870,12 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 	case EDealerEvent::CardPositionUpdateFinished:
 		// Handling card position updates for blast only
 
-		if (GSM->IsCurrentState(EGameState::PlayerBlastTarget))
+		if (GSM->IsCurrentState(EGameState::PlayerBlastTarget) || GSM->IsCurrentState(EGameState::OpponentBlastTarget))
 		{
-			// Switch state machine to player turn
-			GSM->ChangeState<GSM_State_PlayerTurn>();
+			GameState->bHandleBlastEdgeCase = true;
+			EndState();
 		}
-		else if(GSM->IsCurrentState(EGameState::OpponentBlastTarget))
-		{
-			// Switch state machine to player turn
-			GSM->ChangeState<GSM_State_OpponentTurn>();
-		}
+
 		break;
 	}
 }

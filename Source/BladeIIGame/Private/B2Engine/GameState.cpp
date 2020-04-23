@@ -13,6 +13,7 @@ B2GameState::B2GameState(const FB2Cards& Cards)
 	Turn = EPlayer::Undecided;
 	
 	bBlastAnimationPending = false;
+	bHandleBlastEdgeCase = false;
 
 	bOpponentIsAI = false;
 }

@@ -49,6 +49,15 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 		return;
 	}
 
+	// If its the blast state (and we didnt find a winner/loser) just enter the same players turn again
+	if (GameState->bHandleBlastEdgeCase)
+	{
+		GameState->bHandleBlastEdgeCase = false;
+
+		GI->ContinueTurn();
+		return;
+	}
+
 	// Handle tied scores
 	if (PlayerScore == OpponentScore)
 	{
@@ -103,6 +112,8 @@ void GSM_State_ProcessBoardState::End()
 
 EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& TargetHand, const TArray<ECard>& TargetField, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, bool bIsOppositePlayersTurn) const
 {
+	ABladeIIGameMode* GI = GameModeInstance;
+
 	// Logically this is kind of backwards but it works in my head
 
 	// TODO perhaps we need to handle the case where a player ends up in an unwinnable position after the first draw. 
@@ -129,7 +140,7 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 		uint32 ScoreGap = TargetScore - OppositePlayerScore;
 
 		// If its the other players turn and they failed to match or beat the targets score
-		if (bIsOppositePlayersTurn)
+		if (bIsOppositePlayersTurn && !GI->GetGameState()->bHandleBlastEdgeCase)
 		{
 			return EWinCondition::ScoreVictory;
 		}
