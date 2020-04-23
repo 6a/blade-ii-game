@@ -39,6 +39,8 @@ void UOptionsMenu::ToggleMenu()
 		{
 			PlayAnimation(CloseAnimation);
 			State = State::MenuClosed;
+
+			
 		}
 		else if (State == State::MenuClosed)
 		{
