@@ -32,6 +32,10 @@ struct FB2ServerUpdate
 		return OutJsonString;
 	}
 
+	/**
+	 * Static helper - converts a string representation of a server message to a FB2ServerUpdate
+	 * @return The converted update object
+	 */
 	static FB2ServerUpdate FromJSONString(const FString& JSONString)
 	{
 		FB2ServerUpdate OutUpdate{ EServerUpdate::None };

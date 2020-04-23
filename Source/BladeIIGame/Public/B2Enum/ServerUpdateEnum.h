@@ -19,7 +19,7 @@ enum class EServerUpdate : uint8
 	CardBlast UMETA(DisplayName = "Played Elise's Rapier"),
 	CardForce UMETA(DisplayName = "Played Sara's Sword and Gun"),
 	InstructionCards UMETA(DisplayName = "Initial Cards"),
-	InstructionQuit UMETA(DisplayName = "Quit"),
+	InstructionForfeit UMETA(DisplayName = "Forfeit"),
 	InstructionMessage UMETA(DisplayName = "Message"),
 	InstructionConnectionFailed UMETA(DisplayName = "Connection Failed"),
 };

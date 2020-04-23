@@ -806,7 +806,7 @@ void ABladeIIGameMode::AutoLoadFinished()
 
 void ABladeIIGameMode::LocalQuit()
 {
-	Opponent->SendUpdate(EServerUpdate::InstructionQuit, LOCAL_QUIT_METADATA);
+	Opponent->SendUpdate(EServerUpdate::InstructionForfeit, LOCAL_QUIT_METADATA);
 
 	// TODO add this to a callback instead, that quits after a timeout OR when receiving an OK from the server or something.
 	FGenericPlatformMisc::RequestExit(false);

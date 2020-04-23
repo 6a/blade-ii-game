@@ -1,19 +1,25 @@
 #include "B2Engine/NetServer.h"
 
+#include "B2Engine/WebSocketPacket.h"
+#include "B2Enum/WSPacketTypeEnum.h"
+
 #include "B2Utility/Log.h"
 
 const uint32 MAX_CONNECTION_ATTEMPTS = 3;
-const FString WEBSOCKET_URL = TEXT("wss://echo.websocket.org");
+const FString WEBSOCKET_URL = TEXT("ws://localhost:80/matchmaking");
 
-bool UB2NetServer::Initialise(const FString& PublicID, const FString& AuthToken, uint64 MatchID)
+bool UB2NetServer::Initialise(const FString& InPublicID, const FString& InAuthToken, uint64 InMatchID)
 {
+	PublicID = InPublicID;
+	AuthToken = InAuthToken;
+	MatchID = InMatchID;
+
 	ConnectionAttempts = 0;
+	bConnected = false;
 
 	B2Utility::LogInfo("Attempting to initialise connection to game server");
 
-	OutBoundQueue.Enqueue(FB2ServerUpdate{ EServerUpdate::InstructionMessage, TEXT("Hello, World!") });
-
-	bool bInitialised = Connect(PublicID, AuthToken, MatchID);
+	bool bInitialised = SetupWSConnection();
 
 	if (!bInitialised)
 	{
@@ -22,7 +28,6 @@ bool UB2NetServer::Initialise(const FString& PublicID, const FString& AuthToken,
 	else
 	{
 		B2Utility::LogWarning("Initialised websocket");
-		SetupEventListeners();
 	}
 
 	return bInitialised;
@@ -36,8 +41,28 @@ void UB2NetServer::Tick(float DeltaSeconds)
 		FB2ServerUpdate MessageToServer;
 		while (OutBoundQueue.Dequeue(MessageToServer))
 		{
-			FString MessageToServerJSON = MessageToServer.GetSerialised();
-			WebSocket->SendText(MessageToServerJSON);
+			FB2WebSocketPacket WSPacket{};
+
+			if (static_cast<uint8>(MessageToServer.Update) >= 12)
+			{
+				// Translate the instruction to a packet type
+				switch (MessageToServer.Update)
+				{
+				case EServerUpdate::InstructionForfeit:
+					WSPacket.Code = static_cast<uint8>(EWSPacketType::Forfeit);
+					break;
+				case EServerUpdate::InstructionMessage:
+					WSPacket.Code = static_cast<uint8>(EWSPacketType::Message);
+					break;
+				}
+			}
+			else
+			{
+				WSPacket.Code = static_cast<uint8>(EWSPacketType::Move);
+				WSPacket.Message = MessageToServer.GetSerialised();
+			}
+
+			WebSocket->SendText(WSPacket.GetSerialised());
 		}
 	}
 }
@@ -47,7 +72,7 @@ const FB2ServerUpdate UB2NetServer::GetNextUpdate()
 	return FB2ServerUpdate();
 }
 
-bool UB2NetServer::Connect(const FString& PublicID, const FString& AuthToken, uint64 MatchID)
+bool UB2NetServer::SetupWSConnection()
 {
 	// Add any other headers, auth or whatever to the default headers
 	TArray<FWebSocketHeaderPair> Headers(DefaultHeaders);
@@ -55,23 +80,12 @@ bool UB2NetServer::Connect(const FString& PublicID, const FString& AuthToken, ui
 
 	// Attempt to connect
 	bool bConnectionFailed = true;
+
 	WebSocket = UWebSocketBlueprintLibrary::ConnectWithHeader(WEBSOCKET_URL, Headers, bConnectionFailed);
 
-	// Try again until the retry limit is reached, then exit and clean up + report back
-	if (bConnectionFailed)
-	{
-		if (++ConnectionAttempts < MAX_CONNECTION_ATTEMPTS)
-		{
-			B2Utility::LogWarning(FString::Printf(TEXT("Could not connect to websocket [ %s ] - Retrying (retry #%d)"), *WEBSOCKET_URL, ConnectionAttempts));
-			return Connect(PublicID, AuthToken, MatchID);
-		}
-		else
-		{
-			return false;
-		}
-	}
+	SetupEventListeners();
 
-	return true;
+	return !bConnectionFailed;
 }
 
 void UB2NetServer::SetupEventListeners()
@@ -98,6 +112,21 @@ void UB2NetServer::HandleConnectionClosedEvent()
 
 void UB2NetServer::HandleConnectionErrorEvent(const FString& Error)
 {
+	// If we arent connected, try to connect
+	if (!bConnected)
+	{
+		if (++ConnectionAttempts <= MAX_CONNECTION_ATTEMPTS)
+		{
+			B2Utility::LogWarning(FString::Printf(TEXT("Could not connect to websocket [ %s ] - Retrying (retry #%d)"), *WEBSOCKET_URL, ConnectionAttempts));
+			SetupWSConnection();
+			return;
+		}
+		else
+		{
+			// Handle - couldnt connect after MAX_CONNECTION_ATTEMPTS tries
+		}
+	}
+
 	// TODO how to handle this?
 	bConnected = false;
 
@@ -106,7 +135,9 @@ void UB2NetServer::HandleConnectionErrorEvent(const FString& Error)
 
 void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 {
-	FB2ServerUpdate Update = FB2ServerUpdate::FromJSONString(Data);
+	FB2WebSocketPacket WebSocketPacket = FB2WebSocketPacket::FromJSONString(Data);
+	B2Utility::LogInfo(FString::Printf(TEXT("WS packet received: Code: %d, Message: [ %s ]"), WebSocketPacket.Code, *WebSocketPacket.Message));
 
-	B2Utility::LogInfo(FString::Printf(TEXT("Connection received data: Update: %d | Metadata: [ %s ]"), Update.Update, *Update.Metadata));
+	FB2ServerUpdate Update = FB2ServerUpdate::FromJSONString(WebSocketPacket.Message);
+	B2Utility::LogInfo(FString::Printf(TEXT("WS update parsed: Update: %d | Metadata: [ %s ]"), Update.Update, *Update.Metadata));
 }

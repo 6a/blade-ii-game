@@ -36,17 +36,22 @@ private:
 	/* The websocket itself */
 	UWebSocketBase* WebSocket;
 
-	/* How many times we have tried to connect (or reconnect) */
+	/* How many times we have tried to connect */
 	uint32 ConnectionAttempts;
 
 	/* Whether or not the connection is currently active */
 	bool bConnected;
 
+	/* Connection parameters */
+	FString PublicID;
+	FString AuthToken;
+	uint64 MatchID;
+
 	/**
-	 * Attempt to connect to the game server
-	 * @return True if the connection was made successfully, else false
+	 * Attempt to initialise the websocket connection
+	 * @return True if initialised
 	 */
-	bool Connect(const FString& PublicID, const FString& AuthToken, uint64 MatchID);
+	bool SetupWSConnection();
 
 	/* Set up the event listeners for the websocket connection */
 	void SetupEventListeners();

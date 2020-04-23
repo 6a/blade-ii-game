@@ -14,7 +14,7 @@ void UB2Opponent::Tick(float DeltaSeconds)
 		{
 			if (OnCardsReceived.IsBound()) OnCardsReceived.Broadcast(FB2Cards(ServerUpdate.Metadata));
 		}
-		else if (ServerUpdate.Update >= EServerUpdate::InstructionQuit)
+		else if (ServerUpdate.Update >= EServerUpdate::InstructionForfeit)
 		{
 			if (OnInstructionReceived.IsBound()) OnInstructionReceived.Broadcast(ServerUpdate);
 		}

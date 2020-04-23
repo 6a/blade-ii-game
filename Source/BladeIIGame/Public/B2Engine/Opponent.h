@@ -43,6 +43,7 @@ public:
 
 protected:
 	/* The back end for this opponent. Could be an AI opponent, or a network opponent */
+	UPROPERTY()
 	UB2Server* BackEnd;
 
 };
