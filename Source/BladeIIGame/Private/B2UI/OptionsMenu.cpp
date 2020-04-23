@@ -16,7 +16,7 @@ void UOptionsMenu::NativeOnInitialized()
 
 	LoadStoredValues();
 
-	bIsOpen = true;
+	bIsOpen = false;
 }
 
 UOptionsMenu::UOptionsMenu(const FObjectInitializer& ObjectInitializer)
@@ -31,15 +31,38 @@ UOptionsMenu::UOptionsMenu(const FObjectInitializer& ObjectInitializer)
 
 void UOptionsMenu::ToggleMenu()
 {
+	APlayerController* PlayerController = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+
 	if (!IsAnyAnimationPlaying())
 	{
 		if (bIsOpen)
 		{
 			PlayAnimation(CloseAnimation);
+
+			if (PlayerController)
+			{
+				PlayerController->bShowMouseCursor = false;
+				PlayerController->bEnableMouseOverEvents = false;
+
+				FInputModeGameOnly InputMode;
+				PlayerController->SetInputMode(InputMode);
+			}
 		}
 		else
 		{
 			PlayAnimation(OpenAnimation);
+
+			if (PlayerController)
+			{
+				PlayerController->bShowMouseCursor = true;
+				PlayerController->bEnableMouseOverEvents = true;
+
+				FInputModeGameAndUI InputMode;
+				InputMode.SetWidgetToFocus(nullptr);
+				InputMode.SetHideCursorDuringCapture(false);
+				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+				PlayerController->SetInputMode(InputMode);
+			}
 		}
 
 		bIsOpen = !bIsOpen;
@@ -81,6 +104,18 @@ void UOptionsMenu::OnLanguageComboBoxValueChanged(FString SelectedItem, ESelectI
 	GameModeInstance->GetSettings()->SetStringSetting(EStringSetting::Language, SelectedItem);
 }
 
+FEventReply UOptionsMenu::OnBackgroundClicked(FGeometry MyGeometry, const FPointerEvent& MouseEvent)
+{
+	ToggleMenu();
+
+	return FEventReply(true);
+}
+
+void UOptionsMenu::OnForfeitButtonPressed()
+{
+
+}
+
 UWidget* UOptionsMenu::OnLanguageComboBoxConstructed(FString Item)
 {
 	UComboBoxItem* ComboBoxItem = CreateWidget<UComboBoxItem>(this, ComboBoxItemClass);
@@ -110,6 +145,16 @@ void UOptionsMenu::RegisterEventListeners()
 	{
 		LanguageComboBox->OnGenerateWidgetEvent.BindDynamic(this, &UOptionsMenu::OnLanguageComboBoxConstructed);
 		LanguageComboBox->OnSelectionChanged.AddDynamic(this, &UOptionsMenu::OnLanguageComboBoxValueChanged);
+	}
+
+	if (Darkener)
+	{
+		Darkener->OnMouseButtonDownEvent.BindDynamic(this, &UOptionsMenu::OnBackgroundClicked);
+	}
+
+	if (ForfeitButton)
+	{
+		ForfeitButton->OnClicked.AddDynamic(this, &UOptionsMenu::OnForfeitButtonPressed);
 	}
 }
 

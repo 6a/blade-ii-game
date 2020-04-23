@@ -66,6 +66,10 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UButton* ForfeitButton;
 
+	/* Forfeit button widget */
+	UPROPERTY(meta = (BindWidget))
+	UImage* Darkener;
+
 	/* Open Animation */
 	UPROPERTY(meta = (BindWidgetAnim))
 	UWidgetAnimation* OpenAnimation;
@@ -101,6 +105,14 @@ private:
 	/* Callback handler for when the language combo box's value changes */
 	UFUNCTION()
 	void OnLanguageComboBoxValueChanged(FString SelectedItem, ESelectInfo::Type SelectionType);
+
+	/* Callback handler for when the background is clicked */
+	UFUNCTION()
+	FEventReply OnBackgroundClicked(FGeometry MyGeometry, const FPointerEvent& MouseEvent);
+
+	/* Callback handler for when the forfeit button is pressed */
+	UFUNCTION()
+	void OnForfeitButtonPressed();
 
 	/* Callback handler for when the language combobox is constructed */
 	UFUNCTION()
