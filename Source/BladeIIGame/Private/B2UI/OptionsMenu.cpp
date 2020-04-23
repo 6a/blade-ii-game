@@ -38,31 +38,10 @@ void UOptionsMenu::ToggleMenu()
 		if (bIsOpen)
 		{
 			PlayAnimation(CloseAnimation);
-
-			if (PlayerController)
-			{
-				PlayerController->bShowMouseCursor = false;
-				PlayerController->bEnableMouseOverEvents = false;
-
-				FInputModeGameOnly InputMode;
-				PlayerController->SetInputMode(InputMode);
-			}
 		}
 		else
 		{
 			PlayAnimation(OpenAnimation);
-
-			if (PlayerController)
-			{
-				PlayerController->bShowMouseCursor = true;
-				PlayerController->bEnableMouseOverEvents = true;
-
-				FInputModeGameAndUI InputMode;
-				InputMode.SetWidgetToFocus(nullptr);
-				InputMode.SetHideCursorDuringCapture(false);
-				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-				PlayerController->SetInputMode(InputMode);
-			}
 		}
 
 		bIsOpen = !bIsOpen;

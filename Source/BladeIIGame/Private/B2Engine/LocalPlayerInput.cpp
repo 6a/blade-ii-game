@@ -150,6 +150,9 @@ void ALocalPlayerInput::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	/* Set up mouse controls */
 	PlayerController = Cast<APlayerController>(GetController());
+	PlayerController->bShowMouseCursor = true;
+	PlayerController->bEnableClickEvents = true;
+	PlayerController->bEnableMouseOverEvents = true;
 
 	FInputModeGameAndUI InputMode;
 	InputMode.SetHideCursorDuringCapture(false);
