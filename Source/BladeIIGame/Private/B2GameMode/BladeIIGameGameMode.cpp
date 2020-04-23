@@ -182,6 +182,19 @@ void ABladeIIGameMode::StartPlay()
 {
 	Super::StartPlay();
 
+	if (Settings->IsVersusAI())
+	{
+		static_cast<UB2AIOpponent*>(Opponent)->Configure(static_cast<EAIDifficulty>(Settings->GetIntSetting(EIntSetting::MatchID)));
+	}
+	else
+	{
+		uint64 MatchID = Settings->GetIntSetting(EIntSetting::MatchID);
+		FString PublicID = Settings->GetStringSetting(EStringSetting::PublicID);
+		FString AuthToken = Settings->GetStringSetting(EStringSetting::AuthToken);
+
+		static_cast<UB2NetOpponent*>(Opponent)->Configure(PublicID, AuthToken, MatchID);
+	}
+
 	bOtherDelayedStartComponentReady = false;
 
 	Settings->ApplyAll();
@@ -220,15 +233,11 @@ void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitial
 	if (LaunchConfig.MatchID <= B2LaunchConfig::MATCH_ID_AI_GAME_THRESHOLD)
 	{
 		UB2AIOpponent* AIOpponent = ObjectInitializer.CreateDefaultSubobject<UB2AIOpponent>(this, TEXT("AI Opponent"));
-		AIOpponent->Configure(static_cast<EAIDifficulty>(LaunchConfig.MatchID));
-
 		Opponent = static_cast<UB2Opponent*>(AIOpponent);
 	}
 	else
 	{
 		UB2NetOpponent* NetOpponent = ObjectInitializer.CreateDefaultSubobject<UB2NetOpponent>(this, TEXT("Net Opponent"));
-		NetOpponent->Configure(LaunchConfig.PublicID, LaunchConfig.AuthToken, LaunchConfig.MatchID);
-
 		Opponent = static_cast<UB2Opponent*>(NetOpponent);
 	}
 

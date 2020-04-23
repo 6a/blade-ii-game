@@ -24,7 +24,7 @@ public:
 	bool bIsBotGame;
 	 
 	/* A MatchID equal or less than this value indicates that the match is a bot game of (value) difficulty */
-	const static int MATCH_ID_AI_GAME_THRESHOLD = 1;
+	const static uint32 MATCH_ID_AI_GAME_THRESHOLD = 1;
 
 	B2LaunchConfig() {}
 	B2LaunchConfig(const FString& GameInfoFileName);

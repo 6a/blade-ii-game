@@ -43,7 +43,7 @@ public:
 
 protected:
 	/* The back end for this opponent. Could be an AI opponent, or a network opponent */
-	B2Server* BackEnd;
+	UB2Server* BackEnd;
 
 };
 

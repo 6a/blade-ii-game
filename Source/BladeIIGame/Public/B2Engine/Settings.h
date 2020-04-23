@@ -51,9 +51,22 @@ public:
 	 */
 	void SetStringSetting(EStringSetting Setting, const FString& Value);
 
+	/**
+	 * Get the specified int setting
+	 * @param Setting - The setting to get
+	 * @return The int setting
+	 */
+	uint64 GetIntSetting(EIntSetting Setting) const;
+
+	/**
+	 * Set the specified int setting with the specified value
+	 * @param Setting - The setting to set
+	 * @param Value - The new value
+	 */
+	void SetIntSetting(EIntSetting Setting, uint64 Value);
+
 	/* Returns true if the game is vs the AI */
 	bool IsVersusAI() const;
-
 
 	/* Applies all the stored settings */
 	void ApplyAll();

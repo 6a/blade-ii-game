@@ -21,4 +21,5 @@ enum class EServerUpdate : uint8
 	InstructionCards UMETA(DisplayName = "Initial Cards"),
 	InstructionQuit UMETA(DisplayName = "Quit"),
 	InstructionMessage UMETA(DisplayName = "Message"),
+	InstructionConnectionFailed UMETA(DisplayName = "Connection Failed"),
 };

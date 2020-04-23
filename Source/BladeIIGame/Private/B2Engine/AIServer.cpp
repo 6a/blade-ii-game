@@ -8,9 +8,9 @@
 #include "B2Utility/String.h"
 #include "B2Utility/Log.h"
 
-const FB2ServerUpdate B2AIServer::GetNextUpdate()
+const FB2ServerUpdate UB2AIServer::GetNextUpdate()
 {
-	FB2ServerUpdate Payload = B2Server::GetNextUpdate();
+	FB2ServerUpdate Payload = UB2Server::GetNextUpdate();
 
 	if (!bCardsSent)
 	{
@@ -32,7 +32,7 @@ const FB2ServerUpdate B2AIServer::GetNextUpdate()
 	return Payload;
 }
 
-void B2AIServer::Tick(float DeltaSeconds)
+void UB2AIServer::Tick(float DeltaSeconds)
 {
 	if (Winner != EPlayer::Undecided)
 	{
@@ -41,7 +41,7 @@ void B2AIServer::Tick(float DeltaSeconds)
 
 	// Handle messages "to" the server (rather, to us)
 	FB2ServerUpdate IncomingUpdate;
-	while (InboundQueue.Dequeue(IncomingUpdate))
+	while (OutBoundQueue.Dequeue(IncomingUpdate))
 	{
 		// Ignore "None" or message types for now
 		if (IncomingUpdate.Update == EServerUpdate::None || IncomingUpdate.Update == EServerUpdate::InstructionMessage)
@@ -57,7 +57,7 @@ void B2AIServer::Tick(float DeltaSeconds)
 	}
 }
 
-void B2AIServer::ConfigureInitialState()
+void UB2AIServer::ConfigureInitialState()
 {
 	// Note - The AI player is always player 1, or in this case, the "opponent"
 
@@ -99,7 +99,7 @@ void B2AIServer::ConfigureInitialState()
 	}
 }
 
-bool B2AIServer::ExecuteTurn()
+bool UB2AIServer::ExecuteTurn()
 {
 	// Choose a card to play
 	ECard ChosenCard;
@@ -115,7 +115,7 @@ bool B2AIServer::ExecuteTurn()
 	{
 		FB2ServerUpdate UpdateToSend = ExecuteMove(ChosenCard);
 
-		OutBoundQueue.Enqueue(UpdateToSend);
+		InBoundQueue.Enqueue(UpdateToSend);
 	}
 
 	UpdateTurn();
@@ -123,7 +123,7 @@ bool B2AIServer::ExecuteTurn()
 	return bValidMoveFound;
 }
 
-void B2AIServer::UpdateTurn()
+void UB2AIServer::UpdateTurn()
 {
 	if (PlayerScore == AIScore)
 	{
@@ -139,7 +139,7 @@ void B2AIServer::UpdateTurn()
 	}
 }
 
-bool B2AIServer::HandleTie()
+bool UB2AIServer::HandleTie()
 {
 	bool bNoValidMove = false;
 
@@ -174,7 +174,7 @@ bool B2AIServer::HandleTie()
 					CardToServerUpdate(ChosenCard),
 				};
 
-				OutBoundQueue.Enqueue(Update);
+				InBoundQueue.Enqueue(Update);
 			}
 			else
 			{
@@ -225,7 +225,7 @@ bool B2AIServer::HandleTie()
 	return !bNoValidMove;
 }
 
-void B2AIServer::UpdateState(const FB2ServerUpdate& Update)
+void UB2AIServer::UpdateState(const FB2ServerUpdate& Update)
 {
 	ECard InCard = ServerUpdateToCard(Update.Update);
 	Cards.PlayerHand.RemoveSingle(InCard);
@@ -289,7 +289,7 @@ void B2AIServer::UpdateState(const FB2ServerUpdate& Update)
 	UpdateTurn();
 }
 
-ECard B2AIServer::RemoveLast(TArray<ECard>& FromArray)
+ECard UB2AIServer::RemoveLast(TArray<ECard>& FromArray)
 {
 	ECard Card = ECard::InactiveForce;
 
@@ -302,7 +302,7 @@ ECard B2AIServer::RemoveLast(TArray<ECard>& FromArray)
 	return Card;
 }
 
-bool B2AIServer::GetNextMove(ECard& OutCard)
+bool UB2AIServer::GetNextMove(ECard& OutCard)
 {
 	// TODO make this smart - At the moment we just choose a random card that wont make use auto lose
 
@@ -427,7 +427,7 @@ bool B2AIServer::GetNextMove(ECard& OutCard)
 	return true;
 }
 
-FB2ServerUpdate B2AIServer::ExecuteMove(ECard ChosenCard)
+FB2ServerUpdate UB2AIServer::ExecuteMove(ECard ChosenCard)
 {
 	FB2ServerUpdate UpateToSendToPlayer
 	{
@@ -493,7 +493,7 @@ FB2ServerUpdate B2AIServer::ExecuteMove(ECard ChosenCard)
 	return UpateToSendToPlayer;
 }
 
-void B2AIServer::Bolt(TArray<ECard>& Field)
+void UB2AIServer::Bolt(TArray<ECard>& Field)
 {
 	ECard BoltedCard = Field[Field.Num() - 1];
 
@@ -502,7 +502,7 @@ void B2AIServer::Bolt(TArray<ECard>& Field)
 	Field[Field.Num() - 1] = static_cast<ECard>(static_cast<uint32>(BoltedCard) + BOLTED_CARD_OFFSET);
 }
 
-void B2AIServer::UnBolt(TArray<ECard>& Field)
+void UB2AIServer::UnBolt(TArray<ECard>& Field)
 {
 	ECard UnboltedCard = Field[Field.Num() - 1];
 
@@ -511,12 +511,12 @@ void B2AIServer::UnBolt(TArray<ECard>& Field)
 	Field[Field.Num() - 1] = static_cast<ECard>(static_cast<uint32>(UnboltedCard) - BOLTED_CARD_OFFSET);
 }
 
-bool B2AIServer::IsBolted(ECard Card) const
+bool UB2AIServer::IsBolted(ECard Card) const
 {
 	return Card > ECard::Force;
 }
 
-uint32 B2AIServer::GetBoltedCardRealValue(ECard Card) const
+uint32 UB2AIServer::GetBoltedCardRealValue(ECard Card) const
 {
 	int32 OutValue = 0;
 
@@ -530,7 +530,7 @@ uint32 B2AIServer::GetBoltedCardRealValue(ECard Card) const
 	return OutValue;
 }
 
-uint32 B2AIServer::CalculateScore(TArray<ECard>& Field) const
+uint32 UB2AIServer::CalculateScore(TArray<ECard>& Field) const
 {
 	int32 Total = 0;
 
@@ -554,7 +554,7 @@ uint32 B2AIServer::CalculateScore(TArray<ECard>& Field) const
 	return Total;
 }
 
-EServerUpdate B2AIServer::CardToServerUpdate(ECard Card) const
+EServerUpdate UB2AIServer::CardToServerUpdate(ECard Card) const
 {
 	EServerUpdate OutUpdateType = EServerUpdate::None;
 
@@ -566,7 +566,7 @@ EServerUpdate B2AIServer::CardToServerUpdate(ECard Card) const
 	return OutUpdateType;
 }
 
-ECard B2AIServer::ServerUpdateToCard(EServerUpdate Update) const
+ECard UB2AIServer::ServerUpdateToCard(EServerUpdate Update) const
 {
 	ECard OutCard = ECard::ElliotsOrbalStaff;
 
@@ -578,13 +578,13 @@ ECard B2AIServer::ServerUpdateToCard(EServerUpdate Update) const
 	return OutCard;
 }
 
-void B2AIServer::UpdateScores()
+void UB2AIServer::UpdateScores()
 {
 	PlayerScore = CalculateScore(Cards.PlayerField);
 	AIScore = CalculateScore(Cards.OpponentField);
 }
 
-void B2AIServer::ResolveAITurn()
+void UB2AIServer::ResolveAITurn()
 {
 	while (Turn != EPlayer::Player)
 	{
@@ -617,7 +617,7 @@ void B2AIServer::ResolveAITurn()
 	}
 }
 
-void B2AIServer::SetAILoss(const FString& Reason)
+void UB2AIServer::SetAILoss(const FString& Reason)
 {
 	B2Utility::LogWarning(FString("AI entered loss state: ").Append(Reason));
 
@@ -626,7 +626,7 @@ void B2AIServer::SetAILoss(const FString& Reason)
 	BoltTest();
 }
 
-FB2Cards B2AIServer::BoltTest() const
+FB2Cards UB2AIServer::BoltTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -639,7 +639,7 @@ FB2Cards B2AIServer::BoltTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::OpponentBoltTest() const
+FB2Cards UB2AIServer::OpponentBoltTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -652,7 +652,7 @@ FB2Cards B2AIServer::OpponentBoltTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::BlastTest() const
+FB2Cards UB2AIServer::BlastTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -665,7 +665,7 @@ FB2Cards B2AIServer::BlastTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::OpponentBlastTest() const
+FB2Cards UB2AIServer::OpponentBlastTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -678,7 +678,7 @@ FB2Cards B2AIServer::OpponentBlastTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::ForceTest() const
+FB2Cards UB2AIServer::ForceTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -691,7 +691,7 @@ FB2Cards B2AIServer::ForceTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::OpponentForceTest() const
+FB2Cards UB2AIServer::OpponentForceTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -704,7 +704,7 @@ FB2Cards B2AIServer::OpponentForceTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::RodTest() const
+FB2Cards UB2AIServer::RodTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -717,7 +717,7 @@ FB2Cards B2AIServer::RodTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::OpponentRodTest() const
+FB2Cards UB2AIServer::OpponentRodTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -730,7 +730,7 @@ FB2Cards B2AIServer::OpponentRodTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::MirrorTest() const
+FB2Cards UB2AIServer::MirrorTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -743,7 +743,7 @@ FB2Cards B2AIServer::MirrorTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::OpponentMirrorTest() const
+FB2Cards UB2AIServer::OpponentMirrorTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -756,7 +756,7 @@ FB2Cards B2AIServer::OpponentMirrorTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::StandardCardsOnlyTest() const
+FB2Cards UB2AIServer::StandardCardsOnlyTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -769,7 +769,7 @@ FB2Cards B2AIServer::StandardCardsOnlyTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::CardOverlapTest() const
+FB2Cards UB2AIServer::CardOverlapTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -782,7 +782,7 @@ FB2Cards B2AIServer::CardOverlapTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::DupeTest() const
+FB2Cards UB2AIServer::DupeTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -795,7 +795,7 @@ FB2Cards B2AIServer::DupeTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::PlayerFirstTest() const
+FB2Cards UB2AIServer::PlayerFirstTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -808,7 +808,7 @@ FB2Cards B2AIServer::PlayerFirstTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::AIFirstTest() const
+FB2Cards UB2AIServer::AIFirstTest() const
 {
 	FB2Cards GeneratedCards;
 
@@ -821,7 +821,7 @@ FB2Cards B2AIServer::AIFirstTest() const
 	return GeneratedCards;
 }
 
-FB2Cards B2AIServer::AllRandomTest() const
+FB2Cards UB2AIServer::AllRandomTest() const
 {
 	FB2Cards GeneratedCards;
 

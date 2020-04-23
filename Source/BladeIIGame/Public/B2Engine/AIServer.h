@@ -4,8 +4,15 @@
 #include "B2Engine/Cards.h"
 #include "B2Enum/PlayerEnum.h"
 
-class B2AIServer : public B2Server
+#include "AIServer.generated.h"
+
+UCLASS()
+class UB2AIServer : public UB2Server
 {
+	GENERATED_BODY()
+
+public:
+
 	/**
 	 * Get the next update from the server.
 	 * @return The update

@@ -69,6 +69,12 @@ FString USettings::GetStringSetting(EStringSetting Setting) const
 	case EStringSetting::Language:
 		OutString = ShortLocaleStringToFull(SettingsCache.Language);
 		break;
+	case EStringSetting::PublicID:
+		OutString = SettingsCache.PublicID;
+		break;
+	case EStringSetting::AuthToken:
+		OutString = SettingsCache.AuthToken;
+		break;
 	}
 
 	return OutString;
@@ -85,7 +91,32 @@ void USettings::SetStringSetting(EStringSetting Setting, const FString& Value)
 		SettingsCache.Language = FullLocaleStringToShort(Value);
 		FInternationalization::Get().SetCurrentCulture(SettingsCache.Language);
 		break;
+	case EStringSetting::PublicID:
+		SettingsCache.PublicID = Value;
+		break;
+	case EStringSetting::AuthToken:
+		SettingsCache.AuthToken = Value;
+		break;
 	}
+}
+
+uint64 USettings::GetIntSetting(EIntSetting Setting) const
+{
+	uint64 OutInt = 0;
+
+	switch (Setting)
+	{
+	case EIntSetting::MatchID:
+		OutInt = SettingsCache.MatchID;
+		break;
+	}
+
+	return OutInt;
+}
+
+void USettings::SetIntSetting(EIntSetting Setting, uint64 Value)
+{
+
 }
 
 bool USettings::IsVersusAI() const
@@ -99,6 +130,8 @@ void USettings::ApplyAll()
 	FInternationalization::Get().SetCurrentLanguageAndLocale(SettingsCache.Language);
 
 	// Volume is handled by the game sound actor at game start
+
+	// Screen settings...
 	
 }
 

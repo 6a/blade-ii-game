@@ -4,12 +4,17 @@
 
 #include "Containers/Queue.h"
 
-#include "ServerUpdate.h"
+#include "B2Engine/ServerUpdate.h"
 
-class B2Server
+#include "Server.generated.h"
+
+UCLASS()
+class UB2Server : public UObject
 {
+	GENERATED_BODY()
+
 public:
-	virtual ~B2Server();
+	virtual ~UB2Server();
 
 	/**
 	 * Get the next update from the server. Keep calling this until the payload is none.
@@ -28,7 +33,7 @@ public:
 	virtual void Tick(float DeltaSeconds);
 
 protected:
-	TQueue<FB2ServerUpdate> InboundQueue;
 	TQueue<FB2ServerUpdate> OutBoundQueue;
+	TQueue<FB2ServerUpdate> InBoundQueue;
 };
 

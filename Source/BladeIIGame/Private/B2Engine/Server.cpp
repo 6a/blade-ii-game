@@ -1,29 +1,29 @@
 #include "B2Engine/Server.h"
 
-B2Server::~B2Server()
+UB2Server::~UB2Server()
 {
-	InboundQueue.Empty();
 	OutBoundQueue.Empty();
+	InBoundQueue.Empty();
 }
 
-const FB2ServerUpdate B2Server::GetNextUpdate()
+const FB2ServerUpdate UB2Server::GetNextUpdate()
 {
 	FB2ServerUpdate OutUpdate
 	{
 		EServerUpdate::None,
 	};
 
-	OutBoundQueue.Dequeue(OutUpdate);
+	InBoundQueue.Dequeue(OutUpdate);
 
 	return OutUpdate;
 }
 
-void B2Server::SendUpdate(EServerUpdate Update, const FString& MetaData)
+void UB2Server::SendUpdate(EServerUpdate Update, const FString& MetaData)
 {
-	InboundQueue.Enqueue(FB2ServerUpdate{Update, MetaData});
+	OutBoundQueue.Enqueue(FB2ServerUpdate{Update, MetaData});
 }
 
-void B2Server::Tick(float DeltaSeconds)
+void UB2Server::Tick(float DeltaSeconds)
 {
 
 }

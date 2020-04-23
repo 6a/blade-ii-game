@@ -214,6 +214,9 @@ private:
 	/* Set up any event listeners */
 	void RegisterEventListeners();
 
+	/* Initialise the opponent object */
+	void InitialiseOpponent();
+
 	/* Find and store a reference to the arena */
 	void FindArena();
 
