@@ -39,8 +39,6 @@ void UOptionsMenu::ToggleMenu()
 		{
 			PlayAnimation(CloseAnimation);
 			State = State::MenuClosed;
-
-			
 		}
 		else if (State == State::MenuClosed)
 		{
@@ -168,7 +166,7 @@ void UOptionsMenu::RegisterEventListeners()
 
 void UOptionsMenu::SetSliderValue(Slider Slider, float Value)
 {
-	// As we have custom fill behaviour, we set the value and then manuallycall the on change callback handler
+	// As we have custom fill behaviour, we set the value and then manually call the on change callback handler
 
 	switch (Slider)
 	{
