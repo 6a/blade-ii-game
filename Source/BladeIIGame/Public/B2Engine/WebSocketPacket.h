@@ -12,7 +12,7 @@ struct FB2WebSocketPacket
 	GENERATED_BODY()
 
 	UPROPERTY()
-	uint8 Code;
+	uint16 Code;
 
 	UPROPERTY()
 	FString Message;

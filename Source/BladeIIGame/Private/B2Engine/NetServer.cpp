@@ -8,6 +8,18 @@
 const uint32 MAX_CONNECTION_ATTEMPTS = 3;
 const FString WEBSOCKET_URL = TEXT("ws://localhost:80/matchmaking");
 
+/* Codes for categorising websocket messages */
+const uint16 WEBSOCKET_PACKET_MATCHID = 400;
+const uint16 WEBSOCKET_PACKET_IDEXPECTED = 401;
+const uint16 WEBSOCKET_PACKET_BADFORMAT = 402;
+const uint16 WEBSOCKET_PACKET_INVALID = 403;
+const uint16 WEBSOCKET_PACKET_MATCHJOINED = 404;
+const uint16 WEBSOCKET_PACKET_MATCHDATA = 405;
+const uint16 WEBSOCKET_PACKET_OPPONENTDATA = 406;
+const uint16 WEBSOCKET_PACKET_MOVEUPDATE = 407;
+const uint16 WEBSOCKET_PACKET_FORFEIT = 408;
+const uint16 WEBSOCKET_PACKET_MESSAGE = 409;
+
 bool UB2NetServer::Initialise(const FString& InPublicID, const FString& InAuthToken, uint64 InMatchID)
 {
 	PublicID = InPublicID;
@@ -49,16 +61,17 @@ void UB2NetServer::Tick(float DeltaSeconds)
 				switch (MessageToServer.Update)
 				{
 				case EServerUpdate::InstructionForfeit:
-					WSPacket.Code = static_cast<uint8>(EWSPacketType::Forfeit);
+					WSPacket.Code = WEBSOCKET_PACKET_FORFEIT;
 					break;
 				case EServerUpdate::InstructionMessage:
-					WSPacket.Code = static_cast<uint8>(EWSPacketType::Message);
+					WSPacket.Code = WEBSOCKET_PACKET_MESSAGE;
+					WSPacket.Message = MessageToServer.GetSerialised();
 					break;
 				}
 			}
 			else
 			{
-				WSPacket.Code = static_cast<uint8>(EWSPacketType::Move);
+				WSPacket.Code = WEBSOCKET_PACKET_MOVEUPDATE;
 				WSPacket.Message = MessageToServer.GetSerialised();
 			}
 

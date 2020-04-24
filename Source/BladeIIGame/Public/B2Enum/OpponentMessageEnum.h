@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-/* EPlayer represents different dealer events (such as on deck dealt, on card placed) */
+/* EOpponentMessage represents different "things" that the opponent can say */
 UENUM(BlueprintType)
 enum class EOpponentMessage : uint8
 {
