@@ -15,7 +15,7 @@ void USettings::Initialise(ABladeIIGameMode* GameMode, const B2LaunchConfig& Lau
 	GameModeInstance = GameMode;
 
 	// TODO do this properly
-	VersionString = "V0.0.1.202004212113";
+	VersionString = "0.0.1.202004270020";
 }
 
 float USettings::GetFloatSetting(EFloatSetting Setting) const
