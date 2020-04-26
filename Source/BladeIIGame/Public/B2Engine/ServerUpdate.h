@@ -39,7 +39,7 @@ struct FB2ServerUpdate
 		FB2ServerUpdate OutUpdate{ EServerUpdate::None };
 
 		TArray<FString> OutArray;
-		int32 Count = InString.ParseIntoArray(OutArray, *SERIALIZED_SERVER_UPDATE_DELIMITER);
+		int32 Count = InString.ParseIntoArray(OutArray, *SERIALIZED_SERVER_UPDATE_DELIMITER, false);
 
 		if (OutArray.Num() == DESERIALIZED_SERVER_UPDATE_COMPONENTS)
 		{

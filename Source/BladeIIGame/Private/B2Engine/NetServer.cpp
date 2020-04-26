@@ -106,7 +106,7 @@ void UB2NetServer::Tick(float DeltaSeconds)
 
 const FB2ServerUpdate UB2NetServer::GetNextUpdate()
 {
-	return FB2ServerUpdate();
+	return Super::GetNextUpdate();
 }
 
 bool UB2NetServer::SetupWSConnection()
@@ -219,9 +219,7 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 			OutUpdate = FB2ServerUpdate::UnSerialise(WebSocketPacket.Message);
 			if (OutUpdate.Code != EServerUpdate::None) 
 			{
-
-
-
+				InBoundQueue.Enqueue(OutUpdate);
 			}
 		}
 	}

@@ -8,14 +8,14 @@ UB2Server::~UB2Server()
 
 const FB2ServerUpdate UB2Server::GetNextUpdate()
 {
-	FB2ServerUpdate OutUpdate
+	FB2ServerUpdate InUpdate
 	{
 		EServerUpdate::None,
 	};
 
-	InBoundQueue.Dequeue(OutUpdate);
+	InBoundQueue.Dequeue(InUpdate);
 
-	return OutUpdate;
+	return InUpdate;
 }
 
 void UB2Server::SendUpdate(EServerUpdate Update, const FString& MetaData)
