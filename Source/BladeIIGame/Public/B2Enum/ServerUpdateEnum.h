@@ -24,4 +24,5 @@ enum class EServerUpdate : uint8
 	InstructionConnectionFailed UMETA(DisplayName = "Connection Failed"),
 	InstructionPlayerData UMETA(DisplayName = "Player Data"),
 	InstructionOpponentData UMETA(DisplayName = "Opponent Data"),
+	InstructionConnectionProgress UMETA(DisplayName = "Connection Progress"),
 };

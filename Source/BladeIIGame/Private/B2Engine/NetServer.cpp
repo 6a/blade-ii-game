@@ -14,19 +14,35 @@ const float TIME_BETWEEN_PINGS = 4.f;
 
 /* Codes for categorising websocket messages */
 const uint16 WSC_AUTH = 200;
+const uint16 WSC_AUTH_RECEIVED = 205;
+const uint16 WSC_AUTH_SUCCESS = 208;
 
 const uint16 WSC_MATCH_ID = 400;
 const uint16 WSC_MATCH_ID_EXPECTED = 401;
 const uint16 WSC_MATCH_ID_BAD_FORMAT = 402;
 const uint16 WSC_MATCH_INVALID = 403;
-const uint16 WSC_MATCH_ID_NOT_RECEIVED = 404;
-const uint16 WSC_MATCH_MULTIPLE_CONNECTIONS = 405;
-const uint16 WSC_MATCH_FULL = 406;
-const uint16 WSC_MATCH_JOINED = 407;
-const uint16 WSC_MATCH_ILLEGAL_MOVE = 408;
-const uint16 WSC_MATCH_RELAY_MESSAGE = 409;
-const uint16 WSC_MATCH_MOVE = 410;
-const uint16 WSC_MATCH_FORFEIT = 411;
+const uint16 WSC_MATCH_ID_RECEIVED = 404;
+const uint16 WSC_MATCH_ID_NOT_RECEIVED = 405;
+const uint16 WSC_MATCH_ID_CONFIRMED = 406;
+const uint16 WSC_MATCH_MULTIPLE_CONNECTIONS = 407;
+const uint16 WSC_MATCH_FULL = 408;
+const uint16 WSC_MATCH_JOINED = 409;
+const uint16 WSC_MATCH_ILLEGAL_MOVE = 410;
+const uint16 WSC_MATCH_RELAY_MESSAGE = 411;
+const uint16 WSC_MATCH_MOVE = 412;
+const uint16 WSC_MATCH_DATA = 413;
+const uint16 WSC_MATCH_FORFEIT = 414;
+const uint16 WSC_MATCH_TIMED_OUT = 415;
+
+/* The server events to expect when a connection is successfully made */
+const TArray<uint16> SEQ_EVT_CONNECTION_SUCCESS
+{
+	WSC_AUTH_RECEIVED,
+	WSC_AUTH_SUCCESS,
+	WSC_MATCH_ID_RECEIVED,
+	WSC_MATCH_ID_CONFIRMED,
+	WSC_MATCH_JOINED,
+};
 
 bool UB2NetServer::Initialise(const FString& InPublicID, const FString& InAuthToken, uint64 InMatchID)
 {
@@ -142,10 +158,13 @@ void UB2NetServer::HandleConnectionEvent()
 	bConnected = true;
 
 	// Auth
-	WebSocket->SendText(MakeAuthPacket().GetSerialised());
+	FB2WebSocketPacket AuthPacket = MakeAuthPacket();
+	FString SerialisedAuthString = AuthPacket.GetSerialised();
+	WebSocket->SendText(SerialisedAuthString);
 
 	// Match ID
-	WebSocket->SendText(MakeMatchIDPacket().GetSerialised());
+	FB2WebSocketPacket MatchIDPacket = MakeMatchIDPacket();
+	WebSocket->SendText(MatchIDPacket.GetSerialised());
 
 	B2Utility::LogInfo("Connection opened");
 }
@@ -183,8 +202,36 @@ void UB2NetServer::HandleConnectionErrorEvent(const FString& Error)
 void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 {
 	FB2WebSocketPacket WebSocketPacket = FB2WebSocketPacket::FromJSONString(Data);
-	B2Utility::LogInfo(FString::Printf(TEXT("WS packet received: Type: %d, Payload: [ %s ]"), WebSocketPacket.Code, *WebSocketPacket.Message));
 
-	FB2ServerUpdate Update = FB2ServerUpdate::UnSerialise(WebSocketPacket.Message);
-	B2Utility::LogInfo(FString::Printf(TEXT("WS update parsed: Update: %d | Payload: [ %s ]"), Update.Code, *Update.Payload));
+	FB2ServerUpdate OutUpdate{ EServerUpdate::None };
+
+	// If the websocket packet code was parsed as 0, this was either a noop or an eror. 
+	// Exit early if this is the case
+	if (WebSocketPacket.Code != 0) 
+	{		
+		// Connecting to server
+		if (SEQ_EVT_CONNECTION_SUCCESS.Contains(WebSocketPacket.Code)) {
+			OutUpdate.Code = EServerUpdate::InstructionConnectionProgress;
+		}
+		else if (WebSocketPacket.Code == WSC_MATCH_DATA || WebSocketPacket.Code == WSC_MATCH_MOVE)
+		{
+			// Unpack the server update in the payload - exit silently if it was parsed as none
+			OutUpdate = FB2ServerUpdate::UnSerialise(WebSocketPacket.Message);
+			if (OutUpdate.Code != EServerUpdate::None) 
+			{
+
+
+
+			}
+		}
+	}
+
+	if (OutUpdate.Code != EServerUpdate::None)
+	{
+		B2Utility::LogInfo(FString::Printf(TEXT("WS update parsed: Code: %d | Payload: [ %s ]"), OutUpdate.Code, *OutUpdate.Payload));
+	}
+	else
+	{
+		B2Utility::LogInfo(FString::Printf(TEXT("WS packet received but could not be parsed: Code: %d, Payload: [ %s ]"), WebSocketPacket.Code, *WebSocketPacket.Message));
+	}
 }
