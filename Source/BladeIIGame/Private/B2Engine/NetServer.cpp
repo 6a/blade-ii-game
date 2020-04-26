@@ -193,7 +193,7 @@ void UB2NetServer::HandleConnectionEvent()
 	FB2WebSocketPacket MatchIDPacket = MakeMatchIDPacket();
 	WebSocket->SendText(MatchIDPacket.GetSerialised());
 
-	B2Utility::LogInfo("Connection opened");
+	InBoundQueue.Enqueue(FB2ServerUpdate{ EServerUpdate::InstructionConnectionProgress });
 }
 
 void UB2NetServer::HandleConnectionClosedEvent()
@@ -201,7 +201,6 @@ void UB2NetServer::HandleConnectionClosedEvent()
 	bConnected = false;
 
 	InBoundQueue.Enqueue(FB2ServerUpdate{ EServerUpdate::InstructionConnectionClosed });
-
 
 	B2Utility::LogInfo("Connection closed");
 }

@@ -29,6 +29,8 @@ enum class EServerUpdate : uint8
 	InstructionOpponentData UMETA(DisplayName = "Opponent Data"),
 	InstructionConnectionProgress UMETA(DisplayName = "Connection Progress"),
 	InstructionConnectionClosed UMETA(DisplayName = "Connection Closed"),
+
+	// Error messages from the server grouped so we can check for errors by equality (> the lowest value error)
 	InstructionConnectionError UMETA(DisplayName = "Connection Error"),
 	InstructionAuthError UMETA(DisplayName = "Auth Error"),
 	InstructionMatchCheckError UMETA(DisplayName = "Match Check Failed"),

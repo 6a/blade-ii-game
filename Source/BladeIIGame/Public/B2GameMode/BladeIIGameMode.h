@@ -76,7 +76,7 @@ public:
 	void UpdateCardState();
 
 	/* Helper function to inform the game mode that the automatic load has finished (when vs AI) */
-	void AutoLoadFinished();
+	void LoadingFinished();
 
 	/* Helper function to initialise a match quit + shutdown by the local player */
 	void LocalQuit();
@@ -176,7 +176,17 @@ private:
 	/* Timer handle for any delayed clear and draw calls */
 	FTimerHandle ClearAndDrawHandle;
 
+	/* Used to ensure that one of the calls to DelayedStart results in the game starting */
 	bool bOtherDelayedStartComponentReady;
+
+	/* For tracking connection progress - Stored as a float, increment by one for each event */
+	float ConnectionProgress;
+	float MatchPrepProgress;
+
+	// Progress max values
+	const float CONNECTION_PROGRESS_TARGET = 6;
+	const float MATCH_PREP_PROGRESS_TARGET = 3;
+
 
 	/**
 	 * Reads the launch config and sets up the engine accordingly.

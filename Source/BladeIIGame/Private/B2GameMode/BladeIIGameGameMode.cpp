@@ -182,22 +182,12 @@ void ABladeIIGameMode::StartPlay()
 {
 	Super::StartPlay();
 
-	if (Settings->IsVersusAI())
-	{
-		static_cast<UB2AIOpponent*>(Opponent)->Configure(static_cast<EAIDifficulty>(Settings->GetIntSetting(EIntSetting::MatchID)));
-	}
-	else
-	{
-		uint64 MatchID = Settings->GetIntSetting(EIntSetting::MatchID);
-		FString PublicID = Settings->GetStringSetting(EStringSetting::PublicID);
-		FString AuthToken = Settings->GetStringSetting(EStringSetting::AuthToken);
-
-		static_cast<UB2NetOpponent*>(Opponent)->Configure(PublicID, AuthToken, MatchID);
-	}
-
 	bOtherDelayedStartComponentReady = false;
 
 	Settings->ApplyAll();
+
+	ConnectionProgress = 0;
+	MatchPrepProgress = 0;
 
 	FindArena();
 
@@ -222,6 +212,8 @@ void ABladeIIGameMode::StartPlay()
 	FindGameSoundActor();
 
 	RegisterEventListeners();
+
+	InitialiseOpponent();
 }
 
 void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)
@@ -491,16 +483,35 @@ void ABladeIIGameMode::InitialiseBoard()
 	}
 }
 
+void ABladeIIGameMode::InitialiseOpponent()
+{
+	if (Settings->IsVersusAI())
+	{
+		static_cast<UB2AIOpponent*>(Opponent)->Configure(static_cast<EAIDifficulty>(Settings->GetIntSetting(EIntSetting::MatchID)));
+	}
+	else
+	{
+		uint64 MatchID = Settings->GetIntSetting(EIntSetting::MatchID);
+		FString PublicID = Settings->GetStringSetting(EStringSetting::PublicID);
+		FString AuthToken = Settings->GetStringSetting(EStringSetting::AuthToken);
+
+		static_cast<UB2NetOpponent*>(Opponent)->Configure(PublicID, AuthToken, MatchID);
+
+		// Set the initial state of the loading screen
+		UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::Connecting, 0 / CONNECTION_PROGRESS_TARGET);
+	}
+}
+
 void ABladeIIGameMode::DelayedStart()
 {
 	if (!bOtherDelayedStartComponentReady)
 	{
 		bOtherDelayedStartComponentReady = true;
+
+		InitialiseBoard();
 	}
 	else
 	{
-		InitialiseBoard();
-
 		EngineState = EEngineState::Dealing;
 			
 		if (FAST_DRAW)
@@ -799,7 +810,7 @@ void ABladeIIGameMode::UpdateCardState()
 	//Arena->PrintOpponentCards();
 }
 
-void ABladeIIGameMode::AutoLoadFinished()
+void ABladeIIGameMode::LoadingFinished()
 {
 	DelayedStart();
 }
@@ -851,13 +862,29 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
 	GameState = new B2GameState(Cards);
 
-	GameState->bOpponentIsAI = Settings->IsVersusAI();
+	UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::PreparingMatch, ++MatchPrepProgress / MATCH_PREP_PROGRESS_TARGET);
 
 	DelayedStart();
 }
 
 void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instruction)
 {
+	// Handle errors first
+	if (Instruction.Code >= EServerUpdate::InstructionConnectionError)
+	{
+
+	}
+	// Connection updates
+	else if (Instruction.Code == EServerUpdate::InstructionConnectionProgress)
+	{
+		UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::Connecting, ++ConnectionProgress / CONNECTION_PROGRESS_TARGET);
+	}
+	// Match prep updates
+	else if (Instruction.Code == EServerUpdate::InstructionPlayerData || Instruction.Code == EServerUpdate::InstructionOpponentData)
+	{
+		UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::PreparingMatch, ++MatchPrepProgress / MATCH_PREP_PROGRESS_TARGET);
+	}
+
 	B2Utility::LogInfo(FString::Printf(TEXT("Server Instruction: [%d] Metadata: [ %s ]"), Instruction.Code, *Instruction.Payload));
 }
 

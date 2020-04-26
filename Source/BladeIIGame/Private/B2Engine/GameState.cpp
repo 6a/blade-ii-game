@@ -14,6 +14,4 @@ B2GameState::B2GameState(const FB2Cards& Cards)
 	
 	bBlastAnimationPending = false;
 	bHandleBlastEdgeCase = false;
-
-	bOpponentIsAI = false;
 }

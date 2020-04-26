@@ -14,11 +14,30 @@ class BLADEIIGAME_API ULoadingScreen : public UUserWidget
 	
 public:
 
+	// Helper enums for setting loading bar values
+	enum class LoadingBar
+	{
+		Connecting,
+		PreparingMatch,
+		StartingMatch,
+	};
+
 	/**
 	 * Initialise the loading screen
 	 * @param bIsVersusAI - Whether or not this game is vs the AI (if true, we do a fake load)
 	 */
 	void Initialise(bool bIsVersusAI);
+
+	/**
+	 * Set the progress for the specified loading bar. Note that, setting the progress for a bar will
+	 * auto-fill all the bars prior, if not already full:
+	 * 1. Connecting
+	 * 2. PreparingMatch
+	 * 3. StartingMatch
+	 * @param Target - The loading bar to set
+	 * @param Value - The new progress value (0-1)
+	 */
+	void SetProgress(LoadingBar Target, float Value);
 
 protected:
 
@@ -33,8 +52,7 @@ private:
 	const TCHAR CHAR_BLANK = L' ';
 
 	/* For output text */
-	const FString TEXT_VERSION_PREFIX = "Version ";
-	const FString TEXT_INITIALIZING = "Initialising Blade II Engine";
+	const FString TEXT_VERSION_PREFIX = "Initialising Blade II V";
 	const FString TEXT_CONNECTING = "Connecting to Server";
 	const FString TEXT_PREPARING_MATCH = "Preparing Match";
 	const FString TEXT_STARTING_MATCH = "Starting Match";
@@ -42,14 +60,14 @@ private:
 
 	/* Limits */
 	const uint32 CONSOLE_WIDTH = 60;
-	const float LOAD_ALPHA_MAX = 5;
-	const float AUTO_LOAD_TIME = 5;
+	const float PROGRESS_MAX = 4;
+	const float AUTO_LOAD_TIME = 4;
 
 	/* For auto load */
 	const float LOAD_TIME_PER_LINE = 1.f;
-	float LoadAlpha;
+	float OverallProgress;
 	float NextAutoProgressBarStartTime;
-	uint32 AutoLoadPhase;
+	uint32 LoadingPhase;
 
 	/* For fading the screen out after load */
 	const float FADE_ALPHA_MAX = 1.f;
@@ -60,16 +78,15 @@ private:
 	/* Pointer to the game mode instance */
 	class ABladeIIGameMode* GameModeInstance;
 
-	/* Whether or not this game is vs the AI (if true, we animate automatically) */
+	/* Whether or not we should increment the loading progress display automatically (such as for an AI game or when the first two bars are full */
 	bool bAutoLoad;
+
+	/* Whether or not loading progress has changed, denoting that the UI should be re-drawn with new values */
+	bool bUIRequiresUpdate;
 
 	/* Version text widget */
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* VersionText;
-
-	/* Initialising text widget */
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* TextInitialising;
 
 	/* Connecting to server text widget */
 	UPROPERTY(meta = (BindWidget))
