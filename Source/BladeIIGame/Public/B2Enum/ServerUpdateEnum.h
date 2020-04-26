@@ -18,11 +18,20 @@ enum class EServerUpdate : uint8
 	CardMirror UMETA(DisplayName = "Played Emma's Orbal Staff"),
 	CardBlast UMETA(DisplayName = "Played Elise's Rapier"),
 	CardForce UMETA(DisplayName = "Played Sara's Sword and Gun"),
-	InstructionCards UMETA(DisplayName = "Initial Cards"),
+
+	// Messages that can be sent to and from the server
 	InstructionForfeit UMETA(DisplayName = "Forfeit"),
 	InstructionMessage UMETA(DisplayName = "Message"),
-	InstructionConnectionFailed UMETA(DisplayName = "Connection Failed"),
+
+	// Messages that can only be received from the server
+	InstructionCards UMETA(DisplayName = "Initial Cards"),
 	InstructionPlayerData UMETA(DisplayName = "Player Data"),
 	InstructionOpponentData UMETA(DisplayName = "Opponent Data"),
 	InstructionConnectionProgress UMETA(DisplayName = "Connection Progress"),
+	InstructionConnectionClosed UMETA(DisplayName = "Connection Closed"),
+	InstructionConnectionError UMETA(DisplayName = "Connection Error"),
+	InstructionAuthError UMETA(DisplayName = "Auth Error"),
+	InstructionMatchCheckError UMETA(DisplayName = "Match Check Failed"),
+	InstructionMatchSetupError UMETA(DisplayName = "Match setup Failed"),
+	InstructionMatchIllegalMove UMETA(DisplayName = "Illegal Move Detected"),
 };
