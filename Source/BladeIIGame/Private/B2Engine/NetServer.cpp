@@ -13,20 +13,20 @@ const FString AUTH_DELIMITER = TEXT(":");
 const float TIME_BETWEEN_PINGS = 4.f;
 
 /* Codes for categorising websocket messages */
-const uint16 WEBSOCKET_PACKET_AUTH_REQUEST = 200;
+const uint16 WSC_AUTH = 200;
 
-const uint16 WEBSOCKET_PACKET_MATCHID = 400;
-const uint16 WEBSOCKET_PACKET_IDEXPECTED = 401;
-const uint16 WEBSOCKET_PACKET_BADFORMAT = 402;
-const uint16 WEBSOCKET_PACKET_INVALID = 403;
-const uint16 WEBSOCKET_PACKET_NOTRECEIVED = 404;
-const uint16 WEBSOCKET_PACKET_MATCHJOINED = 405;
-const uint16 WEBSOCKET_PACKET_MATCHDATA = 406;
-const uint16 WEBSOCKET_PACKET_OPPONENTDATA = 407;
-const uint16 WEBSOCKET_PACKET_MOVEUPDATE = 408;
-const uint16 WEBSOCKET_PACKET_FORFEIT = 409;
-const uint16 WEBSOCKET_PACKET_OPPONENTFORFEIT = 410;
-const uint16 WEBSOCKET_PACKET_MESSAGE = 411;
+const uint16 WSC_MATCH_ID = 400;
+const uint16 WSC_MATCH_ID_EXPECTED = 401;
+const uint16 WSC_MATCH_ID_BAD_FORMAT = 402;
+const uint16 WSC_MATCH_INVALID = 403;
+const uint16 WSC_MATCH_ID_NOT_RECEIVED = 404;
+const uint16 WSC_MATCH_MULTIPLE_CONNECTIONS = 405;
+const uint16 WSC_MATCH_FULL = 406;
+const uint16 WSC_MATCH_JOINED = 407;
+const uint16 WSC_MATCH_ILLEGAL_MOVE = 408;
+const uint16 WSC_MATCH_RELAY_MESSAGE = 409;
+const uint16 WSC_MATCH_MOVE = 410;
+const uint16 WSC_MATCH_FORFEIT = 411;
 
 bool UB2NetServer::Initialise(const FString& InPublicID, const FString& InAuthToken, uint64 InMatchID)
 {
@@ -69,17 +69,17 @@ void UB2NetServer::Tick(float DeltaSeconds)
 				switch (MessageToServer.Code)
 				{
 				case EServerUpdate::InstructionForfeit:
-					WSPacket.Code = WEBSOCKET_PACKET_FORFEIT;
+					WSPacket.Code = WSC_MATCH_FORFEIT;
 					break;
 				case EServerUpdate::InstructionMessage:
-					WSPacket.Code = WEBSOCKET_PACKET_MESSAGE;
+					WSPacket.Code = WSC_MATCH_RELAY_MESSAGE;
 					WSPacket.Message = MessageToServer.GetSerialised();
 					break;
 				}
 			}
 			else
 			{
-				WSPacket.Code = WEBSOCKET_PACKET_MOVEUPDATE;
+				WSPacket.Code = WSC_MATCH_MOVE;
 				WSPacket.Message = MessageToServer.GetSerialised();
 			}
 
@@ -120,7 +120,7 @@ void UB2NetServer::SetupEventListeners()
 FB2WebSocketPacket UB2NetServer::MakeAuthPacket() const
 {
 	FB2WebSocketPacket Packet{
-		WEBSOCKET_PACKET_AUTH_REQUEST,
+		WSC_AUTH,
 		FString::Printf(TEXT("%s%s%s"), *PublicID, *AUTH_DELIMITER, *AuthToken),
 	};
 
@@ -130,7 +130,7 @@ FB2WebSocketPacket UB2NetServer::MakeAuthPacket() const
 FB2WebSocketPacket UB2NetServer::MakeMatchIDPacket() const
 {
 	FB2WebSocketPacket Packet{
-		WEBSOCKET_PACKET_MATCHID,
+		WSC_MATCH_ID,
 		FString::Printf(TEXT("%d"), MatchID),
 	};
 
