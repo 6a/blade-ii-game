@@ -39,7 +39,7 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 			bMovedReceived = true;
 
 			// If the opponent is an AI opponent, we add an artificial delay
-			if (GI->GetGameState()->bOpponentIsAI)
+			if (GI->GetSettings()->IsVersusAI())
 			{
 				MoveExecutionTime = GI->GetWorld()->GetTimeSeconds() + FMath::FRandRange(AI_DELAY_MIN, AI_DELAY_MAX);
 			}

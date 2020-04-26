@@ -25,9 +25,6 @@ struct B2GameState
 	// Turn
 	EPlayer Turn;
 
-	// True if the opponent is the AI opponent
-	bool bOpponentIsAI;
-
 	// Blast stuff
 
 	// Blast effect animation (card destruction) pending bool (should be set to false once checked)
