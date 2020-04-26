@@ -23,8 +23,8 @@ const FB2ServerUpdate UB2AIServer::GetNextUpdate()
 		// Set up the initial internal state based on the cards
 		ConfigureInitialState();
 
-		Payload.Update = EServerUpdate::InstructionCards;
-		Payload.Metadata = OutCards.GetSerialised(0);
+		Payload.Code = EServerUpdate::InstructionCards;
+		Payload.Payload = OutCards.GetSerialised(0);
 
 		bCardsSent = true;
 	}
@@ -44,7 +44,7 @@ void UB2AIServer::Tick(float DeltaSeconds)
 	while (OutBoundQueue.Dequeue(IncomingUpdate))
 	{
 		// Ignore "None" or message types for now
-		if (IncomingUpdate.Update == EServerUpdate::None || IncomingUpdate.Update == EServerUpdate::InstructionMessage)
+		if (IncomingUpdate.Code == EServerUpdate::None || IncomingUpdate.Code == EServerUpdate::InstructionMessage)
 		{
 			continue;
 		}
@@ -227,7 +227,7 @@ bool UB2AIServer::HandleTie()
 
 void UB2AIServer::UpdateState(const FB2ServerUpdate& Update)
 {
-	ECard InCard = ServerUpdateToCard(Update.Update);
+	ECard InCard = ServerUpdateToCard(Update.Code);
 	Cards.PlayerHand.RemoveSingle(InCard);
 
 	// Depending on the type of card and/or the board state, we either place the card on the field, or execute a special card
@@ -251,7 +251,7 @@ void UB2AIServer::UpdateState(const FB2ServerUpdate& Update)
 		{
 			// If the card is a blast card, we need to also remove the selected card (specified in metadata) from the opponents hand
 			int32 OutInt;
-			FDefaultValueHelper::ParseInt(Update.Metadata, OutInt);
+			FDefaultValueHelper::ParseInt(Update.Payload, OutInt);
 			ECard BlastedCard = static_cast<ECard>(OutInt);
 
 			Cards.OpponentHand.RemoveSingle(BlastedCard);
@@ -461,7 +461,7 @@ FB2ServerUpdate UB2AIServer::ExecuteMove(ECard ChosenCard)
 			Cards.PlayerHand.RemoveSingle(CardToBlast);
 			Cards.PlayerDiscard.Add(CardToBlast);
 
-			UpateToSendToPlayer.Metadata = FString::FromInt(static_cast<int32>(CardToBlast));
+			UpateToSendToPlayer.Payload = FString::FromInt(static_cast<int32>(CardToBlast));
 		}
 		else if (bUsedRodEffect)
 		{

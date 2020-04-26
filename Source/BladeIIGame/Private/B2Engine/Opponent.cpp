@@ -8,19 +8,19 @@ void UB2Opponent::Tick(float DeltaSeconds)
 
 	FB2ServerUpdate ServerUpdate = BackEnd->GetNextUpdate();
 
-	while (ServerUpdate.Update != EServerUpdate::None)
+	while (ServerUpdate.Code != EServerUpdate::None)
 	{
-		if (ServerUpdate.Update == EServerUpdate::InstructionCards)
+		if (ServerUpdate.Code == EServerUpdate::InstructionCards)
 		{
-			if (OnCardsReceived.IsBound()) OnCardsReceived.Broadcast(FB2Cards(ServerUpdate.Metadata));
+			if (OnCardsReceived.IsBound()) OnCardsReceived.Broadcast(FB2Cards(ServerUpdate.Payload));
 		}
-		else if (ServerUpdate.Update >= EServerUpdate::InstructionForfeit)
+		else if (ServerUpdate.Code >= EServerUpdate::InstructionForfeit)
 		{
 			if (OnInstructionReceived.IsBound()) OnInstructionReceived.Broadcast(ServerUpdate);
 		}
 		else
 		{
-			B2Utility::LogInfo(FString::Printf(TEXT("Opponent received card instruction from server: [ %d ][ %s ]"), ServerUpdate.Update, *ServerUpdate.Metadata));
+			B2Utility::LogInfo(FString::Printf(TEXT("Opponent received card instruction from server: [ %d ][ %s ]"), ServerUpdate.Code, *ServerUpdate.Payload));
 
 			MoveUpdateQueue.Enqueue(ServerUpdate);
 		}

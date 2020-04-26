@@ -150,7 +150,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 			CurrentSlot = GI->GetArena()->OpponentHand;
 			TargetSlot = GI->GetArena()->OpponentField;
 
-			int32 SourceSlotIndex = CurrentSlot->GetFirstIndexOfType(ServerUpdateToCard(MoveUpdate.Update));
+			int32 SourceSlotIndex = CurrentSlot->GetFirstIndexOfType(ServerUpdateToCard(MoveUpdate.Code));
 			if (SourceSlotIndex != -1)
 			{
 				GI->GetDealer()->Move(CurrentSlot, SourceSlotIndex, TargetSlot, ARC_ON_DRAW_FROM_DECK);

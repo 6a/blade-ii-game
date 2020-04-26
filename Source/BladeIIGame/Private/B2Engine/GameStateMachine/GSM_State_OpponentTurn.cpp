@@ -51,7 +51,7 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 	}
 	else if (!bMoveHandled && GI->GetWorld()->GetTimeSeconds() > MoveExecutionTime)
 	{
-		ECard Card = ServerUpdateToCard(CachedMove.Update);
+		ECard Card = ServerUpdateToCard(CachedMove.Code);
 
 		// Reset eyes
 		GI->GetOpponentAvatar()->RevertEyes();
@@ -84,7 +84,7 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 				if (bUsedBlastEffect)
 				{
 					int32 OutInt;
-					FDefaultValueHelper::ParseInt(CachedMove.Metadata, OutInt);
+					FDefaultValueHelper::ParseInt(CachedMove.Payload, OutInt);
 
 					if (OutInt != -1)
 					{
@@ -92,7 +92,7 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 					}
 					else
 					{
-						B2Utility::LogWarning(FString::Printf(TEXT("Unable to parse the blast metadata from the opponent: [ %s ]"), *CachedMove.Metadata));
+						B2Utility::LogWarning(FString::Printf(TEXT("Unable to parse the blast metadata from the opponent: [ %s ]"), *CachedMove.Payload));
 					}
 				}
 

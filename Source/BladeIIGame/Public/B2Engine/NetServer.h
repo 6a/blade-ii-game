@@ -4,6 +4,8 @@
 
 #include "WebSocketBlueprintLibrary.h"
 
+#include "B2Engine/WebSocketPacket.h"
+
 #include "NetServer.generated.h"
 
 UCLASS()
@@ -34,6 +36,7 @@ private:
 	TArray<FWebSocketHeaderPair> DefaultHeaders;
 
 	/* The websocket itself */
+	UPROPERTY()
 	UWebSocketBase* WebSocket;
 
 	/* How many times we have tried to connect */
@@ -55,6 +58,18 @@ private:
 
 	/* Set up the event listeners for the websocket connection */
 	void SetupEventListeners();
+
+	/**
+	 * Creates a websocket packet containing the local players authentication information
+	 * @return The packet
+	 */
+	FB2WebSocketPacket MakeAuthPacket() const;
+
+	/**
+	 * Creates a websocket packet containing match ID
+	 * @return The packet
+	 */
+	FB2WebSocketPacket MakeMatchIDPacket() const;
 
 	/* Handler for successful connection events */
 	UFUNCTION()
