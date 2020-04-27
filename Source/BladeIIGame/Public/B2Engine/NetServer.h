@@ -15,11 +15,15 @@ class UB2NetServer : public UB2Server
 
 public:
 
+	UB2NetServer();
+
 	/**
-	 * Get the next update from the server.
-	 * @return The update
+	 * Initialise this object, and attempt to connect to the game server
+	 * @param PublicID - The public ID of the local player
+	 * @param AuthToken - The auth token for the local player
+	 * @param MatchID - The match ID for the match that the local player is attempting to join
 	 */
-	bool Initialise(const FString& PublicID, const FString& AuthToken, uint64 MatchID);
+	void Initialise(const FString& PublicID, const FString& AuthToken, uint64 MatchID);
 
 	/* Tick the server */
 	virtual void Tick(float DeltaSeconds);
@@ -29,6 +33,12 @@ public:
 	 * @return The update
 	 */
 	virtual const FB2ServerUpdate GetNextUpdate() override;
+
+	/**
+	 * Attempt to connect to the game server again - only valid if the client has not yet connected
+	 * @return false if the conditions are invalid (such as if the client has disconnected after being connected already)
+	 */
+	virtual bool Connect() override;
 
 private:
 
@@ -44,6 +54,16 @@ private:
 
 	/* Whether or not the connection is currently active */
 	bool bConnected;
+	
+	/* Whether or not the connection has ever been active */
+	bool bConnectionMade;
+
+	/* For manually timing out the connection */
+	float TimeSinceConnectionStart;
+	bool bEnforceConnectionTimeout;
+
+	/* For determining when to consider the connection as "made" */
+	uint32 ConnectionStepsProcessed;
 
 	/* Connection parameters */
 	FString PublicID;

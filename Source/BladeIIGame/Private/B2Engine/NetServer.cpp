@@ -10,7 +10,7 @@ const FString WEBSOCKET_URL = TEXT("ws://localhost:80/game");
 //const FString WEBSOCKET_URL = TEXT("wss://echo.websocket.org");
 const FString AUTH_DELIMITER = TEXT(":");
 
-const float TIME_BETWEEN_PINGS = 4.f;
+const float MAX_CONNECT_ATTEMPT_TIME = 4.f;
 
 /* Codes for categorising websocket messages */
 const uint16 WSC_AUTH = 200;
@@ -71,29 +71,23 @@ const TArray<uint16> SEQ_EVT_MATCH_SETUP_ERROR
 	WSC_MATCH_MULTIPLE_CONNECTIONS,
 };
 
-bool UB2NetServer::Initialise(const FString& InPublicID, const FString& InAuthToken, uint64 InMatchID)
+UB2NetServer::UB2NetServer()
+{
+	bConnected = false;
+	bConnectionMade = false;
+	bEnforceConnectionTimeout = false;
+	ConnectionStepsProcessed = 0;
+}
+
+void UB2NetServer::Initialise(const FString& InPublicID, const FString& InAuthToken, uint64 InMatchID)
 {
 	PublicID = InPublicID;
 	AuthToken = InAuthToken;
 	MatchID = InMatchID;
 
-	ConnectionAttempts = 0;
-	bConnected = false;
+	bConnectionMade = false;
 
-	B2Utility::LogInfo("Attempting to initialise connection to game server");
-
-	bool bInitialised = SetupWSConnection();
-
-	if (!bInitialised)
-	{
-		B2Utility::LogWarning("Unable to initialise websocket");
-	}
-	else
-	{
-		B2Utility::LogWarning("Initialised websocket");
-	}
-
-	return bInitialised;
+	Connect();
 }
 
 void UB2NetServer::Tick(float DeltaSeconds)
@@ -126,7 +120,19 @@ void UB2NetServer::Tick(float DeltaSeconds)
 				WSPacket.Message = MessageToServer.GetSerialised();
 			}
 
-			WebSocket->SendText(WSPacket.GetSerialised());
+			if (WebSocket)
+			{
+				WebSocket->SendText(WSPacket.GetSerialised());
+			}
+		}
+	} 
+	else if (bEnforceConnectionTimeout)
+	{
+		TimeSinceConnectionStart += DeltaSeconds;
+		if (TimeSinceConnectionStart >= MAX_CONNECT_ATTEMPT_TIME)
+		{
+			ConnectionAttempts = MAX_CONNECTION_ATTEMPTS;
+			HandleConnectionErrorEvent("Connection attempt timed out");
 		}
 	}
 }
@@ -136,8 +142,41 @@ const FB2ServerUpdate UB2NetServer::GetNextUpdate()
 	return Super::GetNextUpdate();
 }
 
+bool UB2NetServer::Connect()
+{
+	B2Utility::LogInfo("Attempting to initialise connection to game server");
+
+	bConnected = false;
+	ConnectionAttempts = 0;
+	TimeSinceConnectionStart = 0;
+	bEnforceConnectionTimeout = true;
+	ConnectionStepsProcessed = 0;
+
+	if (!bConnectionMade)
+	{
+		bool bInitialised = SetupWSConnection();
+
+		if (!bInitialised)
+		{
+			B2Utility::LogWarning("Unable to initialise websocket");
+			InBoundQueue.Enqueue(FB2ServerUpdate{ EServerUpdate::InstructionConnectionError });
+		}
+		else
+		{
+			B2Utility::LogWarning("Initialised websocket");
+		}
+
+		return bInitialised;
+	}
+
+	return false;
+}
+
 bool UB2NetServer::SetupWSConnection()
 {
+	// Null out the websocket to ensure that it can receive no more events
+	WebSocket = nullptr;
+
 	// Add any other headers, auth or whatever to the default headers
 	TArray<FWebSocketHeaderPair> Headers(DefaultHeaders);
 	//Headers.Add(FWebSocketHeaderPair());
@@ -149,15 +188,18 @@ bool UB2NetServer::SetupWSConnection()
 
 	SetupEventListeners();
 
-	return !bConnectionFailed;
+	return !bConnectionFailed && WebSocket;
 }
 
 void UB2NetServer::SetupEventListeners()
 {
-	WebSocket->OnConnectComplete.AddDynamic(this, &UB2NetServer::HandleConnectionEvent);
-	WebSocket->OnConnectError.AddDynamic(this, &UB2NetServer::HandleConnectionErrorEvent);
-	WebSocket->OnClosed.AddDynamic(this, &UB2NetServer::HandleConnectionClosedEvent);
-	WebSocket->OnReceiveData.AddDynamic(this, &UB2NetServer::HandleMessageReceivedEvent);
+	if (WebSocket)
+	{
+		WebSocket->OnConnectComplete.AddDynamic(this, &UB2NetServer::HandleConnectionEvent);
+		WebSocket->OnConnectError.AddDynamic(this, &UB2NetServer::HandleConnectionErrorEvent);
+		WebSocket->OnClosed.AddDynamic(this, &UB2NetServer::HandleConnectionClosedEvent);
+		WebSocket->OnReceiveData.AddDynamic(this, &UB2NetServer::HandleMessageReceivedEvent);
+	}
 }
 
 FB2WebSocketPacket UB2NetServer::MakeAuthPacket() const
@@ -199,6 +241,7 @@ void UB2NetServer::HandleConnectionEvent()
 void UB2NetServer::HandleConnectionClosedEvent()
 {
 	bConnected = false;
+	WebSocket = nullptr;
 
 	InBoundQueue.Enqueue(FB2ServerUpdate{ EServerUpdate::InstructionConnectionClosed });
 
@@ -212,11 +255,19 @@ void UB2NetServer::HandleConnectionErrorEvent(const FString& Error)
 	{
 		if (++ConnectionAttempts <= MAX_CONNECTION_ATTEMPTS)
 		{
+			TimeSinceConnectionStart = 0;
+
 			B2Utility::LogWarning(FString::Printf(TEXT("Could not connect to websocket [ %s ] - Retrying (retry #%d)"), *WEBSOCKET_URL, ConnectionAttempts));
-			SetupWSConnection();
-			return;
+			if (SetupWSConnection())
+			{
+				return;
+			}
+
 		}
 	}
+
+	bConnected = false;
+	bEnforceConnectionTimeout = false;
 
 	InBoundQueue.Enqueue(FB2ServerUpdate{ EServerUpdate::InstructionConnectionError });
 
@@ -236,6 +287,12 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 		// Connecting to server
 		if (SEQ_EVT_CONNECTION_SUCCESS.Contains(WebSocketPacket.Code)) {
 			OutUpdate.Code = EServerUpdate::InstructionConnectionProgress;
+
+			if (!bConnectionMade && int32(++ConnectionStepsProcessed) >= SEQ_EVT_CONNECTION_SUCCESS.Num())
+			{
+				bConnectionMade = true;
+				bEnforceConnectionTimeout = false;
+			}
 		}
 		// Receiving match data / moves
 		else if (WebSocketPacket.Code == WSC_MATCH_DATA || WebSocketPacket.Code == WSC_MATCH_MOVE)
@@ -248,6 +305,8 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 		{
 			OutUpdate.Code = EServerUpdate::InstructionForfeit;
 			B2Utility::LogWarning(TEXT("Opponent forfeited"));
+
+			bEnforceConnectionTimeout = false;
 		}
 		// Booted out due to illegal move
 		else if (WebSocketPacket.Code == WSC_MATCH_ILLEGAL_MOVE)
@@ -260,18 +319,24 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 		{
 			OutUpdate.Code = EServerUpdate::InstructionAuthError;
 			B2Utility::LogWarning(FString::Printf(TEXT("Authentication error: %d"), WebSocketPacket.Code));
+
+			bEnforceConnectionTimeout = false;
 		}
 		// Match Check errors
 		else if (SEQ_EVT_MATCH_CHECK_ERROR.Contains(WebSocketPacket.Code))
 		{
 			OutUpdate.Code = EServerUpdate::InstructionMatchCheckError;
 			B2Utility::LogWarning(FString::Printf(TEXT("Match check error: %d"), WebSocketPacket.Code));
+
+			bEnforceConnectionTimeout = false;
 		}
 		// Match Setup errors
 		else if (SEQ_EVT_MATCH_SETUP_ERROR.Contains(WebSocketPacket.Code))
 		{
 			OutUpdate.Code = EServerUpdate::InstructionMatchSetupError;
 			B2Utility::LogWarning(FString::Printf(TEXT("Match setup error: %d"), WebSocketPacket.Code));
+
+			bEnforceConnectionTimeout = false;
 		}
 
 		if (OutUpdate.Code != EServerUpdate::None)

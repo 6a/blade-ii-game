@@ -22,6 +22,7 @@
 #include "B2UI/Avatar.h"
 #include "B2UI/LoadingScreen.h"
 #include "B2UI/OptionsMenu.h"
+#include "B2UI/ErrorModal.h"
 
 #include "BladeIIGameMode.generated.h"
 
@@ -142,6 +143,9 @@ private:
 	UPROPERTY()
 	UOptionsMenu* UIOptionsMenuLayer;
 
+	UPROPERTY()
+	UErrorModal* UIErrorModalLayer;
+
 	/* Pointer to the settings object */
 	UPROPERTY()
 	USettings* Settings;
@@ -158,14 +162,17 @@ private:
 	/* The current state of the engine */
 	EEngineState EngineState;
 
-	/* Class type for avatar widget */
+	/* Class type for the avatar widget */
 	TSubclassOf<UAvatar> UIAvatarWidgetClass;
 
-	/* Class type for avatar widget */
+	/* Class type for the loading screen widget */
 	TSubclassOf<ULoadingScreen> UILoadingScreenWidgetClass;
 
-	/* Class type for avatar widget */
+	/* Class type for the options menu widget */
 	TSubclassOf<UOptionsMenu> UIOptionsMenuWidgetClass;
+
+	/* Class type for the error modal widget */
+	TSubclassOf<UErrorModal> UIErrorModalWidgetClass;
 
 	/* Class type for the cursor actor */
 	TSubclassOf<ACardSelector> CursorClass;
@@ -183,10 +190,9 @@ private:
 	float ConnectionProgress;
 	float MatchPrepProgress;
 
-	// Progress max values
+	// Loading progress max values
 	const float CONNECTION_PROGRESS_TARGET = 6;
 	const float MATCH_PREP_PROGRESS_TARGET = 3;
-
 
 	/**
 	 * Reads the launch config and sets up the engine accordingly.
@@ -206,14 +212,17 @@ private:
 	/* Set up the gameplay state machine */
 	void CreateGSM();
 
-	/* Gets and stores a reference to the UI Avatar layer class */
+	/* Gets and stores a reference to the UI Avatar widget class */
 	void GetUIAvatarWidgetClass();
 
-	/* Gets and stores a reference to the UI loading screen layer class */
+	/* Gets and stores a reference to the UI loading screen widget class */
 	void GetUILoadingScreenWidgetClass();
 
-	/* Gets and stores a reference to the UI options menu layer class */
+	/* Gets and stores a reference to the UI options menu widget class */
 	void GetUIOptionsMenuWidgetClass();
+
+	/* Gets and stores a reference to the UI error modal widget class */
+	void GetUIErrorModalWidgetClass();
 
 	/* Gets and stores a reference to the cursor actor class */
 	void GetCursorClass();
@@ -251,8 +260,11 @@ private:
 	/* Set up the UI loading screen layer */
 	void SetupUILoadingScreenLayer();
 
-	/* Set up the UI loading screen layer */
+	/* Set up the UI options menu layer */
 	void SetupUIOptionsMenuLayer();
+
+	/* Set up the UI error modal layer */
+	void SetupUIErrorModalLayer();
 
 	/* Set up the avatar capture rig */
 	void SetupAvatarCaptureRig();
@@ -298,4 +310,8 @@ private:
 	/* Event handler for when a menu button is received by the input actor */
 	UFUNCTION()
 	void HandleMenuButtonPressed();
+
+	/* Event handler for when the error modal close button is pressed */
+	UFUNCTION()
+	void HandleErrorModalButtonPressed();
 };

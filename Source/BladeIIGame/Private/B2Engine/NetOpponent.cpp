@@ -8,6 +8,7 @@
 void UB2NetOpponent::Configure(const FString& PublicID, const FString& AuthToken, uint64 MatchID)
 {
 	UB2NetServer* NetServer = NewObject<UB2NetServer>();
+
 	NetServer->Initialise(PublicID, AuthToken, MatchID);
 	BackEnd = NetServer;
 

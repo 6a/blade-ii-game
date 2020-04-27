@@ -35,3 +35,8 @@ void UB2Opponent::SendUpdate(EServerUpdate Update, const FString& MetaData) cons
 
 	BackEnd->SendUpdate(Update, MetaData);
 }
+
+bool UB2Opponent::ReConnect()
+{
+	return BackEnd->Connect();
+}

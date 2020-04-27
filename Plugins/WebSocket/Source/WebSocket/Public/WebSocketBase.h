@@ -131,6 +131,9 @@ public:
 
 	bool Connect(const FString& uri, const TMap<FString, FString>& header);
 
+	UFUNCTION(BlueprintCallable, Category = WebSocket)
+	void Ping();
+
 #if PLATFORM_UWP
 	Concurrency::task<void> ConnectAsync(Platform::String^ uriString);
 	void MessageReceived(Windows::Networking::Sockets::MessageWebSocket^ sender, Windows::Networking::Sockets::MessageWebSocketMessageReceivedEventArgs^ args);

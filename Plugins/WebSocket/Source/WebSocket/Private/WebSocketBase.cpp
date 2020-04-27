@@ -445,6 +445,12 @@ void UWebSocketBase::SendText(const FString& data)
 #endif
 }
 
+const FString PING_PACKET = TEXT("__PING__");
+void UWebSocketBase::Ping()
+{
+	SendText(PING_PACKET);
+}
+
 void UWebSocketBase::ProcessWriteable()
 {
 #if PLATFORM_UWP
@@ -452,7 +458,18 @@ void UWebSocketBase::ProcessWriteable()
 #else
 	while (mSendQueue.Num() > 0)
 	{
-		std::string strData = TCHAR_TO_UTF8(*mSendQueue[0]);
+		std::string strData;
+		lws_write_protocol protocol = LWS_WRITE_TEXT;
+
+		if (*mSendQueue[0] == PING_PACKET) 
+		{
+			strData = TCHAR_TO_UTF8("");
+			protocol = LWS_WRITE_PING;
+		} 
+		else
+		{
+			strData = TCHAR_TO_UTF8(*mSendQueue[0]);
+		}
 
 		unsigned char buf[LWS_PRE + MAX_ECHO_PAYLOAD];
 		memcpy(&buf[LWS_PRE], strData.c_str(), strData.size() );

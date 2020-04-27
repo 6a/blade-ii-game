@@ -6,51 +6,55 @@
 
 #include "B2Utility/Log.h"
 
-void UOptionsMenu::NativeOnInitialized()
-{
-	Super::NativeOnInitialized();
-
-	GameModeInstance = Cast<ABladeIIGameMode>(GetWorld()->GetAuthGameMode());
-
-	RegisterEventListeners();
-
-	LoadStoredValues();
-
-	State = State::MenuClosed;
-}
+const FString COMBOBOX_ITEM_BLUEPRINT_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_ComboBoxItem'");
 
 UOptionsMenu::UOptionsMenu(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<UComboBoxItem> ComboBoxItem(TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_ComboBoxItemItem'"));
+	static ConstructorHelpers::FClassFinder<UComboBoxItem> ComboBoxItem(*COMBOBOX_ITEM_BLUEPRINT_PATH);
 	if (ComboBoxItem.Succeeded())
 	{
 		ComboBoxItemClass = ComboBoxItem.Class;
 	}
+
+	State = State::MenuClosed;
+}
+
+void UOptionsMenu::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	RegisterEventListeners();
+	
+	GameModeInstance = Cast<ABladeIIGameMode>(GetWorld()->GetAuthGameMode());
+
+	LoadStoredValues();
 }
 
 void UOptionsMenu::ToggleMenu()
 {
-	APlayerController* PlayerController = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-
-	if (!IsAnyAnimationPlaying())
+	if (State == State::MenuOpen)
 	{
-		if (State == State::MenuOpen)
-		{
-			PlayAnimation(CloseAnimation);
-			State = State::MenuClosed;
-		}
-		else if (State == State::MenuClosed)
-		{
-			PlayAnimation(OpenAnimation);
-			State = State::MenuOpen;
-		}
-		else if (State == State::ModalOpen)
-		{
-			PlayAnimation(ModalCloseAnimation);
-			State = State::MenuOpen;
-		}
+		PlayAnimationReverse(ShowHideMenuAnimation);
+		State = State::MenuClosed;
 	}
+	else if (State == State::MenuClosed)
+	{
+		PlayAnimationForward(ShowHideMenuAnimation);
+		State = State::MenuOpen;
+	}
+	else if (State == State::ModalOpen)
+	{
+		PlayAnimationReverse(ShowHideModalAnimation);
+		State = State::MenuOpen;
+	}
+
+	LanguageComboBox->Clear();
+}
+
+void UOptionsMenu::ClearLanguageComboBoxFocus()
+{
+	LanguageComboBox->Clear();
 }
 
 void UOptionsMenu::OnMasterVolumeValueChanged(float NewValue)
@@ -97,8 +101,9 @@ FEventReply UOptionsMenu::OnBackgroundClicked(FGeometry MyGeometry, const FPoint
 
 void UOptionsMenu::OnForfeitButtonPressed()
 {
-	PlayAnimation(ModalOpenAnimation);
+	PlayAnimationForward(ShowHideModalAnimation);
 	State = State::ModalOpen;
+
 }
 
 UWidget* UOptionsMenu::OnLanguageComboBoxConstructed(FString Item)
@@ -116,8 +121,9 @@ void UOptionsMenu::OnForfeitConfirmButtonPressed()
 
 void UOptionsMenu::OnForfeitCancelButtonPressed()
 {
-	PlayAnimation(ModalCloseAnimation);
+	PlayAnimationReverse(ShowHideModalAnimation);
 	State = State::MenuOpen;
+
 }
 
 void UOptionsMenu::RegisterEventListeners()

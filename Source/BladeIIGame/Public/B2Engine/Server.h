@@ -32,6 +32,12 @@ public:
 	/* Tick the server */
 	virtual void Tick(float DeltaSeconds);
 
+	/**
+	 * Attempt to connect to the game server again - only valid if the client has not yet connected
+	 * @return false if the conditions are invalid (such as if the client has disconnected after being connected already)
+	 */
+	virtual bool Connect();
+
 protected:
 	TQueue<FB2ServerUpdate> OutBoundQueue;
 	TQueue<FB2ServerUpdate> InBoundQueue;

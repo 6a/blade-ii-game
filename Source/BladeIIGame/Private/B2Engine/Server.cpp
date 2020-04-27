@@ -27,3 +27,8 @@ void UB2Server::Tick(float DeltaSeconds)
 {
 
 }
+
+bool UB2Server::Connect()
+{
+	return false;
+}
