@@ -62,6 +62,9 @@ private:
 	float TimeSinceConnectionStart;
 	bool bEnforceConnectionTimeout;
 
+	/* Set to true to ensure that websocket events are no longer handled */
+	bool bIgnoreAllEvents;
+
 	/* For determining when to consider the connection as "made" */
 	uint32 ConnectionStepsProcessed;
 

@@ -38,12 +38,12 @@ void UErrorModal::SetErrorType(ErrorType Type)
 		InfoText->SetText(LocalisedTextCheckNet);
 		break;
 	case UErrorModal::ErrorType::Disconnected:
-		NegativeButton->SetVisibility(ESlateVisibility::Hidden);
+		NegativeButton->SetVisibility(ESlateVisibility::Collapsed);
 		MessageText->SetText(LocalisedTextDisconnected);
 		InfoText->SetText(LocalisedTextCheckNet);
 		break;
 	case UErrorModal::ErrorType::OpponentForfeit:
-		NegativeButton->SetVisibility(ESlateVisibility::Hidden);
+		NegativeButton->SetVisibility(ESlateVisibility::Collapsed);
 		MessageText->SetText(LocalisedTextOpponentForfeit);
 		InfoText->SetText(LocalisedTextVictorious);
 		break;

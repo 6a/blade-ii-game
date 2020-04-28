@@ -48,18 +48,27 @@ public:
 
 private:
 	/* Card textures */
+	UPROPERTY()
 	TArray<UTexture*> CardFrontTextures;
+
+	UPROPERTY()
 	UTexture* CardBackTexture;
+
+	UPROPERTY()
 	UTexture* CardFrontMRSTexture;
+	
+	UPROPERTY()
 	UTexture* CardBackMRSTexture;
 
 	/* Card actor */
 	TSubclassOf<ACard> CardActorClass;
 
 	/* Pointer to current world object */
+	UPROPERTY()
 	UWorld* World;
 
 	/* Pointer to the current arena actor */
+	UPROPERTY()
 	AArena* Arena;
 
 	/**

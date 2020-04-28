@@ -77,6 +77,7 @@ UB2NetServer::UB2NetServer()
 	bConnectionMade = false;
 	bEnforceConnectionTimeout = false;
 	ConnectionStepsProcessed = 0;
+	bIgnoreAllEvents = false;
 }
 
 void UB2NetServer::Initialise(const FString& InPublicID, const FString& InAuthToken, uint64 InMatchID)
@@ -151,6 +152,7 @@ bool UB2NetServer::Connect()
 	TimeSinceConnectionStart = 0;
 	bEnforceConnectionTimeout = true;
 	ConnectionStepsProcessed = 0;
+	bIgnoreAllEvents = false;
 
 	if (!bConnectionMade)
 	{
@@ -224,6 +226,9 @@ FB2WebSocketPacket UB2NetServer::MakeMatchIDPacket() const
 
 void UB2NetServer::HandleConnectionEvent()
 {
+	// Early exit if we are ignoring events
+	if (bIgnoreAllEvents) return;
+
 	bConnected = true;
 
 	// Auth
@@ -241,15 +246,19 @@ void UB2NetServer::HandleConnectionEvent()
 void UB2NetServer::HandleConnectionClosedEvent()
 {
 	bConnected = false;
-	WebSocket = nullptr;
+
+	// Early exit if we are ignoring events
+	if (bIgnoreAllEvents) return;
 
 	InBoundQueue.Enqueue(FB2ServerUpdate{ EServerUpdate::InstructionConnectionClosed });
-
 	B2Utility::LogInfo("Connection closed");
 }
 
 void UB2NetServer::HandleConnectionErrorEvent(const FString& Error)
 {
+	// Early exit if we are ignoring events
+	if (bIgnoreAllEvents) return;
+
 	// If we arent connected, try to connect
 	if (!bConnected)
 	{
@@ -270,7 +279,6 @@ void UB2NetServer::HandleConnectionErrorEvent(const FString& Error)
 	bEnforceConnectionTimeout = false;
 
 	InBoundQueue.Enqueue(FB2ServerUpdate{ EServerUpdate::InstructionConnectionError });
-
 	B2Utility::LogInfo(FString("Connection errored: ").Append(Error));
 }
 
@@ -307,12 +315,14 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 			B2Utility::LogWarning(TEXT("Opponent forfeited"));
 
 			bEnforceConnectionTimeout = false;
+			bIgnoreAllEvents = true;
 		}
 		// Booted out due to illegal move
 		else if (WebSocketPacket.Code == WSC_MATCH_ILLEGAL_MOVE)
 		{
 			OutUpdate.Code = EServerUpdate::InstructionMatchIllegalMove;
 			B2Utility::LogWarning(TEXT("Illegal Move played by the local player"));
+			bIgnoreAllEvents = true;
 		}
 		// Auth errors
 		else if (SEQ_EVT_AUTH_ERROR.Contains(WebSocketPacket.Code))
@@ -321,6 +331,7 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 			B2Utility::LogWarning(FString::Printf(TEXT("Authentication error: %d"), WebSocketPacket.Code));
 
 			bEnforceConnectionTimeout = false;
+			bIgnoreAllEvents = true;
 		}
 		// Match Check errors
 		else if (SEQ_EVT_MATCH_CHECK_ERROR.Contains(WebSocketPacket.Code))
@@ -329,6 +340,7 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 			B2Utility::LogWarning(FString::Printf(TEXT("Match check error: %d"), WebSocketPacket.Code));
 
 			bEnforceConnectionTimeout = false;
+			bIgnoreAllEvents = true;
 		}
 		// Match Setup errors
 		else if (SEQ_EVT_MATCH_SETUP_ERROR.Contains(WebSocketPacket.Code))
@@ -337,6 +349,7 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 			B2Utility::LogWarning(FString::Printf(TEXT("Match setup error: %d"), WebSocketPacket.Code));
 
 			bEnforceConnectionTimeout = false;
+			bIgnoreAllEvents = true;
 		}
 
 		if (OutUpdate.Code != EServerUpdate::None)

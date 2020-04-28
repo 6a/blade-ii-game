@@ -926,8 +926,13 @@ void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instructio
 	// Websocket connection died
 	else if (Instruction.Code == EServerUpdate::InstructionConnectionClosed)
 	{
-		// Ignore close events during postgame
-		if (EngineState != EEngineState::PostGame)
+		if (EngineState == EEngineState::Initialisation)
+		{
+			UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::UnableToConnect);
+			UIOptionsMenuLayer->ClearLanguageComboBoxFocus();
+			UIErrorModalLayer->SetActive(true);
+		}
+		else
 		{
 			UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::Disconnected);
 			UIOptionsMenuLayer->ClearLanguageComboBoxFocus();
