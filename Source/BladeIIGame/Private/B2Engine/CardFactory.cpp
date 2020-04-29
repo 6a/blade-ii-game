@@ -42,8 +42,8 @@ ACard* UB2CardFactory::Make(const ECard& Card, const FVector& StartingPosition, 
 	SpawnedCard->SetActorLabel(*B2Utility::CardEnumToString(Card));
 #endif
 
-	UMaterialInstanceDynamic* MaterialFront = UMaterialInstanceDynamic::Create(SpawnedCard->Mesh->GetMaterial(0), NULL);
-	UMaterialInstanceDynamic* MaterialBack = UMaterialInstanceDynamic::Create(SpawnedCard->Mesh->GetMaterial(1), NULL);
+	UMaterialInstanceDynamic* MaterialFront = SpawnedCard->Mesh->CreateAndSetMaterialInstanceDynamicFromMaterial(0, SpawnedCard->Mesh->GetMaterial(0));
+	UMaterialInstanceDynamic* MaterialBack = SpawnedCard->Mesh->CreateAndSetMaterialInstanceDynamicFromMaterial(1, SpawnedCard->Mesh->GetMaterial(1));
 
 	MaterialFront->SetTextureParameterValue(TEXT("Texture"), GetTexture(Card));
 	MaterialFront->SetTextureParameterValue(TEXT("MRS Map"), CardFrontMRSTexture);
@@ -64,13 +64,13 @@ void UB2CardFactory::LoadConfig(const B2CardFactoryConfig& CardFactoryConfig)
 	/* Card front textures */
 	for (auto It = CardFactoryConfig.CardFrontPaths.CreateConstIterator(); It; ++It)
 	{
-		CardFrontTextures.Add(LoadObject<UTexture>(NULL, **It, NULL, LOAD_None, NULL));
+		CardFrontTextures.Add(LoadObject<UTexture>(this, **It, NULL, LOAD_None, NULL));
 	}
 
 	/* Card back and MRS textures */
-	CardBackTexture = LoadObject<UTexture>(NULL, *CardFactoryConfig.CardBackPath, NULL, LOAD_None, NULL);
-	CardFrontMRSTexture = LoadObject<UTexture>(NULL, *CardFactoryConfig.CardFrontMRSPath, NULL, LOAD_None, NULL);
-	CardBackMRSTexture = LoadObject<UTexture>(NULL, *CardFactoryConfig.CardBackMRSPath, NULL, LOAD_None, NULL);
+	CardBackTexture = LoadObject<UTexture>(this, *CardFactoryConfig.CardBackPath, NULL, LOAD_None, NULL);
+	CardFrontMRSTexture = LoadObject<UTexture>(this, *CardFactoryConfig.CardFrontMRSPath, NULL, LOAD_None, NULL);
+	CardBackMRSTexture = LoadObject<UTexture>(this, *CardFactoryConfig.CardBackMRSPath, NULL, LOAD_None, NULL);
 
 	/* World */
 	World = CardFactoryConfig.World;

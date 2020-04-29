@@ -27,12 +27,17 @@ void UAvatar::SetOpponentMessage(EOpponentMessage Message, const FString& Charac
 	Callout->SetText(GetTextForMessage(Message, Character));
 }
 
-bool UAvatar::IsAnimatingCalloutText() const
+void UAvatar::SetOpponentName(const FString& Name)
+{
+	NameplateText->SetText(FText::FromString(Name));
+}
+
+bool UAvatar::IsAnimatingOpponentCalloutText() const
 {
 	return Callout->IsAnimatingText();
 }
 
-bool UAvatar::IsCalloutActive() const
+bool UAvatar::IsOpponentCalloutActive() const
 {
 	return Callout->IsActive();
 }

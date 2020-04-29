@@ -24,12 +24,18 @@ public:
 	 * @param Character - String representation of the character for which the corresponding message should be fetched
 	 */
 	void SetOpponentMessage(EOpponentMessage Message, const FString& Character);
+
+	/**
+	 * Sets the name displayed under the opponents avatar
+	 * @param Name - The name to display
+	 */
+	void SetOpponentName(const FString& Name);
 	
 	/* Returns true if the callout is currently animating text */
-	bool IsAnimatingCalloutText() const;
+	bool IsAnimatingOpponentCalloutText() const;
 
 	/* Returns true if the callout is currently active (animating text, waiting, or fading out) */
-	bool IsCalloutActive() const;
+	bool IsOpponentCalloutActive() const;
 
 private:
 

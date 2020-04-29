@@ -13,7 +13,22 @@ class BLADEIIGAME_API AAvatarCaptureRig : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
+
+	enum class Character : uint8
+	{
+		Laura,
+		Alisa,
+		Elliot,
+		Emma,
+		Fie,
+		Gaius,
+		Jusis,
+		Machias,
+		Millium,
+		Rean,
+	};
+
 	/* The main mesh for the avatar, with read access for blueprints */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USkeletalMeshComponent* AvatarMesh;
@@ -28,8 +43,11 @@ public:
 
 	AAvatarCaptureRig();
 
-	/* Set the current game mode instance */
-	void SetGameModeInstance(class ABladeIIGameMode* InGameModeInstance);
+	/**
+	 * Initialise the capture rig to the specified character
+	 * @param Char - The character to set the rig to
+	 */
+	void Initialise(Character Char);
 
 	/* Switch to a random set of eyes - will automatically revert after the timeout period */
 	void ChangeEyes();
@@ -75,8 +93,17 @@ private:
 	/* Name of the eye and mouth texture parameter */
 	const FName TEXTURE_PARAM_NAME = FName(TEXT("Dynamic"));
 
+	/* Skeletal mesh root path */
+	const FString SKELETAL_MESH_PATH = TEXT("SkeletalMesh'/Game/BladeIIGame/Meshes/Characters/");
+
+	/* Animation root path */
+	const FString ANIMATION_PATH = TEXT("AnimSequence'/Game/BladeIIGame/Animations/Characters/");
+
 	/* The folder delimiter */
-	const FString F_DLIM = "/";
+	const FString F_DLIM = TEXT("/");
+
+	/* End of reference delimiter */
+	const FString R_DLIM = TEXT("'");
 
 	/* The total number of eye textures to load */
 	const uint32 NUM_EYE_TEX = 6;
@@ -132,7 +159,19 @@ private:
 	 * @param Index - The index for the texture
 	 * @return the reference path as a string
 	 */
-	const FString GetPathForIndex(Folder Folder, uint32 Index) const;
+	const FString GetVariationPathForIndex(Folder Folder, uint32 Index) const;
+
+	/**
+	 * Returns the reference path the static mesh for the current character
+	 * @return the reference path as a string
+	 */
+	const FString GetStaticMeshPath() const;
+
+	/**
+	 * Returns the reference path the animation for the current character
+	 * @return the reference path as a string
+	 */
+	const FString GetAnimationPath() const;
 
 	/* Load the mouth and eye textures for this avatar */
 	void LoadTextures();

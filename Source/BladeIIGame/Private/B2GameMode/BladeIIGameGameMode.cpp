@@ -241,6 +241,9 @@ void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitial
 	// Set up the settings object
 	Settings = ObjectInitializer.CreateDefaultSubobject<USettings>(this, TEXT("Settings"));
 	Settings->Initialise(this, LaunchConfig);
+
+	// Set the local player public ID in the player data object
+	PlayerData.LocalPlayer.PublicID = LaunchConfig.PublicID;
 }
 
 void ABladeIIGameMode::SetupCardFactory(const FObjectInitializer& ObjectInitializer)
@@ -488,10 +491,6 @@ void ABladeIIGameMode::SetupAvatarCaptureRig()
 	if (AvatarCaptureRigClass)
 	{
 		AvatarCaptureRig = GetWorld()->SpawnActor<AAvatarCaptureRig>(AvatarCaptureRigClass, AVATAR_CAPTURE_RIG_SPAWN_LOCATION, FRotator::ZeroRotator);
-		if (AvatarCaptureRig)
-		{
-			AvatarCaptureRig->SetGameModeInstance(this);
-		}
 	}
 }
 
@@ -522,6 +521,8 @@ void ABladeIIGameMode::InitialiseOpponent()
 	if (Settings->IsVersusAI())
 	{
 		static_cast<UB2AIOpponent*>(Opponent)->Configure(static_cast<EAIDifficulty>(Settings->GetIntSetting(EIntSetting::MatchID)));
+
+		AvatarCaptureRig->Initialise(AAvatarCaptureRig::Character::Laura);
 	}
 	else
 	{
@@ -538,11 +539,11 @@ void ABladeIIGameMode::DelayedStart()
 	if (!bOtherDelayedStartComponentReady)
 	{
 		bOtherDelayedStartComponentReady = true;
-
-		InitialiseBoard();
 	}
 	else
 	{
+		InitialiseBoard();
+
 		EngineState = EEngineState::Dealing;
 			
 		if (FAST_DRAW)
@@ -948,6 +949,17 @@ void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instructio
 	else if (Instruction.Code == EServerUpdate::InstructionPlayerData || Instruction.Code == EServerUpdate::InstructionOpponentData)
 	{
 		UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::PreparingMatch, ++MatchPrepProgress / MATCH_PREP_PROGRESS_TARGET);
+
+		if (Instruction.Code == EServerUpdate::InstructionPlayerData)
+		{
+			PlayerData.AddLocalPlayerData(Instruction.Payload);
+		}
+		else
+		{
+			PlayerData.AddOpponentData(Instruction.Payload);
+			AvatarCaptureRig->Initialise(static_cast<AAvatarCaptureRig::Character>(PlayerData.Opponent.Avatar));
+			UIAvatarLayer->SetOpponentName(PlayerData.Opponent.DisplayName);
+		}
 	}
 
 	B2Utility::LogInfo(FString::Printf(TEXT("Server Instruction: [%d] Metadata: [ %s ]"), Instruction.Code, *Instruction.Payload));

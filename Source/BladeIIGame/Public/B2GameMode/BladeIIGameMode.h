@@ -11,6 +11,7 @@
 #include "B2Engine/LocalPlayerInput.h"
 #include "B2Engine/UIEffectLayer.h"
 #include "B2Engine/Settings.h"
+#include "B2Engine/PlayerData.h"
 #include "B2Engine/GameStateMachine/GSM.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
@@ -151,6 +152,7 @@ private:
 	USettings* Settings;
 
 	/* Pointer to the cardfactory that will be used throughout this match */
+	UPROPERTY()
 	UB2CardFactory* CardFactory;
 
 	/* The gamestate state machine instance */
@@ -158,6 +160,9 @@ private:
 
 	/* The current state of the game */
 	B2GameState* GameState;
+
+	/* Data relating to each player (display name, avatar etc. */
+	B2PlayerData PlayerData;
 
 	/* The current state of the engine */
 	EEngineState EngineState;
