@@ -894,7 +894,10 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
 	GameState = new B2GameState(Cards);
 
-	UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::PreparingMatch, ++MatchPrepProgress / MATCH_PREP_PROGRESS_TARGET);
+	if (!Settings->IsVersusAI())
+	{
+		UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::PreparingMatch, ++MatchPrepProgress / MATCH_PREP_PROGRESS_TARGET);
+	}
 
 	DelayedStart();
 }

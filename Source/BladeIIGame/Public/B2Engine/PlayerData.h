@@ -35,6 +35,10 @@ public:
 
 private:
 
+	const uint32 LOCAL_PLAYER_DATA_SIZE = 2;
+	const uint32 OPPONENT_DATA_SIZE = 3;
+	const FString DELIMITER = TEXT(".");
+
 	/* Decodes a local player data string into the local player member variable */
 	bool DeserializeLocalPlayerData(const FString& Data);
 

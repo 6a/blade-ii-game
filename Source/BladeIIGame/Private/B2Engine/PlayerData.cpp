@@ -4,10 +4,6 @@
 
 #include "B2Utility/Log.h"
 
-const uint32 LOCAL_PLAYER_DATA_SIZE = 2;
-const uint32 OPPONENT_DATA_SIZE = 3;
-const FString DELIMITER = TEXT(".");
-
 void B2PlayerData::AddLocalPlayerData(const FString& LocalPlayerRaw)
 {
 	if (!DeserializeLocalPlayerData(LocalPlayerRaw))
