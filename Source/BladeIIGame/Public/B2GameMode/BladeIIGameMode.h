@@ -21,6 +21,7 @@
 #include "B2Enum/UIEffectEventEnum.h"
 #include "B2Enum/WinConditionEnum.h"
 #include "B2UI/Avatar.h"
+#include "B2UI/StatusIndicator.h"
 #include "B2UI/LoadingScreen.h"
 #include "B2UI/OptionsMenu.h"
 #include "B2UI/ErrorModal.h"
@@ -93,6 +94,7 @@ public:
 	UB2Opponent* GetOpponent() const { return Opponent; }
 	UB2UIEffectLayer* GetUIEffectLayer() const { return UIEffectLayer; }
 	UAvatar* GetUIAvatarLayer() const { return UIAvatarLayer; }
+	UStatusIndicator* GetUIStatusIndicatorLayer() const { return UIStatusIndicatorLayer; }
 	ULoadingScreen* GetUILoadingScreenLayer() const { return UILoadingScreenLayer; }
 	USettings* GetSettings() const { return Settings; }
 	
@@ -136,6 +138,10 @@ private:
 	UPROPERTY()
 	UAvatar* UIAvatarLayer;
 
+	/* Pointer to UI status indicator layer */
+	UPROPERTY()
+	UStatusIndicator* UIStatusIndicatorLayer;
+
 	/* Loading screen UI layer*/
 	UPROPERTY()
 	ULoadingScreen* UILoadingScreenLayer;
@@ -169,6 +175,9 @@ private:
 
 	/* Class type for the avatar widget */
 	TSubclassOf<UAvatar> UIAvatarWidgetClass;
+
+	/* Class type for the status indicator widget */
+	TSubclassOf<UStatusIndicator> UIStatusIndicatorWidgetClass;
 
 	/* Class type for the loading screen widget */
 	TSubclassOf<ULoadingScreen> UILoadingScreenWidgetClass;
@@ -220,6 +229,9 @@ private:
 	/* Gets and stores a reference to the UI Avatar widget class */
 	void GetUIAvatarWidgetClass();
 
+	/* Gets and stores a reference to the status indicator widget class */
+	void GetUIStatusIndicatorClass();
+
 	/* Gets and stores a reference to the UI loading screen widget class */
 	void GetUILoadingScreenWidgetClass();
 
@@ -261,6 +273,9 @@ private:
 
 	/* Set up the UI avatar layer */
 	void SetupUIAvatarLayer();
+
+	/* Set up the UI status indicator layer */
+	void SetupUIStatusIndicatorLayer();
 
 	/* Set up the UI loading screen layer */
 	void SetupUILoadingScreenLayer();

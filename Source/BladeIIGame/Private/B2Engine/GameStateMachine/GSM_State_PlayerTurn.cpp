@@ -120,7 +120,8 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				GI->GetGameSound()->PlaySFX(ESFX::CursorSelect);
 
 				GI->GetGameState()->bAcceptPlayerInput = false;
-				break;
+
+				GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
 			}
 		}
 	}

@@ -7,6 +7,8 @@ void UStatusIndicator::SetState(State NewState)
 	if (NewState != CurrentState)
 	{
 		CurrentState = NewState;
+		WaitingAnimationTimer = 0;
+		WaitingAnimationPhase = 0;
 		TurnTimeRemaining = TIMER_MAX;
 
 		UWidgetAnimation* AnimationToPlay = nullptr;

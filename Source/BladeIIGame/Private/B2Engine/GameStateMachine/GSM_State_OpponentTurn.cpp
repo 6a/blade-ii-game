@@ -115,6 +115,8 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 		}
 
 		bMoveHandled = true;
+
+		GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
 	}
 }
 

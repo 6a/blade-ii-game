@@ -36,6 +36,7 @@ const float OUT_OF_BOUNDS_OFFSET_X = 28;
 const FString AVATAR_CAPTURE_RIG_BLUEPRINT_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_AvatarCaptureRig'");
 const FString AVATAR_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Avatar'");
 const FVector AVATAR_CAPTURE_RIG_SPAWN_LOCATION = FVector(500, 0, 0);
+const FString STATUS_INDICATOR_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_StatusIndicator'");
 const FString LOADING_SCREEN_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_LoadingScreen'");
 const FString OPTIONS_MENU_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_OptionsMenu'");
 const FString ERROR_MODAL_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_ErrorModal'");
@@ -58,6 +59,8 @@ ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 	CreateGSM();
 
 	GetUIAvatarWidgetClass();
+
+	GetUIStatusIndicatorClass();
 
 	GetUILoadingScreenWidgetClass();
 
@@ -137,11 +140,13 @@ void ABladeIIGameMode::ChangeTurn()
 	{
 		GameState->Turn = EPlayer::Opponent;
 		GSM->ChangeState<GSM_State_OpponentTurn>();
+		UIStatusIndicatorLayer->SetState(UStatusIndicator::State::OpponentTurn);
 	}
 	else
 	{
 		GameState->Turn = EPlayer::Player;
 		GSM->ChangeState<GSM_State_PlayerTurn>();
+		UIStatusIndicatorLayer->SetState(UStatusIndicator::State::PlayerTurn);
 	}
 }
 
@@ -203,6 +208,8 @@ void ABladeIIGameMode::StartPlay()
 	SetupUIEffectLayer();
 
 	SetupUIAvatarLayer();
+
+	SetupUIStatusIndicatorLayer();
 
 	SetupUILoadingScreenLayer();
 
@@ -296,6 +303,15 @@ void ABladeIIGameMode::GetUIAvatarWidgetClass()
 	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the avatar widget")))
 	{
 		UIAvatarWidgetClass = ClassFinder.Class;
+	}
+}
+
+void ABladeIIGameMode::GetUIStatusIndicatorClass()
+{
+	ConstructorHelpers::FClassFinder<UStatusIndicator> ClassFinder(*STATUS_INDICATOR_WIDGET_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the status indicator widget")))
+	{
+		UIStatusIndicatorWidgetClass = ClassFinder.Class;
 	}
 }
 
@@ -445,6 +461,18 @@ void ABladeIIGameMode::SetupUIAvatarLayer()
 		if (UIAvatarLayer)
 		{
 			UIAvatarLayer->AddToPlayerScreen();
+		}
+	}
+}
+
+void ABladeIIGameMode::SetupUIStatusIndicatorLayer()
+{
+	if (UIStatusIndicatorWidgetClass)
+	{
+		UIStatusIndicatorLayer = CreateWidget<UStatusIndicator>(GetWorld()->GetGameInstance(), UIStatusIndicatorWidgetClass, TEXT("UI Status Indicator Layer"));
+		if (UIStatusIndicatorLayer)
+		{
+			UIStatusIndicatorLayer->AddToPlayerScreen();
 		}
 	}
 }
