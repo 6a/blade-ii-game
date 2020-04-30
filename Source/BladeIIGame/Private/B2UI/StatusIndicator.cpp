@@ -24,6 +24,9 @@ void UStatusIndicator::SetState(State NewState)
 		case UStatusIndicator::State::OpponentTurn:
 			AnimationToPlay = SwitchToOpponentTurnAnim;
 			break;
+		case UStatusIndicator::State::GameOver:
+			AnimationToPlay = SwitchToGameOverAnim;
+			break;
 		}
 
 		if (AnimationToPlay)
@@ -62,7 +65,7 @@ void UStatusIndicator::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 		uint32 WaitingCharCount = (WaitingAnimationPhase % WAITING_PLACEHOLDER_MAX_CHARS) + 1;
 		TimerTextString = FString::ChrN(WaitingCharCount, Waiting_PLACEHOLDER_CHAR);
 	}
-	else
+	else if (CurrentState != State::GameOver)
 	{
 		TimerTextString = FString::FromInt(FMath::FloorToInt(TurnTimeRemaining));
 		TurnTimeRemaining = FMath::Clamp(TurnTimeRemaining - InDeltaTime, 0.f, TIMER_MAX);
@@ -74,6 +77,10 @@ void UStatusIndicator::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 				PlayAnimation(WarningAnim, 0, 0);
 			}
 		}
+	}
+	else
+	{
+		TimerTextString = TEXT("");
 	}
 
 	if (TimerText)

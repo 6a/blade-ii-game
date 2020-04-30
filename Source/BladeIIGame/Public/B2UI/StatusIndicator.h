@@ -20,6 +20,7 @@ public:
 		Waiting,
 		PlayerTurn,
 		OpponentTurn,
+		GameOver,
 	};
 
 	/**
@@ -67,6 +68,10 @@ private:
 	/* Switching animation --> To opponent turn */
 	UPROPERTY(meta = (BindWidgetAnim))
 	UWidgetAnimation* SwitchToOpponentTurnAnim;
+
+	/* Switching animation --> To game over state */
+	UPROPERTY(meta = (BindWidgetAnim))
+	UWidgetAnimation* SwitchToGameOverAnim;
 
 	/* Timer warning animation */
 	UPROPERTY(meta = (BindWidgetAnim))

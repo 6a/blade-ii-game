@@ -130,6 +130,8 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 		Dealer->RevealOpponentsHand();
 	}
 
+	UIStatusIndicatorLayer->SetState(UStatusIndicator::State::GameOver);
+
 	B2Utility::LogInfo(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
 }
 
