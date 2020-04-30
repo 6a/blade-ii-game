@@ -81,8 +81,11 @@ public:
 	/* Helper function to inform the game mode that the automatic load has finished (when vs AI) */
 	void LoadingFinished();
 
-	/* Helper function to initialise a match quit + shutdown by the local player */
-	void LocalQuit();
+	/**
+	 * Helper function to initialise a match quit + shutdown by the local player
+	 * @param bReportForfeit - Whether or not to report the quit to the server (defaults to true)
+	 */
+	void LocalQuit(bool bReportForfeit = true);
 
 	/* Getters for various references */
 	AArena* GetArena() const { return Arena; }

@@ -44,11 +44,13 @@ void UEffectsLayerWidget::Play(EUIEffect Effect, const FVector* TargetWorldPosit
         Force->Play(Position, StartDelay, PostDelay);
         EffectSwitcher->SetActiveWidget(Force);
         break;
+    case EUIEffect::Victory:
+        Victory->Play(Position, StartDelay, PostDelay);
+        EffectSwitcher->SetActiveWidget(Victory);
+        break;
     case EUIEffect::Draw:
         break;
-    case EUIEffect::Win:
-        break;
-    case EUIEffect::Loss:
+    case EUIEffect::Defeat:
         break;
     default:
         break;

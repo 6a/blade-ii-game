@@ -877,9 +877,9 @@ void ABladeIIGameMode::LoadingFinished()
 	DelayedStart();
 }
 
-void ABladeIIGameMode::LocalQuit()
+void ABladeIIGameMode::LocalQuit(bool bReportForfeit)
 {
-	Opponent->SendUpdate(EServerUpdate::InstructionForfeit, LOCAL_QUIT_METADATA);
+	if (bReportForfeit) Opponent->SendUpdate(EServerUpdate::InstructionForfeit, LOCAL_QUIT_METADATA);
 
 	// TODO add this to a callback instead, that quits after a timeout OR when receiving an OK from the server or something.
 	FGenericPlatformMisc::RequestExit(false);

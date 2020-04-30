@@ -13,6 +13,6 @@ enum class EUIEffect : uint8
 	BlastTarget UMETA(DisplayName = "Blast Target"),
 	Force UMETA(DisplayName = "Force"),
 	Draw UMETA(DisplayName = "Draw"),
-	Win UMETA(DisplayName = "Win"),
-	Loss UMETA(DisplayName = "Loss"),
+	Victory UMETA(DisplayName = "Win"),
+	Defeat UMETA(DisplayName = "Loss"),
 };
