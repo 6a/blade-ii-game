@@ -4,36 +4,37 @@
 
 void UStatusIndicator::SetState(State NewState)
 {
-	if (NewState != CurrentState)
+	// Don't check to see if the new state == old state, as we can use this function to reset the timer as well
+
+	CurrentState = NewState;
+	WaitingAnimationTimer = 0;
+	WaitingAnimationPhase = 0;
+	TurnTimeRemaining = TIMER_MAX;
+
+	UWidgetAnimation* AnimationToPlay = nullptr;
+
+	switch (NewState)
 	{
-		CurrentState = NewState;
-		WaitingAnimationTimer = 0;
-		WaitingAnimationPhase = 0;
-		TurnTimeRemaining = TIMER_MAX;
+	case UStatusIndicator::State::Waiting:
+		AnimationToPlay = SwitchToWaitingAnim;
+		break;
+	case UStatusIndicator::State::PlayerTurn:
+		AnimationToPlay = SwitchToPlayerTurnAnim;
+		break;
+	case UStatusIndicator::State::OpponentTurn:
+		AnimationToPlay = SwitchToOpponentTurnAnim;
+		break;
+	case UStatusIndicator::State::GameOver:
+		AnimationToPlay = SwitchToGameOverAnim;
+	case UStatusIndicator::State::DrawACard:
+		AnimationToPlay = SwitchToDrawACardAnim;
+		break;
+	}
 
-		UWidgetAnimation* AnimationToPlay = nullptr;
-
-		switch (NewState)
-		{
-		case UStatusIndicator::State::Waiting:
-			AnimationToPlay = SwitchToWaitingAnim;
-			break;
-		case UStatusIndicator::State::PlayerTurn:
-			AnimationToPlay = SwitchToPlayerTurnAnim;
-			break;
-		case UStatusIndicator::State::OpponentTurn:
-			AnimationToPlay = SwitchToOpponentTurnAnim;
-			break;
-		case UStatusIndicator::State::GameOver:
-			AnimationToPlay = SwitchToGameOverAnim;
-			break;
-		}
-
-		if (AnimationToPlay)
-		{
-			StopAllAnimations();
-			PlayAnimation(AnimationToPlay);
-		}
+	if (AnimationToPlay)
+	{
+		StopAllAnimations();
+		PlayAnimation(AnimationToPlay);
 	}
 }
 

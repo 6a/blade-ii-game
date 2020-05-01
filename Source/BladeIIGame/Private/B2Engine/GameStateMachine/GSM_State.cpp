@@ -4,7 +4,7 @@
 
 GSM_State::GSM_State()
 {
-
+	bIsTimed = false;
 }
 
 void GSM_State::Init(ABladeIIGameMode* GameMode)
@@ -14,7 +14,25 @@ void GSM_State::Init(ABladeIIGameMode* GameMode)
 
 void GSM_State::Tick(float DeltaSeconds)
 {
+	if (bIsTimed)
+	{
+		ABladeIIGameMode* GI = GameModeInstance;
 
+		// Early exit if we are out of time
+		if (GI->GetSettings()->IsVersusAI())
+		{
+			if (GI->GetWorld()->GetTimeSeconds() >= TurnEndTime)
+			{
+				if (!bTimedOut)
+				{
+					bTimedOut = true;
+					GI->EndGame(EPlayer::Opponent, EWinCondition::TimeOut);
+				}
+
+				return;
+			}
+		}
+	}
 }
 
 void GSM_State::End()
@@ -158,6 +176,18 @@ void GSM_State::OpponentMessage(EOpponentMessage MessageType) const
 	GI->GetUIAvatarLayer()->SetOpponentMessage(MessageType, GI->GetOpponentAvatar()->GetCurrentCharacterName());
 	GI->GetOpponentAvatar()->ChangeEyes();
 	GI->GetOpponentAvatar()->AnimateMouth();
+}
+
+void GSM_State::SetIsTimed()
+{
+	ABladeIIGameMode* GI = GameModeInstance;
+
+	if (GI->GetSettings()->IsVersusAI())
+	{
+		TurnEndTime = GI->GetWorld()->GetTimeSeconds() + MAX_TURN_TIME_AI_GAME;
+		bIsTimed = true;
+		bTimedOut = false;
+	}
 }
 
 ACard* GSM_State::GetCurrentCard()

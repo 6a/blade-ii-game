@@ -28,6 +28,15 @@ protected:
 	/* The maximum amount of time a turn can take (for bot games only - networked games are handled by the server */
 	const float MAX_TURN_TIME_AI_GAME = 21.f;
 
+	/* Whether or not this state is timed. If true, and its an AI game, running out of time will trigger a loss (used for AI games only) */
+	bool bIsTimed;
+
+	/* The time at which this turn will end, and the player will be forced to forfeit (used for AI games only) */
+	float TurnEndTime;
+
+	/* Whether or not the player has run out of time for their turn (used for AI games only) */
+	bool bTimedOut;
+
 	UPROPERTY()
 	class ABladeIIGameMode* GameModeInstance;
 
@@ -68,6 +77,9 @@ protected:
 
 	/* Requests a message callout with a message of the specified type + mouth animation for the opponent avatar */
 	void OpponentMessage(EOpponentMessage MessageType) const;
+
+	/* Set the timer flag to true, and initialise any required values. */
+	void SetIsTimed();
 
 private:
 	/* The value to remove from a bolted card (non effect) to determine its non flipped type */

@@ -21,6 +21,7 @@ public:
 		PlayerTurn,
 		OpponentTurn,
 		GameOver,
+		DrawACard,
 	};
 
 	/**
@@ -72,6 +73,10 @@ private:
 	/* Switching animation --> To game over state */
 	UPROPERTY(meta = (BindWidgetAnim))
 	UWidgetAnimation* SwitchToGameOverAnim;
+
+	/* Switching animation --> To draw a card state */
+	UPROPERTY(meta = (BindWidgetAnim))
+	UWidgetAnimation* SwitchToDrawACardAnim;
 
 	/* Timer warning animation */
 	UPROPERTY(meta = (BindWidgetAnim))

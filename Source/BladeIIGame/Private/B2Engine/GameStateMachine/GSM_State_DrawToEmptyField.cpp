@@ -56,6 +56,10 @@ void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 
 		GI->GetUIAvatarLayer()->SetOpponentMessage(EOpponentMessage::Draw, GI->GetOpponentAvatar()->GetCurrentCharacterName());
 		GI->GetOpponentAvatar()->AnimateMouth();
+
+		GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::DrawACard);
+
+		SetIsTimed();
 	}
 }
 
@@ -127,6 +131,8 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 
 					bIsWaitingForOpponentDrawFromHand = true;
 				}
+
+				GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
 
 				break;
 			}
