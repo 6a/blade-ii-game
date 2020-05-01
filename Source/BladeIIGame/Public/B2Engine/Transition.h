@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 
+#include "B2Game/GameSound.h"
 #include "B2Enum/EaseEnum.h"
 
 typedef int64 B2WaitGroup;
@@ -63,6 +64,8 @@ public:
 	/* Reset all the static counters such as current and next wait group  */
 	static void ResetStatic();
 
+	void SetGameSoundInstance(class AGameSound* GameSoundInstance);
+
 private:
 	B2TRotation Rotation;
 	B2TPosition Translation;
@@ -77,6 +80,12 @@ private:
 	static TMap<B2WaitGroup, size_t> WaitGroups;
 	static B2WaitGroup CurrentWaitGroup;
 	static B2WaitGroup NextWaitGroup;
+
+	/* Reference to the game sound class */
+	class AGameSound* GameSound;
+
+	/* Whether or not the card sound has been played yet */
+	bool bHasPlayedSound;
 
 	/**
 	 * Eases between two vectors using the specified easing method

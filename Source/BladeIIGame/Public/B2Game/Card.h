@@ -31,7 +31,7 @@ public:
 	 * Add a transition to the transition queue, which will play after any preceeding transitions have finished playing.
 	 * @param Transition - A transition helper object
 	 */
-	void QueueTransition(const B2Transition& Transition);
+	void QueueTransition(B2Transition& Transition);
 
 	/**
 	 * Fade the card in over (Duration) seconds
@@ -100,4 +100,7 @@ private:
 	const float LERP_MAX = 1.f;
 	const float EASE_EXPONENT = 2.f;
 	const FName OPACITY_PARAMETER = TEXT("Opacity");
+
+	/* Reference to the game sound class */
+	class AGameSound* GameSound;
 };

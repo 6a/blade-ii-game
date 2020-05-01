@@ -1,10 +1,11 @@
 #include "B2Game/Card.h"
 
 #include "Materials/MaterialInstanceDynamic.h"
-
 #include "Misc/Guid.h"
 #include "UObject/ConstructorHelpers.h"
+#include "EngineUtils.h"
 
+#include "B2Game/GameSound.h"
 #include "B2Utility/Log.h"
 
 ACard::ACard()
@@ -28,10 +29,20 @@ ACard::ACard()
 void ACard::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Find and store a reference to the game sound actor
+	for (TActorIterator<AGameSound> GameSoundIter(GetWorld()); GameSoundIter; ++GameSoundIter)
+	{
+		if (GameSoundIter)
+		{
+			GameSound = *GameSoundIter;
+		}
+	}
 }
 
-void ACard::QueueTransition(const B2Transition& Transition)
+void ACard::QueueTransition(B2Transition& Transition)
 {
+	Transition.SetGameSoundInstance(GameSound);
 	Transitions.Enqueue(Transition);
 }
 
@@ -114,8 +125,6 @@ void ACard::Tick(float DeltaTime)
 		/* If the transition has now finished, remove it and exit early */
 		if (Transitions.Peek()->Done())
 		{
-			//B2Utility::LogInfo(FString::Printf(TEXT("Card with WG [ %d ] Finished"), Transitions.Peek()->WaitGroup));
-
 			Transitions.Pop();
 			return;
 		}

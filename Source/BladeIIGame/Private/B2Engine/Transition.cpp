@@ -2,6 +2,7 @@
 
 #include "Math/UnrealMathUtility.h"
 
+#include "B2Game/GameSound.h"
 #include "B2Utility/Log.h"
 
 const float LERP_MIN = 0.f;
@@ -26,6 +27,7 @@ B2Transition::B2Transition(B2WaitGroup WaitGroup, B2TPosition PositionData, B2TR
 	CurrentAlpha = 0;
 
 	bTransitionFinished = false;
+	bHasPlayedSound = false;
 
 	if (WaitGroup >= 0)
 	{
@@ -69,6 +71,13 @@ void B2Transition::Tick(float DeltaTime)
 	if (Duration == 0)
 	{
 		Step = 1;
+	}
+
+	/* Play a card sound, the first time the animation ticks */
+	if (!bHasPlayedSound)
+	{
+		GameSound->PlaySFX(ESFX::CardDeal);
+		bHasPlayedSound = true;
 	}
 
 	/* Calculate and update the alpha value */
@@ -145,6 +154,11 @@ void B2Transition::ResetStatic()
 	NextWaitGroup = 0;
 }
 
+void B2Transition::SetGameSoundInstance(AGameSound* GameSoundInstance)
+{
+	GameSound = GameSoundInstance;
+}
+
 FVector B2Transition::EaseVector(FVector Start, FVector Target, float Alpha, EEase Ease)
 {
 	switch (Ease)
@@ -166,18 +180,6 @@ FRotator B2Transition::EaseRotator(FRotator Start, FRotator Target, float Alpha,
 {
 	FQuat StartQuat = Start.Quaternion();
 	FQuat TargetQuat = Target.Quaternion();
-
-	//switch (Ease)
-	//{
-	//case EEase::EaseIn:
-	//	;
-	//case EEase::EaseInOut:
-	//	return FMath::InterpEaseInOut(StartQuat, TargetQuat, Alpha, EASE_EXPONENT).Rotator();
-	//case EEase::EaseOut:
-	//	return FMath::InterpEaseOut(StartQuat, TargetQuat, Alpha, EASE_EXPONENT).Rotator();
-	//case EEase::Linear:
-	//	return FMath::Lerp(StartQuat, TargetQuat, Alpha).Rotator();
-	//}
 
 	return FQuat::Slerp(StartQuat, TargetQuat, Alpha).Rotator();
 }

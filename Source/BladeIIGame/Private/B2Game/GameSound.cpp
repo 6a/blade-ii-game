@@ -146,12 +146,7 @@ void AGameSound::BeginPlay()
 
 void AGameSound::PlayOneshot(USoundWave* Sound)
 {
-	FAudioDevice* CurrentAudioDevice = GetWorld()->GetAudioDevice()->GetAudioDeviceManager()->GetActiveAudioDevice();
-
-	if (CurrentAudioDevice)
-	{
-		UGameplayStatics::PlaySound2D(this, Sound, GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::SFXVolume));
-	}
+	UGameplayStatics::PlaySound2D(this, Sound, GameModeInstance->GetSettings()->GetFloatSetting(EFloatSetting::SFXVolume));
 }
 
 void AGameSound::Tick(float DeltaTime)
