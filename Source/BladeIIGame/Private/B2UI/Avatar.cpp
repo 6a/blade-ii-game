@@ -16,6 +16,7 @@ const FString LOC_KEY_BLAST = "_BLAST";
 const FString LOC_KEY_FORCE = "_FORCE";
 const FString LOC_KEY_REACTION = "_REACTION";
 const FString LOC_KEY_VICTORY = "_VICTORY";
+const FString LOC_KEY_TIEDGAME = "_TIEDGAME";
 const FString LOC_KEY_DEFEAT = "_DEFEAT";
 const FString LOC_KEY_SUFFIX_000 = "000";
 const FString LOC_KEY_SUFFIX_001 = "001";
@@ -107,6 +108,9 @@ FString UAvatar::MessageTypeToString(EOpponentMessage Message) const
 		break;
 	case EOpponentMessage::Victory:
 		OutMessageString = LOC_KEY_VICTORY;
+		break;
+	case EOpponentMessage::TiedGame:
+		OutMessageString = LOC_KEY_TIEDGAME;
 		break;
 	case EOpponentMessage::Defeat:
 		OutMessageString = LOC_KEY_DEFEAT;

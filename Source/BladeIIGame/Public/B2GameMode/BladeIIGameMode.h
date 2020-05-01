@@ -46,11 +46,11 @@ public:
 	/* Informs the engine that the local player won */
 
 	/**
-	 * Informs the engine that one of the players has achieved victory
-	 * @param Player - The player that has won
-	 * @param WinCondition - The win condition that they achieved
+	 * Informs the engine that the game has ended
+	 * @param Victor - The player that has won, or undecided if the game ended in a draw
+	 * @param WinCondition - The win condition that they achieved (ignored for draws)
 	 */
-	void VictoryAchieved(EPlayer Player,  EWinCondition WinCondition);
+	void EndGame(EPlayer Victor,  EWinCondition WinCondition);
 
 	/* Informs the engine that it is safe to switch turns */
 	void ChangeTurn();

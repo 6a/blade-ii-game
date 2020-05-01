@@ -32,12 +32,19 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	// Check for all the potential branches.
 	// Early exit when a condition is met
 
+	// Early exit check for draw condition
+	if (GameDrawn(Arena, PlayerScore, OpponentScore))
+	{
+		GI->EndGame(EPlayer::Undecided, EWinCondition());
+		return;
+	}
+
 	// Check if either local player or the opponent won after the most recent move
 	bool bIsOtherPlayersTurn = GI->GetGameState()->Turn == EPlayer::Opponent;
 	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, PlayerHand, PlayerField, OpponentHand, OpponentField, OpponentDeckCount, bIsOtherPlayersTurn);
 	if (LocalPlayerOutcome != EWinCondition::None)
 	{
-		GI->VictoryAchieved(EPlayer::Player, LocalPlayerOutcome);
+		GI->EndGame(EPlayer::Player, LocalPlayerOutcome);
 		return;
 	}
 
@@ -45,7 +52,7 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, OpponentHand, OpponentField, PlayerHand, PlayerField, PlayerDeckCount, bIsOtherPlayersTurn);
 	if (OpponentOutcome != EWinCondition::None)
 	{
-		GI->VictoryAchieved(EPlayer::Opponent, OpponentOutcome);
+		GI->EndGame(EPlayer::Opponent, OpponentOutcome);
 		return;
 	}
 
@@ -216,4 +223,20 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 	}
 
 	return EWinCondition::None;
+}
+
+bool GSM_State_ProcessBoardState::GameDrawn(AArena* Arena, uint32 LocalPlayerScore, uint32 OpponentScore) const
+{
+	if (Arena->PlayerDeck->Num() + Arena->OpponentDeck->Num() == 0)
+	{
+		if (Arena->PlayerHand->Num() + Arena->OpponentHand->Num() == 0)
+		{
+			if (LocalPlayerScore == OpponentScore)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }

@@ -103,34 +103,46 @@ void ABladeIIGameMode::EndState()
 	GSM->ChangeState<GSM_State_ProcessBoardState>();
 }
 
-void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinCondition)
+void ABladeIIGameMode::EndGame(EPlayer Victor, EWinCondition WinCondition)
 {
-	FString Turn;
-	if (Player == EPlayer::Player)
+	// Handle draws
+	if (Victor == EPlayer::Undecided)
 	{
-		Turn = TEXT("Local Player");
-		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Defeat, AvatarCaptureRig->GetCurrentCharacterName());
-
-		// Play victory sound effect
-		GameSound->PlaySFX(ESFX::Victory);
-
-		// Play animation
-		UIEffectLayer->Play(EUIEffect::Victory, nullptr);
-	}
-	else if (Player == EPlayer::Opponent)
-	{
-		Turn = TEXT("Opponent");
-		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Victory, AvatarCaptureRig->GetCurrentCharacterName());
+		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::TiedGame, AvatarCaptureRig->GetCurrentCharacterName());
 
 		// Play defeat sound effect
 		GameSound->PlaySFX(ESFX::Defeat);
 
 		// Play animation
-		UIEffectLayer->Play(EUIEffect::Defeat, nullptr);
+		UIEffectLayer->Play(EUIEffect::Draw, nullptr);
 	}
-	else // handle draw
+	else
 	{
+		FString Turn;
+		if (Victor == EPlayer::Player)
+		{
+			Turn = TEXT("Local Player");
+			UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Defeat, AvatarCaptureRig->GetCurrentCharacterName());
 
+			// Play victory sound effect
+			GameSound->PlaySFX(ESFX::Victory);
+
+			// Play animation
+			UIEffectLayer->Play(EUIEffect::Victory, nullptr);
+		}
+		else if (Victor == EPlayer::Opponent)
+		{
+			Turn = TEXT("Opponent");
+			UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Victory, AvatarCaptureRig->GetCurrentCharacterName());
+
+			// Play defeat sound effect
+			GameSound->PlaySFX(ESFX::Defeat);
+
+			// Play animation
+			UIEffectLayer->Play(EUIEffect::Defeat, nullptr);
+		}
+
+		B2Utility::LogInfo(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
 	}
 
 	AvatarCaptureRig->AnimateMouth();
@@ -143,8 +155,6 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 	UIStatusIndicatorLayer->SetState(UStatusIndicator::State::GameOver);
 
 	EngineState = EEngineState::PostGame;
-
-	B2Utility::LogInfo(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
 }
 
 void ABladeIIGameMode::ChangeTurn()

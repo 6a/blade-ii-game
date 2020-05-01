@@ -36,5 +36,7 @@ private:
 	 * @returns Either the win condition achieved, or EWinCondition::None if the target did not win
 	 */
 	EWinCondition CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& TargetHand, const TArray<ECard>& TargetField, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, bool bIsOppositePlayersTurn) const;
+
+	bool GameDrawn(class AArena* Arena, uint32 LocalPlayerScore, uint32 OpponentScore) const;
 };
 

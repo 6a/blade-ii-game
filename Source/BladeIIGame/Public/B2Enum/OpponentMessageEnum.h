@@ -17,5 +17,6 @@ enum class EOpponentMessage : uint8
 	Force UMETA(DisplayName = "Force"),
 	Reaction UMETA(DisplayName = "Reaction"),
 	Victory UMETA(DisplayName = "Victory"),
+	TiedGame UMETA(DisplayName = "Tied Game"),
 	Defeat UMETA(DisplayName = "Defeat"),
 };

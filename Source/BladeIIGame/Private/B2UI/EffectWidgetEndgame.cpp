@@ -18,6 +18,8 @@ void UEffectWidgetEndgame::NativeOnInitialized()
 	{
 		QuitButton->OnClicked.AddDynamic(this, &UEffectWidgetEndgame::HandleQuitButtonClicked);
 	}
+
+	HandleCultureChange();
 }
 
 void UEffectWidgetEndgame::RunAnimation()
