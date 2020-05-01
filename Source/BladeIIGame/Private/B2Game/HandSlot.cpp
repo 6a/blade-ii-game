@@ -28,6 +28,12 @@ const FB2Transform UHandSlot::GetTransformForIndex(uint32 Index) const
 	if (TransformsSource.IsValidIndex(NewIndex))
 	{
 		Transform = TransformsSource[NewIndex];
+		
+		// Edge case for 0 index transform - remove the slight Y rotation
+		if (Index == 0)
+		{
+			Transform.Rotation.Pitch = 0;
+		}
 	}
 
 	return Transform;

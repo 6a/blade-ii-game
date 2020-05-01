@@ -54,11 +54,18 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	// Early exit if we are out of time
-	if (GI->GetSettings()->IsVersusAI() && !bTimedOut && GI->GetWorld()->GetTimeSeconds() > TurnEndTime)
+	if (GI->GetSettings()->IsVersusAI())
 	{
-		bTimedOut = true;
-		GI->EndGame(EPlayer::Opponent, EWinCondition::TimeOut);
-		return;
+		if (GI->GetWorld()->GetTimeSeconds() >= TurnEndTime)
+		{
+			if (!bTimedOut)
+			{
+				bTimedOut = true;
+				GI->EndGame(EPlayer::Opponent, EWinCondition::TimeOut);
+			}
+
+			return;
+		}
 	}
 
 	if (GI->GetGameState()->bAcceptPlayerInput)
