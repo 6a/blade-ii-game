@@ -113,14 +113,24 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 
 		// Play victory sound effect
 		GameSound->PlaySFX(ESFX::Victory);
+
+		// Play animation
+		UIEffectLayer->Play(EUIEffect::Victory, nullptr);
 	}
-	else
+	else if (Player == EPlayer::Opponent)
 	{
 		Turn = TEXT("Opponent");
 		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Victory, AvatarCaptureRig->GetCurrentCharacterName());
 
 		// Play defeat sound effect
 		GameSound->PlaySFX(ESFX::Defeat);
+
+		// Play animation
+		UIEffectLayer->Play(EUIEffect::Defeat, nullptr);
+	}
+	else // handle draw
+	{
+
 	}
 
 	AvatarCaptureRig->AnimateMouth();
@@ -131,6 +141,8 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 	}
 
 	UIStatusIndicatorLayer->SetState(UStatusIndicator::State::GameOver);
+
+	EngineState = EEngineState::PostGame;
 
 	B2Utility::LogInfo(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
 }
