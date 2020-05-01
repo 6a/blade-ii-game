@@ -25,6 +25,9 @@ protected:
 	const FVector ARC_ON_MOVE = FVector(0, 0, 4);
 	const FVector ARC_ON_DRAW_FROM_DECK = FVector(0, 0, 12);
 
+	/* The maximum amount of time a turn can take (for bot games only - networked games are handled by the server */
+	const float MAX_TURN_TIME_AI_GAME = 21.f;
+
 	UPROPERTY()
 	class ABladeIIGameMode* GameModeInstance;
 

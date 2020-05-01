@@ -39,6 +39,12 @@ void GSM_State_PlayerTurn::Init(ABladeIIGameMode* GameMode)
 	uint32 CurrentPlayerScore = GI->GetGameState()->PlayerScore;
 	uint32 CurrentOpponentScore = GI->GetGameState()->OpponentScore;
 	GI->GetArena()->ScoreDisplay->Update(CurrentPlayerScore, CurrentOpponentScore);
+
+	if (GI->GetSettings()->IsVersusAI())
+	{
+		TurnEndTime = GI->GetWorld()->GetTimeSeconds() + MAX_TURN_TIME_AI_GAME;
+		bTimedOut = false;
+	}
 }
 
 void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
@@ -46,6 +52,14 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 	GSM_State::Tick(DeltaSeconds);
 
 	ABladeIIGameMode* GI = GameModeInstance;
+
+	// Early exit if we are out of time
+	if (GI->GetSettings()->IsVersusAI() && !bTimedOut && GI->GetWorld()->GetTimeSeconds() > TurnEndTime)
+	{
+		bTimedOut = true;
+		GI->EndGame(EPlayer::Opponent, EWinCondition::TimeOut);
+		return;
+	}
 
 	if (GI->GetGameState()->bAcceptPlayerInput)
 	{

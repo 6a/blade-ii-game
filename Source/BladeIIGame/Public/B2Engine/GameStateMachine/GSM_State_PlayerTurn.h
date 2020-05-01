@@ -19,6 +19,12 @@ public:
 
 private:
 
+	/* The time at which this turn will end, and the player will be forced to forfeit (used for AI games only) */
+	float TurnEndTime;
+
+	/* Whether or not the player has run out of time for their turn (used for AI games only) */
+	bool bTimedOut;
+
 	/* Update the hand to display the currently selected card */
 	virtual void UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecting = false) override;
 };

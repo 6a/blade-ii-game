@@ -9,4 +9,5 @@ enum class EWinCondition : uint8
 	None UMETA(DisplayName = "No Win"),
 	OpponentOnlyHasEffectCards UMETA(DisplayName = "Opponent Only Has Effect Cards"),
 	ScoreVictory UMETA(DisplayName = "Score Victory"),
+	TimeOut UMETA(DisplayName = "Time Out"),
 };
