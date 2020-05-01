@@ -1,5 +1,6 @@
 #include "B2Engine/AIServer.h"
 
+#include "Algo/Reverse.h"
 #include "Misc/DefaultValueHelper.h"
 
 #include "B2Game/Card.h"
@@ -7,6 +8,7 @@
 #include "B2Predicate/IsNotEffectCard.h"
 #include "B2Utility/String.h"
 #include "B2Utility/Log.h"
+#include "B2Utility/Array.h"
 
 const FB2ServerUpdate UB2AIServer::GetNextUpdate()
 {
@@ -15,7 +17,7 @@ const FB2ServerUpdate UB2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = ForceTest();
+		Cards = GenerateCards();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -624,6 +626,134 @@ void UB2AIServer::SetAILoss(const FString& Reason)
 	Winner = EPlayer::Player;
 
 	BoltTest();
+}
+
+FB2Cards UB2AIServer::GenerateCards() const
+{
+	FB2Cards GeneratedCards;
+
+	// Add all the cards (ref: https://www.reddit.com/r/Falcom/comments/fxt5nq/can_i_buy_the_card_game_blade_anywhere/fmxo8qo/)
+	TArray<ECard> Pool = {
+		ECard::ElliotsOrbalStaff, ECard::ElliotsOrbalStaff,
+		ECard::FiesTwinGunswords, ECard::FiesTwinGunswords, ECard::FiesTwinGunswords, ECard::FiesTwinGunswords, ECard::FiesTwinGunswords,
+		ECard::AlisasOrbalBow, ECard::AlisasOrbalBow, ECard::AlisasOrbalBow, ECard::AlisasOrbalBow, ECard::AlisasOrbalBow,
+		ECard::JusisSword, ECard::JusisSword, ECard::JusisSword, ECard::JusisSword, ECard::JusisSword,
+		ECard::MachiasOrbalShotgun, ECard::MachiasOrbalShotgun, ECard::MachiasOrbalShotgun, ECard::MachiasOrbalShotgun,
+		ECard::GaiusSpear, ECard::GaiusSpear, ECard::GaiusSpear,
+		ECard::LaurasGreatsword, ECard::LaurasGreatsword,
+		ECard::Bolt, ECard::Bolt, ECard::Bolt, ECard::Bolt,
+		ECard::Mirror, ECard::Mirror, ECard::Mirror, ECard::Mirror,
+		ECard::Blast, ECard::Blast, ECard::Blast, ECard::Blast,
+		ECard::Force, ECard::Force,
+	};
+
+	bool bSuccess = false;
+	while (!bSuccess)
+	{
+		B2Utility::ShuffleArray(Pool);
+
+		GeneratedCards.PlayerDeck = TArray<ECard>(Pool.GetData(), 15);
+		GeneratedCards.OpponentDeck = TArray<ECard>(Pool.GetData() + (Pool.GetTypeSize() * 15), 15);
+
+		bSuccess = ValidateCards(GeneratedCards);
+	}
+
+	return GeneratedCards;
+}
+
+bool UB2AIServer::ValidateCards(const FB2Cards& InCards) const
+{
+	for (size_t i = 0; i < MAX_DRAW_ON_START; i++)
+	{
+		uint32 CardIndex = POST_INIT_DECK_SIZE - 1 - i;
+
+		// break - just in case
+		if (CardIndex < 0)
+		{
+			break;
+		}
+
+		int32 LocalPlayerScore = ACard::TypeToValue(InCards.PlayerDeck[CardIndex]);
+		int32 OpponentScore = ACard::TypeToValue(InCards.OpponentDeck[CardIndex]);
+		int32 ScoreDifference = FMath::Abs(LocalPlayerScore - OpponentScore);
+		
+		// If the scores are not equal, we then go on to check if there is a valid move that can be made by the player who goes first
+		if (ScoreDifference != 0)
+		{
+			TArray<ECard> HandToCheck;
+			ECard CardToBeatOrMatch;
+			uint32 CurrentScore;
+
+			// Determine the data set to work on
+			if (LocalPlayerScore < OpponentScore)
+			{
+				HandToCheck = TArray<ECard>(InCards.PlayerDeck.GetData(), 15);
+				CardToBeatOrMatch = InCards.OpponentDeck[CardIndex];
+				CurrentScore = LocalPlayerScore;
+			}
+			else
+			{
+				HandToCheck = TArray<ECard>(InCards.OpponentDeck.GetData(), 15);
+				CardToBeatOrMatch = InCards.PlayerDeck[CardIndex];
+				CurrentScore = OpponentScore;
+			}
+
+			// Reverse the hand to check (as it will get drawn from the top of the deck, rather than the middle)
+			Algo::Reverse(HandToCheck);
+
+			return ValidFirstMoveAvailable(HandToCheck, CardToBeatOrMatch, CurrentScore);
+		}
+	}
+
+
+	return false;
+}
+
+bool UB2AIServer::ValidFirstMoveAvailable(const TArray<ECard>& CardSet, ECard CardToBeatOrMatch, uint32 CurrentScore) const
+{
+	// Early exit if there is only one card, though this should never happen on the local client
+	if (CardSet.Num() == 1)
+	{
+		return true;
+	}
+
+	// This implementation is greedy but it should be fine - TODO see if this is causing a spike
+	for (size_t i = 0; i < CardSet.Num(); i++)
+	{
+		TArray<ECard> CardsWithoutCurrent(CardSet);
+		CardsWithoutCurrent.RemoveAt(i);
+
+		// If there is at least one non effect card left if the current card is played
+		if (CardsWithoutCurrent.ContainsByPredicate<B2Predicate_IsNotEffectCard>(B2Predicate_IsNotEffectCard()))
+		{
+			// Blast are always invalid as they dont change the score
+			if (CardSet[i] != ECard::Blast)
+			{
+				// If the new score beats or matches the target score, its valid
+				if (CurrentScore + ACard::TypeToValue(CardSet[i]) >= ACard::TypeToValue(CardToBeatOrMatch))
+				{
+					return true;
+				}
+
+				// If the card is a force card and playing it would beat or match the target score, its valid
+				if (CardSet[i] == ECard::Force)
+				{
+					if (CurrentScore * 2 >= ACard::TypeToValue(CardToBeatOrMatch))
+					{
+						return true;
+					}
+				}
+
+				// Bolts are always valid to play from this position
+				if (CardSet[i] == ECard::Bolt)
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 FB2Cards UB2AIServer::BoltTest() const

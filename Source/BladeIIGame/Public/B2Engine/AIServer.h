@@ -49,6 +49,12 @@ private:
 	const uint32 SERVER_MESSAGE_CARD_UPDATE_MAX = 11;
 	const uint32 SERVER_MESSAGE_CARD_OFFSET = 1;
 
+	/* Maximum number of draws a game can have when first drawing from the deck */
+	const uint32 MAX_DRAW_ON_START = 3;
+
+	/* The size of the deck after the initial draw to hand is performed */
+	const uint32 POST_INIT_DECK_SIZE = 5;
+
 	/* Prevents the initial deck from being generated and sent more than once */
 	bool bCardsSent = false;
 
@@ -125,6 +131,25 @@ private:
 
 	/* Set the AI to the loss state */
 	void SetAILoss(const FString& Reason);
+
+	/* Generate the set of cards to be used for this AI game */
+	FB2Cards GenerateCards() const;
+
+	/**
+	 * Validates the passed in set of cards, to ensure that the game will not immediately end due to a bad state etc.
+	  *@param InCards - The cards to check
+	 * @return true if the cards are valid
+	 */
+	bool ValidateCards(const FB2Cards& InCards) const;
+
+	/**
+	 * Returns true if the specified card set contains a card that can beat the target card
+	  *@param CardSet - The cards set to check - typically a players hand
+	  *@param CardToBeatOrMatch - The card on the other side of the field that needs to be beaten or matched
+	  *@param CurrentScore - The current score that the player (the one for which we are checking for a valid first move) has
+	 * @return true if there is a valid first move that can be made
+	 */
+	bool ValidFirstMoveAvailable(const TArray<ECard>& CardSet, ECard CardToBeatOrMatch, uint32 CurrentScore) const;
 
 	/* Testing card setups */
 	FB2Cards BoltTest() const;
