@@ -88,6 +88,7 @@ private:
 	FString VersionString;
 
 	/* Reference to the game mode instance */
+	UPROPERTY()
 	class ABladeIIGameMode* GameModeInstance;
 
 	/**

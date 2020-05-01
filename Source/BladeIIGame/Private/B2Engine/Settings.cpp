@@ -1,9 +1,13 @@
 ﻿#include "B2Engine/Settings.h"
 
 #include "Internationalization/Internationalization.h"
+#include "GameFramework/GameUserSettings.h"
+#include "Engine/Engine.h"
+#include "RHI.h"
 
 #include "B2Utility/Log.h"
-
+#include "B2Predicate/MatchResolution.h"
+#include "B2Predicate/SortResolutionByRefreshRate.h"
 #include "B2GameMode/BladeIIGameMode.h"
 
 void USettings::Initialise(ABladeIIGameMode* GameMode, const B2LaunchConfig& LaunchConfig)
@@ -131,8 +135,55 @@ void USettings::ApplyAll()
 
 	// Volume is handled by the game sound actor at game start
 
-	// Screen settings...
-	
+	// Screen settings (only if not in editor mode)
+	if (!WITH_EDITOR && GEngine)
+	{
+		UGameUserSettings* GameUserSettings = GEngine->GetGameUserSettings();
+		if (GameUserSettings)
+		{
+			// Screen resolution & refresh rate
+			FScreenResolutionArray AvailableResolutions;
+			if (RHIGetAvailableResolutions(AvailableResolutions, false))
+			{
+				FScreenResolutionRHI TargetResolution{ SettingsCache.Resolution.X, SettingsCache.Resolution.Y };
+
+				FScreenResolutionRHI ResolutionToApply;
+
+				FScreenResolutionArray MatchingResolutions = AvailableResolutions.FilterByPredicate(B2Predicate_MatchResolution(TargetResolution));
+				if (SettingsCache.ScreenMode != EWindowMode::Type::Fullscreen && MatchingResolutions.Num() > 0)
+				{
+					MatchingResolutions.Sort(B2Predicate_SortResolutionByRefreshRate());
+					ResolutionToApply = MatchingResolutions.Last();
+				}
+				else
+				{
+					AvailableResolutions.Sort(B2Predicate_SortResolutionByRefreshRate());
+					ResolutionToApply = AvailableResolutions.Last();
+				}
+
+				// Resolution
+				GameUserSettings->SetScreenResolution(FIntPoint(ResolutionToApply.Width, ResolutionToApply.Height));
+
+				// Refresh rate
+				GameUserSettings->SetFrameRateLimit(ResolutionToApply.RefreshRate);
+			}
+
+			// Screen mode
+			GameUserSettings->SetFullscreenMode(SettingsCache.ScreenMode);
+
+			// Set Vsync
+			GameUserSettings->SetVSyncEnabled(SettingsCache.VSyncOn);
+
+			// AA, Shadows and PP
+			GameUserSettings->SetAntiAliasingQuality(SettingsCache.AntiAliasing);
+			GameUserSettings->SetShadowQuality(SettingsCache.ShadowQuality);
+			GameUserSettings->SetPostProcessingQuality(SettingsCache.PostProcessing);
+
+			// Apply all settings
+			GameUserSettings->ConfirmVideoMode();
+			GameUserSettings->ApplyResolutionSettings(false);
+		}
+	}
 }
 
 FString USettings::ShortLocaleStringToFull(const FString& ShortLocaleString) const

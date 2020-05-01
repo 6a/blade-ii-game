@@ -744,8 +744,8 @@ bool UB2AIServer::ValidFirstMoveAvailable(const TArray<ECard>& CardSet, ECard Ca
 					}
 				}
 
-				// Bolts are always valid to play from this position
-				if (CardSet[i] == ECard::Bolt)
+				// Bolts and mirrors are always valid to play from this position
+				if (CardSet[i] == ECard::Bolt || CardSet[i] == ECard::Mirror)
 				{
 					return true;
 				}
