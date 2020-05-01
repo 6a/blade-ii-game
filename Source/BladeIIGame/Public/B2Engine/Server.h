@@ -4,12 +4,17 @@
 
 #include "Containers/Queue.h"
 
-#include "ServerUpdate.h"
+#include "B2Engine/ServerUpdate.h"
 
-class B2Server
+#include "Server.generated.h"
+
+UCLASS()
+class UB2Server : public UObject
 {
+	GENERATED_BODY()
+
 public:
-	virtual ~B2Server();
+	virtual ~UB2Server();
 
 	/**
 	 * Get the next update from the server. Keep calling this until the payload is none.
@@ -27,8 +32,14 @@ public:
 	/* Tick the server */
 	virtual void Tick(float DeltaSeconds);
 
+	/**
+	 * Attempt to connect to the game server again - only valid if the client has not yet connected
+	 * @return false if the conditions are invalid (such as if the client has disconnected after being connected already)
+	 */
+	virtual bool Connect();
+
 protected:
-	TQueue<FB2ServerUpdate> InboundQueue;
 	TQueue<FB2ServerUpdate> OutBoundQueue;
+	TQueue<FB2ServerUpdate> InBoundQueue;
 };
 

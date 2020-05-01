@@ -21,16 +21,79 @@ AAvatarCaptureRig::AAvatarCaptureRig()
 
 	CaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Scene Capture Component"));
 	CaptureComponent->SetupAttachment(Boom);
-
-	/* TODO change hardcode to loading in some way */
-	AvatarCharacterName = "Laura";
-
-	LoadTextures();
 }
 
-void AAvatarCaptureRig::SetGameModeInstance(ABladeIIGameMode* InGameModeInstance)
+void AAvatarCaptureRig::Initialise(Character Char)
 {
-	GameModeInstance = InGameModeInstance;
+	switch (Char)
+	{
+	case AAvatarCaptureRig::Character::Laura:
+		AvatarCharacterName = TEXT("Laura");
+		break;
+	case AAvatarCaptureRig::Character::Alisa:
+		AvatarCharacterName = TEXT("Alisa");
+		break;
+	case AAvatarCaptureRig::Character::Elliot:
+		AvatarCharacterName = TEXT("Elliot");
+		break;
+	case AAvatarCaptureRig::Character::Emma:
+		AvatarCharacterName = TEXT("Emma");
+		break;
+	case AAvatarCaptureRig::Character::Fie:
+		AvatarCharacterName = TEXT("Fie");
+		break;
+	case AAvatarCaptureRig::Character::Gaius:
+		AvatarCharacterName = TEXT("Gaius");
+		break;
+	case AAvatarCaptureRig::Character::Jusis:
+		AvatarCharacterName = TEXT("Jusis");
+		break;
+	case AAvatarCaptureRig::Character::Machias:
+		AvatarCharacterName = TEXT("Machias");
+		break;
+	case AAvatarCaptureRig::Character::Millium:
+		AvatarCharacterName = TEXT("Millium");
+		break;
+	case AAvatarCaptureRig::Character::Rean:
+		AvatarCharacterName = TEXT("Rean");
+		break;
+	}
+
+	// Set model
+	FString SMPath = GetStaticMeshPath();
+	B2Utility::LogInfo(SMPath);
+	USkeletalMesh* LoadedSM = LoadObject<USkeletalMesh>(NULL, *SMPath, NULL, LOAD_None, NULL);
+	if (LoadedSM)
+	{
+		AvatarMesh->SetSkeletalMesh(LoadedSM);
+	}
+
+	// Set animation?
+	FString AnimPath = GetAnimationPath();
+	B2Utility::LogInfo(AnimPath);
+	UAnimSequence* LoadedAnimation = LoadObject<UAnimSequence>(NULL, *AnimPath, NULL, LOAD_None, NULL);
+	if (LoadedAnimation)
+	{
+		UAnimationAsset* AnimationAsset = Cast<UAnimationAsset>(LoadedAnimation);
+
+		if (AnimationAsset)
+		{
+			AvatarMesh->SetAnimation(AnimationAsset);
+			AvatarMesh->PlayAnimation(AnimationAsset, true);
+		}
+	}
+
+	uint32 EyeMaterialSlot = AvatarMesh->GetMaterialIndex(MATERIAL_SLOT_EYE);
+	uint32 MouthMaterialSlot = AvatarMesh->GetMaterialIndex(MATERIAL_SLOT_MOUTH);
+
+	EyeMaterialInstance = AvatarMesh->CreateAndSetMaterialInstanceDynamicFromMaterial(EyeMaterialSlot, AvatarMesh->GetMaterial(EyeMaterialSlot));
+	MouthMaterialInstance = AvatarMesh->CreateAndSetMaterialInstanceDynamicFromMaterial(MouthMaterialSlot, AvatarMesh->GetMaterial(MouthMaterialSlot));
+
+	ensureMsgf(EyeMaterialInstance, TEXT("Couldnt get a reference to and/or cast the eye material for the avatar"));
+	ensureMsgf(MouthMaterialInstance, TEXT("Couldnt get a reference to and/or cast the mouth material for the avatar"));
+
+	// Load textures
+	LoadTextures();
 }
 
 void AAvatarCaptureRig::ChangeEyes()
@@ -60,14 +123,7 @@ void AAvatarCaptureRig::BeginPlay()
 {
 	Super::BeginPlay();
 
-	uint32 EyeMaterialSlot = AvatarMesh->GetMaterialIndex(MATERIAL_SLOT_EYE);
-	uint32 MouthMaterialSlot = AvatarMesh->GetMaterialIndex(MATERIAL_SLOT_MOUTH);
-
-	EyeMaterialInstance = AvatarMesh->CreateAndSetMaterialInstanceDynamicFromMaterial(EyeMaterialSlot, AvatarMesh->GetMaterial(EyeMaterialSlot));
-	MouthMaterialInstance = AvatarMesh->CreateAndSetMaterialInstanceDynamicFromMaterial(MouthMaterialSlot, AvatarMesh->GetMaterial(MouthMaterialSlot));
-	
-	ensureMsgf(EyeMaterialInstance, TEXT("Couldnt get a reference to and/or cast the eye material for the avatar"));
-	ensureMsgf(MouthMaterialInstance, TEXT("Couldnt get a reference to and/or cast the mouth material for the avatar"));
+	GameModeInstance = Cast<ABladeIIGameMode>(GetWorld()->GetAuthGameMode());
 }
 
 void AAvatarCaptureRig::RandomMouthTexture()
@@ -75,7 +131,7 @@ void AAvatarCaptureRig::RandomMouthTexture()
 	uint32 TextureIndex = FMath::RandRange(1, MouthTextures.Num() - 1);
 	SetTexture(Folder::Mouth, TextureIndex);
 
-	if (!GameModeInstance->GetUIAvatarLayer()->IsAnimatingCalloutText())
+	if (!GameModeInstance->GetUIAvatarLayer()->IsAnimatingOpponentCalloutText())
 	{
 		if (GetWorldTimerManager().TimerExists(MouthAnimationHandle))
 		{
@@ -86,7 +142,7 @@ void AAvatarCaptureRig::RandomMouthTexture()
 	}
 }
 
-const FString AAvatarCaptureRig::GetPathForIndex(Folder Folder, uint32 Index) const
+const FString AAvatarCaptureRig::GetVariationPathForIndex(Folder Folder, uint32 Index) const
 {
 	FString FolderString;
 	FString FileName;
@@ -113,11 +169,28 @@ const FString AAvatarCaptureRig::GetPathForIndex(Folder Folder, uint32 Index) co
 	return OutString;
 }
 
+const FString AAvatarCaptureRig::GetStaticMeshPath() const
+{
+	FString FileName = FString::Printf(TEXT("SM_%s.SM_%s"), *AvatarCharacterName, *AvatarCharacterName);
+
+	return FString::Printf(TEXT("%s%s%s%s%s"), *SKELETAL_MESH_PATH, *AvatarCharacterName, *F_DLIM, *FileName, *R_DLIM);
+}
+
+const FString AAvatarCaptureRig::GetAnimationPath() const
+{
+	FString FileName = FString::Printf(TEXT("A_Character_Idle_%s.A_Character_Idle_%s"), *AvatarCharacterName, *AvatarCharacterName);
+
+	return FString::Printf(TEXT("%s%s%s%s%s"), *ANIMATION_PATH, *AvatarCharacterName, *F_DLIM, *FileName, *R_DLIM);
+}
+
 void AAvatarCaptureRig::LoadTextures()
 {
+	EyeTextures.Empty(NUM_EYE_TEX);
+	MouthTextures.Empty(NUM_MOUTH_TEX);
+
 	for (size_t i = 0; i < NUM_EYE_TEX; i++)
 	{
-		FString Path = GetPathForIndex(Folder::Eyes, i);
+		FString Path = GetVariationPathForIndex(Folder::Eyes, i);
 		UTexture* LoadedTexture = LoadObject<UTexture>(NULL, *Path, NULL, LOAD_None, NULL);
 
 		if (ensureMsgf(LoadedTexture, TEXT("Could not load texture file: \n%s"), *Path))
@@ -132,7 +205,7 @@ void AAvatarCaptureRig::LoadTextures()
 
 	for (size_t i = 0; i < NUM_MOUTH_TEX; i++)
 	{
-		FString Path = GetPathForIndex(Folder::Mouth, i);
+		FString Path = GetVariationPathForIndex(Folder::Mouth, i);
 		UTexture* LoadedTexture = LoadObject<UTexture>(NULL, *Path, NULL, LOAD_None, NULL);
 
 		if (ensureMsgf(LoadedTexture, TEXT("Could not load texture file:\n%s"), *Path))

@@ -11,6 +11,7 @@
 #include "B2Engine/LocalPlayerInput.h"
 #include "B2Engine/UIEffectLayer.h"
 #include "B2Engine/Settings.h"
+#include "B2Engine/PlayerData.h"
 #include "B2Engine/GameStateMachine/GSM.h"
 #include "B2Game/Arena.h"
 #include "B2Game/CardSelector.h"
@@ -20,8 +21,10 @@
 #include "B2Enum/UIEffectEventEnum.h"
 #include "B2Enum/WinConditionEnum.h"
 #include "B2UI/Avatar.h"
+#include "B2UI/StatusIndicator.h"
 #include "B2UI/LoadingScreen.h"
 #include "B2UI/OptionsMenu.h"
+#include "B2UI/ErrorModal.h"
 
 #include "BladeIIGameMode.generated.h"
 
@@ -76,10 +79,13 @@ public:
 	void UpdateCardState();
 
 	/* Helper function to inform the game mode that the automatic load has finished (when vs AI) */
-	void AutoLoadFinished();
+	void LoadingFinished();
 
-	/* Helper function to initialise a match quit + shutdown by the local player */
-	void LocalQuit();
+	/**
+	 * Helper function to initialise a match quit + shutdown by the local player
+	 * @param bReportForfeit - Whether or not to report the quit to the server (defaults to true)
+	 */
+	void LocalQuit(bool bReportForfeit = true);
 
 	/* Getters for various references */
 	AArena* GetArena() const { return Arena; }
@@ -91,6 +97,7 @@ public:
 	UB2Opponent* GetOpponent() const { return Opponent; }
 	UB2UIEffectLayer* GetUIEffectLayer() const { return UIEffectLayer; }
 	UAvatar* GetUIAvatarLayer() const { return UIAvatarLayer; }
+	UStatusIndicator* GetUIStatusIndicatorLayer() const { return UIStatusIndicatorLayer; }
 	ULoadingScreen* GetUILoadingScreenLayer() const { return UILoadingScreenLayer; }
 	USettings* GetSettings() const { return Settings; }
 	
@@ -134,6 +141,10 @@ private:
 	UPROPERTY()
 	UAvatar* UIAvatarLayer;
 
+	/* Pointer to UI status indicator layer */
+	UPROPERTY()
+	UStatusIndicator* UIStatusIndicatorLayer;
+
 	/* Loading screen UI layer*/
 	UPROPERTY()
 	ULoadingScreen* UILoadingScreenLayer;
@@ -142,11 +153,15 @@ private:
 	UPROPERTY()
 	UOptionsMenu* UIOptionsMenuLayer;
 
+	UPROPERTY()
+	UErrorModal* UIErrorModalLayer;
+
 	/* Pointer to the settings object */
 	UPROPERTY()
 	USettings* Settings;
 
 	/* Pointer to the cardfactory that will be used throughout this match */
+	UPROPERTY()
 	UB2CardFactory* CardFactory;
 
 	/* The gamestate state machine instance */
@@ -155,17 +170,26 @@ private:
 	/* The current state of the game */
 	B2GameState* GameState;
 
+	/* Data relating to each player (display name, avatar etc. */
+	B2PlayerData PlayerData;
+
 	/* The current state of the engine */
 	EEngineState EngineState;
 
-	/* Class type for avatar widget */
+	/* Class type for the avatar widget */
 	TSubclassOf<UAvatar> UIAvatarWidgetClass;
 
-	/* Class type for avatar widget */
+	/* Class type for the status indicator widget */
+	TSubclassOf<UStatusIndicator> UIStatusIndicatorWidgetClass;
+
+	/* Class type for the loading screen widget */
 	TSubclassOf<ULoadingScreen> UILoadingScreenWidgetClass;
 
-	/* Class type for avatar widget */
+	/* Class type for the options menu widget */
 	TSubclassOf<UOptionsMenu> UIOptionsMenuWidgetClass;
+
+	/* Class type for the error modal widget */
+	TSubclassOf<UErrorModal> UIErrorModalWidgetClass;
 
 	/* Class type for the cursor actor */
 	TSubclassOf<ACardSelector> CursorClass;
@@ -176,7 +200,16 @@ private:
 	/* Timer handle for any delayed clear and draw calls */
 	FTimerHandle ClearAndDrawHandle;
 
+	/* Used to ensure that one of the calls to DelayedStart results in the game starting */
 	bool bOtherDelayedStartComponentReady;
+
+	/* For tracking connection progress - Stored as a float, increment by one for each event */
+	float ConnectionProgress;
+	float MatchPrepProgress;
+
+	// Loading progress max values
+	const float CONNECTION_PROGRESS_TARGET = 6;
+	const float MATCH_PREP_PROGRESS_TARGET = 3;
 
 	/**
 	 * Reads the launch config and sets up the engine accordingly.
@@ -196,14 +229,20 @@ private:
 	/* Set up the gameplay state machine */
 	void CreateGSM();
 
-	/* Gets and stores a reference to the UI Avatar layer class */
+	/* Gets and stores a reference to the UI Avatar widget class */
 	void GetUIAvatarWidgetClass();
 
-	/* Gets and stores a reference to the UI loading screen layer class */
+	/* Gets and stores a reference to the status indicator widget class */
+	void GetUIStatusIndicatorClass();
+
+	/* Gets and stores a reference to the UI loading screen widget class */
 	void GetUILoadingScreenWidgetClass();
 
-	/* Gets and stores a reference to the UI options menu layer class */
+	/* Gets and stores a reference to the UI options menu widget class */
 	void GetUIOptionsMenuWidgetClass();
+
+	/* Gets and stores a reference to the UI error modal widget class */
+	void GetUIErrorModalWidgetClass();
 
 	/* Gets and stores a reference to the cursor actor class */
 	void GetCursorClass();
@@ -213,6 +252,9 @@ private:
 
 	/* Set up any event listeners */
 	void RegisterEventListeners();
+
+	/* Initialise the opponent object */
+	void InitialiseOpponent();
 
 	/* Find and store a reference to the arena */
 	void FindArena();
@@ -235,11 +277,17 @@ private:
 	/* Set up the UI avatar layer */
 	void SetupUIAvatarLayer();
 
+	/* Set up the UI status indicator layer */
+	void SetupUIStatusIndicatorLayer();
+
 	/* Set up the UI loading screen layer */
 	void SetupUILoadingScreenLayer();
 
-	/* Set up the UI loading screen layer */
+	/* Set up the UI options menu layer */
 	void SetupUIOptionsMenuLayer();
+
+	/* Set up the UI error modal layer */
+	void SetupUIErrorModalLayer();
 
 	/* Set up the avatar capture rig */
 	void SetupAvatarCaptureRig();
@@ -285,4 +333,8 @@ private:
 	/* Event handler for when a menu button is received by the input actor */
 	UFUNCTION()
 	void HandleMenuButtonPressed();
+
+	/* Event handler for when the error modal close button is pressed */
+	UFUNCTION()
+	void HandleErrorModalButtonPressed();
 };

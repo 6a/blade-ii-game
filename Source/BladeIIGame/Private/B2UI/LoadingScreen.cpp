@@ -11,8 +11,7 @@ void ULoadingScreen::Initialise(bool bIsVersusAI)
 
 	VersionText->SetText(FText::FromString(FString(TEXT_VERSION_PREFIX).Append(GameModeInstance->GetSettings()->GetStringSetting(EStringSetting::Version))));
 
-	TextInitialising->SetText(FText::FromString(AddLoadingBar(TEXT_INITIALIZING, 0)));
-	TextConnecting->SetText(FText());
+	TextConnecting->SetText(FText::FromString(AddLoadingBar(TEXT_CONNECTING, 0)));
 	TextPreparingMatch->SetText(FText());
 	TextStartingMatch->SetText(FText());
 
@@ -20,30 +19,55 @@ void ULoadingScreen::Initialise(bool bIsVersusAI)
 	{
 		SetRenderOpacity(0);
 		SetVisibility(ESlateVisibility::Hidden);
-		GameModeInstance->AutoLoadFinished();
+		GameModeInstance->LoadingFinished();
 	}
 	else
 	{
-		LoadAlpha = 0;
+		OverallProgress = 0;
 		FadeAlpha = 1;
-		AutoLoadPhase = 0;
+		LoadingPhase = 0;
 		NextAutoProgressBarStartTime = GetWorld()->GetTimeSeconds() + 0.4f;
+		bUIRequiresUpdate = true;
 
 		bAutoLoad = bIsVersusAI;
 	}
 }
 
+void ULoadingScreen::SetProgress(LoadingBar Target, float Value)
+{
+	// Clamp value to prevent any incorrect values
+	Value = FMath::Clamp(Value, 0.f, 1.f);
+
+	float NewAlpha = 0;
+
+	switch (Target)
+	{
+	case LoadingBar::Connecting:
+		NewAlpha = Value;
+		break;
+	case LoadingBar::PreparingMatch:
+		NewAlpha = 1 + Value;
+		break;
+	}
+
+	if (NewAlpha > OverallProgress)
+	{
+		bUIRequiresUpdate = true;
+		OverallProgress = NewAlpha;
+	}
+}
+
 void ULoadingScreen::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	if (!FAST_LOAD && bAutoLoad && GetWorld()->GetTimeSeconds() >= NextAutoProgressBarStartTime)
+	if (!FAST_LOAD)
 	{
-		if (LoadAlpha >= LOAD_ALPHA_MAX)
+		if (OverallProgress >= PROGRESS_MAX)
 		{
 			if (FadeAlpha <= 0)
 			{
 				bAutoLoad = false;
 				SetVisibility(ESlateVisibility::Hidden);
-				GameModeInstance->AutoLoadFinished();
+				GameModeInstance->LoadingFinished();
 
 			}
 			else
@@ -57,55 +81,45 @@ void ULoadingScreen::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 				SetRenderOpacity(FadeAlphaEased);
 			}
 		}
-		else
+
+		if (bAutoLoad || OverallProgress >= 2)
 		{
-			float Step = LOAD_ALPHA_MAX / ((AUTO_LOAD_TIME) / InDeltaTime);
-
-			LoadAlpha = FMath::Clamp(LoadAlpha + Step, 0.f, LOAD_ALPHA_MAX);
-
-			// Initialising
-			if (LoadAlpha > 0)
+			if (GetWorld()->GetTimeSeconds() >= NextAutoProgressBarStartTime)
 			{
-				if (AutoLoadPhase == 0)
-				{
-					AutoLoadPhase = 1;
-					NextAutoProgressBarStartTime = GetWorld()->GetTimeSeconds() + 0.4f;
-				}
-
-				float Fill = FMath::Clamp(LoadAlpha, 0.f, 1.f);
-				TextInitialising->SetText(FText::FromString(AddLoadingBar(TEXT_INITIALIZING, Fill)));
+				float Step = PROGRESS_MAX / ((AUTO_LOAD_TIME) / InDeltaTime);
+				OverallProgress = FMath::Clamp(OverallProgress + Step, 0.f, PROGRESS_MAX);
+				bUIRequiresUpdate = true;
 			}
+		}
+
+		if (bUIRequiresUpdate)
+		{
+			bUIRequiresUpdate = false;
 
 			// Connecting to server
-			if (LoadAlpha > 1)
+			if (OverallProgress > 0)
 			{
-				if (AutoLoadPhase == 1)
-				{
-					AutoLoadPhase = 2;
-					NextAutoProgressBarStartTime = GetWorld()->GetTimeSeconds() + 0.4f;
-				}
-
-				float Fill = FMath::Clamp(LoadAlpha - 1, 0.f, 1.f);
+				float Fill = FMath::Clamp(OverallProgress, 0.f, 1.f);
 				TextConnecting->SetText(FText::FromString(AddLoadingBar(TEXT_CONNECTING, Fill)));
 			}
 
 			// Preparing match
-			if (LoadAlpha > 2)
+			if (OverallProgress >= 1)
 			{
-				if (AutoLoadPhase == 2)
+				if (LoadingPhase == 0)
 				{
-					AutoLoadPhase = 3;
-					NextAutoProgressBarStartTime = GetWorld()->GetTimeSeconds() + 0.4f;
+					LoadingPhase = 1;
+					if (bAutoLoad) NextAutoProgressBarStartTime = GetWorld()->GetTimeSeconds() + 0.4f;
 				}
 
-				float Fill = FMath::Clamp(LoadAlpha - 2, 0.f, 1.f);
+				float Fill = FMath::Clamp(OverallProgress - 1, 0.f, 1.f);
 				TextPreparingMatch->SetText(FText::FromString(AddLoadingBar(TEXT_PREPARING_MATCH, Fill)));
 			}
 
 			// Starting match
-			if (LoadAlpha > 3)
+			if (OverallProgress >= 2)
 			{
-				float Fill = FMath::Clamp((LoadAlpha - 3), 0.f, 2.f);
+				float Fill = FMath::Clamp((OverallProgress - 2), 0.f, 2.f);
 				TextStartingMatch->SetText(FText::FromString(AddSpinner(TEXT_STARTING_MATCH, Fill)));
 			}
 		}

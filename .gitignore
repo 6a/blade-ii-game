@@ -73,5 +73,5 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
-# For debugging
+# For internal debugging
 Content/BladeIIGame/Data/l2.txt

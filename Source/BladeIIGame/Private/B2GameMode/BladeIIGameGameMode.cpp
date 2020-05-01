@@ -36,8 +36,10 @@ const float OUT_OF_BOUNDS_OFFSET_X = 28;
 const FString AVATAR_CAPTURE_RIG_BLUEPRINT_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_AvatarCaptureRig'");
 const FString AVATAR_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Avatar'");
 const FVector AVATAR_CAPTURE_RIG_SPAWN_LOCATION = FVector(500, 0, 0);
+const FString STATUS_INDICATOR_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_StatusIndicator'");
 const FString LOADING_SCREEN_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_LoadingScreen'");
 const FString OPTIONS_MENU_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_OptionsMenu'");
+const FString ERROR_MODAL_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_ErrorModal'");
 const FString CARD_CURSOR_BLUEPRINT_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card_Cursor'");
 const FString LOCAL_QUIT_METADATA = TEXT("LOCAL_QUIT");
 
@@ -58,9 +60,13 @@ ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 
 	GetUIAvatarWidgetClass();
 
+	GetUIStatusIndicatorClass();
+
 	GetUILoadingScreenWidgetClass();
 
 	GetUIOptionsMenuWidgetClass();
+
+	GetUIErrorModalWidgetClass();
 
 	GetCursorClass();
 
@@ -107,14 +113,24 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 
 		// Play victory sound effect
 		GameSound->PlaySFX(ESFX::Victory);
+
+		// Play animation
+		UIEffectLayer->Play(EUIEffect::Victory, nullptr);
 	}
-	else
+	else if (Player == EPlayer::Opponent)
 	{
 		Turn = TEXT("Opponent");
 		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Victory, AvatarCaptureRig->GetCurrentCharacterName());
 
 		// Play defeat sound effect
 		GameSound->PlaySFX(ESFX::Defeat);
+
+		// Play animation
+		UIEffectLayer->Play(EUIEffect::Defeat, nullptr);
+	}
+	else // handle draw
+	{
+
 	}
 
 	AvatarCaptureRig->AnimateMouth();
@@ -123,6 +139,10 @@ void ABladeIIGameMode::VictoryAchieved(EPlayer Player, EWinCondition WinConditio
 	{
 		Dealer->RevealOpponentsHand();
 	}
+
+	UIStatusIndicatorLayer->SetState(UStatusIndicator::State::GameOver);
+
+	EngineState = EEngineState::PostGame;
 
 	B2Utility::LogInfo(FString::Printf(TEXT("[%s] Has won ~ Condition [ %d ]"), *Turn, WinCondition));
 }
@@ -134,11 +154,13 @@ void ABladeIIGameMode::ChangeTurn()
 	{
 		GameState->Turn = EPlayer::Opponent;
 		GSM->ChangeState<GSM_State_OpponentTurn>();
+		UIStatusIndicatorLayer->SetState(UStatusIndicator::State::OpponentTurn);
 	}
 	else
 	{
 		GameState->Turn = EPlayer::Player;
 		GSM->ChangeState<GSM_State_PlayerTurn>();
+		UIStatusIndicatorLayer->SetState(UStatusIndicator::State::PlayerTurn);
 	}
 }
 
@@ -186,6 +208,9 @@ void ABladeIIGameMode::StartPlay()
 
 	Settings->ApplyAll();
 
+	ConnectionProgress = 0;
+	MatchPrepProgress = 0;
+
 	FindArena();
 
 	InitialiseCardFactory();
@@ -198,9 +223,13 @@ void ABladeIIGameMode::StartPlay()
 
 	SetupUIAvatarLayer();
 
+	SetupUIStatusIndicatorLayer();
+
 	SetupUILoadingScreenLayer();
 
 	SetupUIOptionsMenuLayer();
+
+	SetupUIErrorModalLayer();
 
 	SetupAvatarCaptureRig();
 
@@ -209,6 +238,8 @@ void ABladeIIGameMode::StartPlay()
 	FindGameSoundActor();
 
 	RegisterEventListeners();
+
+	InitialiseOpponent();
 }
 
 void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)
@@ -220,21 +251,20 @@ void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitial
 	if (LaunchConfig.MatchID <= B2LaunchConfig::MATCH_ID_AI_GAME_THRESHOLD)
 	{
 		UB2AIOpponent* AIOpponent = ObjectInitializer.CreateDefaultSubobject<UB2AIOpponent>(this, TEXT("AI Opponent"));
-		AIOpponent->Configure(static_cast<EAIDifficulty>(LaunchConfig.MatchID));
-
 		Opponent = static_cast<UB2Opponent*>(AIOpponent);
 	}
 	else
 	{
 		UB2NetOpponent* NetOpponent = ObjectInitializer.CreateDefaultSubobject<UB2NetOpponent>(this, TEXT("Net Opponent"));
-		NetOpponent->Configure(LaunchConfig.PublicID, LaunchConfig.AuthToken, LaunchConfig.MatchID);
-
 		Opponent = static_cast<UB2Opponent*>(NetOpponent);
 	}
 
 	// Set up the settings object
 	Settings = ObjectInitializer.CreateDefaultSubobject<USettings>(this, TEXT("Settings"));
 	Settings->Initialise(this, LaunchConfig);
+
+	// Set the local player public ID in the player data object
+	PlayerData.LocalPlayer.PublicID = LaunchConfig.PublicID;
 }
 
 void ABladeIIGameMode::SetupCardFactory(const FObjectInitializer& ObjectInitializer)
@@ -290,6 +320,15 @@ void ABladeIIGameMode::GetUIAvatarWidgetClass()
 	}
 }
 
+void ABladeIIGameMode::GetUIStatusIndicatorClass()
+{
+	ConstructorHelpers::FClassFinder<UStatusIndicator> ClassFinder(*STATUS_INDICATOR_WIDGET_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the status indicator widget")))
+	{
+		UIStatusIndicatorWidgetClass = ClassFinder.Class;
+	}
+}
+
 void ABladeIIGameMode::GetUILoadingScreenWidgetClass()
 {
 	ConstructorHelpers::FClassFinder<ULoadingScreen> ClassFinder(*LOADING_SCREEN_WIDGET_PATH);
@@ -305,6 +344,15 @@ void ABladeIIGameMode::GetUIOptionsMenuWidgetClass()
 	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the options menu widget")))
 	{
 		UIOptionsMenuWidgetClass = ClassFinder.Class;
+	}
+}
+
+void ABladeIIGameMode::GetUIErrorModalWidgetClass()
+{
+	ConstructorHelpers::FClassFinder<UErrorModal> ClassFinder(*ERROR_MODAL_WIDGET_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the error modal widget")))
+	{
+		UIErrorModalWidgetClass = ClassFinder.Class;
 	}
 }
 
@@ -325,7 +373,6 @@ void ABladeIIGameMode::GetAvatarCaptureRigClass()
 		AvatarCaptureRigClass = ClassFinder.Class;
 	}
 }
-
 
 void ABladeIIGameMode::RegisterEventListeners()
 {
@@ -349,11 +396,17 @@ void ABladeIIGameMode::RegisterEventListeners()
 	{
 		LocalPlayerInput->OnMenuButtonPressed.AddDynamic(this, &ABladeIIGameMode::HandleMenuButtonPressed);
 	}
+
+	// From Error modal
+	if (UIErrorModalLayer)
+	{
+		UIErrorModalLayer->OnButtonPressed.AddDynamic(this, &ABladeIIGameMode::HandleErrorModalButtonPressed);
+	}
 }
 
 void ABladeIIGameMode::FindArena()
 {
-	// Try to get a reference to the arena
+	// Try to get a reference to the arena actor
 	for (TActorIterator<AArena> ArenaIter(GetWorld()); ArenaIter; ++ArenaIter)
 	{
 		if (ArenaIter)
@@ -383,12 +436,12 @@ void ABladeIIGameMode::FindLocalPlayerInput()
 
 void ABladeIIGameMode::FindGameSoundActor()
 {
-	// Try to get a reference to the local player input actor
-	for (TActorIterator<AGameSound> InputIter(GetWorld()); InputIter; ++InputIter)
+	// Try to get a reference to the game sound actor
+	for (TActorIterator<AGameSound> GameSoundIter(GetWorld()); GameSoundIter; ++GameSoundIter)
 	{
-		if (InputIter)
+		if (GameSoundIter)
 		{
-			GameSound = *InputIter;
+			GameSound = *GameSoundIter;
 		}
 	}
 
@@ -426,6 +479,18 @@ void ABladeIIGameMode::SetupUIAvatarLayer()
 	}
 }
 
+void ABladeIIGameMode::SetupUIStatusIndicatorLayer()
+{
+	if (UIStatusIndicatorWidgetClass)
+	{
+		UIStatusIndicatorLayer = CreateWidget<UStatusIndicator>(GetWorld()->GetGameInstance(), UIStatusIndicatorWidgetClass, TEXT("UI Status Indicator Layer"));
+		if (UIStatusIndicatorLayer)
+		{
+			UIStatusIndicatorLayer->AddToPlayerScreen();
+		}
+	}
+}
+
 void ABladeIIGameMode::SetupUILoadingScreenLayer()
 {
 	if (UILoadingScreenWidgetClass)
@@ -451,34 +516,63 @@ void ABladeIIGameMode::SetupUIOptionsMenuLayer()
 	}
 }
 
+void ABladeIIGameMode::SetupUIErrorModalLayer()
+{
+	if (UIErrorModalWidgetClass)
+	{
+		UIErrorModalLayer = CreateWidget<UErrorModal>(GetWorld()->GetGameInstance(), UIErrorModalWidgetClass, TEXT("UI Error Modal Layer"));
+		if (UIErrorModalLayer)
+		{
+			UIErrorModalLayer->AddToPlayerScreen();
+		}
+	}
+}
+
 void ABladeIIGameMode::SetupAvatarCaptureRig()
 {
 	if (AvatarCaptureRigClass)
 	{
 		AvatarCaptureRig = GetWorld()->SpawnActor<AAvatarCaptureRig>(AvatarCaptureRigClass, AVATAR_CAPTURE_RIG_SPAWN_LOCATION, FRotator::ZeroRotator);
-		if (AvatarCaptureRig)
-		{
-			AvatarCaptureRig->SetGameModeInstance(this);
-		}
 	}
 }
 
 void ABladeIIGameMode::InitialiseBoard()
 {
-	// Player Deck
-	for (int i = 0; i < GameState->Cards.PlayerDeck.Num(); ++i)
+	if (GameState)
 	{
-		FB2Transform CardTransform = Arena->PlayerDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(GameState->Cards.PlayerDeck[i], CardTransform.Position + FVector(OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
-		Arena->PlayerDeck->Add(Card);
-	}
+		// Player Deck
+		for (int i = 0; i < GameState->Cards.PlayerDeck.Num(); ++i)
+		{
+			FB2Transform CardTransform = Arena->PlayerDeck->GetTransformForIndex(i);
+			ACard* Card = CardFactory->Make(GameState->Cards.PlayerDeck[i], CardTransform.Position + FVector(OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
+			Arena->PlayerDeck->Add(Card);
+		}
 
-	// Opponent Deck
-	for (int i = 0; i < GameState->Cards.OpponentDeck.Num(); ++i)
+		// Opponent Deck
+		for (int i = 0; i < GameState->Cards.OpponentDeck.Num(); ++i)
+		{
+			FB2Transform CardTransform = Arena->OpponentDeck->GetTransformForIndex(i);
+			ACard* Card = CardFactory->Make(GameState->Cards.OpponentDeck[i], CardTransform.Position + FVector(-OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
+			Arena->OpponentDeck->Add(Card);
+		}
+	}
+}
+
+void ABladeIIGameMode::InitialiseOpponent()
+{
+	if (Settings->IsVersusAI())
 	{
-		FB2Transform CardTransform = Arena->OpponentDeck->GetTransformForIndex(i);
-		ACard* Card = CardFactory->Make(GameState->Cards.OpponentDeck[i], CardTransform.Position + FVector(-OUT_OF_BOUNDS_OFFSET_X, 0, 5), CardTransform.Rotation);
-		Arena->OpponentDeck->Add(Card); 
+		static_cast<UB2AIOpponent*>(Opponent)->Configure(static_cast<EAIDifficulty>(Settings->GetIntSetting(EIntSetting::MatchID)));
+
+		AvatarCaptureRig->Initialise(AAvatarCaptureRig::Character::Laura);
+	}
+	else
+	{
+		uint64 MatchID = Settings->GetIntSetting(EIntSetting::MatchID);
+		FString PublicID = Settings->GetStringSetting(EStringSetting::PublicID);
+		FString AuthToken = Settings->GetStringSetting(EStringSetting::AuthToken);
+
+		static_cast<UB2NetOpponent*>(Opponent)->Configure(PublicID, AuthToken, MatchID);
 	}
 }
 
@@ -790,14 +884,14 @@ void ABladeIIGameMode::UpdateCardState()
 	//Arena->PrintOpponentCards();
 }
 
-void ABladeIIGameMode::AutoLoadFinished()
+void ABladeIIGameMode::LoadingFinished()
 {
 	DelayedStart();
 }
 
-void ABladeIIGameMode::LocalQuit()
+void ABladeIIGameMode::LocalQuit(bool bReportForfeit)
 {
-	Opponent->SendUpdate(EServerUpdate::InstructionQuit, LOCAL_QUIT_METADATA);
+	if (bReportForfeit) Opponent->SendUpdate(EServerUpdate::InstructionForfeit, LOCAL_QUIT_METADATA);
 
 	// TODO add this to a callback instead, that quits after a timeout OR when receiving an OK from the server or something.
 	FGenericPlatformMisc::RequestExit(false);
@@ -842,14 +936,78 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 {
 	GameState = new B2GameState(Cards);
 
-	GameState->bOpponentIsAI = Settings->IsVersusAI();
+	if (!Settings->IsVersusAI())
+	{
+		UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::PreparingMatch, ++MatchPrepProgress / MATCH_PREP_PROGRESS_TARGET);
+	}
 
 	DelayedStart();
 }
 
 void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instruction)
 {
-	B2Utility::LogInfo(FString::Printf(TEXT("Server Instruction: [%d] Metadata: [ %s ]"), Instruction.Update, *Instruction.Metadata));
+	// Handle errors first
+	if (Instruction.Code >= EServerUpdate::InstructionConnectionError)
+	{
+		// Unable to connect (initial connection) 
+		if (ConnectionProgress < CONNECTION_PROGRESS_TARGET)
+		{
+			UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::UnableToConnect);
+		}
+		else
+		{
+			UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::Disconnected);
+		}
+
+		UIOptionsMenuLayer->ClearLanguageComboBoxFocus();
+		UIErrorModalLayer->SetActive(true);
+	}
+	// Opponent forfeit
+	else if (Instruction.Code == EServerUpdate::InstructionForfeit)
+	{
+		UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::OpponentForfeit);
+		UIOptionsMenuLayer->ClearLanguageComboBoxFocus();
+		UIErrorModalLayer->SetActive(true);
+	}
+	// Websocket connection died
+	else if (Instruction.Code == EServerUpdate::InstructionConnectionClosed)
+	{
+		if (EngineState == EEngineState::Initialisation)
+		{
+			UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::UnableToConnect);
+			UIOptionsMenuLayer->ClearLanguageComboBoxFocus();
+			UIErrorModalLayer->SetActive(true);
+		}
+		else
+		{
+			UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::Disconnected);
+			UIOptionsMenuLayer->ClearLanguageComboBoxFocus();
+			UIErrorModalLayer->SetActive(true);
+		}
+	}
+	// Connection updates
+	else if (Instruction.Code == EServerUpdate::InstructionConnectionProgress)
+	{
+		UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::Connecting, ++ConnectionProgress / CONNECTION_PROGRESS_TARGET);
+	}
+	// Match prep updates
+	else if (Instruction.Code == EServerUpdate::InstructionPlayerData || Instruction.Code == EServerUpdate::InstructionOpponentData)
+	{
+		UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::PreparingMatch, ++MatchPrepProgress / MATCH_PREP_PROGRESS_TARGET);
+
+		if (Instruction.Code == EServerUpdate::InstructionPlayerData)
+		{
+			PlayerData.AddLocalPlayerData(Instruction.Payload);
+		}
+		else
+		{
+			PlayerData.AddOpponentData(Instruction.Payload);
+			AvatarCaptureRig->Initialise(static_cast<AAvatarCaptureRig::Character>(PlayerData.Opponent.Avatar));
+			UIAvatarLayer->SetOpponentName(PlayerData.Opponent.DisplayName);
+		}
+	}
+
+	B2Utility::LogInfo(FString::Printf(TEXT("Server Instruction: [%d] Metadata: [ %s ]"), Instruction.Code, *Instruction.Payload));
 }
 
 void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
@@ -882,5 +1040,22 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 
 void ABladeIIGameMode::HandleMenuButtonPressed()
 {
-	UIOptionsMenuLayer->ToggleMenu();
+	if (!UIErrorModalLayer->IsActive())
+	{
+		UIOptionsMenuLayer->ToggleMenu();
+	}
+}
+
+void ABladeIIGameMode::HandleErrorModalButtonPressed()
+{
+	// As this callback should only be fired when the retry button was pressed, we don't check anything - just initiate a recheck
+	if (Opponent->ReConnect())
+	{
+		B2Utility::LogInfo("Attempting to reconnect");
+		ConnectionProgress = 0;
+	}
+	else
+	{
+		B2Utility::LogWarning("Reconnection attempt invalid");
+	}
 }

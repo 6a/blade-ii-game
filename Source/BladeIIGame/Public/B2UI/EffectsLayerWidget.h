@@ -51,13 +51,25 @@ private:
 	UPROPERTY(meta = (BindWidgetOptional))
 	UEffectWidget* Blast;
 
-		/* Effect widgets */
+	/* Effect widgets */
 	UPROPERTY(meta = (BindWidgetOptional))
 	UEffectWidget* BlastTarget;
 
 	/* Effect widgets */
 	UPROPERTY(meta = (BindWidgetOptional))
 	UEffectWidget* Force;
+
+	/* Endgame widgets */
+	UPROPERTY(meta = (BindWidgetOptional))
+	UEffectWidget* Victory;
+
+	/* Endgame widgets */
+	UPROPERTY(meta = (BindWidgetOptional))
+	UEffectWidget* Draw;
+
+	/* Endgame widgets */
+	UPROPERTY(meta = (BindWidgetOptional))
+	UEffectWidget* Defeat;
 
 	/* Handle any effect finish events for the attached effect widgets */
 	UFUNCTION()

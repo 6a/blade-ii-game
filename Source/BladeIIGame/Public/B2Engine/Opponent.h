@@ -41,9 +41,15 @@ public:
 	 */
 	void SendUpdate(EServerUpdate Update, const FString& MetaData = FString()) const;
 
+	/**
+	 * Attempt to connect to the game server again - only valid if the client has not yet connected
+	 * @return false if the conditions are invalid (such as if the client has disconnected after being connected already)
+	 */
+	bool ReConnect();
+
 protected:
 	/* The back end for this opponent. Could be an AI opponent, or a network opponent */
-	B2Server* BackEnd;
-
+	UPROPERTY()
+	UB2Server* BackEnd;
 };
 

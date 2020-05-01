@@ -4,8 +4,15 @@
 #include "B2Engine/Cards.h"
 #include "B2Enum/PlayerEnum.h"
 
-class B2AIServer : public B2Server
+#include "AIServer.generated.h"
+
+UCLASS()
+class UB2AIServer : public UB2Server
 {
+	GENERATED_BODY()
+
+public:
+
 	/**
 	 * Get the next update from the server.
 	 * @return The update
@@ -14,6 +21,13 @@ class B2AIServer : public B2Server
 
 	/* Tick the server */
 	virtual void Tick(float DeltaSeconds) override;
+
+	/**
+	 * Attempt to connect to the game server again - only valid if the client has not yet connected
+	 * @note For the AI server this will always return false
+	 * @return false if the conditions are invalid (such as if the client has disconnected after being connected already)
+	 */
+	virtual bool Connect() override { return false; }
 
 private:
 	/* The maximum value (in terms of enum value) that an effect card can have */

@@ -30,5 +30,6 @@ struct FB2Cards
 	 * @param PlayerNumber - The player number for the recipeint of this message (probably 0, the local player)
 	 */
 	const FString GetSerialised(uint32 PlayerNumber);
+
 };
 

@@ -54,6 +54,7 @@ protected:
 	void RunAnimationAtTargetScreenPosition();
 
 private:
+
 	/* The time (in seconds) to delay the effect finished callback */
 	float PostDelay;
 

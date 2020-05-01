@@ -82,7 +82,7 @@ const FString B2LaunchConfig::Parse(const FString& LaunchConfigRaw)
 	}
 
 	// Set all the string values first
-	Handle = StringValues[0];
+	DisplayName = StringValues[0];
 	PublicID = StringValues[1];
 	AuthToken = StringValues[2];
 	Language = StringValues[4];

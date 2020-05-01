@@ -17,42 +17,44 @@ void UEffectsLayerWidget::Initialise()
 void UEffectsLayerWidget::Play(EUIEffect Effect, const FVector* TargetWorldPosition, float StartDelay, float PostDelay)
 {
     FVector2D Position = TargetWorldPosition ? WorldToScreenOffset(*TargetWorldPosition) : GetCenterOffset();
+    UEffectWidget* TargetWidget = nullptr;
 
 	switch (Effect)
 	{
     case EUIEffect::Rod:
-        Rod->Play(Position, StartDelay, PostDelay);
-        EffectSwitcher->SetActiveWidget(Rod);
+        TargetWidget = Rod;
         break;
     case EUIEffect::Bolt:
-        Bolt->Play(Position, StartDelay, PostDelay);
-        EffectSwitcher->SetActiveWidget(Bolt);
+        TargetWidget = Bolt;
         break;
     case EUIEffect::Mirror:
-        Mirror->Play(Position, StartDelay, PostDelay);
-        EffectSwitcher->SetActiveWidget(Mirror);
+        TargetWidget = Mirror;
         break;
     case EUIEffect::Blast:
-        Blast->Play(Position, StartDelay, PostDelay);
-        EffectSwitcher->SetActiveWidget(Blast);
+        TargetWidget = Blast;
         break;
     case EUIEffect::BlastTarget:
-        BlastTarget->Play(Position, StartDelay, PostDelay);
-        EffectSwitcher->SetActiveWidget(BlastTarget);
+        TargetWidget = BlastTarget;
         break;
     case EUIEffect::Force:
-        Force->Play(Position, StartDelay, PostDelay);
-        EffectSwitcher->SetActiveWidget(Force);
+        TargetWidget = Force;
+        break;
+    case EUIEffect::Victory:
+        TargetWidget = Victory;
         break;
     case EUIEffect::Draw:
+        TargetWidget = Draw;
         break;
-    case EUIEffect::Win:
-        break;
-    case EUIEffect::Loss:
-        break;
-    default:
+    case EUIEffect::Defeat:
+        TargetWidget = Defeat;
         break;
 	}
+
+    if (TargetWidget)
+    {
+        TargetWidget->Play(Position, StartDelay, PostDelay);
+        EffectSwitcher->SetActiveWidget(TargetWidget);
+    }
 }
 
 void UEffectsLayerWidget::HandleEffectEvent(EUIEffectEvent Event)

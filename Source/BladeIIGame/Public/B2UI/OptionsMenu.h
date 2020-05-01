@@ -6,7 +6,8 @@
 #include "Components/Slider.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
-#include "Components/ComboBoxString.h"
+#include "B2UI/ComboBoxStringWithOverride.h"
+#include "Components/WindowTitleBarArea.h"
 
 #include "B2UI/ComboBoxItem.h"
 
@@ -19,12 +20,17 @@ class BLADEIIGAME_API UOptionsMenu : public UUserWidget
 	
 public:
 
-	virtual void NativeOnInitialized() override;
-
 	UOptionsMenu(const FObjectInitializer& ObjectInitializer);
 
 	/* Toggle the options menu between open and closed - does not interrupt animations, so will result in a noop if one is playing */
 	void ToggleMenu();
+
+	/* Utility function to remove focus from the combo box */
+	void ClearLanguageComboBoxFocus();
+
+protected:
+
+	virtual void NativeOnInitialized() override;
 
 private:
 
@@ -72,7 +78,7 @@ private:
 
 	/* Language combo box widget */
 	UPROPERTY(meta = (BindWidget))
-	UComboBoxString* LanguageComboBox;
+	UComboBoxStringWithOverride* LanguageComboBox;
 
 	/* Forfeit button widget */
 	UPROPERTY(meta = (BindWidget))
@@ -94,19 +100,11 @@ private:
 
 	/* Open Animation */
 	UPROPERTY(meta = (BindWidgetAnim))
-	UWidgetAnimation* OpenAnimation;
+	UWidgetAnimation* ShowHideMenuAnimation;
 
 	/* Close Animation */
 	UPROPERTY (meta = (BindWidgetAnim))
-	UWidgetAnimation* CloseAnimation;
-
-	/* Open Modal Animation */
-	UPROPERTY(meta = (BindWidgetAnim))
-	UWidgetAnimation* ModalOpenAnimation;
-
-	/* Close Modal Animation */
-	UPROPERTY(meta = (BindWidgetAnim))
-	UWidgetAnimation* ModalCloseAnimation;
+	UWidgetAnimation* ShowHideModalAnimation;
 
 	/* Combo box item class */
 	TSubclassOf<UComboBoxItem> ComboBoxItemClass;
