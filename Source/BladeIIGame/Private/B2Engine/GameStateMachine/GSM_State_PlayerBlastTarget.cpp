@@ -27,7 +27,7 @@ void GSM_State_PlayerBlastTarget::Init(ABladeIIGameMode* GameMode)
 	UpdateCursorPosition(0, true);
 	Cursor->ToggleActorVisibility(true);
 
-	GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::PlayerTurn);
+	GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::PlayerTurn, false);
 }
 
 void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)

@@ -30,7 +30,7 @@ void GSM_State_OpponentBlastTarget::Init(ABladeIIGameMode* GameMode)
 	NextActionTime = GI->GetWorld()->GetTimeSeconds() + WAIT_TIME_BETWEEN_ACTIONS;
 	bTargetCardSelected = false;
 
-	GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::OpponentTurn);
+	GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::OpponentTurn, false);
 }
 
 void GSM_State_OpponentBlastTarget::Tick(float DeltaSeconds)

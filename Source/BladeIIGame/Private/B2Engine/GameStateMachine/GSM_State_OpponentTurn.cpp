@@ -120,7 +120,11 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 
 		bMoveHandled = true;
 
-		GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
+		// Update the status indicator if this wasnt a blast card
+		if (!bUsedBlastEffect)
+		{
+			GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
+		}
 	}
 }
 

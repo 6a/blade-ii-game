@@ -118,6 +118,9 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				{
 					// Update the server
 					GI->GetOpponent()->SendUpdate(CardToServerUpdate(Card->Type));
+
+					// Also update the status indicator if this card was not a blast card
+					GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
 				}
 
 				// Play card selection sound effect
