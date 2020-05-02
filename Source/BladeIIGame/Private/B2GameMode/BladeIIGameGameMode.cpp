@@ -154,6 +154,8 @@ void ABladeIIGameMode::EndGame(EPlayer Victor, EWinCondition WinCondition)
 
 	UIStatusIndicatorLayer->SetState(UStatusIndicator::State::GameOver);
 
+	LocalPlayerInput->BlockInputs();
+
 	EngineState = EEngineState::PostGame;
 }
 
@@ -164,13 +166,11 @@ void ABladeIIGameMode::ChangeTurn()
 	{
 		GameState->Turn = EPlayer::Opponent;
 		GSM->ChangeState<GSM_State_OpponentTurn>();
-		UIStatusIndicatorLayer->SetState(UStatusIndicator::State::OpponentTurn);
 	}
 	else
 	{
 		GameState->Turn = EPlayer::Player;
 		GSM->ChangeState<GSM_State_PlayerTurn>();
-		UIStatusIndicatorLayer->SetState(UStatusIndicator::State::PlayerTurn);
 	}
 }
 

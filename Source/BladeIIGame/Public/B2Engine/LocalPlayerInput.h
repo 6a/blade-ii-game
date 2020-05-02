@@ -31,6 +31,9 @@ public:
 	/* Returns the current cursor position. Top left is (0, 0), bottom right is (MAX, MAX) */
 	FVector2D GetCurrentMousePosition() const;
 
+	/* Prevent this input controller for receiving and caching any more inputs */
+	void BlockInputs();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -54,6 +57,9 @@ private:
 	ENavButton NavButtonPriority;
 	float NextPollTime;
 
+	/* For disabling input */
+	bool bIsCheckingForInput;
+
 	/* Updates the current mouse position */
 	void UpdateMousePosition();
 
@@ -69,5 +75,4 @@ private:
 	void OnNavigateRightReleased();
 	void OnSelectPressed();
 	void OnMouseMoved(const FVector2D& NewMousePosition);
-
 };

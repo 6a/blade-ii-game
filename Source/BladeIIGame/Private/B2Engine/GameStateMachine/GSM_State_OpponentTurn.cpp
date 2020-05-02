@@ -15,12 +15,16 @@ void GSM_State_OpponentTurn::Init(ABladeIIGameMode* GameMode)
 {
 	GSM_State::Init(GameMode);
 
+	ABladeIIGameMode* GI = GameModeInstance;
+
 	bMoveHandled = false;
 	bMovedReceived = false;
 
 	CachedMove = FB2ServerUpdate{ EServerUpdate::None };
 
 	MoveExecutionTime = TNumericLimits<float>::Max();
+
+	GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::OpponentTurn);
 }
 
 void GSM_State_OpponentTurn::Tick(float DeltaSeconds)

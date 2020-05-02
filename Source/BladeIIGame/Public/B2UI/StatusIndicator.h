@@ -27,8 +27,9 @@ public:
 	/**
 	 * Set the state for the status indicator
 	 * @param NewState - The state to set
+	 * @param bResetTime - Whether or not to reset the timer
 	 */
-	void SetState(State NewState);
+	void SetState(State NewState, bool bResetTime = true);
 
 protected:
 

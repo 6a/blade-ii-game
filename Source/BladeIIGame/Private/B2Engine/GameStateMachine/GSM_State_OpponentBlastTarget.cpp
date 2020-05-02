@@ -29,6 +29,8 @@ void GSM_State_OpponentBlastTarget::Init(ABladeIIGameMode* GameMode)
 	TargetCard = GI->GetArena()->PlayerHand->GetRandomOfType(GI->GetGameState()->MostRecentBlastedCard);
 	NextActionTime = GI->GetWorld()->GetTimeSeconds() + WAIT_TIME_BETWEEN_ACTIONS;
 	bTargetCardSelected = false;
+
+	GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::OpponentTurn);
 }
 
 void GSM_State_OpponentBlastTarget::Tick(float DeltaSeconds)
@@ -50,6 +52,9 @@ void GSM_State_OpponentBlastTarget::Tick(float DeltaSeconds)
 			GI->GetDealer()->OpponentEffectCard(TargetCard);
 
 			bTargetCardSelected = true;
+
+			// Set indicator to waiting state
+			GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
 		}
 		else
 		{

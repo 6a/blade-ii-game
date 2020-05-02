@@ -22,6 +22,8 @@ void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 	if (GI->GetArena()->PlayerField->Num() + GI->GetArena()->OpponentField->Num() > 0)
 	{
 		GI->GetDealer()->ClearField();
+
+		GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
 	}
 	else
 	{
@@ -144,7 +146,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 					bIsWaitingForOpponentDrawFromHand = true;
 				}
 
-				GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::OpponentTurn);
+				GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::OpponentTurn, false);
 
 				break;
 			}

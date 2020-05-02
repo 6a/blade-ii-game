@@ -40,6 +40,8 @@ void GSM_State_PlayerTurn::Init(ABladeIIGameMode* GameMode)
 	uint32 CurrentOpponentScore = GI->GetGameState()->OpponentScore;
 	GI->GetArena()->ScoreDisplay->Update(CurrentPlayerScore, CurrentOpponentScore);
 
+	GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::PlayerTurn);
+
 	SetIsTimed();
 }
 

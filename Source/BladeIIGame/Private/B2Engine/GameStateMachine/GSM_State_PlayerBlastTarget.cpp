@@ -26,6 +26,8 @@ void GSM_State_PlayerBlastTarget::Init(ABladeIIGameMode* GameMode)
 	SetCurrentCardToSelectedTransform();
 	UpdateCursorPosition(0, true);
 	Cursor->ToggleActorVisibility(true);
+
+	GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::PlayerTurn);
 }
 
 void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
@@ -69,6 +71,9 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 
 				// Play card select sound effect
 				GI->GetGameSound()->PlaySFX(ESFX::CursorSelect);
+
+				// Set indicator to waiting state
+				GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
 				break;
 			}
 		}

@@ -2,14 +2,18 @@
 
 #include "B2Utility/Log.h"
 
-void UStatusIndicator::SetState(State NewState)
+void UStatusIndicator::SetState(State NewState, bool bResetTime)
 {
 	// Don't check to see if the new state == old state, as we can use this function to reset the timer as well
 
 	CurrentState = NewState;
-	WaitingAnimationTimer = 0;
-	WaitingAnimationPhase = 0;
-	TurnTimeRemaining = TIMER_MAX;
+
+	if (bResetTime)
+	{
+		WaitingAnimationTimer = 0;
+		WaitingAnimationPhase = 0;
+		TurnTimeRemaining = TIMER_MAX;
+	}
 
 	UWidgetAnimation* AnimationToPlay = nullptr;
 
@@ -26,6 +30,7 @@ void UStatusIndicator::SetState(State NewState)
 		break;
 	case UStatusIndicator::State::GameOver:
 		AnimationToPlay = SwitchToGameOverAnim;
+		break;
 	case UStatusIndicator::State::DrawACard:
 		AnimationToPlay = SwitchToDrawACardAnim;
 		break;
