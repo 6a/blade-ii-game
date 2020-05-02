@@ -296,15 +296,16 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 		if (SEQ_EVT_CONNECTION_SUCCESS.Contains(WebSocketPacket.Code)) {
 			OutUpdate.Code = EServerUpdate::InstructionConnectionProgress;
 
-			if (!bConnectionMade && int32(++ConnectionStepsProcessed) >= SEQ_EVT_CONNECTION_SUCCESS.Num())
+			if (int32(++ConnectionStepsProcessed) >= SEQ_EVT_CONNECTION_SUCCESS.Num())
 			{
-				bConnectionMade = true;
 				bEnforceConnectionTimeout = false;
 			}
 		}
 		// Receiving match data / moves
 		else if (WebSocketPacket.Code == WSC_MATCH_DATA || WebSocketPacket.Code == WSC_MATCH_MOVE)
 		{
+			bConnectionMade = true;
+
 			// Unpack the server update in the payload - exit silently if it was parsed as none
 			OutUpdate = FB2ServerUpdate::UnSerialise(WebSocketPacket.Message);
 		}
