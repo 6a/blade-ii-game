@@ -50,6 +50,7 @@ void UErrorModal::SetErrorType(ErrorType Type)
 		NegativeButton->SetVisibility(ESlateVisibility::Collapsed);
 		MessageText->SetText(LocalisedTextOpponentForfeit);
 		InfoText->SetText(LocalisedTextVictorious);
+		break;
 	case UErrorModal::ErrorType::MutualTimeOut:
 		NegativeButton->SetVisibility(ESlateVisibility::Collapsed);
 		MessageText->SetText(LocalisedTextMutualTimeOut);
