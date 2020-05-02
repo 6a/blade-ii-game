@@ -14,6 +14,7 @@ void GSM_State_DrawToEmptyField::Init(ABladeIIGameMode* GameMode)
 	GSM_State::Init(GameMode);
 
 	bIsWaitingForOpponentDrawFromHand = false;
+	bIsWaitingForNetworkDrawFromDeck = false;
 
 	ABladeIIGameMode* GI = GameModeInstance;
 
@@ -106,20 +107,31 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 
 				if (GI->GetGameState()->CursorPosition == ECardSlot::PlayerDeck)
 				{
-					// From player deck to player field
-					UCardSlot* CurrentSlot = GI->GetArena()->PlayerDeck;
-					UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
+					// If vs network opponent, send update to server
+					if (GI->GetSettings()->IsVersusAI())
+					{
+						// From player deck to player field
+						UCardSlot* CurrentSlot = GI->GetArena()->PlayerDeck;
+						UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
 
-					GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
+						GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
 
-					// From opponent deck to opponent field
-					CurrentSlot = GI->GetArena()->OpponentDeck;
-					TargetSlot = GI->GetArena()->OpponentField;
+						// From opponent deck to opponent field
+						CurrentSlot = GI->GetArena()->OpponentDeck;
+						TargetSlot = GI->GetArena()->OpponentField;
 
-					GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
+						GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
 
-					// Play base sound effect
-					GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);
+						// Play base sound effect
+						GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);
+					}
+					else
+					{
+						ACard* SelectedCard = GI->GetArena()->PlayerDeck->GetLast();
+						GI->GetOpponent()->SendUpdate(CardToServerUpdate(SelectedCard->Type));
+
+						bIsWaitingForNetworkDrawFromDeck = true;
+					}
 				}
 				else
 				{
@@ -132,7 +144,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 					bIsWaitingForOpponentDrawFromHand = true;
 				}
 
-				GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
+				GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::OpponentTurn);
 
 				break;
 			}
@@ -144,7 +156,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 		if (GI->GetOpponent()->MoveUpdateQueue.Dequeue(MoveUpdate))
 		{
 			// From player hand to player field
-			UCardSlot* CurrentSlot = GI->GetArena()->PlayerHand;
+			UCardSlot* CurrentSlot = GI->GetArena()->PlayerDeck;
 			UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
 
 			GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
@@ -153,7 +165,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 			GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);
 
 			// From opponent hand to opponent field
-			CurrentSlot = GI->GetArena()->OpponentHand;
+			CurrentSlot = GI->GetArena()->OpponentDeck;
 			TargetSlot = GI->GetArena()->OpponentField;
 
 			int32 SourceSlotIndex = CurrentSlot->GetFirstIndexOfType(ServerUpdateToCard(MoveUpdate.Code));
@@ -173,6 +185,29 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 			GI->GetDealer()->UpdateHandPositions(EPlayer::Opponent);
 
 			bIsWaitingForOpponentDrawFromHand = false;
+		}
+	}
+	else if (bIsWaitingForNetworkDrawFromDeck)
+	{
+		FB2ServerUpdate MoveUpdate;
+		if (GI->GetOpponent()->MoveUpdateQueue.Dequeue(MoveUpdate))
+		{
+			// From player deck to player field
+			UCardSlot* CurrentSlot = GI->GetArena()->PlayerDeck;
+			UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
+
+			GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
+
+			// From opponent deck to opponent field
+			CurrentSlot = GI->GetArena()->OpponentDeck;
+			TargetSlot = GI->GetArena()->OpponentField;
+
+			GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
+
+			// Play base sound effect
+			GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);
+
+			bIsWaitingForNetworkDrawFromDeck = false;
 		}
 	}
 }

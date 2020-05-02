@@ -36,6 +36,11 @@ const uint16 WSC_MATCH_RELAY_MESSAGE = 412;
 const uint16 WSC_MATCH_MOVE = 413;
 const uint16 WSC_MATCH_DATA = 414;
 const uint16 WSC_MATCH_FORFEIT = 415;
+const uint16 WSC_MATCH_MUTUAL_TIMEOUT = 416;
+const uint16 WSC_MATCH_TIME_OUT = 417;
+const uint16 WSC_MATCH_WIN = 418;
+const uint16 WSC_MATCH_DRAW = 419;
+const uint16 WSC_MATCH_LOSS = 420;
 
 /* The server events to expect when a connection is successfully made */
 const TArray<uint16> SEQ_EVT_CONNECTION_SUCCESS
@@ -323,6 +328,20 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 		{
 			OutUpdate.Code = EServerUpdate::InstructionMatchIllegalMove;
 			B2Utility::LogWarning(TEXT("Illegal Move played by the local player"));
+			bIgnoreAllEvents = true;
+		}
+		// Mutual timeout - draw
+		else if (WebSocketPacket.Code == WSC_MATCH_MUTUAL_TIMEOUT)
+		{
+			OutUpdate.Code = EServerUpdate::InstructionMatchMutualTimeOut;
+			B2Utility::LogWarning(TEXT("Match ended in a draw due to a mutual timeout"));
+			bIgnoreAllEvents = true;
+		}
+		// Booted out due to being timed out for a move
+		else if (WebSocketPacket.Code == WSC_MATCH_TIME_OUT)
+		{
+			OutUpdate.Code = EServerUpdate::InstructionMatchTimeOut;
+			B2Utility::LogWarning(TEXT("Match ended in a loss due to the local player being timed out"));
 			bIgnoreAllEvents = true;
 		}
 		// Auth errors

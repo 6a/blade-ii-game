@@ -890,8 +890,6 @@ void ABladeIIGameMode::UpdateCardState()
 	GameState->OpponentScore = AggregateScore(Arena->OpponentField);
 
 	Arena->ScoreDisplay->Update(GameState->PlayerScore, GameState->OpponentScore);
-
-	//Arena->PrintOpponentCards();
 }
 
 void ABladeIIGameMode::LoadingFinished()
@@ -966,7 +964,18 @@ void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instructio
 		}
 		else
 		{
-			UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::Disconnected);
+			if (Instruction.Code == EServerUpdate::InstructionMatchMutualTimeOut)
+			{
+				UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::MutualTimeOut);
+			}
+			else if (Instruction.Code == EServerUpdate::InstructionMatchTimeOut)
+			{
+				UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::TimeOut);
+			}
+			else
+			{
+				UIErrorModalLayer->SetErrorType(UErrorModal::ErrorType::Disconnected);
+			}
 		}
 
 		UIOptionsMenuLayer->ClearLanguageComboBoxFocus();

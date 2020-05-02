@@ -36,4 +36,6 @@ enum class EServerUpdate : uint8
 	InstructionMatchCheckError UMETA(DisplayName = "Match Check Failed"),
 	InstructionMatchSetupError UMETA(DisplayName = "Match setup Failed"),
 	InstructionMatchIllegalMove UMETA(DisplayName = "Illegal Move Detected"),
+	InstructionMatchMutualTimeOut UMETA(DisplayName = "Mutual Time Out"),
+	InstructionMatchTimeOut UMETA(DisplayName = "Time Out"),
 };

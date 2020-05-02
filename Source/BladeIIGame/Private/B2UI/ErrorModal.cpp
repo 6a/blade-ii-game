@@ -9,9 +9,13 @@ const FTextKey LOC_KEY_UI_NAMESPACE(TEXT("LOC_UI"));
 const FTextKey LOC_KEY_UNABLE_TO_CONNECT_MESSAGE(TEXT("UI_LABEL_UNABLETOCONNECT_000"));
 const FTextKey LOC_KEY_DISCONNECTED_MESSAGE(TEXT("UI_LABEL_DISCONNECTED_000"));
 const FTextKey LOC_KEY_OPPONENTFORFEIT_MESSAGE(TEXT("UI_LABEL_OPPONENTFORFEIT_000"));
+const FTextKey LOC_KEY_MUTUAL_TIME_OUT_MESSAGE(TEXT("UI_LABEL_MUTUALTIMEOUT_000"));
+const FTextKey LOC_KEY_TIME_OUT_MESSAGE(TEXT("UI_LABEL_TIMEOUT_000"));
 
 const FTextKey LOC_KEY_CHECKNET_INFO(TEXT("UI_LABEL_CHECKNET_000"));
 const FTextKey LOC_KEY_VICTORIOUS_INFO(TEXT("UI_LABEL_VICTORIOUS_000"));
+const FTextKey LOC_KEY_MUTUAL_TIME_OUT_INFO(TEXT("UI_LABEL_MUTUALTIMEOUTINFO_000"));
+const FTextKey LOC_KEY_TIME_OUT_INFO(TEXT("UI_LABEL_TIMEOUTINFO_000"));
 
 UErrorModal::UErrorModal(const FObjectInitializer& ObjectInitializer)
 	: UUserWidget(ObjectInitializer)
@@ -46,9 +50,17 @@ void UErrorModal::SetErrorType(ErrorType Type)
 		NegativeButton->SetVisibility(ESlateVisibility::Collapsed);
 		MessageText->SetText(LocalisedTextOpponentForfeit);
 		InfoText->SetText(LocalisedTextVictorious);
+	case UErrorModal::ErrorType::MutualTimeOut:
+		NegativeButton->SetVisibility(ESlateVisibility::Collapsed);
+		MessageText->SetText(LocalisedTextMutualTimeOut);
+		InfoText->SetText(LocalisedTextMutualTimeOutInfo);
+		break;
+	case UErrorModal::ErrorType::TimeOut:
+		NegativeButton->SetVisibility(ESlateVisibility::Collapsed);
+		MessageText->SetText(LocalisedTextTimeOut);
+		InfoText->SetText(LocalisedTextTimeOutInfo);
 		break;
 	}
-
 }
 
 void UErrorModal::SetActive(bool bNewVisible)
@@ -94,8 +106,33 @@ void UErrorModal::RegisterEventListeners()
 
 void UErrorModal::SetupLocalization()
 {
-	TArray<FTextKey> Keys{ LOC_KEY_UNABLE_TO_CONNECT_MESSAGE, LOC_KEY_DISCONNECTED_MESSAGE, LOC_KEY_CHECKNET_INFO, LOC_KEY_VICTORIOUS_INFO, LOC_KEY_OPPONENTFORFEIT_MESSAGE };
-	TArray<FText*> Texts{ &LocalisedTextUnableToConnect, &LocalisedTextDisconnected, &LocalisedTextCheckNet, &LocalisedTextVictorious, &LocalisedTextOpponentForfeit };
+	TArray<FTextKey> Keys
+	{
+		LOC_KEY_UNABLE_TO_CONNECT_MESSAGE, 
+		LOC_KEY_DISCONNECTED_MESSAGE, 
+		LOC_KEY_CHECKNET_INFO, 
+		LOC_KEY_VICTORIOUS_INFO, 
+		LOC_KEY_OPPONENTFORFEIT_MESSAGE,
+
+		LOC_KEY_MUTUAL_TIME_OUT_MESSAGE,
+		LOC_KEY_MUTUAL_TIME_OUT_INFO,
+		LOC_KEY_TIME_OUT_MESSAGE,
+		LOC_KEY_TIME_OUT_INFO,
+	};
+
+	TArray<FText*> Texts
+	{
+		&LocalisedTextUnableToConnect, 
+		&LocalisedTextDisconnected, 
+		&LocalisedTextCheckNet, 
+		&LocalisedTextVictorious, 
+		&LocalisedTextOpponentForfeit,
+
+		&LocalisedTextMutualTimeOut,
+		&LocalisedTextMutualTimeOutInfo,
+		&LocalisedTextTimeOut,
+		&LocalisedTextTimeOutInfo,
+	};
 
 	for (size_t i = 0; i < Keys.Num(); i++)
 	{

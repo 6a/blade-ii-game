@@ -21,5 +21,8 @@ private:
 
 	/* Whether or not we are waiting for the opponents draw from their hand to be received from the server pending a draw from hand to field state */
 	bool bIsWaitingForOpponentDrawFromHand;
+
+	/* Whether or not we are waiting for the opponents draw from their deck to be received from the server (Network games only) */
+	bool bIsWaitingForNetworkDrawFromDeck;
 };
 

@@ -23,7 +23,9 @@ public:
 	{
 		UnableToConnect,
 		Disconnected,
-		OpponentForfeit
+		OpponentForfeit,
+		MutualTimeOut,
+		TimeOut,
 	};
 
 	/* Event for when the non-quit button is pressed (quit button handled internally) */
@@ -56,9 +58,13 @@ private:
 	FText LocalisedTextUnableToConnect;
 	FText LocalisedTextDisconnected;
 	FText LocalisedTextOpponentForfeit;
+	FText LocalisedTextMutualTimeOut;
+	FText LocalisedTextTimeOut;
 
 	FText LocalisedTextCheckNet;
 	FText LocalisedTextVictorious;
+	FText LocalisedTextMutualTimeOutInfo;
+	FText LocalisedTextTimeOutInfo;
 
 	/* Reference to the game mode instance */
 	class ABladeIIGameMode* GameModeInstance;
