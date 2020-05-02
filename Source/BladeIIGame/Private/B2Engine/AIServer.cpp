@@ -572,7 +572,7 @@ ECard UB2AIServer::ServerUpdateToCard(EServerUpdate Update) const
 {
 	ECard OutCard = ECard::ElliotsOrbalStaff;
 
-	if (static_cast<uint32>(Update) >= SERVER_MESSAGE_CARD_UPDATE_MIN || static_cast<uint32>(Update) <= SERVER_MESSAGE_CARD_UPDATE_MAX)
+	if (static_cast<uint32>(Update) >= SERVER_MESSAGE_CARD_UPDATE_MIN && static_cast<uint32>(Update) <= SERVER_MESSAGE_CARD_UPDATE_MAX)
 	{
 		OutCard = static_cast<ECard>(static_cast<uint32>(Update) - SERVER_MESSAGE_CARD_OFFSET);
 	}
