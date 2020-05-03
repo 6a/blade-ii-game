@@ -41,7 +41,7 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 
 	// Check if either local player or the opponent won after the most recent move
 	bool bIsOtherPlayersTurn = GI->GetGameState()->Turn == EPlayer::Opponent;
-	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, PlayerHand, PlayerField, OpponentHand, OpponentField, OpponentDeckCount, bIsOtherPlayersTurn);
+	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, PlayerField, OpponentHand, OpponentField, OpponentDeckCount, bIsOtherPlayersTurn);
 	if (LocalPlayerOutcome != EWinCondition::None)
 	{
 		GI->EndGame(EPlayer::Player, LocalPlayerOutcome);
@@ -49,7 +49,7 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	}
 
 	bIsOtherPlayersTurn = GI->GetGameState()->Turn == EPlayer::Player;
-	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, OpponentHand, OpponentField, PlayerHand, PlayerField, PlayerDeckCount, bIsOtherPlayersTurn);
+	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, OpponentField, PlayerHand, PlayerField, PlayerDeckCount, bIsOtherPlayersTurn);
 	if (OpponentOutcome != EWinCondition::None)
 	{
 		GI->EndGame(EPlayer::Opponent, OpponentOutcome);
@@ -117,7 +117,7 @@ void GSM_State_ProcessBoardState::End()
 
 }
 
-EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& TargetHand, const TArray<ECard>& TargetField, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, bool bIsOppositePlayersTurn) const
+EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& TargetField, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, bool bIsOppositePlayersTurn) const
 {
 	ABladeIIGameMode* GI = GameModeInstance;
 
@@ -169,7 +169,7 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 		// Does the other player have a rod card, which can be played, and would playing it save them?
 		if (OppositePlayerHand.ContainsByPredicate<B2Predicate_MatchCardEnumType>(B2Predicate_MatchCardEnumType(ECard::ElliotsOrbalStaff)))
 		{
-			if (OppositePlayerField.Last() > ECard::Force)
+			if (OppositePlayerField.Num() > 0 && OppositePlayerField.Last() > ECard::Force)
 			{
 				if (OppositePlayerField.Last() == ECard::InactiveForce)
 				{
@@ -188,7 +188,7 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 		// Does the other player have a bolt card, which can be played, and would playing it save them?
 		if (OppositePlayerHand.ContainsByPredicate<B2Predicate_MatchCardEnumType>(B2Predicate_MatchCardEnumType(ECard::Bolt)))
 		{
-			if (TargetField.Last() <= ECard::Force)
+			if (TargetField.Num() > 0 && TargetField.Last() <= ECard::Force)
 			{
 				// Note - bolts are always valid to play as long as there is a card that can be bolted on the opposite field
 				return EWinCondition::None;
