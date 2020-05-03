@@ -32,3 +32,8 @@ bool UB2Server::Connect()
 {
 	return false;
 }
+
+void UB2Server::Kill()
+{
+	bIgnoreAllEvents = true;
+}

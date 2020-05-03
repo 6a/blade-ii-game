@@ -40,3 +40,8 @@ bool UB2Opponent::ReConnect()
 {
 	return BackEnd->Connect();
 }
+
+void UB2Opponent::Deactivate()
+{
+	BackEnd->Kill();
+}

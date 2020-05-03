@@ -40,6 +40,9 @@ public:
 	 */
 	virtual bool Connect() override;
 
+	/* Kill the server, so that it stops processing and sending/receiving messages */
+	virtual void Kill();
+
 private:
 
 	/* The default headers to add to the connection */
@@ -61,9 +64,6 @@ private:
 	/* For manually timing out the connection */
 	float TimeSinceConnectionStart;
 	bool bEnforceConnectionTimeout;
-
-	/* Set to true to ensure that websocket events are no longer handled */
-	bool bIgnoreAllEvents;
 
 	/* For determining when to consider the connection as "made" */
 	uint32 ConnectionStepsProcessed;

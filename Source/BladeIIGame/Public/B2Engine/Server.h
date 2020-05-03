@@ -38,8 +38,16 @@ public:
 	 */
 	virtual bool Connect();
 
+	/* Kill the server, so that it stops processing and sending/receiving messages */
+	virtual void Kill();
+
 protected:
+
+	/* Message queues */
 	TQueue<FB2ServerUpdate> OutBoundQueue;
 	TQueue<FB2ServerUpdate> InBoundQueue;
+
+	/* Flag to determine whether or not to actually do stuff */
+	bool bIgnoreAllEvents;
 };
 

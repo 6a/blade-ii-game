@@ -47,6 +47,9 @@ public:
 	 */
 	bool ReConnect();
 
+	/* Deactivate the back end - no more messages will be processed, sent or received */
+	void Deactivate();
+
 protected:
 	/* The back end for this opponent. Could be an AI opponent, or a network opponent */
 	UPROPERTY()

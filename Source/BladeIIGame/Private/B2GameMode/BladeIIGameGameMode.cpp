@@ -156,6 +156,8 @@ void ABladeIIGameMode::EndGame(EPlayer Victor, EWinCondition WinCondition)
 
 	LocalPlayerInput->BlockInputs();
 
+	Opponent->Deactivate();
+
 	EngineState = EEngineState::PostGame;
 }
 

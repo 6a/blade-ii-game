@@ -1,4 +1,4 @@
-#include "B2Engine/NetServer.h"
+﻿#include "B2Engine/NetServer.h"
 
 #include "B2Enum/WSPacketTypeEnum.h"
 #include "Engine/World.h"
@@ -187,6 +187,18 @@ bool UB2NetServer::Connect()
 	return false;
 }
 
+void UB2NetServer::Kill()
+{
+	UB2Server::Kill();
+
+	if (WebSocket)
+	{
+		WebSocket->Close();
+	}
+
+	B2Utility::LogWarning(TEXT("NetServer was killed (永遠の安らぎがあらんことを)"));
+}
+
 bool UB2NetServer::SetupWSConnection()
 {
 	// Null out the websocket to ensure that it can receive no more events
@@ -297,6 +309,9 @@ void UB2NetServer::HandleConnectionErrorEvent(const FString& Error)
 
 void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 {
+	// Early exit if we are ignoring events
+	if (bIgnoreAllEvents) return;
+
 	FB2WebSocketPacket WebSocketPacket = FB2WebSocketPacket::FromJSONString(Data);
 
 	FB2ServerUpdate OutUpdate{ EServerUpdate::None };
