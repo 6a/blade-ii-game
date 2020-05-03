@@ -76,6 +76,14 @@ const TArray<uint16> SEQ_EVT_MATCH_SETUP_ERROR
 	WSC_MATCH_MULTIPLE_CONNECTIONS,
 };
 
+/* Server events that indicate that an match has ended */
+const TArray<uint16> SEQ_EVT_MATCH_END
+{
+	WSC_MATCH_WIN,
+	WSC_MATCH_DRAW,
+	WSC_MATCH_LOSS,
+};
+
 UB2NetServer::UB2NetServer()
 {
 	bConnected = false;
@@ -342,6 +350,14 @@ void UB2NetServer::HandleMessageReceivedEvent(const FString& Data)
 		{
 			OutUpdate.Code = EServerUpdate::InstructionMatchTimeOut;
 			B2Utility::LogWarning(TEXT("Match ended in a loss due to the local player being timed out"));
+			bIgnoreAllEvents = true;
+		}
+		// Match end
+		else if (SEQ_EVT_MATCH_END.Contains(WebSocketPacket.Code))
+		{
+			// No further processing - these are handled by the game state anyway, so no need to pass them along
+
+			bEnforceConnectionTimeout = false;
 			bIgnoreAllEvents = true;
 		}
 		// Auth errors
