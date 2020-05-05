@@ -7,7 +7,6 @@
 class B2LaunchConfig
 {
 public:
-	FString DisplayName;
 	FString PublicID;
 	FString AuthToken;
 	uint64 MatchID;
