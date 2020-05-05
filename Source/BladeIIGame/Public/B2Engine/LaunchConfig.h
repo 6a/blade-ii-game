@@ -21,9 +21,15 @@ public:
 	float BGMVolume;
 	float SFXVolume;
 	bool bIsBotGame;
+	bool bIsTutorialGame;
 	 
-	/* A MatchID equal or less than this value indicates that the match is a bot game of (value) difficulty */
-	const static uint32 MATCH_ID_AI_GAME_THRESHOLD = 1;
+	/* 
+	 * A MatchID less than this value indicates that the match is a bot game of (value) difficulty.
+	 * A value equal to this value indicates that the match is a tutorial game
+	 * @note - Currently the AI opponent has only one difficulty, so any value under this value
+	 * will be an AI game of the standard difficulty
+	*/
+	const static uint64 MATCH_ID_AI_GAME_THRESHOLD = 10;
 
 	B2LaunchConfig() {}
 	B2LaunchConfig(const FString& GameInfoFileName);
