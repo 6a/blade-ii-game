@@ -44,7 +44,7 @@ const FString CARD_CURSOR_BLUEPRINT_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blu
 const FString LOCAL_QUIT_METADATA = TEXT("LOCAL_QUIT");
 
 // TODO set to zero for build
-#define FAST_DRAW 1
+#define FAST_DRAW 0
 
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 {

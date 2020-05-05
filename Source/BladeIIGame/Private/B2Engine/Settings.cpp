@@ -138,6 +138,7 @@ void USettings::ApplyAll()
 	// Screen settings (only if not in editor mode)
 	if (!WITH_EDITOR && GEngine)
 	{
+		return;
 		UGameUserSettings* GameUserSettings = GEngine->GetGameUserSettings();
 		if (GameUserSettings)
 		{
