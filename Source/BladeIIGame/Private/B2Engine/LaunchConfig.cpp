@@ -82,53 +82,52 @@ const FString B2LaunchConfig::Parse(const FString& LaunchConfigRaw)
 	}
 
 	// Set all the string values first
-	DisplayName = StringValues[0];
-	PublicID = StringValues[1];
-	AuthToken = StringValues[2];
-	Language = StringValues[4];
+	PublicID = StringValues[0];
+	AuthToken = StringValues[1];
+	Language = StringValues[3];
 
 	// Set the numerical values after validating
 	// Early exit if the value is not numeric, and return an appropriate error message
 
 	// Match ID
 	if (!StringValues[3].IsNumeric()) return PARSE_ERROR_MATCH_ID_NOT_INT;
-	MatchID = FCString::Atoi(*StringValues[3]);
+	MatchID = FCString::Atoi(*StringValues[2]);
 
 	// Screen mode
 	if (!StringValues[6].IsNumeric()) return PARSE_ERROR_SCREEN_MODE_NOT_INT;
-	ScreenMode = EWindowMode::ConvertIntToWindowMode(FCString::Atoi(*StringValues[6]));
+	ScreenMode = EWindowMode::ConvertIntToWindowMode(FCString::Atoi(*StringValues[5]));
 
 	// VSync
 	if (!StringValues[7].IsNumeric()) return PARSE_ERROR_VSYNC_NOT_INT;
-	VSyncOn = FCString::Atoi(*StringValues[7]) == 1;
+	VSyncOn = FCString::Atoi(*StringValues[6]) == 1;
 
 	// Anti Aliasing
 	if (!StringValues[8].IsNumeric()) return PARSE_ERROR_ANTI_ALIASING_NOT_INT;
-	AntiAliasing = FCString::Atoi(*StringValues[8]);
+	AntiAliasing = FCString::Atoi(*StringValues[7]);
 
 	// Shadow Quality
 	if (!StringValues[9].IsNumeric()) return PARSE_ERROR_SHADOW_QUALITY_NOT_INT;
-	ShadowQuality = FCString::Atoi(*StringValues[9]);
+	ShadowQuality = FCString::Atoi(*StringValues[8]);
 
 	// Post Processing
 	if (!StringValues[10].IsNumeric()) return PARSE_ERROR_POST_PROCESSING_NOT_INT;
-	PostProcessing = FCString::Atoi(*StringValues[10]);
+	PostProcessing = FCString::Atoi(*StringValues[9]);
 
 	// Master Volume
 	if (!StringValues[11].IsNumeric()) return PARSE_ERROR_MASTER_VOLUME_NOT_FLOAT;
-	MasterVolume = FCString::Atof(*StringValues[11]);
+	MasterVolume = FCString::Atof(*StringValues[10]);
 
 	// BGM Volume
 	if (!StringValues[12].IsNumeric()) return PARSE_ERROR_BGM_VOLUME_NOT_FLOAT;
-	BGMVolume = FCString::Atof(*StringValues[12]);
+	BGMVolume = FCString::Atof(*StringValues[11]);
 
 	// SFX Volume
 	if (!StringValues[13].IsNumeric()) return PARSE_ERROR_SFX_VOLUME_NOT_FLOAT;
-	SFXVolume = FCString::Atof(*StringValues[13]);
+	SFXVolume = FCString::Atof(*StringValues[12]);
 
 	// Parse resolution in two steps - first, split the config value at the delimiter, and then validate + parse the individual values
 	FString ResolutionX, ResolutionY;
-	if (!StringValues[5].Split(DELIMITER_RESOLUTION, &ResolutionX, &ResolutionY)) return PARSE_ERROR_RESOLUTION_BAD_FORMAT;
+	if (!StringValues[4].Split(DELIMITER_RESOLUTION, &ResolutionX, &ResolutionY)) return PARSE_ERROR_RESOLUTION_BAD_FORMAT;
 	if (!ResolutionX.IsNumeric() || !ResolutionY.IsNumeric()) return PARSE_ERROR_RESOLUTION_BAD_FORMAT;
 	Resolution = FIntPoint(FCString::Atoi(*ResolutionX), FCString::Atoi(*ResolutionY));
 
