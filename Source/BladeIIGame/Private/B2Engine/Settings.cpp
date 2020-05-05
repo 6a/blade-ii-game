@@ -29,13 +29,13 @@ float USettings::GetFloatSetting(EFloatSetting Setting) const
 	switch (Setting)
 	{
 	case EFloatSetting::MasterVolume:
-		OutFloat = SettingsCache.MasterVolume / 100.f;
+		OutFloat = SettingsCache.MasterVolume;
 		break;
 	case EFloatSetting::BGMVolume:
-		OutFloat = SettingsCache.BGMVolume / 100.f;
+		OutFloat = SettingsCache.BGMVolume;
 		break;
 	case EFloatSetting::SFXVolume:
-		OutFloat = SettingsCache.SFXVolume / 100.f;
+		OutFloat = SettingsCache.SFXVolume;
 		break;
 	}
 
@@ -47,15 +47,15 @@ void USettings::SetFloatSetting(EFloatSetting Setting, float Value)
 	switch (Setting)
 	{
 	case EFloatSetting::MasterVolume:
-		SettingsCache.MasterVolume = FMath::Clamp(FMath::FloorToInt(100.f * Value), 0, 100);
+		SettingsCache.MasterVolume = Value;
 		GameModeInstance->GetGameSound()->SetVolume(EAudioChannel::Master, Value);
 		break;
 	case EFloatSetting::BGMVolume:
-		SettingsCache.BGMVolume = FMath::Clamp(FMath::FloorToInt(100.f * Value), 0, 100);
+		SettingsCache.BGMVolume = Value;
 		GameModeInstance->GetGameSound()->SetVolume(EAudioChannel::BGM, Value);
 		break;
 	case EFloatSetting::SFXVolume:
-		SettingsCache.SFXVolume = FMath::Clamp(FMath::FloorToInt(100.f * Value), 0, 100);
+		SettingsCache.SFXVolume = Value;
 		GameModeInstance->GetGameSound()->SetVolume(EAudioChannel::SFX, Value);
 		break;
 	}
