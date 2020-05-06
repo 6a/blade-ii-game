@@ -6,8 +6,7 @@
 #include "B2Utility/Log.h"
 
 const uint32 MAX_CONNECTION_ATTEMPTS = 3;
-const FString WEBSOCKET_URL = TEXT("ws://localhost:80/game");
-//const FString WEBSOCKET_URL = TEXT("wss://echo.websocket.org");
+const FString WEBSOCKET_URL = TEXT("wss://b2gs.jstanton.io:443/game");
 const FString AUTH_DELIMITER = TEXT(":");
 
 const float MAX_CONNECT_ATTEMPT_TIME = 4.f;
