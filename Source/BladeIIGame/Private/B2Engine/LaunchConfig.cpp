@@ -59,7 +59,7 @@ B2LaunchConfig::~B2LaunchConfig()
 
 bool B2LaunchConfig::SaveSettings()
 {
-	if (/*!WITH_EDITOR &&*/!LaunchConfigFileName.IsEmpty() && true)
+	if (!WITH_EDITOR &&!LaunchConfigFileName.IsEmpty())
 	{
 		// Determine full file path
 		FString Directory = FPaths::Combine(FPaths::ProjectContentDir(), CONFIG_DIRECTORY);
