@@ -28,6 +28,7 @@ B2Transition::B2Transition(B2WaitGroup WaitGroup, B2TPosition PositionData, B2TR
 
 	bTransitionFinished = false;
 	bHasPlayedSound = false;
+	bStarted = false;
 
 	if (WaitGroup >= 0)
 	{
@@ -56,6 +57,12 @@ void B2Transition::Tick(float DeltaTime)
 			// Early exit if this transitions waitgroup is not yet in action
 			return;
 		}
+	}
+
+	if (!bStarted && Translation.StartPosition.Y < 0)
+	{
+		bStarted = true;
+		B2Utility::LogInfo(FString::Printf(TEXT("Animation [%s] in WG [%d] started"), *OwnerID, WaitGroup));
 	}
 
 	/* Calculate the step for this frame and increment the current alpha */
@@ -94,7 +101,7 @@ void B2Transition::Tick(float DeltaTime)
 	/* Calculate and update the current rotation */
 	CurrentRotation = EaseRotator(Rotation.StartRotation, Rotation.EndRotation, CurrentAlpha, Rotation.Ease);
 
-	//Waitgroup check to see if this waitgroup is finished
+	// Waitgroup check to see if this waitgroup is finished
 	if (WaitGroup >= 0)
 	{
 		// If done, early exit and remove this transition from its waitgroup
@@ -111,8 +118,6 @@ void B2Transition::Tick(float DeltaTime)
 					CurrentWaitGroup++;
 				}
 			}
-
-			return;
 		}
 	}
 	else

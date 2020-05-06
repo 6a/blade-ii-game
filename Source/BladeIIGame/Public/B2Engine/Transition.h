@@ -30,6 +30,10 @@ public:
 	FRotator CurrentRotation;
 	B2WaitGroup WaitGroup;
 
+	/* Debug */
+	FString OwnerID;
+	static TMap<B2WaitGroup, size_t> WaitGroups;
+
 	/* Default constructor to avoid having to store a pointer when declared */
 	B2Transition();
 
@@ -77,7 +81,9 @@ private:
 	// Waitgroups
 	bool bTransitionFinished;
 
-	static TMap<B2WaitGroup, size_t> WaitGroups;
+	// Debug
+	bool bStarted;
+
 	static B2WaitGroup CurrentWaitGroup;
 	static B2WaitGroup NextWaitGroup;
 

@@ -31,6 +31,8 @@ UB2Dealer::UB2Dealer()
 	WaitGroupBlastFinished = B2WaitGroupNone;
 	WaitGroupHandPositionUpdateFinished = B2WaitGroupNone;
 
+	CardAnimator = new B2CardAnimator();
+
 	B2Transition::ResetStatic();
 }
 
@@ -54,6 +56,7 @@ void UB2Dealer::Deal()
 	const float DurationIntoDeck = 0.4f;
 	const float OffsetOnStart = 0.2f;
 	B2WaitGroup WG_IntoDeck = B2Transition::GetNextWaitGroup();
+	B2CardAnimationGroup CAG_IntoDeck;
 
 	// Player cards - into deck
 	for (size_t i = 0; i < DECK_CAPACITY; i++)
@@ -81,6 +84,8 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WG_IntoDeck, Position, Rotation, DurationIntoDeck, Delay);
+		//CAG_IntoDeck.Group.Add(B2CardAnimation{ Card, Transition });
+
 		Card->QueueTransition(Transition);
 	}
 
@@ -112,6 +117,8 @@ void UB2Dealer::Deal()
 		B2Transition Transition = B2Transition(WG_IntoDeck, Position, Rotation, DurationIntoDeck, Delay);
 		Card->QueueTransition(Transition);
 	}
+
+	CardAnimator->AddGroup();
 
 	// Animation Segment 2
 	// FROM: Deck

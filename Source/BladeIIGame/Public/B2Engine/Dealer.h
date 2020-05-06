@@ -4,6 +4,7 @@
 
 #include "B2Game/Arena.h"
 #include "B2Enum/DealerEventEnum.h"
+#include "B2Engine/CardAnimator.h"
 
 #include "Dealer.generated.h"
 
@@ -125,6 +126,9 @@ private:
 	B2WaitGroup WaitGroupEffectReady;
 	B2WaitGroup WaitGroupBlastFinished;
 	B2WaitGroup WaitGroupHandPositionUpdateFinished;
+
+	/* Pointer to the card animator class */
+	B2CardAnimator* CardAnimator;
 
 	/**
 	 * Helper function for effect card transition

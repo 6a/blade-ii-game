@@ -142,6 +142,15 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 		}
 	}
 
+	// Exit early if a blast card was used, which ended in the opposite players hand becoming empty
+	if (GI->GetGameState()->bHandleBlastEdgeCase)
+	{
+		if (OppositePlayerHand.Num() == 0)
+		{
+			return EWinCondition::ScoreVictory;
+		}
+	}
+
 	if (TargetScore > OppositePlayerScore)
 	{
 		uint32 ScoreGap = TargetScore - OppositePlayerScore;
@@ -227,6 +236,9 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 
 bool GSM_State_ProcessBoardState::GameDrawn(AArena* Arena, uint32 LocalPlayerScore, uint32 OpponentScore) const
 {
+	ABladeIIGameMode* GI = GameModeInstance;
+
+	// All cards expired, with equal scores
 	if (Arena->PlayerDeck->Num() + Arena->OpponentDeck->Num() == 0)
 	{
 		if (Arena->PlayerHand->Num() + Arena->OpponentHand->Num() == 0)
