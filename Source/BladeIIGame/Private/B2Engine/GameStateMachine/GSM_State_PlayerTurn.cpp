@@ -85,7 +85,7 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				bool bUsedBoltEffect = (Card->Type == ECard::Bolt && GI->GetArena()->OpponentField->Num() > 0 && GI->GetArena()->OpponentField->GetLast()->IsActive());
 				bool bUsedMirrorEffect = (Card->Type == ECard::Mirror && GI->GetArena()->PlayerField->Num() > 0 && GI->GetArena()->OpponentField->Num() > 0);
 				bool bUsedBlastEffect = (Card->Type == ECard::Blast && GI->GetArena()->OpponentHand->Num() > 0);
-				bool bUsedForceEffect = (Card->Type == ECard::Force);
+				bool bUsedForceEffect = (Card->Type == ECard::Force) && GI->GetGameState()->PlayerScore > 0;
 				bool bUsedNormalCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect && !bUsedForceEffect;
 
 				// If the selected card was a normal card or a force card, and the players lastest field card is flipped, remove it
@@ -129,6 +129,12 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				GI->GetGameState()->bAcceptPlayerInput = false;
 
 				GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
+			}
+
+			// Incase we need to break out after a card is selected
+			if (GI->GetGameState()->bAcceptPlayerInput)
+			{
+				break;
 			}
 		}
 	}

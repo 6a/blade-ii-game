@@ -23,6 +23,9 @@ public:
 	/* The type of this card */
 	ECard Type;
 
+	/* Reference to the game sound class */
+	class AGameSound* GameSound;
+
 	const static uint32 MAX_CARD_SCORE = 7;
 
 	ACard();
@@ -100,7 +103,4 @@ private:
 	const float LERP_MAX = 1.f;
 	const float EASE_EXPONENT = 2.f;
 	const FName OPACITY_PARAMETER = TEXT("Opacity");
-
-	/* Reference to the game sound class */
-	class AGameSound* GameSound;
 };

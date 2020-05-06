@@ -25,4 +25,5 @@ enum class EGameState : uint8
 	OpponentBlastTarget UMETA(DisplayName = "Opponent Blast Target"),
 	PlayerForce UMETA(DisplayName = "Player Force"),
 	OpponentForce UMETA(DisplayName = "Opponent Force"),
+	PostGame UMETA(DisplayName = "Post Game"),
 };

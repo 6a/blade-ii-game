@@ -239,7 +239,8 @@ void UB2AIServer::UpdateState(const FB2ServerUpdate& Update)
 	bool bUsedBoltEffect = (InCard == ECard::Bolt) && Cards.OpponentField.Num() > 0 && !IsBolted(Cards.OpponentField.Last());
 	bool bUsedMirrorEffect = (InCard == ECard::Mirror) && Cards.PlayerField.Num() > 0 && Cards.OpponentField.Num() > 0;
 	bool bUsedBlastEffect = (InCard == ECard::Blast) && Cards.OpponentHand.Num() > 0;
-	bool bUsedNormalOrForceCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect;
+	bool bUsedForceEffect = (InCard == ECard::Force && PlayerScore > 0);
+	bool bUsedNormalOrForceCard = (!bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect) || bUsedForceEffect;
 
 	// If the selected card was a normal card or a force card, and the players lastest field card is flipped, remove it
 	if (Cards.PlayerField.Num() > 0 && IsBolted(Cards.PlayerField.Last()) && bUsedNormalOrForceCard)
@@ -442,7 +443,8 @@ FB2ServerUpdate UB2AIServer::ExecuteMove(ECard ChosenCard)
 	bool bUsedBoltEffect = (ChosenCard == ECard::Bolt) && Cards.PlayerField.Num() > 0 && !IsBolted(Cards.PlayerField.Last());
 	bool bUsedMirrorEffect = (ChosenCard == ECard::Mirror) && Cards.PlayerField.Num() > 0 && Cards.OpponentField.Num() > 0;
 	bool bUsedBlastEffect = (ChosenCard == ECard::Blast) && Cards.PlayerHand.Num() > 0;
-	bool bUsedNormalOrForceCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect;
+	bool bUsedForceEffect = (ChosenCard == ECard::Force && AIScore > 0);
+	bool bUsedNormalOrForceCard = (!bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect) || bUsedForceEffect;
 
 	// If the selected card was a normal card or a force card, and the opponents lastest field card is flipped, remove it
 	if (Cards.OpponentField.Num() > 0 && IsBolted(Cards.OpponentField.Last()) && bUsedNormalOrForceCard)

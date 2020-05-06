@@ -116,13 +116,13 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 						UCardSlot* CurrentSlot = GI->GetArena()->PlayerDeck;
 						UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
 
-						GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
+						GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
 
 						// From opponent deck to opponent field
 						CurrentSlot = GI->GetArena()->OpponentDeck;
 						TargetSlot = GI->GetArena()->OpponentField;
 
-						GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK);
+						GI->GetDealer()->Move(CurrentSlot, CurrentSlot->Num() - 1, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
 
 						// Play base sound effect
 						GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);

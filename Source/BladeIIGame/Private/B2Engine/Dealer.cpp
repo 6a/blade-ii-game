@@ -31,7 +31,7 @@ UB2Dealer::UB2Dealer()
 	WaitGroupBlastFinished = B2WaitGroupNone;
 	WaitGroupHandPositionUpdateFinished = B2WaitGroupNone;
 
-	CardAnimator = new B2CardAnimator();
+	CardAnimator = CreateDefaultSubobject<UB2CardAnimator>(TEXT("Card Animator"));
 
 	B2Transition::ResetStatic();
 }
@@ -56,7 +56,7 @@ void UB2Dealer::Deal()
 	const float DurationIntoDeck = 0.4f;
 	const float OffsetOnStart = 0.2f;
 	B2WaitGroup WG_IntoDeck = B2Transition::GetNextWaitGroup();
-	B2CardAnimationGroup CAG_IntoDeck;
+	FB2CardAnimationGroup CAG_IntoDeck;
 
 	// Player cards - into deck
 	for (size_t i = 0; i < DECK_CAPACITY; i++)
@@ -84,9 +84,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WG_IntoDeck, Position, Rotation, DurationIntoDeck, Delay);
-		//CAG_IntoDeck.Group.Add(B2CardAnimation{ Card, Transition });
-
-		Card->QueueTransition(Transition);
+		CAG_IntoDeck.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
 	// Opponent cards - into deck
@@ -115,10 +113,10 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WG_IntoDeck, Position, Rotation, DurationIntoDeck, Delay);
-		Card->QueueTransition(Transition);
+		CAG_IntoDeck.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
-	CardAnimator->AddGroup();
+	CardAnimator->AddGroup(CAG_IntoDeck);
 
 	// Animation Segment 2
 	// FROM: Deck
@@ -128,6 +126,7 @@ void UB2Dealer::Deal()
 	const float DurationAirToHand = 0.3f;
 	const float OffsetDeckToHand = 0.4f; 
 	B2WaitGroup WG_DeckToHand = B2Transition::GetNextWaitGroup();
+	FB2CardAnimationGroup CAG_DeckToHand;
 
 	// Player cards - deck to hand
 	for (size_t i = 0; i < HAND_CAPACITY; i++)
@@ -157,7 +156,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationDeckToAir, Delay);
-		Card->QueueTransition(Transition);
+		CAG_DeckToHand.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		// Transition 2
 		Position = B2TPosition
@@ -177,7 +176,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		Transition = B2Transition(WG_DeckToHand, Position, Rotation, DurationDeckToAir, 0.0f);
-		Card->QueueTransition(Transition);
+		CAG_DeckToHand.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		// Add the card that we popped from the players deck, to the players hand
 		Arena->PlayerHand->Add(Card);
@@ -211,7 +210,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationDeckToAir, Delay);
-		Card->QueueTransition(Transition);
+		CAG_DeckToHand.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		// Transition 2
 		Position = B2TPosition
@@ -231,11 +230,13 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		Transition = B2Transition(WG_DeckToHand, Position, Rotation, DurationAirToHand, 0.0f);
-		Card->QueueTransition(Transition);
+		CAG_DeckToHand.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		// Add the card that we popped from the players deck, to the players hand
 		Arena->OpponentHand->Add(Card);
 	}
+
+	CardAnimator->AddGroup(CAG_DeckToHand);
 
 	// Animation Segment 3
 	// FROM: Player Hand (Hidden)
@@ -244,6 +245,7 @@ void UB2Dealer::Deal()
 	const float DurationPlayerHandReveal = 0.3f;
 	const float OffsetPlayerHandReveal = 0.3f;
 	B2WaitGroup WG_PlayerHandReveal = B2Transition::GetNextWaitGroup();
+	FB2CardAnimationGroup CAG_PlayerHandReveal;
 
 	// Player cards reveal
 	for (size_t i = 0; i < Arena->PlayerHand->Num(); i++)
@@ -271,8 +273,10 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WG_PlayerHandReveal, Position, Rotation, DurationPlayerHandReveal, Delay);
-		Card->QueueTransition(Transition);
+		CAG_PlayerHandReveal.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
+
+	CardAnimator->AddGroup(CAG_PlayerHandReveal);
 
 	// Animation Segment 4
 	// FROM: Hand (Spread)
@@ -281,6 +285,7 @@ void UB2Dealer::Deal()
 	const float DelayPreShuffleGatherUp = 1.f;
 	const float DurationPreShuffleGatherUp = 0.5f;
 	B2WaitGroup WG_GatherUp = B2Transition::GetNextWaitGroup();
+	FB2CardAnimationGroup CAG_GatherUp;
 
 	// Player cards gather up
 	for (size_t i = 0; i < Arena->PlayerHand->Num(); i++)
@@ -310,7 +315,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WG_GatherUp, Position, Rotation, DurationPreShuffleGatherUp, Delay);
-		Card->QueueTransition(Transition);
+		CAG_GatherUp.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
 	// Opponents cards gather up
@@ -342,8 +347,10 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WG_GatherUp, Position, Rotation, DurationPreShuffleGatherUp, Delay);
-		Card->QueueTransition(Transition);
+		CAG_GatherUp.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
+
+	CardAnimator->AddGroup(CAG_GatherUp);
 
 	// Animation Segment 5
 	// FROM: Player Hand (Unsorted)
@@ -357,6 +364,11 @@ void UB2Dealer::Deal()
 	B2WaitGroup WG_Shuffle = B2Transition::GetNextWaitGroup();
 	B2WaitGroup WG_PostShuffleSpread = B2Transition::GetNextWaitGroup();
 
+	FB2CardAnimationGroup CAG_Shuffle_Async;
+	FB2CardAnimationGroup CAG_Shuffle_Final;
+	FB2CardAnimationGroup CAG_PostShuffleSpread_Async;
+	FB2CardAnimationGroup CAG_PostShuffleSpread_Final;
+	
 	// Set the waitgroup for dealing
 	WaitGroupDealFinished = WG_PostShuffleSpread + 1;
 
@@ -393,7 +405,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationShuffleSteps, Delay);
-		Card->QueueTransition(Transition);
+		CAG_Shuffle_Async.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		// Transition 2
 		FRotator RotationReversed = Arena->PlayerHandReversed->GetCurrentCenterTransform().Rotation;
@@ -418,7 +430,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationShuffleSteps, Delay);
-		Card->QueueTransition(Transition);
+		CAG_Shuffle_Async.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		// Transition 3 (Sort)
 		int IndexAfterSort = SortedPlayerHand.IndexOfByPredicate([Card](const FString& s) { return s == Card->GetID(); });
@@ -438,7 +450,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, 0.f, 0.f);
-		Card->QueueTransition(Transition);
+		CAG_Shuffle_Async.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		// Transition 4
 		VerticalOffset = IndexAfterSort > 4 ? CARD_STACKING_OFFSET + ((IndexAfterSort - 5) * CARD_STACKING_OFFSET * 2) : -(CARD_STACKING_OFFSET + ((4 - IndexAfterSort) * CARD_STACKING_OFFSET * 2));
@@ -460,7 +472,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		Transition = B2Transition(WG_Shuffle, Position, Rotation, DurationShuffleSteps, Delay);
-		Card->QueueTransition(Transition);
+		CAG_Shuffle_Async.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		// Post shuffle spread - included in this for loop so we can reuse the sorted cards
 
@@ -484,7 +496,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationShuffleSteps, Delay);
-		Card->QueueTransition(Transition);
+		CAG_Shuffle_Final.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		Delay = (Arena->PlayerHand->Num() * OffsetShuffleSpread) - IndexAfterSort * OffsetShuffleSpread;
 
@@ -506,7 +518,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		Transition = B2Transition(WG_PostShuffleSpread, Position, Rotation, DurationShuffleSpread, Delay);
-		Card->QueueTransition(Transition);
+		CAG_PostShuffleSpread_Final.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
 	// Opponents cards (no shuffle, just place)
@@ -538,7 +550,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WG_Shuffle, Position, Rotation, DurationShuffleSteps, Delay);
-		Card->QueueTransition(Transition);
+		CAG_Shuffle_Async.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		// Transition 2
 		FVector SpreadStart = Arena->OpponentHand->GetTransformForIndex(0).Position + i * CARD_STACKING_OFFSET;
@@ -560,7 +572,7 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationShuffleSteps, Delay);
-		Card->QueueTransition(Transition);
+		CAG_Shuffle_Final.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		Delay = (Arena->OpponentHand->Num() * OffsetShuffleSpread) - i * OffsetShuffleSpread;
 
@@ -582,8 +594,13 @@ void UB2Dealer::Deal()
 
 		// Add the transition to the transition queue
 		Transition = B2Transition(WG_PostShuffleSpread, Position, Rotation, DurationShuffleSpread, Delay);
-		Card->QueueTransition(Transition);
+		CAG_PostShuffleSpread_Final.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
+
+	CardAnimator->AddGroup(CAG_Shuffle_Async);
+	CardAnimator->AddGroup(CAG_Shuffle_Final);
+	CardAnimator->AddGroup(CAG_PostShuffleSpread_Async);
+	CardAnimator->AddGroup(CAG_PostShuffleSpread_Final);
 }
 
 void UB2Dealer::FastDeal() 
@@ -599,6 +616,7 @@ void UB2Dealer::FastDeal()
 	bCardsDealt = true;
 
 	B2WaitGroup WG_Final = B2Transition::GetNextWaitGroup();
+	FB2CardAnimationGroup CAG_FastDeal;
 
 	// Set the waitgroup for dealing
 	WaitGroupDealFinished = WG_Final + 1;
@@ -647,7 +665,7 @@ void UB2Dealer::FastDeal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WG_Final, Position, Rotation, 0.1f, Delay);
-		Card->QueueTransition(Transition);
+		CAG_FastDeal.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
 	// Opponent cards - into deck
@@ -692,8 +710,10 @@ void UB2Dealer::FastDeal()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WG_Final, Position, Rotation, 0.1f, Delay);
-		Card->QueueTransition(Transition);
+		CAG_FastDeal.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
+
+	CardAnimator->AddGroup(CAG_FastDeal);
 }
 
 void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* TargetSlot, const FVector& Arc, bool bUseWaitGroup)
@@ -712,6 +732,7 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 	// Determine the wait group to use, and increment the finished wait group if required
 	B2WaitGroup MoveWaitGroup = bUseWaitGroup ? B2Transition::GetNextWaitGroup() : B2WaitGroupNone;
 	if (bUseWaitGroup) WaitGroupCardMoveFinished = MoveWaitGroup + 1;
+	FB2CardAnimationGroup CAG_Move;
 
 	// Add it to the target slot
 	TargetSlot->Add(Card);
@@ -734,7 +755,16 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(MoveWaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
-	Card->QueueTransition(Transition);
+	CAG_Move.Group.Add(FB2CardAnimation{ Card, Transition });
+	
+	if (bUseWaitGroup)
+	{
+		CardAnimator->AddGroup(CAG_Move);
+	}
+	else
+	{
+		CardAnimator->InsertIntoLatestGroup(CAG_Move);
+	}
 }
 
 void UB2Dealer::PlayerEffectCard(ACard* Card)
@@ -759,6 +789,7 @@ void UB2Dealer::FlipFieldCard(ACard* Card, bool bNewActive, float Delay)
 	const float TransitionDuration = 0.4f;
 
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
+	FB2CardAnimationGroup CAG_Flip;
 
 	FRotator TargetRotation = Card->GetActorRotation() + FRotator(180, 0, 0);
 
@@ -780,7 +811,9 @@ void UB2Dealer::FlipFieldCard(ACard* Card, bool bNewActive, float Delay)
 
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
-	Card->QueueTransition(Transition);
+	CAG_Flip.Group.Add(FB2CardAnimation{ Card, Transition });
+
+	CardAnimator->AddGroup(CAG_Flip);
 }
 
 void UB2Dealer::Mirror()
@@ -789,6 +822,7 @@ void UB2Dealer::Mirror()
 	const float MirrorDuration = 0.7f;
 
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
+	FB2CardAnimationGroup CAG_Mirror;
 
 	// Perform all the swaps in advance
 
@@ -820,7 +854,7 @@ void UB2Dealer::Mirror()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, MirrorDuration, DelayOnStart);
-		Card->QueueTransition(Transition);
+		CAG_Mirror.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
 	for (size_t i = 0; i < OpponentField.Num(); i++)
@@ -845,8 +879,10 @@ void UB2Dealer::Mirror()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, MirrorDuration, DelayOnStart);
-		Card->QueueTransition(Transition);
+		CAG_Mirror.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
+
+	CardAnimator->AddGroup(CAG_Mirror);
 }
 
 void UB2Dealer::PreBlastSelect(EPlayer Target)
@@ -863,6 +899,8 @@ void UB2Dealer::PreBlastSelect(EPlayer Target)
 	const float DurationPlayerHandFlip = 0.3f;
 
 	FB2Transform CenterTransform = TargetSlot->GetCurrentCenterTransform();
+
+	FB2CardAnimationGroup CAG_PreBlast;
 
 	for (size_t i = 0; i < TargetSlot->Num(); i++)
 	{
@@ -886,7 +924,7 @@ void UB2Dealer::PreBlastSelect(EPlayer Target)
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, TransitionGatherDuration, DelayOnStart);
-		Card->QueueTransition(Transition);
+		CAG_PreBlast.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		if (Target == EPlayer::Player)
 		{
@@ -910,9 +948,11 @@ void UB2Dealer::PreBlastSelect(EPlayer Target)
 
 			// Add the transition to the transition queue
 			Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationPlayerHandFlip, DelayPrePlayerHandFlip);
-			Card->QueueTransition(Transition);
+			CAG_PreBlast.Group.Add(FB2CardAnimation{ Card, Transition });
 		}
 	}
+
+	CardAnimator->AddGroup(CAG_PreBlast);
 }
 
 void UB2Dealer::BlastSelect(EPlayer Target)
@@ -932,6 +972,7 @@ void UB2Dealer::BlastSelect(EPlayer Target)
 
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
 	WaitGroupEffectReady = WaitGroup + 1;
+	FB2CardAnimationGroup CAG_BlastSelect;
 
 	for (size_t i = 0; i < TargetSlot->Num(); i++)
 	{
@@ -957,7 +998,7 @@ void UB2Dealer::BlastSelect(EPlayer Target)
 
 			// Add the transition to the transition queue
 			B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationPlayerHandFlip, DelayPlayerHandFlip);
-			Card->QueueTransition(Transition);
+			CAG_BlastSelect.Group.Add(FB2CardAnimation{ Card, Transition });
 		}
 
 		FVector Offset = GetDirectionNormalized(Card) * CARD_POP_OUT_DISTANCE;
@@ -982,8 +1023,10 @@ void UB2Dealer::BlastSelect(EPlayer Target)
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, DurationSpread, DelayOnStart);
-		Card->QueueTransition(Transition);
+		CAG_BlastSelect.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
+
+	CardAnimator->AddGroup(CAG_BlastSelect);
 }
 
 void UB2Dealer::BlastCleanup(EPlayer Target)
@@ -993,6 +1036,7 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
 	WaitGroupBlastFinished = WaitGroup + 1;
+	FB2CardAnimationGroup CAG_BlastCleanup;
 
 	const float DelayOnStart = 0.0f;
 	const float SpreadDelay = 0.25f;
@@ -1027,7 +1071,7 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, StackTransitionDuration, DelayOnStart);
-		Card->QueueTransition(Transition);
+		CAG_BlastCleanup.Group.Add(FB2CardAnimation{ Card, Transition });
 
 		// Last transition (spread)
 
@@ -1050,16 +1094,20 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 
 		// Add the transition to the transition queue
 		Transition = B2Transition(WaitGroup, Position, Rotation, SpreadTransitionDuration, SpreadDelay);
-		Card->QueueTransition(Transition);
+		CAG_BlastCleanup.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
+
+	CardAnimator->AddGroup(CAG_BlastCleanup);
 }
 
 void UB2Dealer::ForceOut(ACard* Card)
 {
-	const float DelayOnStart = 0.4f;
+	const float DelayOnStart = 0.0f;
 	const float TransitionDuration = 0.2f;
 
 	FVector Target = Card->GetActorLocation() + (CardIsFromPlayerField(Card) ? FORCE_MAX_OFFSET_PLAYER : FORCE_MAX_OFFSET_OPPONENT);
+
+	FB2CardAnimationGroup CAG_ForceOut;
 
 	// Transition 1
 	B2TPosition Position
@@ -1079,7 +1127,9 @@ void UB2Dealer::ForceOut(ACard* Card)
 
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, TransitionDuration, DelayOnStart);
-	Card->QueueTransition(Transition);
+	CAG_ForceOut.Group.Add(FB2CardAnimation{ Card, Transition });
+
+	CardAnimator->AddGroup(CAG_ForceOut);
 }
 
 void UB2Dealer::ForceIn(ACard* Card)
@@ -1088,6 +1138,8 @@ void UB2Dealer::ForceIn(ACard* Card)
 	const float TransitionDuration = 0.5f;
 
 	FB2Transform TargetTransform = CardIsFromPlayerField(Card) ? Arena->PlayerField->GetNextTransform() : Arena->OpponentField->GetNextTransform();
+
+	FB2CardAnimationGroup CAG_ForceIn;
 
 	// Transition 1
 	B2TPosition Position
@@ -1107,7 +1159,9 @@ void UB2Dealer::ForceIn(ACard* Card)
 
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, TransitionDuration, DelayOnStart);
-	Card->QueueTransition(Transition);
+	CAG_ForceIn.Group.Add(FB2CardAnimation{ Card, Transition });
+
+	CardAnimator->InsertIntoLatestGroup(CAG_ForceIn);
 }
 
 void UB2Dealer::UpdateHandPositions(EPlayer Target)
@@ -1122,6 +1176,7 @@ void UB2Dealer::UpdateHandPositions(EPlayer Target)
 
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
 	WaitGroupHandPositionUpdateFinished = WaitGroup + 1;
+	FB2CardAnimationGroup CAG_UpdateHand;
 
 	for (size_t i = 0; i < TargetSlot->Num(); i++)
 	{
@@ -1146,8 +1201,10 @@ void UB2Dealer::UpdateHandPositions(EPlayer Target)
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
-		TargetCard->QueueTransition(Transition);
+		CAG_UpdateHand.Group.Add(FB2CardAnimation{ TargetCard, Transition });
 	}
+
+	CardAnimator->AddGroup(CAG_UpdateHand);
 }
 
 void UB2Dealer::ClearSingleFromField(ACard* Card) const
@@ -1160,6 +1217,8 @@ void UB2Dealer::ClearSingleFromField(ACard* Card) const
 	FVector TargetPosition = TargetSlot->GetTransformForIndex(0).Position;
 
 	TargetSlot->Add(SourceSlot->RemoveByID(Card->GetID()));
+
+	FB2CardAnimationGroup CAG_ClearSingle;
 
 	// Transition 1
 	B2TPosition Position
@@ -1179,12 +1238,14 @@ void UB2Dealer::ClearSingleFromField(ACard* Card) const
 
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, ClearTransitionDuration, DelayOnStart);
-	Card->QueueTransition(Transition);
+	CAG_ClearSingle.Group.Add(FB2CardAnimation{ Card, Transition });
+
+	CardAnimator->AddGroup(CAG_ClearSingle);
 }
 
 void UB2Dealer::ClearField()
 {
-	const float DelayOnStart = 0.5f;
+	const float DelayOnStart = 0.1f;
 	const float ClearTransitionDuration = 0.5f;
 
 	// Determine the wait group to use, and increment the finished wait group
@@ -1192,6 +1253,8 @@ void UB2Dealer::ClearField()
 	B2WaitGroup ClearWaitGroup = B2Transition::GetNextWaitGroup();
 	B2WaitGroup PostDelayWaitGroup = B2Transition::GetNextWaitGroup();
 	WaitGroupClearFinished = PostDelayWaitGroup + 1;
+	FB2CardAnimationGroup CAG_ClearField;
+	FB2CardAnimationGroup CAG_PostClear;
 
 	FVector PlayerCardTargetPosition = Arena->PlayerDiscard->GetTransformForIndex(0).Position;
 	for (int32 i = Arena->PlayerField->Num() - 1; i >= 0; i--)
@@ -1217,7 +1280,7 @@ void UB2Dealer::ClearField()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(ClearWaitGroup, Position, Rotation, ClearTransitionDuration, DelayOnStart);
-		Card->QueueTransition(Transition);
+		CAG_ClearField.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
 	FVector OpponentCardTargetPosition = Arena->OpponentDiscard->GetTransformForIndex(0).Position;
@@ -1245,11 +1308,11 @@ void UB2Dealer::ClearField()
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(ClearWaitGroup, Position, Rotation, ClearTransitionDuration, DelayOnStart);
-		Card->QueueTransition(Transition);
+		CAG_ClearField.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
 	// Add a delay in so that there is some time between the cards being cleared and the next round starting
-	const float AddedDelay = 1.f;
+	const float AddedDelay = 0.5f;
 
 	ACard* PCard = Arena->PlayerDiscard->GetFirst();
 	ACard* OCard = Arena->OpponentDiscard->GetFirst();
@@ -1274,7 +1337,10 @@ void UB2Dealer::ClearField()
 
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(PostDelayWaitGroup, Position, Rotation, AddedDelay, 0);
-	DelayCard->QueueTransition(Transition);
+	CAG_PostClear.Group.Add(FB2CardAnimation{ DelayCard, Transition });
+
+	CardAnimator->AddGroup(CAG_ClearField);
+	CardAnimator->AddGroup(CAG_PostClear);
 }
 
 void UB2Dealer::RevealOpponentsHand() const
@@ -1284,6 +1350,7 @@ void UB2Dealer::RevealOpponentsHand() const
 	const float DelayPerCard = 0.1f;
 
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
+	FB2CardAnimationGroup CAG_Reveal;
 
 	for (uint32 i = 0; i < Arena->OpponentHand->Num(); i++)
 	{
@@ -1308,8 +1375,10 @@ void UB2Dealer::RevealOpponentsHand() const
 
 		// Add the transition to the transition queue
 		B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, TransitionDuration, CardDelay);
-		Card->QueueTransition(Transition);
+		CAG_Reveal.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
+
+	CardAnimator->AddGroup(CAG_Reveal);
 }
 
 void UB2Dealer::Tick(float DeltaSeconds)
@@ -1317,6 +1386,8 @@ void UB2Dealer::Tick(float DeltaSeconds)
 	// Start processing callbacks, but only the cards were dealt
 	if (bCardsDealt)
 	{
+		CardAnimator->Tick(DeltaSeconds);
+
 		B2WaitGroup CurrentWaitGroup = B2Transition::GetCurrentWaitGroup();
 
 		// Various wait groups checked with if else - wait groups are not constant so cant use a switch statement
@@ -1372,6 +1443,7 @@ void UB2Dealer::EffectCard(ACard* Card, FVector Offset)
 
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
 	WaitGroupEffectReady = WaitGroup + 1;
+	FB2CardAnimationGroup CAG_Effect;
 
 	FVector TargetPosition = Card->GetActorLocation() + Offset;
 	FRotator TargetRotation = Card->IsFaceDown() ? Card->GetActorRotation() + FRotator(180, 0, 0) : Card->GetActorRotation();
@@ -1394,7 +1466,9 @@ void UB2Dealer::EffectCard(ACard* Card, FVector Offset)
 
 	// Add the transition to the transition queue
 	B2Transition Transition = B2Transition(WaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
-	Card->QueueTransition(Transition);
+	CAG_Effect.Group.Add(FB2CardAnimation{ Card, Transition });
+	
+	CardAnimator->AddGroup(CAG_Effect);
 }
 
 FVector UB2Dealer::GetDirectionNormalized(const ACard* Card) const

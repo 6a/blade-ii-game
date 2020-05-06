@@ -128,7 +128,8 @@ private:
 	B2WaitGroup WaitGroupHandPositionUpdateFinished;
 
 	/* Pointer to the card animator class */
-	B2CardAnimator* CardAnimator;
+	UPROPERTY()
+	UB2CardAnimator* CardAnimator;
 
 	/**
 	 * Helper function for effect card transition

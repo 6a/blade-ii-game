@@ -7,33 +7,43 @@
 #include "B2Game/Card.h"
 #include "B2Engine/Transition.h"
 
-struct B2CardAnimation
+#include "CardAnimator.generated.h"
+
+
+USTRUCT()
+struct FB2CardAnimation
 {
+	GENERATED_BODY()
+
 	UPROPERTY()
 	ACard* Card;
 
 	B2Transition Transition;
 };
 
-struct B2CardAnimationGroup
+USTRUCT()
+struct FB2CardAnimationGroup
 {
-	TArray<B2CardAnimation> Group;
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TArray<FB2CardAnimation> Group;
 };
 
-class B2CardAnimator
+UCLASS()
+class UB2CardAnimator : public UObject
 {
+	GENERATED_BODY()
 
 public:
-	B2CardAnimator();
+	void AddGroup(FB2CardAnimationGroup& Group);
 
-	static void AddGroup(const B2CardAnimationGroup& Group);
+	void InsertIntoLatestGroup(FB2CardAnimationGroup& Group);
 
-	static void Tick(float DeltaTime);
+	void Tick(float DeltaTime);
 
 private:
 
-	static B2CardAnimator* Instance;
-
-	TQueue<B2CardAnimationGroup> AnimationQueue;
+	TQueue<FB2CardAnimationGroup> AnimationQueue;
 };
 

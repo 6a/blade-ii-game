@@ -112,43 +112,43 @@ void ACard::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	/* If there is an active transition */
-	if (IsTransitioning())
-	{
-		bool bTransitionEndedOnPreviousTick = Transitions.Peek()->Done();
+	//if (IsTransitioning())
+	//{
+	//	bool bTransitionEndedOnPreviousTick = Transitions.Peek()->Done();
 
-		if (Transitions.Peek()->Done())
-		{
-			if (GetActorLocation().Y < 0)
-			{
-				B2Utility::LogInfo(FString::Printf(TEXT("Card [ %s ] with WG [ %d ] Finished"), *ID, Transitions.Peek()->WaitGroup));
-			}
+	//	if (Transitions.Peek()->Done())
+	//	{
+	//		if (GetActorLocation().Y < 0)
+	//		{
+	//			B2Utility::LogInfo(FString::Printf(TEXT("Card [ %s ] with WG [ %d ] Finished"), *ID, Transitions.Peek()->WaitGroup));
+	//		}
 
-			Transitions.Pop();
-		} 
-		else
-		{
-			if (!Transitions.Peek()->TransitionInactive())
-			{
-				bool bIsLaggingBehind = B2Transition::WaitGroups[Transitions.Peek()->WaitGroup] == 1;
+	//		Transitions.Pop();
+	//	} 
+	//	else
+	//	{
+	//		if (!Transitions.Peek()->TransitionInactive())
+	//		{
+	//			bool bIsLaggingBehind = B2Transition::WaitGroups[Transitions.Peek()->WaitGroup] == 1;
 
-				/* Tick the transition */
-				Transitions.Peek()->Tick(DeltaTime);
+	//			/* Tick the transition */
+	//			Transitions.Peek()->Tick(DeltaTime);
 
-				/* Apply the new values to the card */
-				SetActorLocationAndRotation(Transitions.Peek()->CurrentPosition, Transitions.Peek()->CurrentRotation);
-				
-				if (!bTransitionEndedOnPreviousTick && Transitions.Peek()->Done())
-				{
-					if (GetActorLocation().Y < 0)
-					{
-						B2Utility::LogInfo(FString::Printf(TEXT("Card [ %s ] with WG [ %d ] Finished"), *ID, Transitions.Peek()->WaitGroup));
-					}
+	//			/* Apply the new values to the card */
+	//			SetActorLocationAndRotation(Transitions.Peek()->CurrentPosition, Transitions.Peek()->CurrentRotation);
+	//			
+	//			if (!bTransitionEndedOnPreviousTick && Transitions.Peek()->Done())
+	//			{
+	//				if (GetActorLocation().Y < 0)
+	//				{
+	//					B2Utility::LogInfo(FString::Printf(TEXT("Card [ %s ] with WG [ %d ] Finished"), *ID, Transitions.Peek()->WaitGroup));
+	//				}
 
-					Transitions.Pop();
-				}
-			}
-		}
-	}
+	//				Transitions.Pop();
+	//			}
+	//		}
+	//	}
+	//}
 
 	if (FadeState != EFadeState::None)
 	{

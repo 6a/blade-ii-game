@@ -66,7 +66,7 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 		bool bUsedBoltEffect = (Card == ECard::Bolt && GI->GetArena()->PlayerField->Num() > 0 && GI->GetArena()->PlayerField->GetLast()->IsActive());
 		bool bUsedMirrorEffect = (Card == ECard::Mirror && GI->GetArena()->PlayerField->Num() > 0 && GI->GetArena()->OpponentField->Num() > 0);
 		bool bUsedBlastEffect = (Card == ECard::Blast && GI->GetArena()->PlayerHand->Num() > 0);
-		bool bUsedForceEffect = (Card == ECard::Force);
+		bool bUsedForceEffect = (Card == ECard::Force) && GI->GetGameState()->OpponentScore > 0;
 		bool bUsedNormalCard = !bUsedRodEffect && !bUsedBoltEffect && !bUsedMirrorEffect && !bUsedBlastEffect && !bUsedForceEffect;
 
 		// If the selected card was a normal card or a force card, and the opponents lastest field card is flipped, remove it

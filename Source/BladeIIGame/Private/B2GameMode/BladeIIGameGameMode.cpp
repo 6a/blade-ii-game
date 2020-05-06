@@ -15,6 +15,7 @@
 #include "B2Engine/GameStateMachine/GSM_State_DrawToEmptyField.h"
 #include "B2Engine/GameStateMachine/GSM_State_WaitingForInitialDeal.h"
 #include "B2Engine/GameStateMachine/GSM_State_ProcessBoardState.h"
+#include "B2Engine/GameStateMachine/GSM_State_PostGame.h"
 
 #include "B2Engine/GameStateMachine/GSM_State_PlayerTurn.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerRod.h"
@@ -45,7 +46,7 @@ const FString LOCAL_QUIT_METADATA = TEXT("LOCAL_QUIT");
 const FString TITLE_BAR_BLUEPRINT_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Titlebar'");
 
 // TODO set to zero for build
-#define FAST_DRAW 0
+#define FAST_DRAW 1
 
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 {
@@ -162,6 +163,8 @@ void ABladeIIGameMode::EndGame(EPlayer Victor, EWinCondition WinCondition)
 	Opponent->Deactivate();
 
 	EngineState = EEngineState::PostGame;
+
+	GSM->ChangeState<GSM_State_PostGame>();
 }
 
 void ABladeIIGameMode::ChangeTurn()
@@ -228,6 +231,8 @@ void ABladeIIGameMode::StartPlay()
 
 	FindArena();
 
+	FindGameSoundActor();
+
 	InitialiseCardFactory();
 
 	SetupDealer();
@@ -251,8 +256,6 @@ void ABladeIIGameMode::StartPlay()
 	SetupAvatarCaptureRig();
 
 	FindLocalPlayerInput();
-
-	FindGameSoundActor();
 
 	RegisterEventListeners();
 
