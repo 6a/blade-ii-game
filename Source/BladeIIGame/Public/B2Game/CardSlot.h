@@ -159,6 +159,7 @@ protected:
 	TArray<FB2Transform> CardTransforms;
 
 	/* A container for the current stack of cards on this anchor */
+	UPROPERTY()
 	TArray<ACard*> Cards;
 
 	/* The slot type for this instance. Should be set after creation */

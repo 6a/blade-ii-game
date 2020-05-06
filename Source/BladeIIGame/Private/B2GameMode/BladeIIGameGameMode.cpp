@@ -46,7 +46,7 @@ const FString LOCAL_QUIT_METADATA = TEXT("LOCAL_QUIT");
 const FString TITLE_BAR_BLUEPRINT_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Titlebar'");
 
 // TODO set to zero for build
-#define FAST_DRAW 1
+#define FAST_DRAW 0
 
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 {

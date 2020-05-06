@@ -59,12 +59,6 @@ void B2Transition::Tick(float DeltaTime)
 		}
 	}
 
-	if (!bStarted && Translation.StartPosition.Y < 0)
-	{
-		bStarted = true;
-		B2Utility::LogInfo(FString::Printf(TEXT("Animation [%s] in WG [%d] started"), *OwnerID, WaitGroup));
-	}
-
 	/* Calculate the step for this frame and increment the current alpha */
 	float Step = LERP_MAX / (Duration / DeltaTime);
 

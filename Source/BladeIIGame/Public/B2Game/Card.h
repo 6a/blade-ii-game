@@ -6,7 +6,6 @@
 #include "Components/StaticMeshComponent.h"
 
 #include "B2Enum/CardEnum.h"
-#include "B2Engine/Transition.h"
 
 #include "Card.generated.h"
 
@@ -31,12 +30,6 @@ public:
 	ACard();
 
 	/**
-	 * Add a transition to the transition queue, which will play after any preceeding transitions have finished playing.
-	 * @param Transition - A transition helper object
-	 */
-	void QueueTransition(B2Transition& Transition);
-
-	/**
 	 * Fade the card in over (Duration) seconds
 	 * @param Duration - How long the fade will take
 	 */
@@ -47,9 +40,6 @@ public:
 	 * @param Duration - How long the fade will take
 	 */
 	void FadeOut(float Duration);
-
-	/* Returns true if this card is currently transitioning */
-	bool IsTransitioning() const;
 
 	/* Returns the ID for this card */
 	const FString GetID() const;
@@ -80,9 +70,6 @@ private:
 		FadingIn,
 		FadingOut
 	};
-
-	/* The queue of transitions for this card */
-	TQueue<B2Transition> Transitions;
 
 	/* The randomly generated ID for this card */
 	FString ID;

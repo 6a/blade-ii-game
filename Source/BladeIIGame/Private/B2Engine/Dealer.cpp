@@ -757,14 +757,7 @@ void UB2Dealer::Move(UCardSlot* SourceSlot, uint32 SourceIndex, UCardSlot* Targe
 	B2Transition Transition = B2Transition(MoveWaitGroup, Position, Rotation, TransitionDuration, DelayOnStart);
 	CAG_Move.Group.Add(FB2CardAnimation{ Card, Transition });
 	
-	if (bUseWaitGroup)
-	{
-		CardAnimator->AddGroup(CAG_Move);
-	}
-	else
-	{
-		CardAnimator->InsertIntoLatestGroup(CAG_Move);
-	}
+	CardAnimator->InsertIntoLatestGroup(CAG_Move);
 }
 
 void UB2Dealer::PlayerEffectCard(ACard* Card)

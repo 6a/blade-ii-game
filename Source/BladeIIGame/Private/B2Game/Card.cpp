@@ -40,13 +40,6 @@ void ACard::BeginPlay()
 	}
 }
 
-void ACard::QueueTransition(B2Transition& Transition)
-{
-	Transition.SetGameSoundInstance(GameSound);
-	Transition.OwnerID = ID;
-	Transitions.Enqueue(Transition);
-}
-
 void ACard::FadeIn(float Duration)
 {
 	FadeDuration = Duration;
@@ -57,11 +50,6 @@ void ACard::FadeOut(float Duration)
 {
 	FadeDuration = Duration;
 	FadeState = EFadeState::FadingOut;
-}
-
-bool ACard::IsTransitioning() const
-{
-	return !Transitions.IsEmpty();
 }
 
 const FString ACard::GetID() const
@@ -110,45 +98,6 @@ uint32 ACard::TypeToValue(ECard CardType)
 void ACard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	/* If there is an active transition */
-	//if (IsTransitioning())
-	//{
-	//	bool bTransitionEndedOnPreviousTick = Transitions.Peek()->Done();
-
-	//	if (Transitions.Peek()->Done())
-	//	{
-	//		if (GetActorLocation().Y < 0)
-	//		{
-	//			B2Utility::LogInfo(FString::Printf(TEXT("Card [ %s ] with WG [ %d ] Finished"), *ID, Transitions.Peek()->WaitGroup));
-	//		}
-
-	//		Transitions.Pop();
-	//	} 
-	//	else
-	//	{
-	//		if (!Transitions.Peek()->TransitionInactive())
-	//		{
-	//			bool bIsLaggingBehind = B2Transition::WaitGroups[Transitions.Peek()->WaitGroup] == 1;
-
-	//			/* Tick the transition */
-	//			Transitions.Peek()->Tick(DeltaTime);
-
-	//			/* Apply the new values to the card */
-	//			SetActorLocationAndRotation(Transitions.Peek()->CurrentPosition, Transitions.Peek()->CurrentRotation);
-	//			
-	//			if (!bTransitionEndedOnPreviousTick && Transitions.Peek()->Done())
-	//			{
-	//				if (GetActorLocation().Y < 0)
-	//				{
-	//					B2Utility::LogInfo(FString::Printf(TEXT("Card [ %s ] with WG [ %d ] Finished"), *ID, Transitions.Peek()->WaitGroup));
-	//				}
-
-	//				Transitions.Pop();
-	//			}
-	//		}
-	//	}
-	//}
 
 	if (FadeState != EFadeState::None)
 	{
