@@ -43,7 +43,6 @@ public:
 	 */
 	FString GetStringSetting(EStringSetting Setting) const;
 
-
 	/**
 	 * Set the specified string setting with the specified value
 	 * @param Setting - The setting to set
@@ -70,6 +69,9 @@ public:
 
 	/* Applies all the stored settings */
 	void ApplyAll();
+
+	/* Writes all the settings to the output settings file */
+	bool SaveSettings();
 
 private:
 

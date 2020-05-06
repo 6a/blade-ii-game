@@ -31,11 +31,17 @@ public:
 	*/
 	const static uint64 MATCH_ID_AI_GAME_THRESHOLD = 10;
 
-	B2LaunchConfig() {}
-	B2LaunchConfig(const FString& GameInfoFileName);
+	B2LaunchConfig() { LaunchConfigFileName = FString(); }
+	B2LaunchConfig(const FString& InLaunchConfigFile);
 	~B2LaunchConfig();
 
+	/* Writes all the settings to the settings file */
+	bool SaveSettings();
+
 private:
+	/* The name of the config file (on disk) */
+	FString LaunchConfigFileName;
+
 	/**
 	 * Loads the specified file.
 	 * @param FilePath - The absolute path to the file that should be loaded.
@@ -50,5 +56,11 @@ private:
 	 * @returns An error message, or an empty string if parsing was successful.
 	 */
 	const FString Parse(const FString& LaunchConfigRaw);
+
+	/**
+	 * Creates a settings output string - written to file and parsed by the
+	 * @returns The launch config as a string
+	 */
+	const FString MakeSettingsOutputString() const;
 };
 

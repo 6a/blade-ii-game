@@ -23,14 +23,22 @@ const FString PARSE_ERROR_BGM_VOLUME_NOT_FLOAT = TEXT("BGM volume must be an flo
 const FString PARSE_ERROR_SFX_VOLUME_NOT_FLOAT = TEXT("SFX volume must be an float");
 const FString PARSE_ERROR_RESOLUTION_BAD_FORMAT = TEXT("Resolution format is invalid");
 const FString PARSE_ERROR_NONE = TEXT("");
+const FString DEFAULT_LAUNCH_CONFIG = TEXT("x:x:0:en:1920x1080:1:0:3:3:3:80:80:80");
+const FString OUTPUT_FILE_SUFFIX = TEXT("_Out");
 
-B2LaunchConfig::B2LaunchConfig(const FString& GameInfoFileName)
+B2LaunchConfig::B2LaunchConfig(const FString& InLaunchConfigFile)
 {
+	LaunchConfigFileName = InLaunchConfigFile;
+
 	// Get the raw content of the launch config file
-	FString LaunchConfigRaw = FromFile(GameInfoFileName);
+	FString LaunchConfigRaw = FromFile(InLaunchConfigFile);
 
 	// Exit if the contents was not loaded properly
-	ensureMsgf(!LaunchConfigRaw.IsEmpty(), TEXT("Launch config file could not be loaded"));
+	if (LaunchConfigRaw.IsEmpty())
+	{
+		B2Utility::LogWarning(TEXT("Launch config file could not be loaded - loading default values"));
+		LaunchConfigRaw = DEFAULT_LAUNCH_CONFIG;
+	}
 
 	// Parse the launch config file
 	FString Error = Parse(LaunchConfigRaw);
@@ -46,6 +54,45 @@ B2LaunchConfig::B2LaunchConfig(const FString& GameInfoFileName)
 
 B2LaunchConfig::~B2LaunchConfig()
 {
+	SaveSettings();
+}
+
+bool B2LaunchConfig::SaveSettings()
+{
+	if (/*!WITH_EDITOR &&*/!LaunchConfigFileName.IsEmpty() && true)
+	{
+		// Determine full file path
+		FString Directory = FPaths::Combine(FPaths::ProjectContentDir(), CONFIG_DIRECTORY);
+
+		// Create a PlatformFile instance
+		IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+		// Check that the directory exists
+		if (PlatformFile.CreateDirectory(*Directory)) {
+			// Determine the absolute path for the file
+			FString AbsoluteFileName = Directory + "/" + LaunchConfigFileName;
+
+			// Determine the file name for the output file
+			FString Extension = FPaths::GetExtension(AbsoluteFileName);
+			FString FinalFileName;
+			if (Extension.IsEmpty()) 
+			{
+				FinalFileName = AbsoluteFileName.Append(OUTPUT_FILE_SUFFIX);
+			} 
+			else
+			{
+				Extension = FString(".").Append(Extension);
+
+				FinalFileName = AbsoluteFileName.Replace(*Extension, *OUTPUT_FILE_SUFFIX);
+				FinalFileName.Append(Extension);
+			}
+
+			// Write the file at the specified path
+			return FFileHelper::SaveStringToFile(MakeSettingsOutputString(), *FinalFileName);
+		}
+	}
+
+	return false;
 }
 
 const FString B2LaunchConfig::FromFile(const FString& FilePath) const
@@ -134,4 +181,11 @@ const FString B2LaunchConfig::Parse(const FString& LaunchConfigRaw)
 
 	// If we reached this point the parsing was successful, so we return and inform the caller that the parsing succeeded
 	return PARSE_ERROR_NONE;
+}
+
+const FString B2LaunchConfig::MakeSettingsOutputString() const
+{
+	FString OutString = FString::Printf(TEXT("%s:%f:%f:%f"), *Language, MasterVolume, BGMVolume, SFXVolume);
+
+	return OutString;
 }

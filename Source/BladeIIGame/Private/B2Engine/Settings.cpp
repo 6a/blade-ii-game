@@ -141,7 +141,7 @@ void USettings::ApplyAll()
 	// Volume is handled by the game sound actor at game start
 
 	// Screen settings (only if not in editor mode)
-	if (/*!WITH_EDITOR && */GEngine)
+	if (!WITH_EDITOR && GEngine)
 	{
 		UGameUserSettings* GameUserSettings = GEngine->GetGameUserSettings();
 		if (GameUserSettings)
@@ -199,6 +199,11 @@ void USettings::ApplyAll()
 			GameUserSettings->ApplyResolutionSettings(false);
 		}
 	}
+}
+
+bool USettings::SaveSettings()
+{
+	return false;
 }
 
 FString USettings::ShortLocaleStringToFull(const FString& ShortLocaleString) const
