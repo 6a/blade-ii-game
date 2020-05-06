@@ -8,7 +8,8 @@
 
 #include "B2Utility/Log.h"
 #include "B2Predicate/MatchResolution.h"
-#include "B2Predicate/SortResolutionByRefreshRate.h"
+#include "B2Predicate/SortByResolution.h"
+#include "B2Predicate/SortByRefreshRate.h"
 #include "B2GameMode/BladeIIGameMode.h"
 
 void USettings::Initialise(ABladeIIGameMode* GameMode, const B2LaunchConfig& LaunchConfig)
@@ -114,6 +115,9 @@ uint64 USettings::GetIntSetting(EIntSetting Setting) const
 	case EIntSetting::MatchID:
 		OutInt = SettingsCache.MatchID;
 		break;
+	case EIntSetting::ScreenMode:
+		OutInt = SettingsCache.ScreenMode;
+		break;
 	}
 
 	return OutInt;
@@ -153,13 +157,23 @@ void USettings::ApplyAll()
 				FScreenResolutionArray MatchingResolutions = AvailableResolutions.FilterByPredicate(B2Predicate_MatchResolution(TargetResolution));
 				if (SettingsCache.ScreenMode != EWindowMode::Type::Fullscreen && MatchingResolutions.Num() > 0)
 				{
-					MatchingResolutions.Sort(B2Predicate_SortResolutionByRefreshRate());
+					MatchingResolutions.Sort(B2Predicate_SortByRefreshRate());
 					ResolutionToApply = MatchingResolutions.Last();
 				}
 				else
 				{
-					AvailableResolutions.Sort(B2Predicate_SortResolutionByRefreshRate());
-					ResolutionToApply = AvailableResolutions.Last();
+					AvailableResolutions.Sort(B2Predicate_SortByResolution(1080.f / 1920.f));
+					FScreenResolutionArray HighestResolutionsFiltered = AvailableResolutions.FilterByPredicate(B2Predicate_MatchResolution(AvailableResolutions.Last()));
+
+					if (HighestResolutionsFiltered.Num() > 0)
+					{
+						HighestResolutionsFiltered.Sort(B2Predicate_SortByRefreshRate());
+						ResolutionToApply = HighestResolutionsFiltered.Last();
+					} 
+					else
+					{
+						ResolutionToApply = AvailableResolutions.Last();
+					}
 				}
 
 				// Resolution

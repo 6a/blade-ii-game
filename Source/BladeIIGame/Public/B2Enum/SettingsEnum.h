@@ -26,4 +26,5 @@ UENUM(BlueprintType)
 enum class EIntSetting : uint8
 {
 	MatchID UMETA(DisplayName = "Match ID"),
+	ScreenMode UMETA(DisplayName = "Screen Mode"),
 };

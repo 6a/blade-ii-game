@@ -42,6 +42,7 @@ const FString OPTIONS_MENU_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame
 const FString ERROR_MODAL_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_ErrorModal'");
 const FString CARD_CURSOR_BLUEPRINT_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card_Cursor'");
 const FString LOCAL_QUIT_METADATA = TEXT("LOCAL_QUIT");
+const FString TITLE_BAR_BLUEPRINT_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Titlebar'");
 
 // TODO set to zero for build
 #define FAST_DRAW 0
@@ -67,6 +68,8 @@ ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 	GetUIOptionsMenuWidgetClass();
 
 	GetUIErrorModalWidgetClass();
+
+	GetUITitleBarWidgetClass();
 
 	GetCursorClass();
 
@@ -243,6 +246,8 @@ void ABladeIIGameMode::StartPlay()
 
 	SetupUIErrorModalLayer();
 
+	SetupUITitleBarLayer();
+
 	SetupAvatarCaptureRig();
 
 	FindLocalPlayerInput();
@@ -365,6 +370,15 @@ void ABladeIIGameMode::GetUIErrorModalWidgetClass()
 	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the error modal widget")))
 	{
 		UIErrorModalWidgetClass = ClassFinder.Class;
+	}
+}
+
+void ABladeIIGameMode::GetUITitleBarWidgetClass()
+{
+	ConstructorHelpers::FClassFinder<UUserWidget> ClassFinder(*TITLE_BAR_BLUEPRINT_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the title bar widget")))
+	{
+		UITitleBarClass = ClassFinder.Class;
 	}
 }
 
@@ -536,6 +550,24 @@ void ABladeIIGameMode::SetupUIErrorModalLayer()
 		if (UIErrorModalLayer)
 		{
 			UIErrorModalLayer->AddToPlayerScreen();
+		}
+	}
+}
+
+void ABladeIIGameMode::SetupUITitleBarLayer()
+{
+	if (Settings)
+	{
+		if (Settings->GetIntSetting(EIntSetting::ScreenMode) == 2)
+		{
+			if (UITitleBarClass)
+			{
+				UITitleBarLayer = CreateWidget<UUserWidget>(GetWorld()->GetGameInstance(), UITitleBarClass, TEXT("UI Title Bar Layer"));
+				if (UITitleBarLayer)
+				{
+					UITitleBarLayer->AddToPlayerScreen(1);
+				}
+			}
 		}
 	}
 }

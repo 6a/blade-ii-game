@@ -156,6 +156,9 @@ private:
 	UPROPERTY()
 	UErrorModal* UIErrorModalLayer;
 
+	UPROPERTY()
+	UUserWidget* UITitleBarLayer;
+
 	/* Pointer to the settings object */
 	UPROPERTY()
 	USettings* Settings;
@@ -190,6 +193,9 @@ private:
 
 	/* Class type for the error modal widget */
 	TSubclassOf<UErrorModal> UIErrorModalWidgetClass;
+
+	/* Class type for the title bar widget */
+	TSubclassOf<UUserWidget> UITitleBarClass;
 
 	/* Class type for the cursor actor */
 	TSubclassOf<ACardSelector> CursorClass;
@@ -244,6 +250,9 @@ private:
 	/* Gets and stores a reference to the UI error modal widget class */
 	void GetUIErrorModalWidgetClass();
 
+	/* Gets and stores a reference to the UI title bar widget class */
+	void GetUITitleBarWidgetClass();
+
 	/* Gets and stores a reference to the cursor actor class */
 	void GetCursorClass();
 
@@ -288,6 +297,9 @@ private:
 
 	/* Set up the UI error modal layer */
 	void SetupUIErrorModalLayer();
+
+	/* Set up the UI title bar layer */
+	void SetupUITitleBarLayer();
 
 	/* Set up the avatar capture rig */
 	void SetupAvatarCaptureRig();
