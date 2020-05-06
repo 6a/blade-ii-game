@@ -4,6 +4,7 @@
 #include "GameFramework/GameUserSettings.h"
 #include "Engine/Engine.h"
 #include "RHI.h"
+#include "TimerManager.h"
 
 #include "B2Utility/Log.h"
 #include "B2Predicate/MatchResolution.h"
@@ -136,9 +137,8 @@ void USettings::ApplyAll()
 	// Volume is handled by the game sound actor at game start
 
 	// Screen settings (only if not in editor mode)
-	if (!WITH_EDITOR && GEngine)
+	if (/*!WITH_EDITOR && */GEngine)
 	{
-		return;
 		UGameUserSettings* GameUserSettings = GEngine->GetGameUserSettings();
 		if (GameUserSettings)
 		{
