@@ -214,7 +214,7 @@ private:
 	float MatchPrepProgress;
 
 	// Loading progress max values
-	const float CONNECTION_PROGRESS_TARGET = 6;
+	const float CONNECTION_PROGRESS_TARGET = 5;
 	const float MATCH_PREP_PROGRESS_TARGET = 3;
 
 	/**

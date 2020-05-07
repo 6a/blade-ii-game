@@ -1047,6 +1047,8 @@ void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instructio
 	else if (Instruction.Code == EServerUpdate::InstructionConnectionProgress)
 	{
 		UILoadingScreenLayer->SetProgress(ULoadingScreen::LoadingBar::Connecting, ++ConnectionProgress / CONNECTION_PROGRESS_TARGET);
+
+		B2Utility::LogInfo(FString::FromInt(ConnectionProgress));
 	}
 	// Match prep updates
 	else if (Instruction.Code == EServerUpdate::InstructionPlayerData || Instruction.Code == EServerUpdate::InstructionOpponentData)
