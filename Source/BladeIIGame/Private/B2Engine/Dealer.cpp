@@ -1095,7 +1095,7 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 
 void UB2Dealer::ForceOut(ACard* Card)
 {
-	const float DelayOnStart = 0.0f;
+	const float DelayOnStart = 0.4f;
 	const float TransitionDuration = 0.2f;
 
 	FVector Target = Card->GetActorLocation() + (CardIsFromPlayerField(Card) ? FORCE_MAX_OFFSET_PLAYER : FORCE_MAX_OFFSET_OPPONENT);
