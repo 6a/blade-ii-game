@@ -81,10 +81,8 @@ void UStatusIndicator::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 		UWorld* World = GetWorld();
 		if (World)
 		{
-			float TurnTimeRemaining = TIMER_MAX - (World->GetRealTimeSeconds() - CountdownStartTime);
-
+			float TurnTimeRemaining = FMath::Clamp(TIMER_MAX - (World->GetRealTimeSeconds() - CountdownStartTime), 0.f, TIMER_MAX);
 			TimerTextString = FString::FromInt(FMath::FloorToInt(TurnTimeRemaining));
-			TurnTimeRemaining = FMath::Clamp(TurnTimeRemaining - InDeltaTime, 0.f, TIMER_MAX);
 
 			if (TurnTimeRemaining < WARNING_ANIM_START_TIME)
 			{
@@ -94,8 +92,6 @@ void UStatusIndicator::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 				}
 			}
 		}
-
-
 	}
 	else
 	{
