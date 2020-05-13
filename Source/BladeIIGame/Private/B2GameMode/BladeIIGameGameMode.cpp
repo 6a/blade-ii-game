@@ -218,6 +218,8 @@ void ABladeIIGameMode::ClearAndDraw(float Delay)
 	GSM->ChangeState<GSM_State_DrawToEmptyField>();
 }
 
+#include "B2Predicate/IsNotEffectCard.h"
+
 void ABladeIIGameMode::StartPlay()
 {
 	Super::StartPlay();
@@ -260,6 +262,11 @@ void ABladeIIGameMode::StartPlay()
 	RegisterEventListeners();
 
 	InitialiseOpponent();
+
+	auto Cards = TArray<ECard>({ ECard::MachiasOrbalShotgun, ECard::Bolt });
+	bool Exists = !Cards.ContainsByPredicate<B2Predicate_IsNotEffectCard>(B2Predicate_IsNotEffectCard());
+
+	B2Utility::LogBool(Exists);
 }
 
 void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)
@@ -751,8 +758,6 @@ void ABladeIIGameMode::OnEffectReady()
 		}
 		break;
 	case ECard::Blast:
-		GameState->MostRecentBlastCardID = Card->GetID();
-
 		if (GameState->Turn == EPlayer::Player)
 		{
 			// Switch state machine to player blast

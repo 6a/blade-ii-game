@@ -93,6 +93,8 @@ void GSM_State_OpponentBlastTarget::Tick(float DeltaSeconds)
 			}
 			else if (Event == EUIEffectEvent::Finished)
 			{
+				B2Utility::LogInfo("OpponentBlastTarget : Finished");
+
 				// Remove the blast card
 				ACard* BlastCard = GI->GetArena()->OpponentHand->RemoveByID(GI->GetGameState()->MostRecentBlastCardID);
 				BlastCard->SetActorHiddenInGame(true);

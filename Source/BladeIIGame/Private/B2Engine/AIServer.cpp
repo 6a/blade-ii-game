@@ -17,7 +17,7 @@ const FB2ServerUpdate UB2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = GenerateCards();
+		Cards = OpponentBlastTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;
@@ -791,7 +791,7 @@ FB2Cards UB2AIServer::BlastTest() const
 	for (int i = 14; i >= 0; i--)
 	{
 		GeneratedCards.PlayerDeck.Add(FMath::RandBool() ? ECard::Blast : static_cast<ECard>(FMath::RandRange(1, 6)));
-		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+		GeneratedCards.OpponentDeck.Add(static_cast<ECard>(FMath::RandRange(0, 10)));
 	}
 
 	return GeneratedCards;
@@ -803,7 +803,7 @@ FB2Cards UB2AIServer::OpponentBlastTest() const
 
 	for (int i = 14; i >= 0; i--)
 	{
-		GeneratedCards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(1, 6)));
+		GeneratedCards.PlayerDeck.Add(static_cast<ECard>(FMath::RandRange(0, 10)));
 		GeneratedCards.OpponentDeck.Add(FMath::RandBool() ? ECard::Blast : static_cast<ECard>(FMath::RandRange(1, 6)));
 	}
 

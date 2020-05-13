@@ -25,6 +25,8 @@ void GSM_State_OpponentBlast::Init(ABladeIIGameMode* GameMode)
 	GI->GetGameSound()->PlaySFX(ESFX::EffectBase, 0.2f);
 
 	OpponentMessage(EOpponentMessage::Blast);
+
+	B2Utility::LogInfo("GSM_State_OpponentBlast PreBlastSelect");
 }
 
 void GSM_State_OpponentBlast::Tick(float DeltaSeconds)
@@ -38,6 +40,8 @@ void GSM_State_OpponentBlast::Tick(float DeltaSeconds)
 	{
 		if (Event == EUIEffectEvent::Finished)
 		{
+			B2Utility::LogInfo("GSM_State_OpponentBlast BlastSelect");
+
 			GI->GetDealer()->BlastSelect(EPlayer::Player);
 
 		}

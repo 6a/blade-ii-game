@@ -93,14 +93,17 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 					if (OutInt != -1)
 					{
 						GI->GetGameState()->MostRecentBlastedCard = static_cast<ECard>(OutInt);
+
+						ACard* OpponentBlastCard = GI->GetArena()->OpponentHand->GetFirstOfType(Card);
+
+						GI->GetGameState()->MostRecentBlastCardID = OpponentBlastCard->GetID();
+						GI->GetDealer()->OpponentEffectCard(OpponentBlastCard);
 					}
 					else
 					{
 						B2Utility::LogWarning(FString::Printf(TEXT("Unable to parse the blast metadata from the opponent: [ %s ]"), *CachedMove.Payload));
 					}
 				}
-
-				GI->GetDealer()->OpponentEffectCard(GI->GetArena()->OpponentHand->GetFirstOfType(Card));
 			}
 			else
 			{

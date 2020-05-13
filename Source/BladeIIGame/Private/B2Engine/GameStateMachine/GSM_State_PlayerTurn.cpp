@@ -122,6 +122,10 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 					// Also update the status indicator if this card was not a blast card
 					GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
 				}
+				else
+				{
+					GI->GetGameState()->MostRecentBlastCardID = Card->GetID();
+				}
 
 				// Play card selection sound effect
 				GI->GetGameSound()->PlaySFX(ESFX::CursorSelect);
@@ -129,10 +133,12 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				GI->GetGameState()->bAcceptPlayerInput = false;
 
 				GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
+
+				break;
 			}
 
 			// Incase we need to break out after a card is selected
-			if (GI->GetGameState()->bAcceptPlayerInput)
+			if (!GI->GetGameState()->bAcceptPlayerInput)
 			{
 				break;
 			}

@@ -41,7 +41,7 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 
 	// Check if either local player or the opponent won after the most recent move
 	bool bIsOtherPlayersTurn = GI->GetGameState()->Turn == EPlayer::Opponent;
-	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, PlayerField, OpponentHand, OpponentField, OpponentDeckCount, bIsOtherPlayersTurn);
+	EWinCondition LocalPlayerOutcome = CheckIfTargetWon(PlayerScore, OpponentScore, PlayerHand, PlayerField, OpponentHand, OpponentField, OpponentDeckCount, bIsOtherPlayersTurn);
 	if (LocalPlayerOutcome != EWinCondition::None)
 	{
 		GI->EndGame(EPlayer::Player, LocalPlayerOutcome);
@@ -49,7 +49,7 @@ void GSM_State_ProcessBoardState::Init(ABladeIIGameMode* GameMode)
 	}
 
 	bIsOtherPlayersTurn = GI->GetGameState()->Turn == EPlayer::Player;
-	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, OpponentField, PlayerHand, PlayerField, PlayerDeckCount, bIsOtherPlayersTurn);
+	EWinCondition OpponentOutcome = CheckIfTargetWon(OpponentScore, PlayerScore, OpponentHand, OpponentField, PlayerHand, PlayerField, PlayerDeckCount, bIsOtherPlayersTurn);
 	if (OpponentOutcome != EWinCondition::None)
 	{
 		GI->EndGame(EPlayer::Opponent, OpponentOutcome);
@@ -117,7 +117,7 @@ void GSM_State_ProcessBoardState::End()
 
 }
 
-EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& TargetField, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, bool bIsOppositePlayersTurn) const
+EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& TargetHand, const TArray<ECard>& TargetField, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, bool bIsOppositePlayersTurn) const
 {
 	ABladeIIGameMode* GI = GameModeInstance;
 
@@ -125,6 +125,16 @@ EWinCondition GSM_State_ProcessBoardState::CheckIfTargetWon(uint32 TargetScore, 
 
 	// TODO perhaps we need to handle the case where a player ends up in an unwinnable position after the first draw. 
 	// If this happens, we should probably just redraw instead.
+
+	// Early exit if the player that just made a move only has effect cards left - this way the loss should be detected by the other call to
+	// this function.
+	if (!bIsOppositePlayersTurn && TargetHand.Num() > 0)
+	{
+		if (!TargetHand.ContainsByPredicate<B2Predicate_IsNotEffectCard>(B2Predicate_IsNotEffectCard()))
+		{
+			return EWinCondition::None;
+		}
+	}
 
 	// Early exit if the opponent only has effect cards left, as this is an auto win regardless
 	// Skips check if the opposite players hand is empty (as it means that the target probably has 1 more card to play

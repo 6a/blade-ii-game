@@ -1027,6 +1027,10 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 	// Early exit with noop if the target is not specified
 	if (Target == EPlayer::Undecided) return;
 
+	// Early exit if the target slot is empty 
+	UCardSlot* TargetSlot = Target == EPlayer::Player ? Arena->PlayerHand : Arena->OpponentHand;
+	if (TargetSlot->Num() == 0) return;
+
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
 	WaitGroupBlastFinished = WaitGroup + 1;
 	FB2CardAnimationGroup CAG_BlastCleanup;
@@ -1035,8 +1039,6 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 	const float SpreadDelay = 0.25f;
 	const float StackTransitionDuration = 0.5f;
 	const float SpreadTransitionDuration = 0.5f;
-
-	UCardSlot* TargetSlot = Target == EPlayer::Player ? Arena->PlayerHand : Arena->OpponentHand;
 
 	FB2Transform CenterTransform = TargetSlot->GetCurrentCenterTransform();
 
@@ -1233,7 +1235,7 @@ void UB2Dealer::ClearSingleFromField(ACard* Card) const
 	B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, ClearTransitionDuration, DelayOnStart);
 	CAG_ClearSingle.Group.Add(FB2CardAnimation{ Card, Transition });
 
-	CardAnimator->AddGroup(CAG_ClearSingle);
+	CardAnimator->InsertIntoLatestGroup(CAG_ClearSingle);
 }
 
 void UB2Dealer::ClearField()
