@@ -18,6 +18,7 @@ public:
 	 * @param PublicID - Public ID of the local user.
 	 * @param AuthToken - Auth token for the local user.
 	 * @param MatchID - Match ID.
+	 * @param World - A pointer to the current world.
 	 */
-	void Configure(const FString& PublicID, const FString& AuthToken, uint64 MatchID);
+	void Configure(const FString& PublicID, const FString& AuthToken, uint64 MatchID, UWorld* World);
 };

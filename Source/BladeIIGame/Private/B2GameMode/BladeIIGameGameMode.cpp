@@ -621,7 +621,7 @@ void ABladeIIGameMode::InitialiseOpponent()
 		FString PublicID = Settings->GetStringSetting(EStringSetting::PublicID);
 		FString AuthToken = Settings->GetStringSetting(EStringSetting::AuthToken);
 
-		static_cast<UB2NetOpponent*>(Opponent)->Configure(PublicID, AuthToken, MatchID);
+		static_cast<UB2NetOpponent*>(Opponent)->Configure(PublicID, AuthToken, MatchID, GetWorld());
 	}
 }
 

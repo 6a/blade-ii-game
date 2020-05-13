@@ -9,7 +9,7 @@ const uint32 MAX_CONNECTION_ATTEMPTS = 3;
 const FString WEBSOCKET_URL = TEXT("wss://b2gs.jstanton.io:443/game");
 const FString AUTH_DELIMITER = TEXT(":");
 
-const float MAX_CONNECT_ATTEMPT_TIME = 4.f;
+const float MAX_CONNECT_ATTEMPT_TIME = 6.f;
 
 /* Codes for categorising websocket messages */
 const uint16 WSC_AUTH = 200;
@@ -92,13 +92,15 @@ UB2NetServer::UB2NetServer()
 	bIgnoreAllEvents = false;
 }
 
-void UB2NetServer::Initialise(const FString& InPublicID, const FString& InAuthToken, uint64 InMatchID)
+void UB2NetServer::Initialise(const FString& InPublicID, const FString& InAuthToken, uint64 InMatchID, UWorld* InWorld)
 {
 	PublicID = InPublicID;
 	AuthToken = InAuthToken;
 	MatchID = InMatchID;
 
 	bConnectionMade = false;
+
+	if (!World) World = InWorld;
 
 	Connect();
 }
@@ -141,11 +143,15 @@ void UB2NetServer::Tick(float DeltaSeconds)
 	} 
 	else if (bEnforceConnectionTimeout)
 	{
-		TimeSinceConnectionStart += DeltaSeconds;
-		if (TimeSinceConnectionStart >= MAX_CONNECT_ATTEMPT_TIME)
+		if (World)
 		{
-			ConnectionAttempts = MAX_CONNECTION_ATTEMPTS;
-			HandleConnectionErrorEvent("Connection attempt timed out");
+			float TimeSinceConnectionStart = World->GetRealTimeSeconds() - ConnectionAttemptStartTime;
+
+			if (TimeSinceConnectionStart >= MAX_CONNECT_ATTEMPT_TIME)
+			{
+				ConnectionAttempts = MAX_CONNECTION_ATTEMPTS;
+				HandleConnectionErrorEvent("Connection attempt timed out");
+			}
 		}
 	}
 }
@@ -159,15 +165,14 @@ bool UB2NetServer::Connect()
 {
 	B2Utility::LogInfo("Attempting to initialise connection to game server");
 
-	bConnected = false;
-	ConnectionAttempts = 0;
-	TimeSinceConnectionStart = 0;
-	bEnforceConnectionTimeout = true;
-	ConnectionStepsProcessed = 0;
-	bIgnoreAllEvents = false;
-
 	if (!bConnectionMade)
 	{
+		bConnected = false;
+		ConnectionAttempts = 0;
+		ConnectionStepsProcessed = 0;
+		bIgnoreAllEvents = false;
+		bEnforceConnectionTimeout = true;
+
 		bool bInitialised = SetupWSConnection();
 
 		if (!bInitialised)
@@ -200,21 +205,25 @@ void UB2NetServer::Kill()
 
 bool UB2NetServer::SetupWSConnection()
 {
-	// Null out the websocket to ensure that it can receive no more events
-	WebSocket = nullptr;
+	if (World)
+	{
+		ConnectionAttemptStartTime = World->GetRealTimeSeconds();
 
-	// Add any other headers, auth or whatever to the default headers
-	TArray<FWebSocketHeaderPair> Headers(DefaultHeaders);
-	//Headers.Add(FWebSocketHeaderPair());
+		// Add any other headers, auth or whatever to the default headers
+		TArray<FWebSocketHeaderPair> Headers(DefaultHeaders);
+		//Headers.Add(FWebSocketHeaderPair());
 
-	// Attempt to connect
-	bool bConnectionFailed = true;
+		// Attempt to connect
+		bool bConnectionFailed = true;
 
-	WebSocket = UWebSocketBlueprintLibrary::ConnectWithHeader(WEBSOCKET_URL, Headers, bConnectionFailed);
+		WebSocket = UWebSocketBlueprintLibrary::ConnectWithHeader(WEBSOCKET_URL, Headers, bConnectionFailed);
 
-	SetupEventListeners();
+		SetupEventListeners();
 
-	return !bConnectionFailed && WebSocket;
+		return !bConnectionFailed && WebSocket;
+	}
+
+	return false;
 }
 
 void UB2NetServer::SetupEventListeners()
@@ -246,6 +255,19 @@ FB2WebSocketPacket UB2NetServer::MakeMatchIDPacket() const
 	};
 
 	return Packet;
+}
+
+void UB2NetServer::CleanWebSocket()
+{
+	if (WebSocket)
+	{
+		WebSocket->OnConnectComplete.RemoveAll(this);
+		WebSocket->OnConnectError.RemoveAll(this);
+		WebSocket->OnClosed.RemoveAll(this);
+		WebSocket->OnReceiveData.RemoveAll(this);
+
+		WebSocket = nullptr;
+	}
 }
 
 void UB2NetServer::HandleConnectionEvent()
@@ -283,19 +305,19 @@ void UB2NetServer::HandleConnectionErrorEvent(const FString& Error)
 	// Early exit if we are ignoring events
 	if (bIgnoreAllEvents) return;
 
+	// Clean up the websocket so that we dont received any more events from that particular instance.
+	CleanWebSocket();
+
 	// If we arent connected, try to connect
 	if (!bConnected)
 	{
 		if (++ConnectionAttempts <= MAX_CONNECTION_ATTEMPTS)
 		{
-			TimeSinceConnectionStart = 0;
-
 			B2Utility::LogWarning(FString::Printf(TEXT("Could not connect to websocket [ %s ] - Retrying (retry #%d)"), *WEBSOCKET_URL, ConnectionAttempts));
 			if (SetupWSConnection())
 			{
 				return;
 			}
-
 		}
 	}
 

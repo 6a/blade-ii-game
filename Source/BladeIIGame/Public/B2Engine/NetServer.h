@@ -22,8 +22,9 @@ public:
 	 * @param PublicID - The public ID of the local player
 	 * @param AuthToken - The auth token for the local player
 	 * @param MatchID - The match ID for the match that the local player is attempting to join
+	 * @param InWorld - A pointer to the current world
 	 */
-	void Initialise(const FString& PublicID, const FString& AuthToken, uint64 MatchID);
+	void Initialise(const FString& PublicID, const FString& AuthToken, uint64 MatchID, UWorld* InWorld);
 
 	/* Tick the server */
 	virtual void Tick(float DeltaSeconds);
@@ -62,7 +63,7 @@ private:
 	bool bConnectionMade;
 
 	/* For manually timing out the connection */
-	float TimeSinceConnectionStart;
+	float ConnectionAttemptStartTime;
 	bool bEnforceConnectionTimeout;
 
 	/* For determining when to consider the connection as "made" */
@@ -72,6 +73,10 @@ private:
 	FString PublicID;
 	FString AuthToken;
 	uint64 MatchID;
+
+	/* Pointer to the world for getting the time */
+	UPROPERTY()
+	UWorld* World;
 
 	/**
 	 * Attempt to initialise the websocket connection
@@ -93,6 +98,9 @@ private:
 	 * @return The packet
 	 */
 	FB2WebSocketPacket MakeMatchIDPacket() const;
+
+	/* Unregister all the event listeners from the current websocket and then null it */
+	void CleanWebSocket();
 
 	/* Handler for successful connection events */
 	UFUNCTION()
