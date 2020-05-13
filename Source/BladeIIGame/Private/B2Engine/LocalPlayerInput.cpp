@@ -50,7 +50,7 @@ void ALocalPlayerInput::OnNavigateLeftPressed()
 		NavButtonPriority = ENavButton::Left;
 		bIsLeftNavDown = true;
 
-		if (!bIsRightNavDown) NextPollTime = GetWorld()->GetTimeSeconds() + NAV_POLL_INTERVAL + NAV_POLL_DELAY;
+		if (!bIsRightNavDown) NextPollTime = GetWorld()->GetRealTimeSeconds() + NAV_POLL_INTERVAL + NAV_POLL_DELAY;
 
 		B2Utility::LogInfo(TEXT("Navigate Left Pressed"));
 	}
@@ -65,7 +65,7 @@ void ALocalPlayerInput::OnNavigateRightPressed()
 		NavButtonPriority = ENavButton::Right;
 		bIsRightNavDown = true;
 
-		if (!bIsLeftNavDown) NextPollTime = GetWorld()->GetTimeSeconds() + NAV_POLL_INTERVAL + NAV_POLL_DELAY;
+		if (!bIsLeftNavDown) NextPollTime = GetWorld()->GetRealTimeSeconds() + NAV_POLL_INTERVAL + NAV_POLL_DELAY;
 
 		B2Utility::LogInfo(TEXT("Navigate Right Pressed"));
 	}
@@ -146,18 +146,18 @@ void ALocalPlayerInput::HandleNavigationPolling()
 {
 	if (NavButtonPriority == ENavButton::Left)
 	{
-		if (GetWorld()->GetTimeSeconds() > NextPollTime)
+		if (GetWorld()->GetRealTimeSeconds() > NextPollTime)
 		{
 			ButtonInputQueue.Enqueue(EInput::NavigateLeft);
-			NextPollTime = GetWorld()->GetTimeSeconds() + NAV_POLL_INTERVAL;
+			NextPollTime = GetWorld()->GetRealTimeSeconds() + NAV_POLL_INTERVAL;
 		}
 	}
 	else if (NavButtonPriority == ENavButton::Right)
 	{
-		if (GetWorld()->GetTimeSeconds() > NextPollTime)
+		if (GetWorld()->GetRealTimeSeconds() > NextPollTime)
 		{
 			ButtonInputQueue.Enqueue(EInput::NavigateRight);
-			NextPollTime = GetWorld()->GetTimeSeconds() + NAV_POLL_INTERVAL;
+			NextPollTime = GetWorld()->GetRealTimeSeconds() + NAV_POLL_INTERVAL;
 		}
 	}
 }

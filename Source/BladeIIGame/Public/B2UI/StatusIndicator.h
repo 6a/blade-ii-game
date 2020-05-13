@@ -52,8 +52,8 @@ private:
 	/* The current state of the status indicator */
 	State CurrentState;
 
-	/* Current turn time remaining for the current turn */
-	float TurnTimeRemaining;
+	/* The time at which the current countdown started (real time, not game time) */
+	float CountdownStartTime;
 
 	/* Timer text widget */
 	UPROPERTY(meta = (BindWidget))

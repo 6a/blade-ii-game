@@ -1366,7 +1366,7 @@ void UB2Dealer::RevealOpponentsHand() const
 		B2TRotation Rotation
 		{
 			TargetTransform.Rotation,
-			TargetTransform.Rotation + FRotator(179.9f, 0, 0),
+			TargetTransform.Rotation + FRotator(179.9f, 0, 0), // 180 causes the cards to rotate the wrong way
 			EEase::EaseInOut,
 		};
 

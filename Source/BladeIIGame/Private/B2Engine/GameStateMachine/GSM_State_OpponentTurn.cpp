@@ -45,7 +45,7 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 			// If the opponent is an AI opponent, we add an artificial delay
 			if (GI->GetSettings()->IsVersusAI())
 			{
-				MoveExecutionTime = GI->GetWorld()->GetTimeSeconds() + FMath::FRandRange(AI_DELAY_MIN, AI_DELAY_MAX);
+				MoveExecutionTime = GI->GetWorld()->GetRealTimeSeconds() + FMath::FRandRange(AI_DELAY_MIN, AI_DELAY_MAX);
 			}
 			else
 			{
@@ -53,7 +53,7 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 			}
 		}
 	}
-	else if (!bMoveHandled && GI->GetWorld()->GetTimeSeconds() > MoveExecutionTime)
+	else if (!bMoveHandled && GI->GetWorld()->GetRealTimeSeconds() > MoveExecutionTime)
 	{
 		ECard Card = ServerUpdateToCard(CachedMove.Code);
 

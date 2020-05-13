@@ -26,7 +26,7 @@ void ULoadingScreen::Initialise(bool bIsVersusAI)
 		OverallProgress = 0;
 		FadeAlpha = 1;
 		LoadingPhase = 0;
-		NextAutoProgressBarStartTime = GetWorld()->GetTimeSeconds() + 0.4f;
+		NextAutoProgressBarStartTime = GetWorld()->GetRealTimeSeconds() + 0.4f;
 		bUIRequiresUpdate = true;
 
 		bAutoLoad = bIsVersusAI;
@@ -84,7 +84,7 @@ void ULoadingScreen::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 		if (bAutoLoad || OverallProgress >= 2)
 		{
-			if (GetWorld()->GetTimeSeconds() >= NextAutoProgressBarStartTime)
+			if (GetWorld()->GetRealTimeSeconds() >= NextAutoProgressBarStartTime)
 			{
 				float Step = PROGRESS_MAX / ((AUTO_LOAD_TIME) / InDeltaTime);
 				OverallProgress = FMath::Clamp(OverallProgress + Step, 0.f, PROGRESS_MAX);
@@ -109,7 +109,7 @@ void ULoadingScreen::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 				if (LoadingPhase == 0)
 				{
 					LoadingPhase = 1;
-					if (bAutoLoad) NextAutoProgressBarStartTime = GetWorld()->GetTimeSeconds() + 0.4f;
+					if (bAutoLoad) NextAutoProgressBarStartTime = GetWorld()->GetRealTimeSeconds() + 0.4f;
 				}
 
 				float Fill = FMath::Clamp(OverallProgress - 1, 0.f, 1.f);

@@ -27,7 +27,7 @@ void GSM_State_OpponentBlastTarget::Init(ABladeIIGameMode* GameMode)
 	Cursor->ToggleActorVisibility(true);
 
 	TargetCard = GI->GetArena()->PlayerHand->GetRandomOfType(GI->GetGameState()->MostRecentBlastedCard);
-	NextActionTime = GI->GetWorld()->GetTimeSeconds() + WAIT_TIME_BETWEEN_ACTIONS;
+	NextActionTime = GI->GetWorld()->GetRealTimeSeconds() + WAIT_TIME_BETWEEN_ACTIONS;
 	bTargetCardSelected = false;
 
 	GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::OpponentTurn, false);
@@ -39,7 +39,7 @@ void GSM_State_OpponentBlastTarget::Tick(float DeltaSeconds)
 
 	ABladeIIGameMode* GI = GameModeInstance;
 
-	float Time = GI->GetWorld()->GetTimeSeconds();
+	float Time = GI->GetWorld()->GetRealTimeSeconds();
 
 	if (!bTargetCardSelected && Time >= NextActionTime)
 	{
@@ -62,7 +62,7 @@ void GSM_State_OpponentBlastTarget::Tick(float DeltaSeconds)
 			uint32 NewCursorIndex = GI->GetGameState()->CursorSlotIndex < GI->GetArena()->PlayerHand->Num() - 1 ? GI->GetGameState()->CursorSlotIndex + 1 : 0;
 			UpdateCursorPosition(NewCursorIndex, true);
 
-			NextActionTime = GI->GetWorld()->GetTimeSeconds() + WAIT_TIME_BETWEEN_ACTIONS;
+			NextActionTime = GI->GetWorld()->GetRealTimeSeconds() + WAIT_TIME_BETWEEN_ACTIONS;
 		}
 	}
 	else if (GI->GetGameState()->bBlastAnimationPending)

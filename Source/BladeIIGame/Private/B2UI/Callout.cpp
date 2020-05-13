@@ -41,14 +41,14 @@ bool UCallout::IsAnimatingText() const
 
 bool UCallout::IsActive() const
 {
-	bool bIsWaitingForFadeOut = GetWorld()->GetTimeSeconds() < FadeStartTime;
+	bool bIsWaitingForFadeOut = GetWorld()->GetRealTimeSeconds() < FadeStartTime;
 
 	return (IsAnimatingText() || bIsWaitingForFadeOut || bIsFadingOut);
 }
 
 void UCallout::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	if (bIsFadingOut && GetWorld()->GetTimeSeconds() >= FadeStartTime)
+	if (bIsFadingOut && GetWorld()->GetRealTimeSeconds() >= FadeStartTime)
 	{
 		float Step = LERP_MAX / (TEXT_FADE_DURATION / InDeltaTime);
 
@@ -81,7 +81,7 @@ void UCallout::ProgressTextAnimation()
 			{
 				GetWorld()->GetTimerManager().ClearTimer(TextAnimationHandle);
 				bIsFadingOut = true;
-				FadeStartTime = GetWorld()->GetTimeSeconds() + TEXT_ANIMATION_POST_WAIT;
+				FadeStartTime = GetWorld()->GetRealTimeSeconds() + TEXT_ANIMATION_POST_WAIT;
 				return;
 			}
 		}

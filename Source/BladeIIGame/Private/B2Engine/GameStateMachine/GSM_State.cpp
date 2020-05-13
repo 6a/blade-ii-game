@@ -22,7 +22,7 @@ void GSM_State::Tick(float DeltaSeconds)
 		// Early exit if we are out of time
 		if (GI->GetSettings()->IsVersusAI())
 		{
-			if (GI->GetWorld()->GetTimeSeconds() >= TurnEndTime)
+			if (GI->GetWorld()->GetRealTimeSeconds() >= TurnEndTime)
 			{
 				if (!bTimedOut)
 				{
@@ -185,7 +185,7 @@ void GSM_State::SetIsTimed()
 
 	if (GI->GetSettings()->IsVersusAI())
 	{
-		TurnEndTime = GI->GetWorld()->GetTimeSeconds() + MAX_TURN_TIME_AI_GAME;
+		TurnEndTime = GI->GetWorld()->GetRealTimeSeconds() + MAX_TURN_TIME_AI_GAME;
 		bIsTimed = true;
 		bTimedOut = false;
 	}

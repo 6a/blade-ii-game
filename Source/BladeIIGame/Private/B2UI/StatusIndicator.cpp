@@ -8,11 +8,16 @@ void UStatusIndicator::SetState(State NewState, bool bResetTime)
 
 	CurrentState = NewState;
 
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		CountdownStartTime = World->GetRealTimeSeconds();
+	}
+
 	if (bResetTime)
 	{
 		WaitingAnimationTimer = 0;
 		WaitingAnimationPhase = 0;
-		TurnTimeRemaining = TIMER_MAX;
 	}
 
 	UWidgetAnimation* AnimationToPlay = nullptr;
@@ -48,7 +53,7 @@ void UStatusIndicator::NativeOnInitialized()
 	CurrentState = State::Waiting;
 	WaitingAnimationTimer = 0;
 	WaitingAnimationPhase = 0;
-	TurnTimeRemaining = TIMER_MAX;
+	CountdownStartTime = 0;
 }
 
 void UStatusIndicator::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -73,16 +78,24 @@ void UStatusIndicator::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 	}
 	else if (CurrentState != State::GameOver)
 	{
-		TimerTextString = FString::FromInt(FMath::FloorToInt(TurnTimeRemaining));
-		TurnTimeRemaining = FMath::Clamp(TurnTimeRemaining - InDeltaTime, 0.f, TIMER_MAX);
-
-		if (TurnTimeRemaining < WARNING_ANIM_START_TIME)
+		UWorld* World = GetWorld();
+		if (World)
 		{
-			if (WarningAnim && !IsAnimationPlaying(WarningAnim))
+			float TurnTimeRemaining = TIMER_MAX - (World->GetRealTimeSeconds() - CountdownStartTime);
+
+			TimerTextString = FString::FromInt(FMath::FloorToInt(TurnTimeRemaining));
+			TurnTimeRemaining = FMath::Clamp(TurnTimeRemaining - InDeltaTime, 0.f, TIMER_MAX);
+
+			if (TurnTimeRemaining < WARNING_ANIM_START_TIME)
 			{
-				PlayAnimation(WarningAnim, 0, 0);
+				if (WarningAnim && !IsAnimationPlaying(WarningAnim))
+				{
+					PlayAnimation(WarningAnim, 0, 0);
+				}
 			}
 		}
+
+
 	}
 	else
 	{
