@@ -1350,21 +1350,23 @@ void UB2Dealer::RevealOpponentsHand() const
 	for (uint32 i = 0; i < Arena->OpponentHand->Num(); i++)
 	{
 		ACard* Card = Arena->OpponentHand->GetCardByIndex(i);
+		FB2Transform TargetTransform = Arena->OpponentHand->GetTransformForIndex(i);
+
 		float CardDelay = DelayOnStart + (DelayPerCard * i);
 
 		// Transition 1
 		B2TPosition Position
 		{
-			Card->GetActorLocation(),
-			Card->GetActorLocation(),
+			TargetTransform.Position,
+			TargetTransform.Position,
 			CARD_REVEAL_ARC * FVector(-1, -0.5f, 1),
 			EEase::EaseIn,
 		};
 
 		B2TRotation Rotation
 		{
-			Card->GetActorRotation(),
-			Card->GetActorRotation() + FRotator(180, 0, 0),
+			TargetTransform.Rotation,
+			TargetTransform.Rotation + FRotator(179.9f, 0, 0),
 			EEase::EaseInOut,
 		};
 
