@@ -158,8 +158,18 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 		if (GI->GetOpponent()->MoveUpdateQueue.Dequeue(MoveUpdate))
 		{
 			// From player hand to player field
-			UCardSlot* CurrentSlot = GI->GetArena()->PlayerDeck;
+			UCardSlot* CurrentSlot = nullptr;
 			UCardSlot* TargetSlot = GI->GetArena()->PlayerField;
+
+			// Determine where to take the card from
+			if (GI->GetGameState()->CursorPosition == ECardSlot::PlayerDeck)
+			{
+				CurrentSlot = GI->GetArena()->PlayerDeck;
+			}
+			else
+			{
+				CurrentSlot = GI->GetArena()->PlayerHand;
+			}
 
 			GI->GetDealer()->Move(CurrentSlot, GI->GetGameState()->CursorSlotIndex, TargetSlot, ARC_ON_DRAW_FROM_DECK, false);
 
@@ -167,8 +177,18 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 			GI->GetGameSound()->PlaySFX(ESFX::CursorNavigate);
 
 			// From opponent hand to opponent field
-			CurrentSlot = GI->GetArena()->OpponentDeck;
+			CurrentSlot = nullptr;
 			TargetSlot = GI->GetArena()->OpponentField;
+
+			// Determine where to take the card from
+			if (GI->GetArena()->OpponentDeck->Num() > 0)
+			{
+				CurrentSlot = GI->GetArena()->OpponentDeck;
+			}
+			else
+			{
+				CurrentSlot = GI->GetArena()->OpponentHand;
+			}
 
 			int32 SourceSlotIndex = CurrentSlot->GetFirstIndexOfType(ServerUpdateToCard(MoveUpdate.Code));
 			if (SourceSlotIndex != -1)
