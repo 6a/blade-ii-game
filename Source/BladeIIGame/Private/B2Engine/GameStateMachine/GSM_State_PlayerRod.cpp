@@ -30,6 +30,8 @@ void GSM_State_PlayerRod::Init(ABladeIIGameMode* GameMode)
 
 	// Play base sound effect
 	GI->GetGameSound()->PlaySFX(ESFX::EffectRod, 0.2f);
+
+	GI->GetCamera()->Shake(0.2f);
 }
 
 void GSM_State_PlayerRod::Tick(float DeltaSeconds)

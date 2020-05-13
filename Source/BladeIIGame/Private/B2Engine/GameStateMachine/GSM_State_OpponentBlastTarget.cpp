@@ -90,6 +90,8 @@ void GSM_State_OpponentBlastTarget::Tick(float DeltaSeconds)
 
 				// Update card slots 
 				GI->GetArena()->PlayerDiscard->Add(TargetCard);
+
+				GI->GetCamera()->Shake();
 			}
 			else if (Event == EUIEffectEvent::Finished)
 			{

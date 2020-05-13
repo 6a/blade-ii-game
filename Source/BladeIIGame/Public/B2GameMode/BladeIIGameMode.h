@@ -17,6 +17,7 @@
 #include "B2Game/CardSelector.h"
 #include "B2Game/AvatarCaptureRig.h"
 #include "B2Game/GameSound.h"
+#include "B2Game/Camera.h"
 #include "B2Enum/EngineStateEnum.h"
 #include "B2Enum/UIEffectEventEnum.h"
 #include "B2Enum/WinConditionEnum.h"
@@ -89,6 +90,7 @@ public:
 
 	/* Getters for various references */
 	AArena* GetArena() const { return Arena; }
+	ACamera* GetCamera() const { return Camera; }
 	ACardSelector* GetCursor() const { return Cursor; }
 	ALocalPlayerInput* GetLocalPlayerInput() const { return LocalPlayerInput; }
 	AAvatarCaptureRig* GetOpponentAvatar() const { return AvatarCaptureRig; }
@@ -121,9 +123,13 @@ private:
 	UPROPERTY()
 	AAvatarCaptureRig* AvatarCaptureRig;
 
-	/* Pointer to the game sound actor*/
+	/* Pointer to the game sound actor */
 	UPROPERTY()
 	AGameSound* GameSound;
+
+	/* Pointer to the camera */
+	UPROPERTY()
+	ACamera* Camera;
 
 	/* Pointer the dealer that will be used throughout this match */
 	UPROPERTY()
@@ -267,6 +273,9 @@ private:
 
 	/* Find and store a reference to the arena */
 	void FindArena();
+
+	/* Find and store a reference to the camera */
+	void FindCamera();
 
 	/* Find and store a reference to the local player input actors */
 	void FindLocalPlayerInput();

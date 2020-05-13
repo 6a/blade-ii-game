@@ -99,6 +99,8 @@ void GSM_State_PlayerBlastTarget::Tick(float DeltaSeconds)
 				ACard* TargetCard = RemoveCurrentPlayerCard();
 				TargetCard->SetActorHiddenInGame(true);
 
+				GI->GetCamera()->Shake();
+
 				// Update card slots 
 				GI->GetArena()->OpponentDiscard->Add(TargetCard);
 			}

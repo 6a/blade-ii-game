@@ -233,6 +233,8 @@ void ABladeIIGameMode::StartPlay()
 
 	FindArena();
 
+	FindCamera();
+
 	FindGameSoundActor();
 
 	InitialiseCardFactory();
@@ -448,6 +450,21 @@ void ABladeIIGameMode::FindArena()
 
 	// Throw if the arena was not found
 	check(Arena);
+}
+
+void ABladeIIGameMode::FindCamera()
+{
+	// Try to get a reference to the camera actor
+	for (TActorIterator<ACamera> CamerIter(GetWorld()); CamerIter; ++CamerIter)
+	{
+		if (CamerIter)
+		{
+			Camera = *CamerIter;
+		}
+	}
+
+	// Throw if the camera was not found
+	check(Camera);
 }
 
 void ABladeIIGameMode::FindLocalPlayerInput()

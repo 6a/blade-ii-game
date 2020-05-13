@@ -25,6 +25,8 @@ void GSM_State_OpponentMirror::Init(ABladeIIGameMode* GameMode)
 
 	// Play base sound effect
 	GI->GetGameSound()->PlaySFX(ESFX::EffectBase, 0.25f);
+
+	GI->GetCamera()->Shake(0.25f);
 }
 
 void GSM_State_OpponentMirror::Tick(float DeltaSeconds)

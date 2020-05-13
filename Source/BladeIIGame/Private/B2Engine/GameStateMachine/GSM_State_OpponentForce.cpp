@@ -59,6 +59,8 @@ void GSM_State_OpponentForce::Tick(float DeltaSeconds)
 			GI->GetArena()->OpponentField->Add(UsedForceCard);
 
 			GI->UpdateCardState();
+
+			GI->GetCamera()->Shake(0.5f);
 			
 		}
 		else if (Event == EUIEffectEvent::Finished)

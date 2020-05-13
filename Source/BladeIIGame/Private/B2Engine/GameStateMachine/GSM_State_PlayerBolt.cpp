@@ -40,6 +40,8 @@ void GSM_State_PlayerBolt::Tick(float DeltaSeconds)
 			// Set target card state to inactive
 			GI->GetDealer()->FlipFieldCard(TargetCard, false , 0.0f);
 
+			GI->GetCamera()->Shake();
+
 			// Update score
 			GI->GetGameState()->OpponentScore = GI->AggregateScore(GI->GetArena()->OpponentField);
 			GI->GetArena()->ScoreDisplay->Update(GI->GetGameState()->PlayerScore, GI->GetGameState()->OpponentScore);

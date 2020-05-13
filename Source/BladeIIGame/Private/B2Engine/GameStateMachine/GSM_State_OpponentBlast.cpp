@@ -18,6 +18,8 @@ void GSM_State_OpponentBlast::Init(ABladeIIGameMode* GameMode)
 	// Play blast animation in the center of the screen
 	GI->GetUIEffectLayer()->Play(EUIEffect::Blast, nullptr, 0.2f, 0.0f);
 
+	GI->GetCamera()->Shake(0.3f);
+
 	GI->GetDealer()->PreBlastSelect(EPlayer::Player);
 
 	// Play blast sound effect

@@ -84,6 +84,9 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 
 			if (!bUsedNormalCard)
 			{
+				// Get the effect card that the opponent used
+				ACard* PlayedCard = GI->GetArena()->OpponentHand->GetFirstOfType(Card);
+
 				// Edge case to capture the blasted card from the opponent
 				if (bUsedBlastEffect)
 				{
@@ -93,17 +96,15 @@ void GSM_State_OpponentTurn::Tick(float DeltaSeconds)
 					if (OutInt != -1)
 					{
 						GI->GetGameState()->MostRecentBlastedCard = static_cast<ECard>(OutInt);
-
-						ACard* OpponentBlastCard = GI->GetArena()->OpponentHand->GetFirstOfType(Card);
-
-						GI->GetGameState()->MostRecentBlastCardID = OpponentBlastCard->GetID();
-						GI->GetDealer()->OpponentEffectCard(OpponentBlastCard);
+						GI->GetGameState()->MostRecentBlastCardID = PlayedCard->GetID();
 					}
 					else
 					{
 						B2Utility::LogWarning(FString::Printf(TEXT("Unable to parse the blast metadata from the opponent: [ %s ]"), *CachedMove.Payload));
 					}
 				}
+
+				GI->GetDealer()->OpponentEffectCard(PlayedCard);
 			}
 			else
 			{
