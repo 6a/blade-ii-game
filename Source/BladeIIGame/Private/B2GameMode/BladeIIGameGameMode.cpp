@@ -262,11 +262,6 @@ void ABladeIIGameMode::StartPlay()
 	RegisterEventListeners();
 
 	InitialiseOpponent();
-
-	auto Cards = TArray<ECard>({ ECard::MachiasOrbalShotgun, ECard::Bolt });
-	bool Exists = !Cards.ContainsByPredicate<B2Predicate_IsNotEffectCard>(B2Predicate_IsNotEffectCard());
-
-	B2Utility::LogBool(Exists);
 }
 
 void ABladeIIGameMode::SetupLaunchConfig(const FObjectInitializer& ObjectInitializer)

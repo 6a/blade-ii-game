@@ -10,6 +10,7 @@ GSM_State::GSM_State()
 void GSM_State::Init(ABladeIIGameMode* GameMode)
 {
 	GameModeInstance = GameMode;
+	bShouldExecute = true;
 }
 
 void GSM_State::Tick(float DeltaSeconds)

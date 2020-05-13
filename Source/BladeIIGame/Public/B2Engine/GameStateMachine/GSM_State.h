@@ -37,6 +37,9 @@ protected:
 	/* Whether or not the player has run out of time for their turn (used for AI games only) */
 	bool bTimedOut;
 
+	/* Whether or not this state instance is valid for execution - set to false after a specific event has been handled etc. */
+	bool bShouldExecute;
+
 	UPROPERTY()
 	class ABladeIIGameMode* GameModeInstance;
 

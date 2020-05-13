@@ -36,7 +36,7 @@ void GSM_State_OpponentBlast::Tick(float DeltaSeconds)
 	ABladeIIGameMode* GI = GameModeInstance;
 
 	EUIEffectEvent Event;
-	while (GI->GetUIEffectLayer()->EventQueue.Dequeue(Event))
+	if (bShouldExecute && GI->GetUIEffectLayer()->EventQueue.Dequeue(Event))
 	{
 		if (Event == EUIEffectEvent::Finished)
 		{
@@ -44,6 +44,7 @@ void GSM_State_OpponentBlast::Tick(float DeltaSeconds)
 
 			GI->GetDealer()->BlastSelect(EPlayer::Player);
 
+			bShouldExecute = false;
 		}
 	}
 }

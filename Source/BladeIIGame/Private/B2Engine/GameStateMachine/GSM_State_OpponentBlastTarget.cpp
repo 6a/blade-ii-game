@@ -78,7 +78,7 @@ void GSM_State_OpponentBlastTarget::Tick(float DeltaSeconds)
 	else
 	{
 		EUIEffectEvent Event;
-		while (GI->GetUIEffectLayer()->EventQueue.Dequeue(Event))
+		if (bShouldExecute && GI->GetUIEffectLayer()->EventQueue.Dequeue(Event))
 		{
 			if (Event == EUIEffectEvent::Ready)
 			{
@@ -107,6 +107,8 @@ void GSM_State_OpponentBlastTarget::Tick(float DeltaSeconds)
 
 				// Update the card positions in the hand as we have just removed one
 				GI->GetDealer()->UpdateHandPositions(EPlayer::Opponent);
+
+				bShouldExecute = false;
 			}
 		}
 	}
