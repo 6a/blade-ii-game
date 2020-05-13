@@ -5,7 +5,7 @@
 
 #include "B2Utility/Log.h"
 
-const uint32 MAX_CONNECTION_ATTEMPTS = 3;
+const uint32 MAX_AUTO_RECONNECT_ATTEMPTS = 3;
 const FString WEBSOCKET_URL = TEXT("wss://b2gs.jstanton.io:443/game");
 const FString AUTH_DELIMITER = TEXT(":");
 
@@ -149,7 +149,7 @@ void UB2NetServer::Tick(float DeltaSeconds)
 
 			if (TimeSinceConnectionStart >= MAX_CONNECT_ATTEMPT_TIME)
 			{
-				ConnectionAttempts = MAX_CONNECTION_ATTEMPTS;
+				ConnectionAttempts = MAX_AUTO_RECONNECT_ATTEMPTS;
 				HandleConnectionErrorEvent("Connection attempt timed out");
 			}
 		}
@@ -311,7 +311,7 @@ void UB2NetServer::HandleConnectionErrorEvent(const FString& Error)
 	// If we arent connected, try to connect
 	if (!bConnected)
 	{
-		if (++ConnectionAttempts <= MAX_CONNECTION_ATTEMPTS)
+		if (++ConnectionAttempts <= MAX_AUTO_RECONNECT_ATTEMPTS)
 		{
 			B2Utility::LogWarning(FString::Printf(TEXT("Could not connect to websocket [ %s ] - Retrying (retry #%d)"), *WEBSOCKET_URL, ConnectionAttempts));
 			if (SetupWSConnection())
