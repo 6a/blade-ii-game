@@ -61,7 +61,6 @@ void AAvatarCaptureRig::Initialise(Character Char)
 
 	// Set model
 	FString SMPath = GetStaticMeshPath();
-	B2Utility::LogInfo(SMPath);
 	USkeletalMesh* LoadedSM = LoadObject<USkeletalMesh>(NULL, *SMPath, NULL, LOAD_None, NULL);
 	if (LoadedSM)
 	{
@@ -70,7 +69,6 @@ void AAvatarCaptureRig::Initialise(Character Char)
 
 	// Set animation?
 	FString AnimPath = GetAnimationPath();
-	B2Utility::LogInfo(AnimPath);
 	UAnimSequence* LoadedAnimation = LoadObject<UAnimSequence>(NULL, *AnimPath, NULL, LOAD_None, NULL);
 	if (LoadedAnimation)
 	{
