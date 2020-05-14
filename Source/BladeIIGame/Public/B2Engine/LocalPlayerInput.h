@@ -34,6 +34,9 @@ public:
 	/* Prevent this input controller for receiving and caching any more inputs */
 	void BlockInputs();
 
+	/* Returns true if the mouse has not moved for at least one frame */
+	bool MouseIsStationary() const;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -56,6 +59,9 @@ private:
 	bool bIsRightNavDown;
 	ENavButton NavButtonPriority;
 	float NextPollTime;
+
+	/* Flag to set when the mouse has not moved for at least one frame */
+	bool bMouseIsStationary;
 
 	/* For disabling input */
 	bool bIsCheckingForInput;

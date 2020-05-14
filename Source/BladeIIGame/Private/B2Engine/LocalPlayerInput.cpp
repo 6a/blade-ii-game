@@ -11,6 +11,7 @@ const float NAV_POLL_INTERVAL = 0.125f;
 ALocalPlayerInput::ALocalPlayerInput()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bMouseIsStationary = false;
 }
 
 void ALocalPlayerInput::BeginPlay()
@@ -131,6 +132,11 @@ void ALocalPlayerInput::BlockInputs()
 	bIsCheckingForInput = false;
 }
 
+bool ALocalPlayerInput::MouseIsStationary() const
+{
+	return bMouseIsStationary;
+}
+
 void ALocalPlayerInput::UpdateMousePosition()
 {
 	FVector2D CurrentMousePosition = GetCurrentMousePosition();
@@ -139,6 +145,12 @@ void ALocalPlayerInput::UpdateMousePosition()
 	{
 		PreviousMousePosition = CurrentMousePosition;
 		OnMouseMoved(CurrentMousePosition);
+
+		bMouseIsStationary = false;
+	}
+	else
+	{
+		bMouseIsStationary = true;
 	}
 }
 

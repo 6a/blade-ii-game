@@ -26,6 +26,7 @@
 #include "B2UI/LoadingScreen.h"
 #include "B2UI/OptionsMenu.h"
 #include "B2UI/ErrorModal.h"
+#include "B2UI/ToolTipPanel.h"
 
 #include "BladeIIGameMode.generated.h"
 
@@ -151,6 +152,10 @@ private:
 	UPROPERTY()
 	UStatusIndicator* UIStatusIndicatorLayer;
 
+	/* Pointer to UI tool tip panel layer */
+	UPROPERTY()
+	UToolTipPanel* UIToolTipPanelLayer;
+
 	/* Loading screen UI layer*/
 	UPROPERTY()
 	ULoadingScreen* UILoadingScreenLayer;
@@ -190,6 +195,9 @@ private:
 
 	/* Class type for the status indicator widget */
 	TSubclassOf<UStatusIndicator> UIStatusIndicatorWidgetClass;
+
+	/* Class type for the tooltip panel widget */
+	TSubclassOf<UToolTipPanel> UIToolTipPanelWidgetClass;
 
 	/* Class type for the loading screen widget */
 	TSubclassOf<ULoadingScreen> UILoadingScreenWidgetClass;
@@ -247,6 +255,9 @@ private:
 	/* Gets and stores a reference to the status indicator widget class */
 	void GetUIStatusIndicatorClass();
 
+	/* Gets and stores a reference to the UI tooltip panel widget class */
+	void GetUIToolTipPanelLayer();
+
 	/* Gets and stores a reference to the UI loading screen widget class */
 	void GetUILoadingScreenWidgetClass();
 
@@ -297,6 +308,9 @@ private:
 
 	/* Set up the UI status indicator layer */
 	void SetupUIStatusIndicatorLayer();
+
+	/* Set up the UI tooltip panel layer */
+	void SetupUIToolTipPanelLayer();
 
 	/* Set up the UI loading screen layer */
 	void SetupUILoadingScreenLayer();

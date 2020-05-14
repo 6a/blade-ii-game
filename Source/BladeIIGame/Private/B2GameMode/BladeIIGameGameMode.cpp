@@ -39,6 +39,7 @@ const FString AVATAR_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Bluep
 const FVector AVATAR_CAPTURE_RIG_SPAWN_LOCATION = FVector(500, 0, 0);
 const FString STATUS_INDICATOR_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_StatusIndicator'");
 const FString LOADING_SCREEN_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_LoadingScreen'");
+const FString TOOLTIP_PANEL_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_ToolTipPanel'");
 const FString OPTIONS_MENU_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_OptionsMenu'");
 const FString ERROR_MODAL_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_ErrorModal'");
 const FString CARD_CURSOR_BLUEPRINT_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card_Cursor'");
@@ -63,6 +64,8 @@ ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 	GetUIAvatarWidgetClass();
 
 	GetUIStatusIndicatorClass();
+
+	GetUIToolTipPanelLayer();
 
 	GetUILoadingScreenWidgetClass();
 
@@ -235,6 +238,8 @@ void ABladeIIGameMode::StartPlay()
 
 	FindCamera();
 
+	FindLocalPlayerInput();
+
 	FindGameSoundActor();
 
 	InitialiseCardFactory();
@@ -249,6 +254,8 @@ void ABladeIIGameMode::StartPlay()
 
 	SetupUIStatusIndicatorLayer();
 
+	SetupUIToolTipPanelLayer();
+
 	SetupUILoadingScreenLayer();
 
 	SetupUIOptionsMenuLayer();
@@ -258,8 +265,6 @@ void ABladeIIGameMode::StartPlay()
 	SetupUITitleBarLayer();
 
 	SetupAvatarCaptureRig();
-
-	FindLocalPlayerInput();
 
 	RegisterEventListeners();
 
@@ -350,6 +355,15 @@ void ABladeIIGameMode::GetUIStatusIndicatorClass()
 	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the status indicator widget")))
 	{
 		UIStatusIndicatorWidgetClass = ClassFinder.Class;
+	}
+}
+
+void ABladeIIGameMode::GetUIToolTipPanelLayer()
+{
+	ConstructorHelpers::FClassFinder<UToolTipPanel> ClassFinder(*TOOLTIP_PANEL_WIDGET_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the tooltip panel widget")))
+	{
+		UIToolTipPanelWidgetClass = ClassFinder.Class;
 	}
 }
 
@@ -535,6 +549,19 @@ void ABladeIIGameMode::SetupUIStatusIndicatorLayer()
 		if (UIStatusIndicatorLayer)
 		{
 			UIStatusIndicatorLayer->AddToPlayerScreen();
+		}
+	}
+}
+
+void ABladeIIGameMode::SetupUIToolTipPanelLayer()
+{
+	if (UIToolTipPanelWidgetClass)
+	{
+		UIToolTipPanelLayer = CreateWidget<UToolTipPanel>(GetWorld()->GetGameInstance(), UIToolTipPanelWidgetClass, TEXT("UI ToolTip Panel Layer"));
+		if (UIToolTipPanelLayer)
+		{
+			UIToolTipPanelLayer->AddToPlayerScreen();
+			UIToolTipPanelLayer->SetLocalPlayerInput(LocalPlayerInput);
 		}
 	}
 }
