@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Containers/Queue.h"
 
+#include "B2Game/Card.h"
 #include "B2Enum/InputEnum.h"
 
 #include "LocalPlayerInput.generated.h"
@@ -37,6 +38,9 @@ public:
 	/* Returns true if the mouse has not moved for at least one frame */
 	bool MouseIsStationary() const;
 
+	/* Returns a pointer to the first card (if any) that the mouse is hovering over */
+	ACard* GetHoveredCard() const;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -66,8 +70,15 @@ private:
 	/* For disabling input */
 	bool bIsCheckingForInput;
 
+	/* The currently hovered card, if any */
+	UPROPERTY()
+	ACard* HoveredCard;
+
 	/* Updates the current mouse position */
 	void UpdateMousePosition();
+
+	/* Updates the pointer to the current hovered card (if any) */
+	void UpdateHoveredCard();
 
 	/* Handle polling for the navigation buttons so they can "repeat" when held down */
 	void HandleNavigationPolling();

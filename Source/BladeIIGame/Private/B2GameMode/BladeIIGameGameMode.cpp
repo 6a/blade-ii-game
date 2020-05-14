@@ -165,6 +165,8 @@ void ABladeIIGameMode::EndGame(EPlayer Victor, EWinCondition WinCondition)
 
 	Opponent->Deactivate();
 
+	UIToolTipPanelLayer->SetActive(false);
+
 	EngineState = EEngineState::PostGame;
 
 	GSM->ChangeState<GSM_State_PostGame>();

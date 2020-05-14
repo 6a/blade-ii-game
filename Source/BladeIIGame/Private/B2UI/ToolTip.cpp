@@ -13,7 +13,7 @@ void UToolTip::SetText(const FText& Header, const FText& Information)
 	}
 }
 
-void UToolTip::SetVisible(bool bNewVisible)
+void UToolTip::SetActive(bool bNewVisible)
 {
-	SetRenderOpacity(bNewVisible ? 1 : 0);
+	SetVisibility(bNewVisible ? ESlateVisibility::HitTestInvisible: ESlateVisibility::Hidden);
 }

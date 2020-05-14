@@ -7,6 +7,7 @@
 
 const float NAV_POLL_DELAY = 0.25f;
 const float NAV_POLL_INTERVAL = 0.125f;
+const float RAY_CAST_LENGTH = 200.f;
 
 ALocalPlayerInput::ALocalPlayerInput()
 {
@@ -115,7 +116,6 @@ void ALocalPlayerInput::OnMouseMoved(const FVector2D& NewMousePosition)
 {
 	if (bIsCheckingForInput)
 	{
-
 	}
 }
 
@@ -137,6 +137,11 @@ bool ALocalPlayerInput::MouseIsStationary() const
 	return bMouseIsStationary;
 }
 
+ACard* ALocalPlayerInput::GetHoveredCard() const
+{
+	return HoveredCard;
+}
+
 void ALocalPlayerInput::UpdateMousePosition()
 {
 	FVector2D CurrentMousePosition = GetCurrentMousePosition();
@@ -151,6 +156,25 @@ void ALocalPlayerInput::UpdateMousePosition()
 	else
 	{
 		bMouseIsStationary = true;
+	}
+}
+
+void ALocalPlayerInput::UpdateHoveredCard()
+{
+	FHitResult HitResult(ForceInit);
+
+	bool bHit = PlayerController->GetHitResultUnderCursor(ECC_EngineTraceChannel3, true, HitResult);
+
+	if (bHit)
+	{
+		if (HitResult.GetActor()->GetClass()->IsChildOf<ACard>())
+		{
+			HoveredCard = static_cast<ACard*>(HitResult.GetActor());
+		}
+	}
+	else
+	{
+		HoveredCard = nullptr;
 	}
 }
 
@@ -181,6 +205,8 @@ void ALocalPlayerInput::Tick(float DeltaTime)
 	if (bIsCheckingForInput)
 	{
 		UpdateMousePosition();
+
+		UpdateHoveredCard();
 
 		HandleNavigationPolling();
 	}

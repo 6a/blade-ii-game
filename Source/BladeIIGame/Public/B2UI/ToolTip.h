@@ -26,7 +26,7 @@ public:
 	 * Show/Hide the tooltip
 	 * @param bNewVisible - Whether the tooltip should be visible or not after the function call
 	 */
-	void SetVisible(bool bNewVisible);
+	void SetActive(bool bNewVisible);
 
 private:
 
