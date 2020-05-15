@@ -17,7 +17,7 @@ const FB2ServerUpdate UB2AIServer::GetNextUpdate()
 	if (!bCardsSent)
 	{
 		// Generate the cards for this match
-		Cards = GenerateCards();
+		Cards = OpponentBlastTest();
 
 		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
 		FB2Cards OutCards = Cards;

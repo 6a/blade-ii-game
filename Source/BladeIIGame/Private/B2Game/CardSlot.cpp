@@ -44,6 +44,13 @@ TArray<FString> UCardSlot::GetSortedIDsDescending() const
 	return OutArray;
 }
 
+void UCardSlot::SortAscending()
+{
+	// I think this predicate is actually backwards.
+	Cards.Sort(B2Predicate_SortCardsByTypeAscending());
+	Algo::Reverse(Cards);
+}
+
 void UCardSlot::Add(ACard* Card)
 {
 	Cards.Add(Card);

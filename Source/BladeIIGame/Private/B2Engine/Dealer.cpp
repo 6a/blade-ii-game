@@ -922,12 +922,11 @@ void UB2Dealer::PreBlastSelect(EPlayer Target)
 		if (Target == EPlayer::Player)
 		{
 			FRotator NewTargetRotation = Arena->PlayerHandReversed->GetCurrentCenterTransform().Rotation;
-			FVector VerticalOffset = (TargetSlot->Num() - 1 - i) * CARD_STACKING_OFFSET;
 
 			Position = B2TPosition
 			{
 				Position.EndPosition,
-				Position.EndPosition - VerticalOffset,
+				Position.EndPosition,
 				FVector::ZeroVector,
 				EEase::EaseInOut,
 			};
@@ -941,6 +940,43 @@ void UB2Dealer::PreBlastSelect(EPlayer Target)
 
 			// Add the transition to the transition queue
 			Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationPlayerHandFlip, DelayPrePlayerHandFlip);
+			CAG_PreBlast.Group.Add(FB2CardAnimation{ Card, Transition });
+		}
+	}
+
+	// In another loop, so that we can now clear and re-add the entire hand at once
+	if (Target == EPlayer::Player)
+	{
+		FRotator TargetRotation = Arena->PlayerHandReversed->GetCurrentCenterTransform().Rotation;
+		TArray<ACard*> ShuffledPlayerHand = TargetSlot->RemoveAll();
+		Shuffle(ShuffledPlayerHand);
+
+		for (size_t i = 0; i < ShuffledPlayerHand.Num(); i++)
+		{
+			ACard* Card = ShuffledPlayerHand[i];
+			TargetSlot->Add(Card);
+			
+			FVector VerticalOffset = RAISED_CARD_OFFSET + (i * CARD_STACKING_OFFSET);
+
+			B2Utility::LogInfo(FString::Printf(TEXT("%d ~ %f"), Card->Type, VerticalOffset.Z));
+
+			B2TPosition Position
+			{
+				CenterTransform.Position + VerticalOffset,
+				CenterTransform.Position + VerticalOffset,
+				FVector::ZeroVector,
+				EEase::Linear,
+			};
+
+			B2TRotation Rotation
+			{
+				TargetRotation,
+				TargetRotation,
+				EEase::Linear,
+			};
+
+			// Add the transition to the transition queue
+			B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, 0, 0);
 			CAG_PreBlast.Group.Add(FB2CardAnimation{ Card, Transition });
 		}
 	}
@@ -971,45 +1007,45 @@ void UB2Dealer::BlastSelect(EPlayer Target)
 	{
 		ACard* Card = TargetSlot->GetCardByIndex(i);
 
-		// If the target is the players hand, flip the cards
-		if (Target == EPlayer::Player)
-		{
-			B2TPosition Position
-			{
-				Card->GetActorLocation(),
-				Card->GetActorLocation() + CARD_STACKING_OFFSET,
-				FVector::ZeroVector,
-				EEase::EaseInOut,
-			};
-
-			B2TRotation Rotation
-			{
-				Card->GetActorRotation(),
-				RotationBeforeSpread,
-				EEase::EaseInOut,
-			};
-
-			// Add the transition to the transition queue
-			B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationPlayerHandFlip, DelayPlayerHandFlip);
-			CAG_BlastSelect.Group.Add(FB2CardAnimation{ Card, Transition });
-		}
-
-		FVector Offset = GetDirectionNormalized(Card) * CARD_POP_OUT_DISTANCE;
-
-		FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(i);
-		TargetTransform.Position += RAISED_CARD_OFFSET + Offset;
-
 		B2TPosition Position
 		{
 			Card->GetActorLocation(),
-			TargetTransform.Position,
+			Card->GetActorLocation(),
 			FVector::ZeroVector,
 			EEase::EaseInOut,
 		};
 
 		B2TRotation Rotation
 		{
-			RotationBeforeSpread,
+			Card->GetActorRotation(),
+			Card->GetActorRotation(),
+			EEase::EaseInOut,
+		};
+
+		// If the target is the players hand, flip the cards
+		if (Target == EPlayer::Player)
+		{
+			Rotation.EndRotation = RotationBeforeSpread;
+
+			// Add the transition to the transition queue
+			B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DurationPlayerHandFlip, DelayPlayerHandFlip);
+			CAG_BlastSelect.Group.Add(FB2CardAnimation{ Card, Transition });
+		}
+
+		FB2Transform TargetTransform = TargetSlot->GetTransformForIndex(i);
+		TargetTransform.Position += RAISED_CARD_OFFSET;
+
+		Position = B2TPosition
+		{
+			Position.EndPosition,
+			TargetTransform.Position,
+			FVector::ZeroVector,
+			EEase::EaseInOut,
+		};
+
+		Rotation = B2TRotation
+		{
+			Rotation.EndRotation,
 			TargetSlot->GetTransformForIndex(i).Rotation,
 			EEase::EaseInOut,
 		};
@@ -1039,15 +1075,23 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 	const float SpreadDelay = 0.25f;
 	const float StackTransitionDuration = 0.5f;
 	const float SpreadTransitionDuration = 0.5f;
+	const float DelayPlayerHandFlip = 0.3f;
+	const float DurationPlayerHandFlip = 0.45f;
 
 	FB2Transform CenterTransform = TargetSlot->GetCurrentCenterTransform();
+
+	TArray<FString> SortedPlayerHand;
+	if (Target == EPlayer::Player)
+	{
+		SortedPlayerHand = Arena->PlayerHand->GetSortedIDsDescending();
+	}
 
 	for (size_t i = 0; i < TargetSlot->Num(); i++)
 	{
 		ACard* Card = TargetSlot->GetCardByIndex(i);
-		
+
 		// First transition (stack)
-		FVector StackPosition = CenterTransform.Position + i * CARD_STACKING_OFFSET;
+		FVector StackPosition = RAISED_CARD_OFFSET + CenterTransform.Position + i * CARD_STACKING_OFFSET;
 
 		B2TPosition Position
 		{
@@ -1068,27 +1112,111 @@ void UB2Dealer::BlastCleanup(EPlayer Target)
 		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, StackTransitionDuration, DelayOnStart);
 		CAG_BlastCleanup.Group.Add(FB2CardAnimation{ Card, Transition });
 
-		// Last transition (spread)
+		// If this is the players hand, we flip as well
+		if (Target == EPlayer::Player)
+		{
+			FRotator NewTargetRotation = Arena->PlayerHandReversed->GetCurrentCenterTransform().Rotation;
 
+			Position = B2TPosition
+			{
+				Position.EndPosition,
+				Position.EndPosition,
+				FVector::ZeroVector,
+				EEase::EaseInOut,
+			};
+
+			Rotation = B2TRotation
+			{
+				Rotation.EndRotation,
+				NewTargetRotation,
+				EEase::EaseInOut,
+			};
+
+			// Add the transition to the transition queue
+			Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DelayPlayerHandFlip, DelayPlayerHandFlip);
+			CAG_BlastCleanup.Group.Add(FB2CardAnimation{ Card, Transition });
+		}
+	}
+
+	// If this is the players hand, we re-sort
+	if (Target == EPlayer::Player)
+	{
+		TargetSlot->SortAscending();
+		FVector TargetPosition = CenterTransform.Position;
+		FRotator FlippedTargetRotation = Arena->PlayerHandReversed->GetCurrentCenterTransform().Rotation;
+		FRotator UnFlippedTargetRotation = Arena->PlayerHand->GetCurrentCenterTransform().Rotation;
+
+		for (size_t i = 0; i < TargetSlot->Num(); i++)
+		{
+			ACard* Card = TargetSlot->GetCardByIndex(i);
+			FVector StackPosition = RAISED_CARD_OFFSET + CenterTransform.Position + i * CARD_STACKING_OFFSET;
+
+			B2TPosition Position
+			{
+				StackPosition,
+				StackPosition,
+				FVector::ZeroVector,
+				EEase::EaseInOut,
+			};
+
+			B2TRotation Rotation
+			{
+				FlippedTargetRotation,
+				FlippedTargetRotation - FRotator(359.4f, 0, 0),
+				EEase::EaseInOut,
+			};
+
+			// Add the transition to the transition queue
+			B2Transition Transition(B2WaitGroupNone, Position, Rotation, 0, 0);
+			CAG_BlastCleanup.Group.Add(FB2CardAnimation{ Card, Transition });
+
+			Position = B2TPosition
+			{
+				Position.EndPosition,
+				Position.EndPosition,
+				FVector::ZeroVector,
+				EEase::EaseInOut,
+			};
+
+			Rotation = B2TRotation
+			{
+				Rotation.EndRotation,
+				UnFlippedTargetRotation,
+				EEase::EaseInOut,
+			};
+
+			// Add the transition to the transition queue
+			Transition = B2Transition(B2WaitGroupNone, Position, Rotation, DelayPlayerHandFlip, DelayPlayerHandFlip);
+			CAG_BlastCleanup.Group.Add(FB2CardAnimation{ Card, Transition });
+		}
+	}
+
+	// Last transition (spread)
+	for (size_t i = 0; i < TargetSlot->Num(); i++)
+	{
+		ACard* Card = TargetSlot->GetCardByIndex(i);
+
+		FVector StartPosition = RAISED_CARD_OFFSET + CenterTransform.Position + i * CARD_STACKING_OFFSET;
+		FRotator StartRotation = CenterTransform.Rotation;
 		FB2Transform EndTransform = TargetSlot->GetTransformForIndex(i);
 
-		Position = B2TPosition
+		B2TPosition Position
 		{
-			Position.EndPosition,
+			StartPosition,
 			EndTransform.Position,
 			FVector::ZeroVector,
 			EEase::EaseInOut,
 		};
 
-		Rotation = B2TRotation
+		B2TRotation Rotation
 		{
-			Rotation.EndRotation,
+			StartRotation,
 			EndTransform.Rotation,
 			EEase::EaseInOut,
 		};
 
 		// Add the transition to the transition queue
-		Transition = B2Transition(WaitGroup, Position, Rotation, SpreadTransitionDuration, SpreadDelay);
+		B2Transition Transition(WaitGroup, Position, Rotation, SpreadTransitionDuration, SpreadDelay);
 		CAG_BlastCleanup.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
@@ -1476,4 +1604,18 @@ FVector UB2Dealer::GetDirectionNormalized(const ACard* Card) const
 bool UB2Dealer::CardIsFromPlayerField(const ACard* Card) const
 {
 	return Card->GetActorLocation().Y < 0;
+}
+
+void UB2Dealer::Shuffle(TArray<ACard*>& InCards) const
+{
+	ACard* SwapPointer = nullptr;
+
+	for (size_t i = 0; i < InCards.Num(); i++)
+	{
+		int32 TargetIndex = FMath::RandRange(0, InCards.Num() - 1);
+
+		SwapPointer = InCards[i];
+		InCards[i] = InCards[TargetIndex];
+		InCards[TargetIndex] = SwapPointer;
+	}
 }

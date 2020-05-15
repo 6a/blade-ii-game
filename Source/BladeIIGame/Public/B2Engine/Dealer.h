@@ -150,5 +150,11 @@ private:
 	 * @warning This is pretty hacky - might need to revisit this but it should be fine unless the arena moves
 	 */
 	bool CardIsFromPlayerField(const ACard* Card) const;
+
+	/**
+	 * Shuffles the passed in array in place
+	 * @param InCards - The array to shuffle
+	 */
+	void Shuffle(TArray<ACard*>& InCards) const;
 };
 

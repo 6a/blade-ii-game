@@ -26,6 +26,9 @@ public:
 	/* Returns an array of the card ID's, in descending order */
 	TArray<FString> GetSortedIDsDescending() const;
 
+	/* Sort this slot in ascending order */
+	void SortAscending();
+
 	/* Add the specified card */
 	virtual void Add(ACard* Card);
 

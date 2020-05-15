@@ -44,6 +44,22 @@ protected:
 
 private:
 
+	/* Various const values for use throughout this class */
+	const FVector2D ALIGNMENT_TOP_LEFT = FVector2D(0, 0);
+	const FVector2D ALIGNMENT_BOTTOM_LEFT = FVector2D(0, 1);
+
+	const float TOOL_TIP_DELAY = 0.5f;
+	const float CURSOR_HEIGHT = 52.f;
+
+	const FString LOC_KEY_HEADER_PREFIX = "UI_LABEL_";
+	const FString LOC_KEY_INFO_PREFIX = "UI_INFORMATION_";
+	const FString LOC_KEY_HEADER_FACEDOWN = "UI_LABEL_FACEDOWN_001";
+	const FString LOC_KEY_INFO_FACEDOWN = "UI_INFORMATION_FACEDOWN_001";
+
+	const FTextKey LOC_KEY_UI_NAMESPACE = "LOC_UI";
+
+	const uint8 BOLTED_CARD_OFFSET = 11;
+
 	/* Pointer to the local player input receiver */
 	UPROPERTY()
 	ALocalPlayerInput* LocalPlayerInput;
@@ -62,6 +78,7 @@ private:
 	bool bToolTipActivationPending;
 
 	/* The type for the most recently hovered card */
+	UPROPERTY()
 	ACard* CurrentHoveredCard;
 
 	/* Whether the tooltip text requires an update (due to the hovered card changing etc.) */

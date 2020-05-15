@@ -60,18 +60,22 @@ void B2Transition::Tick(float DeltaTime)
 	}
 
 	/* Calculate the step for this frame and increment the current alpha */
-	float Step = LERP_MAX / (Duration / DeltaTime);
+	float Step;
+
+	if (Duration <= 0)
+	{
+		Step = LERP_MAX;
+	}
+	else
+	{
+		Step = LERP_MAX / (Duration / DeltaTime);
+	}
 
 	// If there is some time to wait, do so, decrementing the wait time and exiting early
 	if (RemainingDelay > 0)
 	{
 		RemainingDelay = FMath::Max(RemainingDelay - Step, 0.f);
 		return;
-	}
-
-	if (Duration == 0)
-	{
-		Step = 1;
 	}
 
 	/* Play a card sound, the first time the animation ticks */
@@ -99,7 +103,7 @@ void B2Transition::Tick(float DeltaTime)
 	if (WaitGroup >= 0)
 	{
 		// If done, early exit and remove this transition from its waitgroup
-		if (CurrentAlpha == LERP_MAX)
+		if (CurrentAlpha >= LERP_MAX)
 		{
 			if (!bTransitionFinished)
 			{
@@ -116,7 +120,7 @@ void B2Transition::Tick(float DeltaTime)
 	}
 	else
 	{
-		if (CurrentAlpha == LERP_MAX && !bTransitionFinished)
+		if (CurrentAlpha >= LERP_MAX && !bTransitionFinished)
 		{
 			bTransitionFinished = true;
 		}
