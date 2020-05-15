@@ -34,6 +34,24 @@ void UToolTipPanel::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 	if (bActive && LocalPlayerInput && ToolTip)
 	{
+		if (!LocalPlayerInput->MouseIsStationary())
+		{
+			if (World)
+			{
+				LastMouseMoveTime = World->GetRealTimeSeconds();
+
+				ACard* HoveredCard = LocalPlayerInput->GetHoveredCard();
+				if (HoveredCard)
+				{
+					if (!CurrentHoveredCard || HoveredCard->Type != CurrentHoveredCard->Type)
+					{
+						CurrentHoveredCard = HoveredCard;
+						bToolTipTextRequiresUpdate = true;
+					}
+				}
+			}
+		}
+
 		if (ShouldShowToolTip())
 		{
 			if (!bToolTipActivationPending && World)
@@ -81,24 +99,6 @@ void UToolTipPanel::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		else
 		{
 			ToolTip->SetActive(false);
-		}
-
-		if (!LocalPlayerInput->MouseIsStationary())
-		{
-			if (World)
-			{
-				LastMouseMoveTime = World->GetRealTimeSeconds();
-				
-				ACard* HoveredCard = LocalPlayerInput->GetHoveredCard();
-				if (HoveredCard)
-				{
-					if (!CurrentHoveredCard || HoveredCard->Type != CurrentHoveredCard->Type)
-					{
-						CurrentHoveredCard = HoveredCard;
-						bToolTipTextRequiresUpdate = true;
-					}
-				}
-			}
 		}
 	}
 }
