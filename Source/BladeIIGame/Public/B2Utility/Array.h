@@ -4,6 +4,7 @@
 
 namespace B2Utility
 {
+	/* Shuffles an array in place */
 	template<typename InElementType, typename InAllocator>
 	void ShuffleArray(TArray<InElementType, InAllocator>& InArray)
 	{

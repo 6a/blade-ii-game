@@ -2,6 +2,7 @@
 
 #include "B2Game/CardSelector.h"
 #include "B2Utility/Log.h"
+#include "B2Utility/Array.h"
 
 // Class scope values
 const size_t DECK_CAPACITY = 15;
@@ -949,7 +950,7 @@ void UB2Dealer::PreBlastSelect(EPlayer Target)
 	{
 		FRotator TargetRotation = Arena->PlayerHandReversed->GetCurrentCenterTransform().Rotation;
 		TArray<ACard*> ShuffledPlayerHand = TargetSlot->RemoveAll();
-		Shuffle(ShuffledPlayerHand);
+		B2Utility::ShuffleArray(ShuffledPlayerHand);
 
 		for (size_t i = 0; i < ShuffledPlayerHand.Num(); i++)
 		{
@@ -957,8 +958,6 @@ void UB2Dealer::PreBlastSelect(EPlayer Target)
 			TargetSlot->Add(Card);
 			
 			FVector VerticalOffset = RAISED_CARD_OFFSET + (i * CARD_STACKING_OFFSET);
-
-			B2Utility::LogInfo(FString::Printf(TEXT("%d ~ %f"), Card->Type, VerticalOffset.Z));
 
 			B2TPosition Position
 			{
@@ -1604,18 +1603,4 @@ FVector UB2Dealer::GetDirectionNormalized(const ACard* Card) const
 bool UB2Dealer::CardIsFromPlayerField(const ACard* Card) const
 {
 	return Card->GetActorLocation().Y < 0;
-}
-
-void UB2Dealer::Shuffle(TArray<ACard*>& InCards) const
-{
-	ACard* SwapPointer = nullptr;
-
-	for (size_t i = 0; i < InCards.Num(); i++)
-	{
-		int32 TargetIndex = FMath::RandRange(0, InCards.Num() - 1);
-
-		SwapPointer = InCards[i];
-		InCards[i] = InCards[TargetIndex];
-		InCards[TargetIndex] = SwapPointer;
-	}
 }
