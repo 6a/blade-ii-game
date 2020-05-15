@@ -146,7 +146,7 @@ FVector2D UToolTipPanel::GetAlignment(const APlayerController* LocalPlayerContro
 bool UToolTipPanel::ShouldShowToolTip() const
 {
 	UWorld* World = GetWorld();
-	if (LocalPlayerInput->GetHoveredCard() && World)
+	if (CurrentHoveredCard && World)
 	{
 		return World->GetRealTimeSeconds() - LastMouseMoveTime > TOOL_TIP_DELAY;
 	}
