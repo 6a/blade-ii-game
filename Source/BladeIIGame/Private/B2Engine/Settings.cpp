@@ -133,6 +133,11 @@ bool USettings::IsVersusAI() const
 	return SettingsCache.bIsBotGame;
 }
 
+bool USettings::IsTutorial() const
+{
+	return SettingsCache.bIsTutorialGame;
+}
+
 void USettings::ApplyAll()
 {
 	// Language
@@ -204,6 +209,11 @@ void USettings::ApplyAll()
 bool USettings::SaveSettings()
 {
 	return false;
+}
+
+void USettings::TutorialFinished()
+{
+	SettingsCache.bIsTutorialGame = false;
 }
 
 FString USettings::ShortLocaleStringToFull(const FString& ShortLocaleString) const

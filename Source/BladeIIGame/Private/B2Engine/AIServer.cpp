@@ -20,6 +20,8 @@ const FB2ServerUpdate UB2AIServer::GetNextUpdate()
 
 		if (AIDifficulty < EAIDifficulty::Tutorial)
 		{
+			// TODO do something based on the difficulty
+
 			// Generate the cards for this match
 			Cards = GenerateCards();
 
@@ -31,7 +33,13 @@ const FB2ServerUpdate UB2AIServer::GetNextUpdate()
 		}
 		else
 		{
+			// Generate the cards for this match
+			Cards = GenerateTutorialCards();
 
+			// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
+			OutCards = Cards;
+
+			TutorialPhase = 0;
 		}
 
 		Payload.Code = EServerUpdate::InstructionCards;
@@ -50,14 +58,22 @@ void UB2AIServer::Tick(float DeltaSeconds)
 		return;
 	}
 
+	// Early exit and handler for tutorial game
+	if (AIDifficulty == EAIDifficulty::Tutorial) 
+	{
+		HandleTutorial();
+
+		return;
+	}
+
 	// Handle messages "to" the server (rather, to us)
 	FB2ServerUpdate IncomingUpdate;
-	while (OutBoundQueue.Dequeue(IncomingUpdate))
+	if (OutBoundQueue.Dequeue(IncomingUpdate))
 	{
 		// Ignore "None" or message types for now
 		if (IncomingUpdate.Code == EServerUpdate::None || IncomingUpdate.Code == EServerUpdate::InstructionMessage)
 		{
-			continue;
+			return;
 		}
 
 		// Update the internal card state
@@ -695,6 +711,15 @@ FB2Cards UB2AIServer::GenerateTutorialCards() const
 		ECard::Force, ECard::Force,
 	};
 
+	B2Utility::ShuffleArray(GeneratedCards.PlayerDeck);
+
+	B2Utility::LogInfo("PLAYERDECK -----------------------------------");
+	for (size_t i = 0; i < GeneratedCards.PlayerDeck.Num(); i++)
+	{
+		B2Utility::LogInfo(FString::FromInt(static_cast<int32>(GeneratedCards.PlayerDeck[i])));
+	}
+
+
 	GeneratedCards.OpponentDeck = TArray<ECard>{
 		ECard::ElliotsOrbalStaff, ECard::ElliotsOrbalStaff,
 		ECard::FiesTwinGunswords, ECard::FiesTwinGunswords, ECard::FiesTwinGunswords, ECard::FiesTwinGunswords,
@@ -705,6 +730,14 @@ FB2Cards UB2AIServer::GenerateTutorialCards() const
 		ECard::Bolt,
 		ECard::Mirror,
 	};
+
+	B2Utility::ShuffleArray(GeneratedCards.OpponentDeck);
+
+	B2Utility::LogInfo("OPPONENTDECK ---------------------------------");
+	for (size_t i = 0; i < GeneratedCards.OpponentDeck.Num(); i++)
+	{
+		B2Utility::LogInfo(FString::FromInt(static_cast<int32>(GeneratedCards.OpponentDeck[i])));
+	}
 
 	return GeneratedCards;
 }
@@ -802,6 +835,30 @@ bool UB2AIServer::ValidFirstMoveAvailable(const TArray<ECard>& CardSet, ECard Ca
 	}
 
 	return false;
+}
+
+void UB2AIServer::HandleTutorial()
+{
+	// Handle messages from the player
+	FB2ServerUpdate IncomingUpdate;
+	if (OutBoundQueue.Dequeue(IncomingUpdate))
+	{
+		// Ignore "None" or message types for now
+		if (IncomingUpdate.Code == EServerUpdate::None)
+		{
+			return;
+		}
+
+		// Handle the trigger that tells us to switch back to normal mode
+		if (IncomingUpdate.Code == EServerUpdate::InstructionMessage)
+		{
+			// Set state to post tutorial state
+
+			// Switch aidifficulty to zero
+
+			// Send any messages that are required
+		}
+	}
 }
 
 FB2Cards UB2AIServer::BoltTest() const

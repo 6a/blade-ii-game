@@ -78,6 +78,9 @@ private:
 	/* The difficulty of the AI (rather, the AI's behavious is based on this) */
 	EAIDifficulty AIDifficulty;
 
+	/* The current move to which we are replying to, for tutorial games only */
+	uint8 TutorialPhase;
+
 	/* Helper function that sets up the internal state of the game after the cards have first been generated */
 	void ConfigureInitialState();
 
@@ -160,6 +163,9 @@ private:
 	 * @return true if there is a valid first move that can be made
 	 */
 	bool ValidFirstMoveAvailable(const TArray<ECard>& CardSet, ECard CardToBeatOrMatch, uint32 CurrentScore) const;
+
+	/* Helper function that executes tutorial steps basd in incoming messages */
+	void HandleTutorial();
 
 	/* Testing card setups */
 	FB2Cards BoltTest() const;

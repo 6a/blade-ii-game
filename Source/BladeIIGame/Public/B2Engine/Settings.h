@@ -67,11 +67,17 @@ public:
 	/* Returns true if the game is vs the AI */
 	bool IsVersusAI() const;
 
+	/* Returns true if the game is a tutorial */
+	bool IsTutorial() const;
+
 	/* Applies all the stored settings */
 	void ApplyAll();
 
 	/* Writes all the settings to the output settings file */
 	bool SaveSettings();
+
+	/* Updates the settings so that they no longer return true for IsTutorial() */
+	void TutorialFinished();
 
 private:
 

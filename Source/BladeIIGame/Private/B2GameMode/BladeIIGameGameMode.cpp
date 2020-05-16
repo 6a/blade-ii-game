@@ -1120,6 +1120,14 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 {
 	UpdateCardState();
 
+	// Handle and early exit when its a tutorial game
+	if (Settings->IsTutorial())
+	{
+		// Add a none update to the queue, indicating to the tutorial state machine that it should progress to the next step
+		Opponent->MoveUpdateQueue.Enqueue(FB2ServerUpdate{ EServerUpdate::None, "" });
+		return;
+	}
+
 	switch (Event)
 	{
 	case EDealerEvent::CardsDealt:
