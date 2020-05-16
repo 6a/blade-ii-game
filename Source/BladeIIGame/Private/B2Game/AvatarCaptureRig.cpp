@@ -25,6 +25,12 @@ AAvatarCaptureRig::AAvatarCaptureRig()
 
 void AAvatarCaptureRig::Initialise(Character Char)
 {
+	// To protect against attempting to set up the rig with a character whos model doesnt exist yet
+	if (!IMPLEMENTED_AVATARS.Contains(Char))
+	{
+		Char = DEFAULT_AVATAR;
+	}
+
 	switch (Char)
 	{
 	case AAvatarCaptureRig::Character::Laura:

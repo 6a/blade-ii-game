@@ -77,6 +77,12 @@ private:
 
 	/* Class consts */
 
+	/* Array of currently implemented avatars to avoid trying to load one that doesnt exist yet */
+	const TArray<Character> IMPLEMENTED_AVATARS = { Character::Laura, Character::Rean };
+
+	/* The default character to select in the case that a non-implemented one is specified */
+	const Character DEFAULT_AVATAR = Character::Laura;
+
 	/* The root path for all mouth and eye variations */
 	const FString VARIATON_PATH = "/Game/BladeIIGame/Textures/Characters/";
 
