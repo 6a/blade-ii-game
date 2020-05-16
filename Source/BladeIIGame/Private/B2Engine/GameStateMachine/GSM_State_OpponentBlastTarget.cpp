@@ -100,8 +100,6 @@ void GSM_State_OpponentBlastTarget::Tick(float DeltaSeconds)
 				// Remove the blast card
 				ACard* BlastCard = GI->GetArena()->OpponentHand->RemoveByID(GI->GetGameState()->MostRecentBlastCardID);
 				BlastCard->SetActorHiddenInGame(true);
-
-				GI->GetArena()->PrintOpponentCards();
 				
 				GI->GetArena()->OpponentDiscard->Add(BlastCard);
 
