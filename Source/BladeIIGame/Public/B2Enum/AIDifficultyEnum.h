@@ -7,5 +7,6 @@ UENUM(BlueprintType)
 enum class EAIDifficulty : uint8
 {
 	Intermediate UMETA(DisplayName = "Intermediate"),
-	Expert UMETA(DisplayName = "Expert")
+	Expert UMETA(DisplayName = "Expert"),
+	Tutorial = 10 UMETA(DisplayName = "Tutorial"),
 };

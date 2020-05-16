@@ -7,7 +7,11 @@
 
 void UB2AIOpponent::Configure(EAIDifficulty Difficulty)
 {
-	BackEnd = NewObject<UB2AIServer>();
+	UB2AIServer* AIServer = NewObject<UB2AIServer>();
+	AIServer->SetDifficulty(Difficulty);
+
+	BackEnd = AIServer;
+
 
 	B2Utility::LogInfo("AI Opponent Initialised");
 }

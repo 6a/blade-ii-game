@@ -16,14 +16,23 @@ const FB2ServerUpdate UB2AIServer::GetNextUpdate()
 
 	if (!bCardsSent)
 	{
-		// Generate the cards for this match
-		Cards = OpponentBlastTest();
+		FB2Cards OutCards;
 
-		// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
-		FB2Cards OutCards = Cards;
+		if (AIDifficulty < EAIDifficulty::Tutorial)
+		{
+			// Generate the cards for this match
+			Cards = GenerateCards();
 
-		// Set up the initial internal state based on the cards
-		ConfigureInitialState();
+			// Make a copy of the cards to send to the player, so we can freely modify the one we just created and stored interanlly
+			OutCards = Cards;
+
+			// Set up the initial internal state based on the cards
+			ConfigureInitialState();
+		}
+		else
+		{
+
+		}
 
 		Payload.Code = EServerUpdate::InstructionCards;
 		Payload.Payload = OutCards.GetSerialised(0);
@@ -57,6 +66,11 @@ void UB2AIServer::Tick(float DeltaSeconds)
 		// Now we iterate until we have successfully moved into either the Undecided state, or the players turn
 		ResolveAITurn();
 	}
+}
+
+void UB2AIServer::SetDifficulty(EAIDifficulty Difficulty)
+{
+	AIDifficulty = Difficulty;
 }
 
 void UB2AIServer::ConfigureInitialState()
@@ -659,6 +673,38 @@ FB2Cards UB2AIServer::GenerateCards() const
 
 		bSuccess = ValidateCards(GeneratedCards);
 	}
+
+	return GeneratedCards;
+}
+
+FB2Cards UB2AIServer::GenerateTutorialCards() const
+{
+	FB2Cards GeneratedCards;
+
+	GeneratedCards.PlayerDeck = TArray<ECard>{
+		ECard::ElliotsOrbalStaff,
+		ECard::FiesTwinGunswords,
+		ECard::AlisasOrbalBow, ECard::AlisasOrbalBow,
+		ECard::JusisSword,
+		ECard::MachiasOrbalShotgun,
+		ECard::GaiusSpear, ECard::GaiusSpear,
+		ECard::LaurasGreatsword,
+		ECard::Bolt, ECard::Bolt,
+		ECard::Mirror,
+		ECard::Blast,
+		ECard::Force, ECard::Force,
+	};
+
+	GeneratedCards.OpponentDeck = TArray<ECard>{
+		ECard::ElliotsOrbalStaff, ECard::ElliotsOrbalStaff,
+		ECard::FiesTwinGunswords, ECard::FiesTwinGunswords, ECard::FiesTwinGunswords, ECard::FiesTwinGunswords,
+		ECard::AlisasOrbalBow, ECard::AlisasOrbalBow,
+		ECard::JusisSword, ECard::JusisSword,
+		ECard::MachiasOrbalShotgun, ECard::MachiasOrbalShotgun,
+		ECard::GaiusSpear,
+		ECard::Bolt,
+		ECard::Mirror,
+	};
 
 	return GeneratedCards;
 }

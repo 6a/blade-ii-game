@@ -3,6 +3,7 @@
 #include "B2Engine/Server.h"
 #include "B2Engine/Cards.h"
 #include "B2Enum/PlayerEnum.h"
+#include "B2Enum/AIDifficultyEnum.h"
 
 #include "AIServer.generated.h"
 
@@ -28,6 +29,9 @@ public:
 	 * @return false if the conditions are invalid (such as if the client has disconnected after being connected already)
 	 */
 	virtual bool Connect() override { return false; }
+
+	/* Sets the AI server so that it will act as a tutorial game instead of a standard AI. */
+	void SetDifficulty(EAIDifficulty Difficulty);
 
 private:
 	/* The maximum value (in terms of enum value) that an effect card can have */
@@ -70,6 +74,9 @@ private:
 
 	/* The winner of the match (if one has been found, else undecided) */
 	EPlayer Winner;
+
+	/* The difficulty of the AI (rather, the AI's behavious is based on this) */
+	EAIDifficulty AIDifficulty;
 
 	/* Helper function that sets up the internal state of the game after the cards have first been generated */
 	void ConfigureInitialState();
@@ -134,6 +141,9 @@ private:
 
 	/* Generate the set of cards to be used for this AI game */
 	FB2Cards GenerateCards() const;
+
+	/* Generate the set of cards to be used for this tutorial */
+	FB2Cards GenerateTutorialCards() const;
 
 	/**
 	 * Validates the passed in set of cards, to ensure that the game will not immediately end due to a bad state etc.
