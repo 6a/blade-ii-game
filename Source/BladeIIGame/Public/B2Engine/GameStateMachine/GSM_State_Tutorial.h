@@ -19,5 +19,13 @@ public:
 
 private:
 
+	/* The last phase, after which we end the tutorial and should enter into a normal game */
+	const uint32 LastPhase = 21;
+
+	/* Current phase for the tutorial */
+	uint32 Phase;
+
+	/* Update the hand to display the currently selected card */
+	virtual void UpdateCursorPosition(uint32 NewCursorIndex, bool bIsBlastSelecting = false) override;
 };
 

@@ -27,6 +27,7 @@
 #include "B2UI/OptionsMenu.h"
 #include "B2UI/ErrorModal.h"
 #include "B2UI/ToolTipPanel.h"
+#include "B2UI/Tutorial.h"
 
 #include "BladeIIGameMode.generated.h"
 
@@ -89,6 +90,9 @@ public:
 	 */
 	void LocalQuit(bool bReportForfeit = true);
 
+	/* End the tutorial, effectively switching the match into a normal AI game at the lowest difficulty */
+	void EndTutorial();
+
 	/* Getters for various references */
 	AArena* GetArena() const { return Arena; }
 	ACamera* GetCamera() const { return Camera; }
@@ -102,6 +106,7 @@ public:
 	UAvatar* GetUIAvatarLayer() const { return UIAvatarLayer; }
 	UStatusIndicator* GetUIStatusIndicatorLayer() const { return UIStatusIndicatorLayer; }
 	ULoadingScreen* GetUILoadingScreenLayer() const { return UILoadingScreenLayer; }
+	UTutorial* GetUITutorialLayer() const { return UITutorialLayer; }
 	USettings* GetSettings() const { return Settings; }
 	
 	UB2CardFactory* GetCardFactory() const { return CardFactory; }
@@ -164,11 +169,17 @@ private:
 	UPROPERTY()
 	UOptionsMenu* UIOptionsMenuLayer;
 
+	/* Error message modal UI layer */
 	UPROPERTY()
 	UErrorModal* UIErrorModalLayer;
 
+	/* Title bar UI layer */
 	UPROPERTY()
 	UUserWidget* UITitleBarLayer;
+
+	/* Tutorial UI layer */
+	UPROPERTY()
+	UTutorial* UITutorialLayer;
 
 	/* Pointer to the settings object */
 	UPROPERTY()
@@ -210,6 +221,9 @@ private:
 
 	/* Class type for the title bar widget */
 	TSubclassOf<UUserWidget> UITitleBarClass;
+
+	/* Class type for the tutorial widget */
+	TSubclassOf<UTutorial> UITutorialClass;
 
 	/* Class type for the cursor actor */
 	TSubclassOf<ACardSelector> CursorClass;
@@ -270,6 +284,9 @@ private:
 	/* Gets and stores a reference to the UI title bar widget class */
 	void GetUITitleBarWidgetClass();
 
+	/* Gets and stores a reference to the UI tutorial widget class */
+	void GetUITutorialWidgetClass();
+
 	/* Gets and stores a reference to the cursor actor class */
 	void GetCursorClass();
 
@@ -323,6 +340,9 @@ private:
 
 	/* Set up the UI title bar layer */
 	void SetupUITitleBarLayer();
+
+	/* Set up the UI tutorial layer */
+	void SetupUITutorialLayer();
 
 	/* Set up the avatar capture rig */
 	void SetupAvatarCaptureRig();

@@ -38,4 +38,7 @@ enum class EServerUpdate : uint8
 	InstructionMatchIllegalMove UMETA(DisplayName = "Illegal Move Detected"),
 	InstructionMatchMutualTimeOut UMETA(DisplayName = "Mutual Time Out"),
 	InstructionMatchTimeOut UMETA(DisplayName = "Time Out"),
+
+	// Edge case message for ending the tutorial mode
+	InstructionTutorialFinished UMETA(DisplayName = "Tutorial Finished"),
 };

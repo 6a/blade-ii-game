@@ -16,6 +16,7 @@
 #include "B2Engine/GameStateMachine/GSM_State_WaitingForInitialDeal.h"
 #include "B2Engine/GameStateMachine/GSM_State_ProcessBoardState.h"
 #include "B2Engine/GameStateMachine/GSM_State_PostGame.h"
+#include "B2Engine/GameStateMachine/GSM_State_Tutorial.h"
 
 #include "B2Engine/GameStateMachine/GSM_State_PlayerTurn.h"
 #include "B2Engine/GameStateMachine/GSM_State_PlayerRod.h"
@@ -43,8 +44,9 @@ const FString TOOLTIP_PANEL_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGam
 const FString OPTIONS_MENU_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_OptionsMenu'");
 const FString ERROR_MODAL_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_ErrorModal'");
 const FString CARD_CURSOR_BLUEPRINT_PATH = TEXT("Blueprint'/Game/BladeIIGame/Blueprints/GameObjects/BP_Card_Cursor'");
+const FString TUTORIAL_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Tutorial'");
 const FString LOCAL_QUIT_METADATA = TEXT("LOCAL_QUIT");
-const FString TITLE_BAR_BLUEPRINT_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Titlebar'");
+const FString TITLE_BAR_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Titlebar'");
 
 // TODO set to zero for build
 #define FAST_DRAW 1
@@ -74,6 +76,8 @@ ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 	GetUIErrorModalWidgetClass();
 
 	GetUITitleBarWidgetClass();
+
+	GetUITutorialWidgetClass();
 
 	GetCursorClass();
 
@@ -230,11 +234,10 @@ void ABladeIIGameMode::StartPlay()
 	Super::StartPlay();
 
 	bOtherDelayedStartComponentReady = false;
-
-	Settings->ApplyAll();
-
 	ConnectionProgress = 0;
 	MatchPrepProgress = 0;
+
+	Settings->ApplyAll();
 
 	FindArena();
 
@@ -259,6 +262,11 @@ void ABladeIIGameMode::StartPlay()
 	SetupUIToolTipPanelLayer();
 
 	SetupUILoadingScreenLayer();
+
+	if (Settings->IsTutorial())
+	{
+		SetupUITutorialLayer();
+	}
 
 	SetupUIOptionsMenuLayer();
 
@@ -398,10 +406,19 @@ void ABladeIIGameMode::GetUIErrorModalWidgetClass()
 
 void ABladeIIGameMode::GetUITitleBarWidgetClass()
 {
-	ConstructorHelpers::FClassFinder<UUserWidget> ClassFinder(*TITLE_BAR_BLUEPRINT_PATH);
+	ConstructorHelpers::FClassFinder<UUserWidget> ClassFinder(*TITLE_BAR_WIDGET_PATH);
 	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the title bar widget")))
 	{
 		UITitleBarClass = ClassFinder.Class;
+	}
+}
+
+void ABladeIIGameMode::GetUITutorialWidgetClass()
+{
+	ConstructorHelpers::FClassFinder<UTutorial> ClassFinder(*TUTORIAL_WIDGET_PATH);
+	if (ensureMsgf(ClassFinder.Succeeded(), TEXT("Could not find the class for the tutorial widget")))
+	{
+		UITutorialClass = ClassFinder.Class;
 	}
 }
 
@@ -623,6 +640,18 @@ void ABladeIIGameMode::SetupUITitleBarLayer()
 	}
 }
 
+void ABladeIIGameMode::SetupUITutorialLayer()
+{
+	if (UITutorialClass)
+	{
+		UITutorialLayer = CreateWidget<UTutorial>(GetWorld()->GetGameInstance(), UITutorialClass, TEXT("UI Tutorial Layer"));
+		if (UITutorialLayer)
+		{
+			UITutorialLayer->AddToPlayerScreen();
+		}
+	}
+}
+
 void ABladeIIGameMode::SetupAvatarCaptureRig()
 {
 	if (AvatarCaptureRigClass)
@@ -697,6 +726,11 @@ void ABladeIIGameMode::DelayedStart()
 		{
 			UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Greeting, AvatarCaptureRig->GetCurrentCharacterName());
 			AvatarCaptureRig->AnimateMouth();
+		}
+		else
+		{
+			GSM->ChangeState<GSM_State_Tutorial>();
+			EngineState = EEngineState::InPlay;
 		}
 
 		// Start the BGM track
@@ -995,6 +1029,13 @@ void ABladeIIGameMode::LocalQuit(bool bReportForfeit)
 
 	// TODO add this to a callback instead, that quits after a timeout OR when receiving an OK from the server or something.
 	FGenericPlatformMisc::RequestExit(false);
+}
+
+void ABladeIIGameMode::EndTutorial()
+{
+	Settings->TutorialFinished();
+
+	Opponent->SendUpdate(EServerUpdate::InstructionTutorialFinished);
 }
 
 UCardSlot* ABladeIIGameMode::GetCardSlot(ECardSlot Slot) const

@@ -698,46 +698,40 @@ FB2Cards UB2AIServer::GenerateTutorialCards() const
 	FB2Cards GeneratedCards;
 
 	GeneratedCards.PlayerDeck = TArray<ECard>{
-		ECard::ElliotsOrbalStaff,
+		ECard::Bolt,
+		ECard::AlisasOrbalBow,
+		ECard::Force,
+		ECard::GaiusSpear,
 		ECard::FiesTwinGunswords,
-		ECard::AlisasOrbalBow, ECard::AlisasOrbalBow,
-		ECard::JusisSword,
-		ECard::MachiasOrbalShotgun,
-		ECard::GaiusSpear, ECard::GaiusSpear,
-		ECard::LaurasGreatsword,
-		ECard::Bolt, ECard::Bolt,
-		ECard::Mirror,
+		ECard::GaiusSpear,
 		ECard::Blast,
-		ECard::Force, ECard::Force,
+		ECard::Mirror,
+		ECard::LaurasGreatsword,
+		ECard::MachiasOrbalShotgun,
+		ECard::JusisSword,
+		ECard::ElliotsOrbalStaff,
+		ECard::Bolt,
+		ECard::AlisasOrbalBow,
+		ECard::Force,
 	};
-
-	B2Utility::ShuffleArray(GeneratedCards.PlayerDeck);
-
-	B2Utility::LogInfo("PLAYERDECK -----------------------------------");
-	for (size_t i = 0; i < GeneratedCards.PlayerDeck.Num(); i++)
-	{
-		B2Utility::LogInfo(FString::FromInt(static_cast<int32>(GeneratedCards.PlayerDeck[i])));
-	}
-
 
 	GeneratedCards.OpponentDeck = TArray<ECard>{
-		ECard::ElliotsOrbalStaff, ECard::ElliotsOrbalStaff,
-		ECard::FiesTwinGunswords, ECard::FiesTwinGunswords, ECard::FiesTwinGunswords, ECard::FiesTwinGunswords,
-		ECard::AlisasOrbalBow, ECard::AlisasOrbalBow,
-		ECard::JusisSword, ECard::JusisSword,
-		ECard::MachiasOrbalShotgun, ECard::MachiasOrbalShotgun,
-		ECard::GaiusSpear,
+		ECard::ElliotsOrbalStaff, 
+		ECard::AlisasOrbalBow, 
+		ECard::FiesTwinGunswords,
+		ECard::AlisasOrbalBow,
+		ECard::MachiasOrbalShotgun, 
+		ECard::FiesTwinGunswords, 
+		ECard::FiesTwinGunswords,
+		ECard::ElliotsOrbalStaff,
 		ECard::Bolt,
 		ECard::Mirror,
+		ECard::FiesTwinGunswords, 
+		ECard::JusisSword, 
+		ECard::MachiasOrbalShotgun,
+		ECard::JusisSword,
+		ECard::GaiusSpear,
 	};
-
-	B2Utility::ShuffleArray(GeneratedCards.OpponentDeck);
-
-	B2Utility::LogInfo("OPPONENTDECK ---------------------------------");
-	for (size_t i = 0; i < GeneratedCards.OpponentDeck.Num(); i++)
-	{
-		B2Utility::LogInfo(FString::FromInt(static_cast<int32>(GeneratedCards.OpponentDeck[i])));
-	}
 
 	return GeneratedCards;
 }
@@ -850,13 +844,11 @@ void UB2AIServer::HandleTutorial()
 		}
 
 		// Handle the trigger that tells us to switch back to normal mode
-		if (IncomingUpdate.Code == EServerUpdate::InstructionMessage)
+		if (IncomingUpdate.Code == EServerUpdate::InstructionTutorialFinished)
 		{
-			// Set state to post tutorial state
+			AIDifficulty = EAIDifficulty::Intermediate;
 
-			// Switch aidifficulty to zero
-
-			// Send any messages that are required
+			ConfigureInitialState();
 		}
 	}
 }
