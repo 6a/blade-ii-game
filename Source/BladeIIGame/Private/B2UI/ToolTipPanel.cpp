@@ -49,6 +49,10 @@ void UToolTipPanel::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 						bToolTipTextRequiresUpdate = true;
 					}
 				}
+				else
+				{
+					CurrentHoveredCard = nullptr;
+				}
 			}
 		}
 

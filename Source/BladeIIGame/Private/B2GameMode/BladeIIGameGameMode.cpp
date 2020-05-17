@@ -692,12 +692,15 @@ void ABladeIIGameMode::DelayedStart()
 			Dealer->Deal();
 		}
 
-		// Animate the opponent avatar
-		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Greeting, AvatarCaptureRig->GetCurrentCharacterName());
-		AvatarCaptureRig->AnimateMouth();
+		// Animate the opponent avatar (skipped for tutorial)
+		if (!Settings->IsTutorial())
+		{
+			UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Greeting, AvatarCaptureRig->GetCurrentCharacterName());
+			AvatarCaptureRig->AnimateMouth();
+		}
 
 		// Start the BGM track
-		GameSound->PlayBGM(0.2f);
+		GameSound->PlayBGM(0.5f);
 	}
 }
 
@@ -715,8 +718,12 @@ void ABladeIIGameMode::OnCardsDealt()
 
 	EngineState = EEngineState::InPlay;
 
-	UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Draw, AvatarCaptureRig->GetCurrentCharacterName());
-	AvatarCaptureRig->AnimateMouth();
+	// Animate the opponent avatar (skipped for tutorial)
+	if (!Settings->IsTutorial())
+	{
+		UIAvatarLayer->SetOpponentMessage(EOpponentMessage::Draw, AvatarCaptureRig->GetCurrentCharacterName());
+		AvatarCaptureRig->AnimateMouth();
+	}
 }
 
 void ABladeIIGameMode::OnEffectReady()
