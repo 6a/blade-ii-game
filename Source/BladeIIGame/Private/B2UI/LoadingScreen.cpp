@@ -3,7 +3,7 @@
 #include "B2GameMode/BladeIIGameMode.h"
 
 // TODO set to zero for build
-#define FAST_LOAD 1
+#define FAST_LOAD 0
 
 void ULoadingScreen::Initialise(bool bIsVersusAI)
 {

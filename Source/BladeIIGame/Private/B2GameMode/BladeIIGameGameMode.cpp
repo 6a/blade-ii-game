@@ -49,7 +49,7 @@ const FString LOCAL_QUIT_METADATA = TEXT("LOCAL_QUIT");
 const FString TITLE_BAR_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Titlebar'");
 
 // TODO set to zero for build
-#define FAST_DRAW 1
+#define FAST_DRAW 0
 
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 {
@@ -261,12 +261,12 @@ void ABladeIIGameMode::StartPlay()
 
 	SetupUIToolTipPanelLayer();
 
-	SetupUILoadingScreenLayer();
-
 	if (Settings->IsTutorial())
 	{
 		SetupUITutorialLayer();
 	}
+
+	SetupUILoadingScreenLayer();
 
 	SetupUIOptionsMenuLayer();
 
@@ -712,7 +712,7 @@ void ABladeIIGameMode::DelayedStart()
 
 		EngineState = EEngineState::Dealing;
 			
-		if (FAST_DRAW)
+		if (FAST_DRAW || Settings->IsTutorial())
 		{
 			Dealer->FastDeal();
 		}
