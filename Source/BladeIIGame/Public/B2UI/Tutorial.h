@@ -36,6 +36,9 @@ private:
 	const uint8 TEXT_WIDGET_INDEX_JP = 0;
 	const uint8 TEXT_WIDGET_INDEX_EN = 1;
 
+	/* The last phase of the tutorial, after which we hide the tutorial overlay */
+	const uint32 TotalPhases = 22;
+
 	virtual void NativeOnInitialized() override;
 
 	/* Handler for culture change events */

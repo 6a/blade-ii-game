@@ -34,12 +34,12 @@ void UTutorial::SetPhase(uint32 Phase)
 
 	if (ContinuePromptText && IntroBackgroundSwitcher)
 	{
-		if (Phase == 21)
+		if (Phase == TotalPhases)
 		{
 			IntroBackgroundSwitcher->SetVisibility(ESlateVisibility::Hidden);
 			ContinuePromptText->SetVisibility(ESlateVisibility::Hidden);
 		}
-		else if (Phase == 22)
+		else if (Phase > TotalPhases)
 		{
 			SetVisible(false);
 		}
