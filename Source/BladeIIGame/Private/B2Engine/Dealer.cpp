@@ -665,7 +665,7 @@ void UB2Dealer::FastDeal()
 		};
 
 		// Add the transition to the transition queue
-		B2Transition Transition = B2Transition(WG_Final, Position, Rotation, 0.1f, Delay);
+		B2Transition Transition = B2Transition(B2WaitGroupNone, Position, Rotation, 0, Delay);
 		CAG_FastDeal.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
@@ -710,7 +710,37 @@ void UB2Dealer::FastDeal()
 		};
 
 		// Add the transition to the transition queue
-		B2Transition Transition = B2Transition(WG_Final, Position, Rotation, 0.1f, Delay);
+		B2Transition Transition = B2Transition(WG_Final, Position, Rotation, 0, Delay);
+		CAG_FastDeal.Group.Add(FB2CardAnimation{ Card, Transition });
+	}
+
+	// Sort player hand
+	Arena->PlayerHand->SortAscending();
+
+	for (uint32 i = 0; i < Arena->PlayerHand->Num(); i++)
+	{
+		// Grab the card and slap it onto correlating hand slot position
+		ACard* Card = Arena->PlayerHand->GetCardByIndex(i);
+		FB2Transform TargetTransform = Arena->PlayerHand->GetTransformForIndex(i);
+
+		// Transition 1
+		B2TPosition Position
+		{
+			TargetTransform.Position,
+			TargetTransform.Position,
+			FVector::ZeroVector,
+			EEase::Linear,
+		};
+
+		B2TRotation Rotation
+		{
+			TargetTransform.Rotation,
+			TargetTransform.Rotation,
+			EEase::Linear,
+		};
+
+		// Add the transition to the transition queue
+		B2Transition Transition = B2Transition(WG_Final, Position, Rotation, 0, 0);
 		CAG_FastDeal.Group.Add(FB2CardAnimation{ Card, Transition });
 	}
 
