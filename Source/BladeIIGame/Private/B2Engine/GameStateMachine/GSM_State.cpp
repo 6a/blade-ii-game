@@ -27,6 +27,9 @@ void GSM_State::Tick(float DeltaSeconds)
 				if (!bTimedOut)
 				{
 					bTimedOut = true;
+
+					GI->GetCursor()->ToggleActorVisibility(false);
+
 					GI->EndGame(EPlayer::Opponent, EWinCondition::TimeOut);
 				}
 
