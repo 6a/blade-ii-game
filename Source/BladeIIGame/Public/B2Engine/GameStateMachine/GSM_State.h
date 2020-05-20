@@ -26,7 +26,7 @@ protected:
 	const FVector ARC_ON_DRAW_FROM_DECK = FVector(0, 0, 12);
 
 	/* The maximum amount of time a turn can take (for bot games only - networked games are handled by the server */
-	const float MAX_TURN_TIME_AI_GAME = 21000.f;
+	const float MAX_TURN_TIME_AI_GAME = 21.f;
 
 	/* Whether or not this state is timed. If true, and its an AI game, running out of time will trigger a loss (used for AI games only) */
 	bool bIsTimed;
