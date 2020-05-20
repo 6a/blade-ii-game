@@ -8,14 +8,14 @@ void UStatusIndicator::SetState(State NewState, bool bResetTime)
 
 	CurrentState = NewState;
 
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		CountdownStartTime = World->GetRealTimeSeconds();
-	}
-
 	if (bResetTime)
 	{
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			CountdownStartTime = World->GetRealTimeSeconds();
+		}
+
 		WaitingAnimationTimer = 0;
 		WaitingAnimationPhase = 0;
 	}

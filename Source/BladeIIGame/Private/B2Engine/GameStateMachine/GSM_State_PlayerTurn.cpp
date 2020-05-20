@@ -125,14 +125,14 @@ void GSM_State_PlayerTurn::Tick(float DeltaSeconds)
 				else
 				{
 					GI->GetGameState()->MostRecentBlastCardID = Card->GetID();
+
+					GI->GetGameState()->BlastTurnEndTime = TurnEndTime;
 				}
 
 				// Play card selection sound effect
 				GI->GetGameSound()->PlaySFX(ESFX::CursorSelect);
 
 				GI->GetGameState()->bAcceptPlayerInput = false;
-
-				GI->GetUIStatusIndicatorLayer()->SetState(UStatusIndicator::State::Waiting);
 
 				break;
 			}

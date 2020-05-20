@@ -38,5 +38,8 @@ struct B2GameState
 
 	// Whether or not we game state processing state needs to handle the edge case for post-blast select states
 	bool bHandleBlastEdgeCase;
+
+	// Timer carry-over for the separate blast states. Set to -1 to ignore.
+	float BlastTurnEndTime;
 };
 

@@ -185,7 +185,16 @@ void GSM_State::SetIsTimed()
 
 	if (GI->GetSettings()->IsVersusAI())
 	{
-		TurnEndTime = GI->GetWorld()->GetRealTimeSeconds() + MAX_TURN_TIME_AI_GAME;
+		if (GI->GetGameState()->BlastTurnEndTime > 0)
+		{
+			TurnEndTime = GI->GetGameState()->BlastTurnEndTime;
+			GI->GetGameState()->BlastTurnEndTime = -1;
+		}
+		else
+		{
+			TurnEndTime = GI->GetWorld()->GetRealTimeSeconds() + MAX_TURN_TIME_AI_GAME;
+		}
+
 		bIsTimed = true;
 		bTimedOut = false;
 	}

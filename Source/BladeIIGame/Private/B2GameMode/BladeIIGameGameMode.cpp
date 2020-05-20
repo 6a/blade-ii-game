@@ -1201,6 +1201,7 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 	case EDealerEvent::CardPositionUpdateFinished:
 		if (GSM->IsCurrentState(EGameState::PlayerBlastTarget) || GSM->IsCurrentState(EGameState::OpponentBlastTarget))
 		{
+			bCardPositionUpdateReceived = true;
 			GameState->bHandleBlastEdgeCase = true;
 		}
 
