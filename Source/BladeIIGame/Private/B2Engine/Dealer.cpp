@@ -1521,7 +1521,7 @@ void UB2Dealer::RevealOpponentsHand() const
 		// Transition 1
 		B2TPosition Position
 		{
-			TargetTransform.Position,
+			Card->GetActorLocation(),
 			TargetTransform.Position,
 			CARD_REVEAL_ARC * FVector(-1, -0.5f, 1),
 			EEase::EaseIn,
@@ -1529,7 +1529,7 @@ void UB2Dealer::RevealOpponentsHand() const
 
 		B2TRotation Rotation
 		{
-			TargetTransform.Rotation,
+			Card->GetActorRotation(),
 			TargetTransform.Rotation + FRotator(179.98f, 0, 0), // 180 causes the cards to rotate the wrong way
 			EEase::EaseInOut,
 		};
