@@ -189,4 +189,5 @@ private:
 	FB2Cards PlayerFirstTest() const;
 	FB2Cards AIFirstTest() const;
 	FB2Cards AllRandomTest() const;
+	FB2Cards MirrorBoltTest() const;
 };

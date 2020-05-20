@@ -245,6 +245,9 @@ private:
 	const float CONNECTION_PROGRESS_TARGET = 5;
 	const float MATCH_PREP_PROGRESS_TARGET = 3;
 
+	// For determining whether it is safe to end the turn or not
+	bool bCardPositionUpdateReceived;
+
 	/**
 	 * Reads the launch config and sets up the engine accordingly.
 	 * @param ObjectInitializer - ObjectInitializer helper from constructor

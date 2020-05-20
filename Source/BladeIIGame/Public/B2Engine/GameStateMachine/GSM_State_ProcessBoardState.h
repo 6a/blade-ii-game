@@ -9,6 +9,13 @@
 class GSM_State_ProcessBoardState : public GSM_State
 {
 public:
+	enum class EActivePlayer : uint8
+	{
+		Target,
+		Opponent,
+		Undecided,
+	};
+
 	GSM_State_ProcessBoardState();
 
 	virtual void Init(class ABladeIIGameMode* GameMode) override;
@@ -35,7 +42,7 @@ private:
 	 * @param OppositePlayerDeckCount - The number of cards in the deck slot of the opposing player
 	 * @returns Either the win condition achieved, or EWinCondition::None if the target did not win
 	 */
-	EWinCondition CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& TargetHand, const TArray<ECard>& TargetField, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, bool bIsOppositePlayersTurn) const;
+	EWinCondition CheckIfTargetWon(uint32 TargetScore, uint32 OppositePlayerScore, const TArray<ECard>& TargetHand, const TArray<ECard>& TargetField, const TArray<ECard>& OppositePlayerHand, const TArray<ECard>& OppositePlayerField, uint32 OppositePlayerDeckCount, EActivePlayer ActivePlayer) const;
 
 	bool GameDrawn(class AArena* Arena, uint32 LocalPlayerScore, uint32 OpponentScore) const;
 };

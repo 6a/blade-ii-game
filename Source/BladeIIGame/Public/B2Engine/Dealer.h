@@ -98,8 +98,9 @@ public:
 	/**
 	 * Moves all the cards in the specified player's hand to their correct location - use after removing a card from the hand
 	 * @param Target - The player whos hand will updated
+	 * @param bFireEventOnCompletion - Whether or not to fire the hand update finished event when the transition is complete
 	 */
-	void UpdateHandPositions(EPlayer Target);
+	void UpdateHandPositions(EPlayer Target, bool bFireEventOnCompletion = true);
 
 	/**
 	 * Clears the specified card off of the field

@@ -860,6 +860,7 @@ void UB2Dealer::Mirror()
 	{
 		ACard* Card = PlayerField[i];
 		FB2Transform TargetTransform = Arena->OpponentField->GetTransformForIndex(i);
+		FRotator TargetRotation = Card->IsActive() ? TargetTransform.Rotation : Card->GetActorRotation() + FRotator(0, -179.98f, 0);
 
 		B2TPosition Position
 		{
@@ -872,7 +873,7 @@ void UB2Dealer::Mirror()
 		B2TRotation Rotation
 		{
 			Card->GetActorRotation(),
-			TargetTransform.Rotation,
+			TargetRotation,
 			EEase::EaseInOut,
 		};
 
@@ -885,6 +886,7 @@ void UB2Dealer::Mirror()
 	{
 		ACard* Card = OpponentField[i];
 		FB2Transform TargetTransform = Arena->PlayerField->GetTransformForIndex(i);
+		FRotator TargetRotation = Card->IsActive() ? TargetTransform.Rotation : Card->GetActorRotation() + FRotator(0, 179.98f, 0);
 
 		B2TPosition Position
 		{
@@ -897,7 +899,7 @@ void UB2Dealer::Mirror()
 		B2TRotation Rotation
 		{
 			Card->GetActorRotation(),
-			TargetTransform.Rotation,
+			TargetRotation,
 			EEase::EaseInOut,
 		};
 
@@ -1316,18 +1318,23 @@ void UB2Dealer::ForceIn(ACard* Card)
 	CardAnimator->InsertIntoLatestGroup(CAG_ForceIn);
 }
 
-void UB2Dealer::UpdateHandPositions(EPlayer Target)
+void UB2Dealer::UpdateHandPositions(EPlayer Target, bool FireEventOnCompletion)
 {
 	const float DelayOnStart = 0.1f;
 	const float TransitionDuration = 0.35f;
 
 	UCardSlot* TargetSlot = Target == EPlayer::Player ? Arena->PlayerHand : Arena->OpponentHand;
 
-	// Early exit if the slot is empty
-	if (TargetSlot->Num() <= 0) return;
+	// Early exit if the slot is empty, while setting the wait group to the current one (so that it triggers the
+	// handler on the gamemode)
+	if (TargetSlot->Num() <= 0)
+	{
+		WaitGroupHandPositionUpdateFinished = B2Transition::GetCurrentWaitGroup();
+		return;
+	}
 
 	B2WaitGroup WaitGroup = B2Transition::GetNextWaitGroup();
-	WaitGroupHandPositionUpdateFinished = WaitGroup + 1;
+	WaitGroupHandPositionUpdateFinished = FireEventOnCompletion ? WaitGroup + 1 : B2WaitGroupNone;
 	FB2CardAnimationGroup CAG_UpdateHand;
 
 	for (size_t i = 0; i < TargetSlot->Num(); i++)
@@ -1523,7 +1530,7 @@ void UB2Dealer::RevealOpponentsHand() const
 		B2TRotation Rotation
 		{
 			TargetTransform.Rotation,
-			TargetTransform.Rotation + FRotator(179.9f, 0, 0), // 180 causes the cards to rotate the wrong way
+			TargetTransform.Rotation + FRotator(179.98f, 0, 0), // 180 causes the cards to rotate the wrong way
 			EEase::EaseInOut,
 		};
 

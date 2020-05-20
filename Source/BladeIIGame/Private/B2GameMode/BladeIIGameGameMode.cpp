@@ -49,7 +49,7 @@ const FString LOCAL_QUIT_METADATA = TEXT("LOCAL_QUIT");
 const FString TITLE_BAR_WIDGET_PATH = TEXT("WidgetBlueprint'/Game/BladeIIGame/Blueprints/UI/BP_Titlebar'");
 
 // TODO set to zero for build
-#define FAST_DRAW 0
+#define FAST_DRAW 1
 
 ABladeIIGameMode::ABladeIIGameMode(const FObjectInitializer& ObjectInitializer)
 {
@@ -106,12 +106,21 @@ void ABladeIIGameMode::Tick(float DeltaSeconds)
 
 void ABladeIIGameMode::EndState()
 {
-	UpdateCardState();
+	if (bCardPositionUpdateReceived)
+	{
+		UpdateCardState();
 
-	B2Utility::LogInfo(FString::Printf(TEXT("[%d] state ended"), GSM->GetCurrentState()));
+		B2Utility::LogInfo(FString::Printf(TEXT("[%d] state ended"), GSM->GetCurrentState()));
 
-	// Switch to the turn switching state
-	GSM->ChangeState<GSM_State_ProcessBoardState>();
+		// Switch to the turn switching state
+		GSM->ChangeState<GSM_State_ProcessBoardState>();
+
+		bCardPositionUpdateReceived = false;
+	}
+	else
+	{
+		bCardPositionUpdateReceived = true;
+	}
 }
 
 void ABladeIIGameMode::EndGame(EPlayer Victor, EWinCondition WinCondition)
@@ -236,6 +245,7 @@ void ABladeIIGameMode::StartPlay()
 	bOtherDelayedStartComponentReady = false;
 	ConnectionProgress = 0;
 	MatchPrepProgress = 0;
+	bCardPositionUpdateReceived = false;
 
 	Settings->ApplyAll();
 
@@ -868,6 +878,7 @@ void ABladeIIGameMode::OnEffectReady()
 
 void ABladeIIGameMode::OnCardPlaced()
 {
+	bCardPositionUpdateReceived = true;
 	EndState();
 }
 
@@ -1188,13 +1199,12 @@ void ABladeIIGameMode::HandleDealerEvent(EDealerEvent Event)
 		OnEffectReady();
 		break;
 	case EDealerEvent::CardPositionUpdateFinished:
-		// Handling card position updates for blast only
-
 		if (GSM->IsCurrentState(EGameState::PlayerBlastTarget) || GSM->IsCurrentState(EGameState::OpponentBlastTarget))
 		{
 			GameState->bHandleBlastEdgeCase = true;
-			EndState();
 		}
+
+		EndState();
 
 		break;
 	}

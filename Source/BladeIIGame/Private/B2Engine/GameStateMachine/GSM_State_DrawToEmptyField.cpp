@@ -203,7 +203,7 @@ void GSM_State_DrawToEmptyField::Tick(float DeltaSeconds)
 			}
 
 			// Update the card positions in the hand as we have just removed cards from each hand
-			GI->GetDealer()->UpdateHandPositions(EPlayer::Player);
+			GI->GetDealer()->UpdateHandPositions(EPlayer::Player, false);
 			GI->GetDealer()->UpdateHandPositions(EPlayer::Opponent);
 
 			bIsWaitingForOpponentDrawFromHand = false;

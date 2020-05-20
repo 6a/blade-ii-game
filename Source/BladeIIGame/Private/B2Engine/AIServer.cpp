@@ -342,9 +342,9 @@ bool UB2AIServer::GetNextMove(ECard& OutCard)
 	TArray<ECard> ValidCards;
 	uint32 ScoreDifference = PlayerScore - AIScore;
 
-	// Edge case - if there is only 1 card left in the hand, treat it as valid
-	// Due to being filtered out in the previous turn, it should be impossible for this to be an effect card
-	if (Cards.OpponentHand.Num() == 1)
+	// Edge case - if there is only 1 card left in the hand, treat it as valid (as long as its not an effect card, as 
+	// playing an effect card as your last is illegal)
+	if (Cards.OpponentHand.Num() == 1 && Cards.OpponentHand.Last() < ECard::Force)
 	{
 		ValidCards.Add(Cards.OpponentHand.Last());
 	}
@@ -352,91 +352,85 @@ bool UB2AIServer::GetNextMove(ECard& OutCard)
 	{
 		for (ECard Card : Cards.OpponentHand)
 		{
-			TArray<ECard> HandWithoutCurrentCard = Cards.OpponentHand.FilterByPredicate(B2Predicate_FilterFirstOfType(Card));
-
-			// Check if removing this card would NOT leave us with only effect cards (auto lose)
-			if (HandWithoutCurrentCard.ContainsByPredicate(B2Predicate_IsNotEffectCard()))
+			// Check if this card has a high enough value to overcome the current score difference
+			if (ACard::TypeToValue(Card) >= ScoreDifference)
 			{
-				// Check if this card has a high enough value to overcome the current score difference
-				if (ACard::TypeToValue(Card) >= ScoreDifference)
+				// If so, its valid to play this card
+				ValidCards.Add(Card);
+				continue;
+			}
+
+			// Check if this card can not overcome the score difference, but...
+			if (ACard::TypeToValue(Card) < ScoreDifference)
+			{
+				// Its a rod card
+				if (Card == ECard::ElliotsOrbalStaff)
 				{
-					// If so, its valid to play this card
-					ValidCards.Add(Card);
-					continue;
+					// We have a card on the field that can be resurrected
+					if (IsBolted(Cards.OpponentField.Last()))
+					{
+						// The card to resurrect has a high enough score to match or beat the other score
+						if (GetBoltedCardRealValue(Cards.OpponentField.Last()) >= ScoreDifference)
+						{
+							// If so, its valid to play this card
+							ValidCards.Add(Card);
+							continue;
+						}
+					}
 				}
 
-				// Check if this card can not overcome the score difference, but...
-				if (ACard::TypeToValue(Card) < ScoreDifference)
+				// This is a bolt card
+				if (Card == ECard::Bolt)
 				{
-					// Its a rod card
-					if (Card == ECard::ElliotsOrbalStaff)
+					// The player has at least one card on their field, which is not already bolted/disabled
+					if (Cards.PlayerField.Num() > 0 && !IsBolted(Cards.PlayerField.Last()))
 					{
-						// We have a card on the field that can be resurrected
-						if (IsBolted(Cards.OpponentField.Last()))
-						{
-							// The card to resurrect has a high enough score to match or beat the other score
-							if (GetBoltedCardRealValue(Cards.OpponentField.Last()) >= ScoreDifference)
-							{
-								// If so, its valid to play this card
-								ValidCards.Add(Card);
-								continue;
-							}
-						}
-					}
-
-					// This is a bolt card
-					if (Card == ECard::Bolt)
-					{
-						// The player has at least one card on their field, which is not already bolted/disabled
-						if (Cards.PlayerField.Num() > 0 && !IsBolted(Cards.PlayerField.Last()))
-						{
-							// If the players score will be lower or equal to our score after bolting
-							TArray<ECard> PlayerFieldBolted = Cards.PlayerField;
-							Bolt(PlayerFieldBolted);
-							uint32 PostBoltPlayerScore = CalculateScore(PlayerFieldBolted);
-							if (AIScore >= PostBoltPlayerScore)
-							{
-								// If so, its valid to play this card
-								ValidCards.Add(Card);
-								continue;
-							}
-						}
-					}
-
-					// This is a mirror card
-					if (Card == ECard::Mirror)
-					{
-						// If fliping the field will either improve or match the opponents current score
-						if (PlayerScore >= AIScore)
+						// If the players score will be lower or equal to our score after bolting
+						TArray<ECard> PlayerFieldBolted = Cards.PlayerField;
+						Bolt(PlayerFieldBolted);
+						uint32 PostBoltPlayerScore = CalculateScore(PlayerFieldBolted);
+						if (AIScore >= PostBoltPlayerScore)
 						{
 							// If so, its valid to play this card
 							ValidCards.Add(Card);
 							continue;
 						}
 					}
+				}
 
-					// This is a blast card
-					if (Card == ECard::Blast)
+				// This is a mirror card
+				if (Card == ECard::Mirror)
+				{
+					// If fliping the field will either improve or match the opponents current score
+					if (PlayerScore >= AIScore)
 					{
-						// If the player has at least one card in their hand
-						if (Cards.PlayerHand.Num() > 0)
-						{
-							// If so, its valid to play this card
-							ValidCards.Add(Card);
-							continue;
-						}
+						// If so, its valid to play this card
+						ValidCards.Add(Card);
+						continue;
 					}
+				}
 
-					// This is a force card
-					if (Card == ECard::Force)
+				// This is a blast card
+				if (Card == ECard::Blast)
+				{
+					// If the player has at least one card in their hand
+					if (Cards.PlayerHand.Num() > 0)
 					{
-						// If we played this force card, the resulting score would be high enough to match or beat the other score
-						if (AIScore * 2 >= PlayerScore)
-						{
-							// If so, its valid to play this card
-							ValidCards.Add(Card);
-							continue;
-						}
+						// If so, its valid to play this card
+						ValidCards.Add(Card);
+						continue;
+					}
+				}
+
+				// This is a force card
+				if (Card == ECard::Force)
+				{
+					// If we played this force card, the resulting score would be high enough to match or beat the other score
+					if (AIScore * 2 >= PlayerScore)
+					{
+						// If so, its valid to play this card
+						ValidCards.Add(Card);
+						continue;
 					}
 				}
 			}
@@ -795,35 +789,28 @@ bool UB2AIServer::ValidFirstMoveAvailable(const TArray<ECard>& CardSet, ECard Ca
 	// This implementation is greedy but it should be fine - TODO see if this is causing a spike
 	for (size_t i = 0; i < CardSet.Num(); i++)
 	{
-		TArray<ECard> CardsWithoutCurrent(CardSet);
-		CardsWithoutCurrent.RemoveAt(i);
-
-		// If there is at least one non effect card left if the current card is played
-		if (CardsWithoutCurrent.ContainsByPredicate<B2Predicate_IsNotEffectCard>(B2Predicate_IsNotEffectCard()))
+		// Blast are always invalid as they dont change the score
+		if (CardSet[i] != ECard::Blast)
 		{
-			// Blast are always invalid as they dont change the score
-			if (CardSet[i] != ECard::Blast)
+			// If the new score beats or matches the target score, its valid
+			if (CurrentScore + ACard::TypeToValue(CardSet[i]) >= ACard::TypeToValue(CardToBeatOrMatch))
 			{
-				// If the new score beats or matches the target score, its valid
-				if (CurrentScore + ACard::TypeToValue(CardSet[i]) >= ACard::TypeToValue(CardToBeatOrMatch))
+				return true;
+			}
+
+			// If the card is a force card and playing it would beat or match the target score, its valid
+			if (CardSet[i] == ECard::Force)
+			{
+				if (CurrentScore * 2 >= ACard::TypeToValue(CardToBeatOrMatch))
 				{
 					return true;
 				}
+			}
 
-				// If the card is a force card and playing it would beat or match the target score, its valid
-				if (CardSet[i] == ECard::Force)
-				{
-					if (CurrentScore * 2 >= ACard::TypeToValue(CardToBeatOrMatch))
-					{
-						return true;
-					}
-				}
-
-				// Bolts and mirrors are always valid to play from this position
-				if (CardSet[i] == ECard::Bolt || CardSet[i] == ECard::Mirror)
-				{
-					return true;
-				}
+			// Bolts and mirrors are always valid to play from this position
+			if (CardSet[i] == ECard::Bolt || CardSet[i] == ECard::Mirror)
+			{
+				return true;
 			}
 		}
 	}
@@ -1059,4 +1046,17 @@ FB2Cards UB2AIServer::AllRandomTest() const
 	}
 
 	return GeneratedCards;
+}
+
+FB2Cards UB2AIServer::MirrorBoltTest() const
+{
+	FB2Cards GeneratedCards;
+
+	for (int i = 14; i >= 0; i--)
+	{
+		GeneratedCards.PlayerDeck.Add(FMath::RandBool() ? ECard::Mirror : static_cast<ECard>(FMath::RandRange(0, 6)));
+		GeneratedCards.OpponentDeck.Add(FMath::RandBool() ? ECard::Bolt : static_cast<ECard>(FMath::RandRange(1, 6)));
+	}
+
+	return GeneratedCards;	
 }

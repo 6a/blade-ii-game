@@ -147,7 +147,7 @@ public:
 	/* Updates the internal container so that the cards are in the right order */
 	virtual void UpdateCardOrder();
 
-	/* Returns a string representation of this slot (namely the cards it contains */
+	/* Returns a string representation of this slot (namely the cards it contains) */
 	virtual FString Stringify() const;
 
 	/* Set this instance's slot type */
