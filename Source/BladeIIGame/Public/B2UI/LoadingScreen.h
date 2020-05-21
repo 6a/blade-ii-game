@@ -52,7 +52,6 @@ private:
 	const TCHAR CHAR_BLANK = L' ';
 
 	/* For output text */
-	const FString TEXT_VERSION_PREFIX = "Initialising Blade II V";
 	const FString TEXT_CONNECTING = "Connecting to Server";
 	const FString TEXT_PREPARING_MATCH = "Preparing Match";
 	const FString TEXT_STARTING_MATCH = "Starting Match";

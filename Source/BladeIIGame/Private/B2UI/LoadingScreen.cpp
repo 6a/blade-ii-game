@@ -9,8 +9,6 @@ void ULoadingScreen::Initialise(bool bIsVersusAI)
 {
 	GameModeInstance = Cast<ABladeIIGameMode>(GetWorld()->GetAuthGameMode());
 
-	VersionText->SetText(FText::FromString(FString(TEXT_VERSION_PREFIX).Append(GameModeInstance->GetSettings()->GetStringSetting(EStringSetting::Version))));
-
 	TextConnecting->SetText(FText::FromString(AddLoadingBar(TEXT_CONNECTING, 0)));
 	TextPreparingMatch->SetText(FText());
 	TextStartingMatch->SetText(FText());
