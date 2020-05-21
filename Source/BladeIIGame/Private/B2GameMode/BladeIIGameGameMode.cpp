@@ -878,7 +878,11 @@ void ABladeIIGameMode::OnEffectReady()
 
 void ABladeIIGameMode::OnCardPlaced()
 {
-	bCardPositionUpdateReceived = true;
+	if (GSM->IsCurrentState(EGameState::DrawToEmptyField))
+	{
+		bCardPositionUpdateReceived = true;
+	}
+
 	EndState();
 }
 
@@ -1098,6 +1102,12 @@ void ABladeIIGameMode::HandleCardsReceived(const FB2Cards& Cards)
 
 void ABladeIIGameMode::HandleServerInstruction(const FB2ServerUpdate& Instruction)
 {
+	// Early exit if the game is already finished
+	if (EngineState == EEngineState::PostGame)
+	{
+		return;
+	}
+
 	// Handle errors first
 	if (Instruction.Code >= EServerUpdate::InstructionConnectionError)
 	{
