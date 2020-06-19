@@ -2,6 +2,8 @@
 
 Developed using Unreal Engine 4.
 
+多少のバイナリーアセットは著作権に守らて公開できないし、LFSは有料ですので、全てのバイナリーアセットを削除しました。
+
 ## Asset credits:
 
 - **Card shuffling sound:** https://freesound.org/people/tymaue/sounds/79617/
