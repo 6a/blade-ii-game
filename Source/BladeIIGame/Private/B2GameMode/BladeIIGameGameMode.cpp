@@ -1050,6 +1050,8 @@ void ABladeIIGameMode::EndTutorial()
 {
 	Settings->TutorialFinished();
 
+	bCardPositionUpdateReceived = true;
+
 	Opponent->SendUpdate(EServerUpdate::InstructionTutorialFinished);
 }
 
